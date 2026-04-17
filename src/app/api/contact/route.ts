@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod/v4";
 import { prisma } from "@/lib/prisma";
 import { resend } from "@/lib/resend";
+import { rateLimit } from "@/lib/rate-limit";
+import { escapeHtml } from "@/lib/utils";
 
 import type { ApiResponse } from "@/types";
 
@@ -16,6 +18,9 @@ const contactSchema = z.object({
 export async function POST(
   request: Request,
 ): Promise<NextResponse<ApiResponse>> {
+  const limited = rateLimit(request, { maxRequests: 5, windowMs: 60_000 });
+  if (limited) return limited;
+
   try {
     const body: unknown = await request.json();
     const result = contactSchema.safeParse(body);
@@ -54,21 +59,21 @@ export async function POST(
     await resend?.emails.send({
       from: "Ithaca Family Academy <noreply@ithacateens.com>",
       to: "ithacafo@ithacafo.com",
-      subject: `New Contact Form Submission from ${name}`,
+      subject: `New Contact Form Submission from ${escapeHtml(name)}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #1b1b1b;">New Contact Form Submission</h2>
           <table style="width: 100%; border-collapse: collapse;">
             <tr>
               <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Name</td>
-              <td style="padding: 8px; border-bottom: 1px solid #eee;">${name}</td>
+              <td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(name)}</td>
             </tr>
             <tr>
               <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Email</td>
-              <td style="padding: 8px; border-bottom: 1px solid #eee;">${email}</td>
+              <td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(email)}</td>
             </tr>
-            ${phone ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Phone</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${phone}</td></tr>` : ""}
-            ${message ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Message</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${message}</td></tr>` : ""}
+            ${phone ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Phone</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(phone)}</td></tr>` : ""}
+            ${message ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Message</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(message)}</td></tr>` : ""}
             <tr>
               <td style="padding: 8px; font-weight: bold;">Subscribe</td>
               <td style="padding: 8px;">${subscribe ? "Yes" : "No"}</td>

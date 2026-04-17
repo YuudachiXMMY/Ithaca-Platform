@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod/v4";
 import { prisma } from "@/lib/prisma";
 import { resend } from "@/lib/resend";
+import { rateLimit } from "@/lib/rate-limit";
+import { escapeHtml } from "@/lib/utils";
 
 import type { ApiResponse } from "@/types";
 
@@ -13,6 +15,9 @@ const subscribeSchema = z.object({
 export async function POST(
   request: Request,
 ): Promise<NextResponse<ApiResponse>> {
+  const limited = rateLimit(request, { maxRequests: 10, windowMs: 60_000 });
+  if (limited) return limited;
+
   try {
     const body: unknown = await request.json();
     const result = subscribeSchema.safeParse(body);
@@ -55,7 +60,7 @@ export async function POST(
       subject: "Welcome to Ithaca Family Academy!",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #1b1b1b;">Welcome${name ? `, ${name}` : ""}!</h1>
+          <h1 style="color: #1b1b1b;">Welcome${name ? `, ${escapeHtml(name)}` : ""}!</h1>
           <p>Thank you for subscribing to Ithaca Family Academy. We're excited to have you join our community.</p>
           <p>You'll receive updates about our programs, events, and opportunities for youth education in AI and engineering.</p>
           <hr style="border: 1px solid #eee; margin: 24px 0;" />

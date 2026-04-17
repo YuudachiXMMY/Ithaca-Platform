@@ -1,0 +1,240 @@
+{
+  "timestamp": "2026-04-17T18:19:39Z",
+  "project": "ithaca-fa-web",
+  "version": "0.1.0",
+  "description": "Ithaca Family Academy official website - Next.js 16 + Prisma + Resend full-stack app",
+  "scan": {
+    "phase": "full",
+    "truncated": false,
+    "totalFilesEstimated": 61,
+    "totalFilesScanned": 61,
+    "coveragePercent": 100,
+    "ignoreRules": [
+      "node_modules/**",
+      ".git/**",
+      ".next/**",
+      ".playwright-mcp/**",
+      "dist/**",
+      "build/**",
+      "out/**",
+      "*.lock",
+      "*.log",
+      "*.bin",
+      "*.pem",
+      "*.tsbuildinfo",
+      ".DS_Store",
+      ".env*",
+      ".vercel"
+    ],
+    "ignoredStats": {
+      "node_modules": "~800+ packages",
+      ".next": "build output",
+      "public/media": "29 images + 4 videos (binary, paths recorded only)"
+    }
+  },
+  "modules": [
+    {
+      "path": "src/app",
+      "language": "TypeScript/TSX",
+      "purpose": "Next.js App Router pages and API routes",
+      "entry": "src/app/layout.tsx",
+      "interfaces": [
+        "src/app/api/subscribe/route.ts",
+        "src/app/api/contact/route.ts",
+        "src/app/api/auth/[...nextauth]/route.ts",
+        "src/app/api/admin/subscribers/route.ts",
+        "src/app/api/admin/emails/route.ts",
+        "src/app/api/admin/emails/send/route.ts",
+        "src/app/api/admin/popups/route.ts",
+        "src/app/api/admin/popups/active/route.ts"
+      ],
+      "pages": [
+        "src/app/page.tsx",
+        "src/app/about-us/page.tsx",
+        "src/app/contact-us/page.tsx",
+        "src/app/programs/page.tsx",
+        "src/app/programs/ev-challenge/page.tsx",
+        "src/app/programs/ai-entrepreneurship-camp/page.tsx",
+        "src/app/programs/engineering-projects/page.tsx",
+        "src/app/programs/ai-pioneers-interview/page.tsx",
+        "src/app/programs/summer-winter-camps/page.tsx",
+        "src/app/programs/ithaca-night/page.tsx",
+        "src/app/admin/page.tsx",
+        "src/app/admin/login/page.tsx",
+        "src/app/admin/subscribers/page.tsx",
+        "src/app/admin/emails/page.tsx",
+        "src/app/admin/popups/page.tsx"
+      ],
+      "tests": [],
+      "config": [
+        "src/middleware.ts"
+      ],
+      "coverage": {
+        "entry": true,
+        "interfaces": true,
+        "tests": false,
+        "dataModel": true
+      },
+      "gaps": [
+        "No test files exist"
+      ]
+    },
+    {
+      "path": "src/components",
+      "language": "TypeScript/TSX",
+      "purpose": "Reusable React UI components",
+      "entry": null,
+      "importantFiles": [
+        "src/components/layout/Header.tsx",
+        "src/components/layout/Footer.tsx",
+        "src/components/shared/PopupBanner.tsx",
+        "src/components/shared/NewsletterForm.tsx",
+        "src/components/contact/ContactForm.tsx",
+        "src/components/ui/Button.tsx",
+        "src/components/ui/SectionHeading.tsx",
+        "src/components/home/HeroSection.tsx",
+        "src/components/home/MissionSection.tsx",
+        "src/components/home/ProgramsShowcase.tsx",
+        "src/components/home/FeaturedSection.tsx",
+        "src/components/home/StudentHighlights.tsx",
+        "src/components/home/ContactSection.tsx",
+        "src/components/animations/FadeIn.tsx",
+        "src/components/animations/StaggerContainer.tsx",
+        "src/components/animations/StaggerItem.tsx",
+        "src/components/programs/PlaceholderProgram.tsx"
+      ],
+      "tests": [],
+      "coverage": {
+        "entry": true,
+        "interfaces": true,
+        "tests": false,
+        "dataModel": "N/A"
+      },
+      "gaps": [
+        "No test files exist"
+      ]
+    },
+    {
+      "path": "src/lib",
+      "language": "TypeScript",
+      "purpose": "Shared utilities: Prisma client, auth config, Resend wrapper, CSS helper",
+      "importantFiles": [
+        "src/lib/prisma.ts",
+        "src/lib/auth.ts",
+        "src/lib/resend.ts",
+        "src/lib/utils.ts"
+      ],
+      "tests": [],
+      "coverage": {
+        "entry": true,
+        "interfaces": true,
+        "tests": false,
+        "dataModel": true
+      },
+      "gaps": [
+        "No test files exist"
+      ]
+    },
+    {
+      "path": "src/types",
+      "language": "TypeScript",
+      "purpose": "Shared interfaces (ApiResponse, NavItem, TeamMember) and constants (NAV_ITEMS, TEAM_MEMBERS, CONTACT_INFO)",
+      "importantFiles": [
+        "src/types/index.ts"
+      ],
+      "tests": [],
+      "coverage": {
+        "entry": true,
+        "interfaces": true,
+        "tests": false,
+        "dataModel": true
+      },
+      "gaps": []
+    },
+    {
+      "path": "prisma",
+      "language": "Prisma/TypeScript",
+      "purpose": "Database schema (5 models) and admin seed script",
+      "importantFiles": [
+        "prisma/schema.prisma",
+        "prisma/seed.ts"
+      ],
+      "tests": [],
+      "coverage": {
+        "entry": true,
+        "interfaces": true,
+        "tests": false,
+        "dataModel": true
+      },
+      "gaps": [
+        "No migration files (using db push)",
+        "No test files exist"
+      ]
+    },
+    {
+      "path": "scripts",
+      "language": "Bash",
+      "purpose": "Local dev launcher: Docker Postgres + schema sync + seed + dev server",
+      "importantFiles": [
+        "scripts/dev.sh"
+      ],
+      "tests": [],
+      "coverage": {
+        "entry": true,
+        "interfaces": "N/A",
+        "tests": false,
+        "dataModel": "N/A"
+      },
+      "gaps": []
+    }
+  ],
+  "techStack": {
+    "runtime": "Node.js 20",
+    "framework": "Next.js 16 (App Router, standalone output)",
+    "language": "TypeScript 5 (strict)",
+    "styling": "Tailwind CSS v4",
+    "database": "PostgreSQL 16",
+    "orm": "Prisma 6.19",
+    "auth": "next-auth 4 (Credentials + JWT)",
+    "email": "Resend 6",
+    "validation": "Zod v4",
+    "forms": "react-hook-form 7 + @hookform/resolvers",
+    "animations": "framer-motion 12",
+    "icons": "lucide-react",
+    "containerization": "Docker (multi-stage Dockerfile)"
+  },
+  "dataModels": [
+    "Subscriber",
+    "ContactMessage",
+    "AdminUser",
+    "EmailCampaign",
+    "Popup"
+  ],
+  "apiEndpoints": [
+    { "method": "POST", "path": "/api/subscribe", "auth": false },
+    { "method": "POST", "path": "/api/contact", "auth": false },
+    { "method": "GET|POST", "path": "/api/auth/[...nextauth]", "auth": false },
+    { "method": "GET", "path": "/api/admin/subscribers", "auth": true },
+    { "method": "DELETE", "path": "/api/admin/subscribers", "auth": true },
+    { "method": "GET", "path": "/api/admin/emails", "auth": true },
+    { "method": "POST", "path": "/api/admin/emails", "auth": true },
+    { "method": "POST", "path": "/api/admin/emails/send", "auth": true },
+    { "method": "GET", "path": "/api/admin/popups", "auth": true },
+    { "method": "POST", "path": "/api/admin/popups", "auth": true },
+    { "method": "PUT", "path": "/api/admin/popups", "auth": true },
+    { "method": "DELETE", "path": "/api/admin/popups", "auth": true },
+    { "method": "GET", "path": "/api/admin/popups/active", "auth": false }
+  ],
+  "gapSummary": {
+    "critical": [
+      "No test suite of any kind (unit, integration, or E2E)"
+    ],
+    "recommended": [
+      "Add Prisma migrations instead of db push for production safety",
+      "Add rate limiting on public API routes (/api/subscribe, /api/contact)",
+      "Add CSRF protection for form submissions",
+      "Add input sanitization for HTML content in email campaigns and popups"
+    ]
+  },
+  "nextScanSuggestions": []
+}
