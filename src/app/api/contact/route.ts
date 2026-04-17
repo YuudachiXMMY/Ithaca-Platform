@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod/v4";
 import { prisma } from "@/lib/prisma";
 import { resend } from "@/lib/resend";
+
 import type { ApiResponse } from "@/types";
 
 const contactSchema = z.object({
@@ -50,7 +51,7 @@ export async function POST(
       }
     }
 
-    await resend.emails.send({
+    await resend?.emails.send({
       from: "Ithaca Family Academy <noreply@ithacateens.com>",
       to: "ithacafo@ithacafo.com",
       subject: `New Contact Form Submission from ${name}`,

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod/v4";
 import { prisma } from "@/lib/prisma";
-import { resend } from "@/lib/resend";
+import { requireResend } from "@/lib/resend";
 import { authOptions } from "@/lib/auth";
 import type { ApiResponse } from "@/types";
 
@@ -80,6 +80,8 @@ export async function POST(
     }
 
     try {
+      const emailClient = requireResend();
+
       for (const batch of batches) {
         const emails = batch.map((subscriber) => ({
           from: "Ithaca Family Academy <noreply@ithacateens.com>",
@@ -88,7 +90,7 @@ export async function POST(
           html: campaign.body,
         }));
 
-        await resend.batch.send(emails);
+        await emailClient.batch.send(emails);
       }
 
       await prisma.emailCampaign.update({

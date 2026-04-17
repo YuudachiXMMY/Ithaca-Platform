@@ -1,7 +1,16 @@
 import { Resend } from "resend";
 
-if (!process.env.RESEND_API_KEY) {
-  throw new Error("RESEND_API_KEY environment variable is not set");
-}
+const apiKey = process.env.RESEND_API_KEY;
 
-export const resend = new Resend(process.env.RESEND_API_KEY);
+// In development, allow running without a Resend API key.
+// Email-sending API routes will return a warning instead of crashing.
+export const resend = apiKey ? new Resend(apiKey) : null;
+
+export function requireResend(): Resend {
+  if (!resend) {
+    throw new Error(
+      "RESEND_API_KEY is not configured. Set it in .env.local to enable email sending.",
+    );
+  }
+  return resend;
+}
