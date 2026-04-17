@@ -1,0 +1,236 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - main [ref=e6]:
+      - generic [ref=e13]:
+        - navigation [ref=e15]:
+          - generic [ref=e18]:
+            - navigation [ref=e20]:
+              - generic [ref=e21]:
+                - link "Home" [ref=e23] [cursor=pointer]:
+                  - /url: /
+                - link "About Us" [ref=e25] [cursor=pointer]:
+                  - /url: /about-us
+                - button "Programs" [ref=e29] [cursor=pointer]:
+                  - generic:
+                    - generic: Programs
+                    - img
+            - link "Ithaca Family Academy" [ref=e32] [cursor=pointer]:
+              - /url: /
+              - img "Ithaca Family Academy" [ref=e35]
+            - navigation [ref=e37]:
+              - generic [ref=e38]:
+                - link "Contact Us" [ref=e40] [cursor=pointer]:
+                  - /url: /contact-us
+                - generic [ref=e42]:
+                  - button "Shopping Cart Icon" [ref=e47] [cursor=pointer]:
+                    - img [ref=e48]
+                  - button [ref=e55] [cursor=pointer]:
+                    - img [ref=e57]
+        - generic [ref=e62]:
+          - generic [ref=e63]:
+            - paragraph [ref=e64]: As you set out for Ithaca
+            - paragraph [ref=e65]: hope your road is a long one,
+            - paragraph [ref=e66]: full of adventure, full of discovery.
+            - paragraph [ref=e67]: ——C. P. CAVAFY
+          - generic [ref=e69]:
+            - link "View Programs" [ref=e71] [cursor=pointer]:
+              - /url: /about-us
+            - link "Consult Now" [ref=e73] [cursor=pointer]:
+              - /url: /contact-us
+    - region [ref=e75]:
+      - generic [ref=e82]:
+        - heading "Empowering youth to explore the future and build the skills to thrive in the AI era." [level=1] [ref=e83]
+        - separator [ref=e84]
+        - paragraph [ref=e85]: Ithaca Family Academy
+    - region [ref=e87]:
+      - generic [ref=e90]:
+        - heading "Our Mission" [level=2] [ref=e91]
+        - generic [ref=e92]:
+          - generic [ref=e94]:
+            - img "A man in a colorful shirt helping a woman on a laptop while another woman watches." [ref=e99]
+            - generic [ref=e101]:
+              - heading "We help teens explore the future." [level=4] [ref=e102]
+              - paragraph [ref=e104]: We guide students through real-world projects where they learn by building, testing, collaborating, and presenting. They can discover their strengths, interests, and a direction that is truly their own.
+          - generic [ref=e106]:
+            - img "Group of young men building a wooden structure indoors." [ref=e111]
+            - generic [ref=e113]:
+              - heading "At Ithaca, students are not passive learners. They are project owners." [level=4] [ref=e114]
+              - paragraph [ref=e116]: We use Project-Based Learning (PBL) to connect learning with real-world problems and challenges, and to develop practical skills that traditional academics alone cannot fully cover.
+          - generic [ref=e118]:
+            - img "Three professionals engaged in a lively discussion in a modern office setting." [ref=e123]
+            - generic [ref=e125]:
+              - heading "We value social impact and AI ethics." [level=4] [ref=e126]
+              - paragraph [ref=e128]: Students learn how to use AI responsibly, cite properly, and build work that can be explained and defended through transparent review and public showcase formats.
+    - region [ref=e130]:
+      - generic [ref=e133]:
+        - heading "Our Programs" [level=2] [ref=e137]
+        - generic [ref=e140]:
+          - link "EV Challenge" [ref=e141] [cursor=pointer]:
+            - /url: /ev-challenge
+          - link "AI Entrepreneurship Camp" [ref=e142] [cursor=pointer]:
+            - /url: /ai-entrepreneurship-camp
+          - link "Engineering Projects" [ref=e143] [cursor=pointer]:
+            - /url: /engineering-projects
+          - link "Other Programs" [ref=e144] [cursor=pointer]:
+            - /url: /about-us
+    - region [ref=e146]:
+      - generic [ref=e156]:
+        - heading "Meet with Dr. Reza Moridi" [level=4] [ref=e157]
+        - paragraph [ref=e159]: Ithaca students engaged in project-based learning by interviewing Dr. Reza Moridi, the former Ontario Minister of Research, Innovation and Science, and Minister of Training, Colleges and Universities, to promote youth empowerment.
+    - region [ref=e161]:
+      - generic [ref=e164]:
+        - heading "Student Highlights" [level=2] [ref=e165]
+        - generic [ref=e166]:
+          - paragraph [ref=e173]: Students from the Ithaca PBL team visited Honda’s production line to explore how artificial intelligence contributes to the car manufacturing process at Honda Canada, emphasizing youth empowerment in their educational experience.
+          - paragraph [ref=e180]: Students in the EV program in Ithaca gained hands-on experience through PBL while working in the workshop, fostering youth empowerment.
+          - generic [ref=e182]:
+            - iframe [ref=e186]:
+              - generic [ref=f1e4]:
+                - generic:
+                  - generic:
+                    - img
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - img
+                  - generic:
+                    - img
+                    - generic: Playing in picture-in-picture
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: More options
+                        - button "More options" [ref=f1e11] [cursor=pointer]:
+                          - img
+                  - generic:
+                    - button "Play" [ref=f1e13] [cursor=pointer]:
+                      - img [ref=f1e14]
+                      - generic:
+                        - generic: Play
+                    - generic [ref=f1e17]:
+                      - generic [ref=f1e18]:
+                        - slider "Progress Bar" [ref=f1e19] [cursor=pointer]
+                        - generic:
+                          - generic:
+                            - generic: 00:00
+                        - generic [ref=f1e24]: 05:04
+                      - generic [ref=f1e25]:
+                        - generic [ref=f1e26]:
+                          - button:
+                            - img
+                          - slider
+                        - button:
+                          - img
+                          - generic: Settings
+                        - button:
+                          - img
+                          - generic: Picture-in-Picture
+                        - button:
+                          - img
+                          - generic: Fullscreen
+                        - button "Show controls" [ref=f1e27] [cursor=pointer]:
+                          - img [ref=f1e28]
+                          - generic:
+                            - generic: Show controls
+                        - link "Watch on Vimeo" [ref=f1e30] [cursor=pointer]:
+                          - /url: https://vimeo.com/1118510980/86cf6488c8?fl=pl&fe=vl
+                          - img [ref=f1e31]
+            - paragraph [ref=e188]: Students interviewed Dr. Peter Teertstra, a professor in the Faculty of Engineering at the University of Waterloo, about his insights on PBL and its role in youth empowerment, particularly in places like Ithaca.
+    - region [ref=e190]:
+      - generic [ref=e192]:
+        - heading "Ithaca Community Spotlight" [level=2] [ref=e194]
+        - generic [ref=e202]:
+          - list [ref=e204]:
+            - listitem
+            - listitem
+            - listitem
+            - listitem
+            - listitem
+            - listitem
+            - listitem
+            - listitem
+            - listitem
+          - paragraph [ref=e206]: Dr. Peter Teertstra, Professor at the Faculty of Engineering, University of Waterloo, and Director of the Sedra Student Design Centre, was leading the Ithaca students on a tour of the Student Design Centre.
+          - generic:
+            - generic:
+              - generic:
+                - list
+                - button [ref=e207] [cursor=pointer]:
+                  - img [ref=e208]
+          - generic:
+            - button [ref=e210] [cursor=pointer]:
+              - img [ref=e211]
+            - button [ref=e213] [cursor=pointer]:
+              - img [ref=e214]
+    - region [ref=e217]:
+      - generic [ref=e219]:
+        - img "Two hikers helping each other ascend a mountain at sunset." [ref=e220]
+        - heading "Contact Us" [level=2] [ref=e223]
+        - generic [ref=e227]:
+          - generic [ref=e228]:
+            - generic [ref=e229]:
+              - heading "Ithaca Family Academy" [level=4] [ref=e230]
+              - paragraph [ref=e231]: 205 Placer Court, North York, ON, Canada
+              - paragraph [ref=e232]:
+                - text: +
+                - link "1 (437) - 226 - 8407" [ref=e233] [cursor=pointer]:
+                  - /url: tel:14372268407
+            - button "Contact Now" [ref=e234] [cursor=pointer]
+          - generic [ref=e236]:
+            - img [ref=e238] [cursor=pointer]
+            - heading "Contact Now" [level=4] [ref=e240]
+            - generic [ref=e241]:
+              - generic [ref=e243]:
+                - generic [ref=e246]:
+                  - textbox "Name" [ref=e247]
+                  - generic: Name
+                - generic [ref=e250]:
+                  - textbox "Email*" [ref=e251]
+                  - generic: Email*
+                - textbox "Message" [ref=e254]
+              - generic [ref=e255]:
+                - generic [ref=e257]:
+                  - textbox "Sign up for our email list for updates, events, and more." [ref=e258]
+                  - paragraph [ref=e260] [cursor=pointer]: Sign up for our email list for updates, events, and more.
+                - paragraph [ref=e262]:
+                  - text: This site is protected by reCAPTCHA and the Google
+                  - link "Privacy Policy" [ref=e263] [cursor=pointer]:
+                    - /url: https://policies.google.com/privacy
+                  - text: and
+                  - link "Terms of Service" [ref=e264] [cursor=pointer]:
+                    - /url: https://policies.google.com/terms
+                  - text: apply.
+                - button "Send" [ref=e267] [cursor=pointer]
+    - contentinfo [ref=e269]:
+      - generic [ref=e271]:
+        - generic [ref=e276]:
+          - paragraph [ref=e277]
+          - paragraph [ref=e278]: Copyright © 2026 Ithaca Family Academy - All Rights Reserved.
+        - list [ref=e280]:
+          - listitem [ref=e281]:
+            - link "About Us" [ref=e282] [cursor=pointer]:
+              - /url: /about-us
+          - listitem [ref=e283]:
+            - link "EV Challenge" [ref=e284] [cursor=pointer]:
+              - /url: /ev-challenge
+          - listitem [ref=e285]:
+            - link "AI Entrepreneurship Camp" [ref=e286] [cursor=pointer]:
+              - /url: /ai-entrepreneurship-camp
+          - listitem [ref=e287]:
+            - link "Engineering Projects" [ref=e288] [cursor=pointer]:
+              - /url: /engineering-projects
+          - listitem [ref=e289]:
+            - link "Contact Us" [ref=e290] [cursor=pointer]:
+              - /url: /contact-us
+    - generic [ref=e292]:
+      - heading "This website uses cookies." [level=4] [ref=e293]
+      - paragraph [ref=e295]: We use cookies to analyze website traffic and optimize your website experience. By accepting our use of cookies, your data will be aggregated with all other user data.
+      - generic [ref=e296]:
+        - link "Decline" [ref=e297] [cursor=pointer]:
+          - /url: ""
+        - link "Accept" [ref=e298] [cursor=pointer]:
+          - /url: ""
+  - button "TrustedSite Certified" [ref=e299] [cursor=pointer]
