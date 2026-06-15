@@ -1,45 +1,13 @@
 "use client";
 
-import { useState, useRef } from "react";
-import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
-import { Play, Volume2, VolumeX } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
-/*  FeaturedSection - full-width cinematic video                      */
+/*  FeaturedSection - full-width Vimeo embed                          */
 /* ------------------------------------------------------------------ */
 
 export function FeaturedSection() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
   const reduce = useReducedMotion();
-
-  function handlePlayPause() {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (video.paused) {
-      video.play();
-      setIsPlaying(true);
-    } else {
-      video.pause();
-      setIsPlaying(false);
-    }
-  }
-
-  function handleMuteToggle() {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const nextMuted = !video.muted;
-    video.muted = nextMuted;
-    setIsMuted(nextMuted);
-  }
-
-  function handleVideoEnd() {
-    setIsPlaying(false);
-  }
 
   return (
     <section
@@ -47,71 +15,22 @@ export function FeaturedSection() {
       aria-label="Featured: Meet Dr. Reza Moridi"
     >
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
-        {/* Full-width cinematic video player */}
+        {/* Full-width Vimeo video embed */}
         <motion.div
-          className="relative overflow-hidden bg-black"
+          className="relative overflow-hidden"
           initial={reduce ? false : { opacity: 0, scale: 0.97 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ type: "spring", stiffness: 60, damping: 20 }}
         >
-          <div className="relative aspect-video md:aspect-[21/9]">
-            {/* Thumbnail overlay */}
-            {!isPlaying && (
-              <Image
-                src="/media/images/thumbnail-dr-moridi.png"
-                alt="Dr. Reza Moridi interview thumbnail"
-                fill
-                sizes="100vw"
-                className="z-[5] object-cover"
-                priority
-              />
-            )}
-
-            <video
-              ref={videoRef}
-              className="absolute inset-0 h-full w-full object-cover"
-              preload="metadata"
-              playsInline
-              muted={isMuted}
-              onEnded={handleVideoEnd}
-              aria-label="Interview with Dr. Reza Moridi"
-            >
-              <source
-                src="/media/videos/dr-moridi-ai-talk.mp4"
-                type="video/mp4"
-              />
-            </video>
-
-            {/* Play/pause overlay */}
-            <button
-              type="button"
-              onClick={handlePlayPause}
-              className="absolute inset-0 z-10 flex items-center justify-center transition-colors duration-200 hover:bg-black/10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent"
-              aria-label={isPlaying ? "Pause video" : "Play video"}
-            >
-              {!isPlaying && (
-                <div className="flex h-16 w-16 items-center justify-center bg-white/90 text-[#111318] transition-transform duration-200 hover:scale-105">
-                  <Play className="h-7 w-7 translate-x-0.5" />
-                </div>
-              )}
-            </button>
-
-            {/* Mute toggle */}
-            {isPlaying && (
-              <button
-                type="button"
-                onClick={handleMuteToggle}
-                className="absolute bottom-4 right-4 z-20 bg-black/50 p-2.5 text-white transition-colors duration-200 hover:bg-black/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                aria-label={isMuted ? "Unmute video" : "Mute video"}
-              >
-                {isMuted ? (
-                  <VolumeX className="h-4 w-4" />
-                ) : (
-                  <Volume2 className="h-4 w-4" />
-                )}
-              </button>
-            )}
+          <div className="relative aspect-video">
+            <iframe
+              src="https://player.vimeo.com/video/1201561760?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479"
+              className="absolute inset-0 h-full w-full"
+              allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              title="Dr. Reza Moridi - AI in Ontario"
+            />
           </div>
         </motion.div>
 

@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 export function HeroSection() {
   return (
     <section
-      className="relative w-full min-h-[60vh] md:min-h-[70vh] flex items-center justify-center overflow-hidden"
+      className="relative w-full min-h-[70vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden"
       aria-label="About Ithaca Family Academy"
     >
       <Image
@@ -18,12 +18,12 @@ export function HeroSection() {
         sizes="100vw"
       />
       <div className="absolute inset-0 bg-black/60" aria-hidden="true" />
-      <div className="relative z-10 max-w-3xl px-6 py-20 text-center">
+      <div className="relative z-10 max-w-3xl px-6 py-24 text-center">
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-white mb-6"
+          className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-8"
         >
           About Ithaca
         </motion.h1>
@@ -31,7 +31,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
-          className="text-lg md:text-xl leading-relaxed text-white/90"
+          className="text-lg md:text-xl leading-relaxed text-white/80 max-w-[50ch] mx-auto"
         >
           Ithaca empowers young people to explore the future and supports the
           next generation to take on responsibility in this fast-evolving world.

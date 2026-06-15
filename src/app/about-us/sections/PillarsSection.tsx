@@ -27,47 +27,37 @@ const PILLARS = [
 export function PillarsSection() {
   return (
     <section
-      className="bg-background-secondary py-20 md:py-28"
+      className="bg-[#14161d] py-32 md:py-40"
       aria-labelledby="pillars-heading"
     >
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-5xl mx-auto px-6">
         <FadeIn>
           <h2
             id="pillars-heading"
-            className="text-3xl md:text-4xl font-bold text-foreground-dark text-center mb-16"
+            className="text-3xl md:text-4xl font-bold text-foreground text-center mb-24"
           >
             Our Three Pillars
           </h2>
         </FadeIn>
-        <div className="grid gap-12 md:gap-16">
+        <div className="flex flex-col gap-24 md:gap-32">
           {PILLARS.map((pillar, index) => (
-            <FadeIn
-              key={pillar.heading}
-              delay={index * 0.15}
-              direction={index % 2 === 0 ? "left" : "right"}
-            >
-              <div
-                className={`flex flex-col gap-8 items-center ${
-                  index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                }`}
-              >
-                <div className="w-full md:w-1/2 aspect-[4/3] relative rounded-2xl overflow-hidden">
+            <FadeIn key={pillar.heading} delay={index * 0.1}>
+              <div className="flex flex-col items-center text-center">
+                <div className="w-full aspect-[16/9] relative rounded-2xl overflow-hidden mb-8">
                   <Image
                     src={pillar.image}
                     alt={pillar.alt}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="(max-width: 768px) 100vw, 960px"
                   />
                 </div>
-                <div className="w-full md:w-1/2 flex flex-col justify-center">
-                  <h3 className="text-2xl md:text-3xl font-bold text-foreground-dark mb-4">
-                    {pillar.heading}
-                  </h3>
-                  <p className="text-lg text-foreground-dark/70 leading-relaxed">
-                    {pillar.text}
-                  </p>
-                </div>
+                <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+                  {pillar.heading}
+                </h3>
+                <p className="text-lg text-foreground/60 leading-relaxed max-w-[50ch]">
+                  {pillar.text}
+                </p>
               </div>
             </FadeIn>
           ))}

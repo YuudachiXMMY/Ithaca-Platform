@@ -44,18 +44,18 @@ const DECAB_ITEMS = [
 export function DecabFramework() {
   return (
     <section
-      className="bg-background-secondary py-20 md:py-28"
+      className="bg-[#14161d] py-32 md:py-40"
       aria-labelledby="decab-heading"
     >
       <div className="max-w-5xl mx-auto px-6">
         <FadeIn>
           <h2
             id="decab-heading"
-            className="text-3xl md:text-4xl font-bold text-foreground-dark text-center mb-4"
+            className="text-3xl md:text-4xl font-bold text-foreground text-center mb-4"
           >
             DECAB Competency Framework
           </h2>
-          <p className="text-foreground-dark/60 text-center max-w-2xl mx-auto mb-16 text-lg">
+          <p className="text-foreground/50 text-center max-w-2xl mx-auto mb-20 text-lg">
             Five integrated competencies that define student growth at Ithaca.
           </p>
         </FadeIn>
@@ -75,16 +75,14 @@ export function DecabFramework() {
               transition={{ delay: index * 0.1, duration: 0.5 }}
               className={`flex items-center gap-5 p-5 md:p-6 rounded-xl bg-gradient-to-r ${item.color} border ${item.borderColor} hover:scale-[1.01] transition-transform`}
             >
-              <div
-                className={`w-14 h-14 md:w-16 md:h-16 rounded-xl bg-foreground-dark/5 flex items-center justify-center shrink-0`}
-              >
+              <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
                 <span
                   className={`text-2xl md:text-3xl font-black ${item.textColor}`}
                 >
                   {item.letter}
                 </span>
               </div>
-              <span className="text-lg md:text-xl font-semibold text-foreground-dark">
+              <span className="text-lg md:text-xl font-semibold text-foreground">
                 {item.title}
               </span>
             </motion.div>

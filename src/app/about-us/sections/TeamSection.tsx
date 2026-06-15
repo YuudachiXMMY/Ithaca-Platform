@@ -25,7 +25,7 @@ const AVATAR_COLORS = [
 export function TeamSection({ members }: TeamSectionProps) {
   return (
     <section
-      className="bg-background py-20 md:py-28"
+      className="bg-background py-32 md:py-40"
       aria-labelledby="team-heading"
     >
       <div className="max-w-6xl mx-auto px-6">

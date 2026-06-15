@@ -61,10 +61,10 @@ const OUTCOMES: readonly Outcome[] = [
 export function StudentOutcomes() {
   return (
     <section
-      className="bg-background py-20 md:py-28"
+      className="bg-background py-32 md:py-40"
       aria-labelledby="outcomes-heading"
     >
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-5xl mx-auto px-6">
         <FadeIn>
           <h2
             id="outcomes-heading"
@@ -72,13 +72,13 @@ export function StudentOutcomes() {
           >
             Student Outcomes
           </h2>
-          <p className="text-foreground/60 text-center max-w-2xl mx-auto mb-16 text-lg">
+          <p className="text-foreground/60 text-center max-w-2xl mx-auto mb-20 text-lg">
             What students achieve through Ithaca programs.
           </p>
         </FadeIn>
 
         <StaggerContainer
-          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="grid sm:grid-cols-2 gap-6"
           staggerDelay={0.08}
         >
           {OUTCOMES.map((outcome) => (

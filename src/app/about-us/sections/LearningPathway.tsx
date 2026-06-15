@@ -28,7 +28,7 @@ const PATHWAY_STEPS: readonly PathwayStep[] = [
 export function LearningPathway() {
   return (
     <section
-      className="bg-background py-20 md:py-28"
+      className="bg-background py-32 md:py-40"
       aria-labelledby="pathway-heading"
     >
       <div className="max-w-6xl mx-auto px-6">

@@ -6,7 +6,7 @@ import { FadeIn } from "@/components/animations/FadeIn";
 export function NewsletterSection() {
   return (
     <section
-      className="bg-background py-20 md:py-28"
+      className="bg-background py-32 md:py-40"
       aria-labelledby="newsletter-heading"
     >
       <div className="max-w-3xl mx-auto px-6 text-center">
