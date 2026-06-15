@@ -77,7 +77,7 @@ function DesktopDropdown({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.15 }}
-            className="absolute left-0 top-full z-50 mt-1 min-w-[220px] rounded-lg border border-border bg-[#1e1e1e] py-2 shadow-xl"
+            className="absolute left-0 top-full z-50 mt-1 min-w-[220px] rounded-lg border border-border bg-[#181b21] py-2 shadow-xl"
             role="menu"
           >
             {item.children.map((child) => (
@@ -142,7 +142,7 @@ function MobileNav({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed right-0 top-0 z-50 flex h-full w-72 flex-col bg-[#1a1a1a] shadow-2xl lg:hidden"
+            className="fixed right-0 top-0 z-50 flex h-full w-72 flex-col bg-[#151720] shadow-2xl lg:hidden"
             aria-label="Mobile navigation"
           >
             <div className="flex items-center justify-end p-4">
@@ -249,7 +249,7 @@ export function Header() {
   }, [mobileOpen]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40 border-b border-border bg-[#161616]/80 backdrop-blur-md">
+    <header className="fixed inset-x-0 top-0 z-40 border-b border-border bg-[#111318]/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="shrink-0" aria-label="Ithaca Family Academy home">

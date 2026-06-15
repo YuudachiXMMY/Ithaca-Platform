@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Outfit } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { PopupBanner } from "@/components/shared/PopupBanner";
 
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -40,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${montserrat.variable} h-full antialiased`}>
+    <html lang="en" className={`${outfit.variable} h-full antialiased`}>
       <head>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-675W5PPJEJ"
@@ -56,8 +56,11 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="min-h-full flex flex-col font-sans">
+        <a href="#main-content" className="skip-to-content">
+          Skip to content
+        </a>
         <Header />
-        <main className="flex-1">{children}</main>
+        <main id="main-content" className="flex-1">{children}</main>
         <Footer />
         <PopupBanner />
       </body>

@@ -95,7 +95,7 @@ export function NewsletterForm({
             "placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-accent",
             isLight
               ? "border-border bg-white text-foreground-dark"
-              : "border-border bg-[#1a1a1a] text-foreground"
+              : "border-border bg-[#151720] text-foreground"
           )}
           {...register("email")}
         />

@@ -1,7 +1,12 @@
 "use client";
 
+import { useRef, useEffect } from "react";
 import Image from "next/image";
-import { motion, type Variants } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
+
+/* ------------------------------------------------------------------ */
+/*  Pillar data                                                       */
+/* ------------------------------------------------------------------ */
 
 interface Pillar {
   readonly title: string;
@@ -14,99 +19,149 @@ const PILLARS: readonly Pillar[] = [
   {
     title: "Explore the Future",
     description:
-      "We help teens explore the future. From AI and engineering to entrepreneurship, our programs connect students with cutting-edge industries and real-world professionals, sparking curiosity and ambition for what lies ahead.",
+      "From AI and engineering to entrepreneurship, our programs connect students with cutting-edge industries and real-world professionals.",
     image: "/media/images/pillar-explore.png",
     alt: "Students exploring future technology and innovation",
   },
   {
     title: "Project-Based Learning",
     description:
-      "At Ithaca, students are not passive learners. They are project owners. Through hands-on, project-based learning, students tackle real challenges, build prototypes, and present their work — developing critical thinking, teamwork, and leadership skills.",
+      "Students are project owners. Through hands-on learning they tackle real challenges, build prototypes, and present their work.",
     image: "/media/images/pillar-pbl.jpg",
     alt: "Students engaged in project-based learning activities",
   },
   {
     title: "Ethics & Social Impact",
     description:
-      "We value social impact and AI ethics. Our curriculum integrates discussions on responsible technology use, ensuring students understand the societal implications of the tools they build and the decisions they make as future innovators.",
+      "Our curriculum integrates responsible technology use, ensuring students understand the societal implications of the tools they build.",
     image: "/media/images/pillar-ethics.jpg",
     alt: "Students discussing AI ethics and social impact",
   },
 ] as const;
 
-const containerVariants: Variants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.2 },
-  },
-};
-
-const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: "easeOut" as const },
-  },
-};
+/* ------------------------------------------------------------------ */
+/*  MissionSection - GSAP sticky-stack with visual intro               */
+/* ------------------------------------------------------------------ */
 
 export function MissionSection() {
-  return (
-    <section
-      className="bg-background-secondary py-20 md:py-28"
-      aria-label="Our Mission"
-    >
-      <div className="mx-auto max-w-7xl px-6">
-        <motion.h2
-          className="mx-auto mb-16 max-w-3xl text-center text-2xl font-bold leading-snug text-foreground-dark md:text-3xl md:leading-snug"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6, ease: "easeOut" as const }}
-        >
-          Empowering youth to explore the future and build the skills to thrive
-          in the AI era.
-        </motion.h2>
+  const stackRef = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
 
-        <motion.div
-          className="grid gap-8 md:grid-cols-3"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-80px" }}
-        >
-          {PILLARS.map((pillar) => (
-            <PillarCard key={pillar.title} pillar={pillar} />
-          ))}
-        </motion.div>
+  useEffect(() => {
+    if (reduce || !stackRef.current) return;
+
+    let ctx: { revert: () => void } | undefined;
+
+    async function init() {
+      const { gsap } = await import("gsap");
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      gsap.registerPlugin(ScrollTrigger);
+
+      if (!stackRef.current) return;
+
+      ctx = gsap.context(() => {
+        const cards = gsap.utils.toArray<HTMLElement>(".mission-card");
+
+        cards.forEach((card, i) => {
+          if (i === cards.length - 1) return;
+
+          ScrollTrigger.create({
+            trigger: card,
+            start: "top top",
+            endTrigger: cards[cards.length - 1],
+            end: "top top",
+            pin: true,
+            pinSpacing: false,
+          });
+
+          gsap.to(card, {
+            scale: 0.92,
+            opacity: 0.4,
+            ease: "none",
+            scrollTrigger: {
+              trigger: cards[i + 1],
+              start: "top bottom",
+              end: "top top",
+              scrub: true,
+            },
+          });
+        });
+      }, stackRef);
+    }
+
+    init();
+
+    return () => {
+      ctx?.revert();
+    };
+  }, [reduce]);
+
+  return (
+    <section aria-label="Our Mission">
+      {/* Mission statement - immersive background image with overlay */}
+      <div className="relative flex min-h-[60dvh] items-end overflow-hidden">
+        {/* Background image */}
+        <Image
+          src="/media/images/homepage-hero-bg.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover"
+          aria-hidden="true"
+        />
+        {/* Dark overlay for text readability */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#0a0c10] via-[#0a0c10]/85 to-[#0a0c10]/50"
+          aria-hidden="true"
+        />
+        <div className="relative z-10 w-full px-5 pb-16 pt-32 sm:px-8 md:px-[6vw]">
+          <h2 className="max-w-4xl text-2xl font-bold leading-snug text-white md:text-4xl lg:text-5xl">
+            Empowering youth to explore the future and build the skills to
+            thrive in the AI era.
+          </h2>
+        </div>
+      </div>
+
+      {/* Sticky-stack cards */}
+      <div ref={stackRef} className="relative">
+        {PILLARS.map((pillar, i) => (
+          <div
+            key={pillar.title}
+            className="mission-card sticky top-0 min-h-[100dvh] bg-[#111318]"
+          >
+            <div className="mx-auto grid min-h-[100dvh] max-w-[1400px] items-center md:grid-cols-2">
+              {/* Image */}
+              <div
+                className={`relative aspect-[4/3] overflow-hidden md:aspect-auto md:h-[100dvh] ${
+                  i % 2 === 1 ? "md:order-2" : ""
+                }`}
+              >
+                <Image
+                  src={pillar.image}
+                  alt={pillar.alt}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover"
+                />
+              </div>
+
+              {/* Text */}
+              <div
+                className={`px-5 py-8 sm:px-8 md:px-14 lg:px-20 ${
+                  i % 2 === 1 ? "md:order-1" : ""
+                }`}
+              >
+                <h3 className="text-2xl font-bold text-white md:text-3xl lg:text-4xl">
+                  {pillar.title}
+                </h3>
+                <p className="mt-3 max-w-md text-sm leading-relaxed text-white/55">
+                  {pillar.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </section>
-  );
-}
-
-function PillarCard({ pillar }: { readonly pillar: Pillar }) {
-  return (
-    <motion.article
-      className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow duration-300 hover:shadow-lg"
-      variants={cardVariants}
-    >
-      <div className="relative aspect-[4/3] overflow-hidden">
-        <Image
-          src={pillar.image}
-          alt={pillar.alt}
-          fill
-          sizes="(max-width: 768px) 100vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      </div>
-      <div className="p-6">
-        <h3 className="mb-3 text-lg font-bold text-foreground-dark">
-          {pillar.title}
-        </h3>
-        <p className="text-sm leading-relaxed text-gray-600">
-          {pillar.description}
-        </p>
-      </div>
-    </motion.article>
   );
 }

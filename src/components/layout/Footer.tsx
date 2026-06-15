@@ -10,7 +10,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border bg-[#111111]" role="contentinfo">
+    <footer className="border-t border-border bg-[#0d0f14]" role="contentinfo">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {/* Top grid */}
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
@@ -112,18 +112,25 @@ export function Footer() {
           <div className="flex flex-col items-center gap-3 text-xs text-foreground/40 sm:flex-row sm:justify-between">
             <p>&copy; {currentYear} Ithaca Family Academy. All rights reserved.</p>
             <div className="flex items-center gap-4">
+              <Link
+                href="/privacy"
+                className="transition-colors hover:text-accent"
+              >
+                Privacy policy
+              </Link>
+              <span aria-hidden="true">|</span>
+              <Link
+                href="/terms"
+                className="transition-colors hover:text-accent"
+              >
+                Terms of service
+              </Link>
+              <span aria-hidden="true">|</span>
               <a
                 href={`mailto:${CONTACT_INFO.email}`}
                 className="transition-colors hover:text-accent"
               >
                 {CONTACT_INFO.email}
-              </a>
-              <span aria-hidden="true">|</span>
-              <a
-                href={`tel:${CONTACT_INFO.phone.replace(/[^+\d]/g, "")}`}
-                className="transition-colors hover:text-accent"
-              >
-                {CONTACT_INFO.phone}
               </a>
             </div>
           </div>

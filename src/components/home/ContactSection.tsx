@@ -1,8 +1,17 @@
 "use client";
 
-import Link from "next/link";
-import { motion, type Variants } from "framer-motion";
+import { useRef } from "react";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useReducedMotion,
+} from "framer-motion";
 import { MapPin, Phone, Mail, ArrowRight } from "lucide-react";
+
+/* ------------------------------------------------------------------ */
+/*  Contact data                                                      */
+/* ------------------------------------------------------------------ */
 
 interface ContactItem {
   readonly icon: React.ComponentType<{ className?: string }>;
@@ -31,118 +40,132 @@ const CONTACT_ITEMS: readonly ContactItem[] = [
   },
 ] as const;
 
-const containerVariants: Variants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.15 },
-  },
-};
+/* ------------------------------------------------------------------ */
+/*  MagneticButton - spring-physics hover pull                        */
+/* ------------------------------------------------------------------ */
 
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut" as const },
-  },
-};
+function MagneticButton({
+  href,
+  children,
+}: {
+  readonly href: string;
+  readonly children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLAnchorElement>(null);
+  const reduce = useReducedMotion();
+
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const springX = useSpring(x, { stiffness: 150, damping: 12 });
+  const springY = useSpring(y, { stiffness: 150, damping: 12 });
+
+  function handleMouseMove(e: React.MouseEvent) {
+    if (reduce || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    x.set((e.clientX - centerX) * 0.25);
+    y.set((e.clientY - centerY) * 0.25);
+  }
+
+  function handleMouseLeave() {
+    x.set(0);
+    y.set(0);
+  }
+
+  return (
+    <motion.a
+      ref={ref}
+      href={href}
+      style={reduce ? undefined : { x: springX, y: springY }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="group inline-flex h-12 items-center gap-2 bg-accent px-8 text-sm font-semibold tracking-wide text-foreground-dark transition-colors duration-200 hover:bg-accent-hover active:scale-[0.97] active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+    >
+      <span>{children}</span>
+      <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+    </motion.a>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  ContactSection - full-bleed CTA with magnetic button              */
+/* ------------------------------------------------------------------ */
 
 export function ContactSection() {
+  const reduce = useReducedMotion();
+
   return (
-    <section className="bg-background py-20 md:py-28" aria-label="Contact Us">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          {/* Text content */}
+    <section className="bg-[#111318] py-12 md:py-16" aria-label="Contact Us">
+      <div className="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
+        <div className="grid gap-10 md:grid-cols-[1.2fr_1fr] md:items-start md:gap-16">
+          {/* Left - headline + subtext */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={reduce ? false : { opacity: 0, x: -24 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6, ease: "easeOut" as const }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ type: "spring", stiffness: 80, damping: 20 }}
           >
-            <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">
+            <h2 className="text-2xl font-bold text-white md:text-4xl lg:text-5xl">
               Get In Touch
             </h2>
-            <p className="mb-10 max-w-md text-foreground/60">
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-white/50">
               Ready to set your child on the road to discovery? Contact us to
               learn more about our programs and enrollment.
             </p>
-
-            <motion.ul
-              className="mb-10 space-y-6"
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-80px" }}
-            >
-              {CONTACT_ITEMS.map((item) => (
-                <ContactRow key={item.label} item={item} />
-              ))}
-            </motion.ul>
-
-            <Link
-              href="/contact-us"
-              className="group inline-flex items-center gap-2 rounded-full bg-accent px-8 py-3 text-sm font-semibold text-foreground-dark transition-colors duration-300 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            >
-              <span>Contact Us</span>
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
           </motion.div>
 
-          {/* Decorative visual */}
+          {/* Right - contact info with 1px separators + CTA */}
           <motion.div
-            className="hidden lg:flex lg:items-center lg:justify-center"
-            initial={{ opacity: 0, x: 30 }}
+            initial={reduce ? false : { opacity: 0, x: 24 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" as const }}
-            aria-hidden="true"
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{
+              type: "spring",
+              stiffness: 80,
+              damping: 20,
+              delay: 0.1,
+            }}
           >
-            <div className="relative flex h-80 w-80 items-center justify-center">
-              {/* Background decorative circles */}
-              <div className="absolute h-72 w-72 rounded-full border border-accent/20" />
-              <div className="absolute h-56 w-56 rounded-full border border-accent/15" />
-              <div className="absolute h-40 w-40 rounded-full border border-accent/10" />
-              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-accent/10">
-                <Mail className="h-10 w-10 text-accent" />
-              </div>
+            <ul className="divide-y divide-white/[0.06]">
+              {CONTACT_ITEMS.map((item) => {
+                const Icon = item.icon;
+                const inner = (
+                  <li key={item.label} className="flex items-center gap-4 py-4">
+                    <Icon className="h-4 w-4 shrink-0 text-accent/60" />
+                    <div className="min-w-0">
+                      <p className="font-mono text-[10px] tracking-[0.15em] text-white/30 uppercase">
+                        {item.label}
+                      </p>
+                      <p className="text-sm text-white">{item.value}</p>
+                    </div>
+                  </li>
+                );
+
+                if (item.href) {
+                  return (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      className="block transition-opacity duration-200 hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                    >
+                      {inner}
+                    </a>
+                  );
+                }
+
+                return <div key={item.label}>{inner}</div>;
+              })}
+            </ul>
+
+            <div className="mt-8">
+              <MagneticButton href="/contact-us">
+                Get in touch
+              </MagneticButton>
             </div>
           </motion.div>
         </div>
       </div>
     </section>
   );
-}
-
-function ContactRow({ item }: { readonly item: ContactItem }) {
-  const Icon = item.icon;
-
-  const content = (
-    <motion.li
-      className="flex items-start gap-4"
-      variants={itemVariants}
-    >
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10">
-        <Icon className="h-5 w-5 text-accent" />
-      </div>
-      <div>
-        <p className="text-xs font-medium tracking-wider text-foreground/50 uppercase">
-          {item.label}
-        </p>
-        <p className="text-base text-foreground">{item.value}</p>
-      </div>
-    </motion.li>
-  );
-
-  if (item.href) {
-    return (
-      <a
-        href={item.href}
-        className="block transition-opacity duration-200 hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-      >
-        {content}
-      </a>
-    );
-  }
-
-  return content;
 }
