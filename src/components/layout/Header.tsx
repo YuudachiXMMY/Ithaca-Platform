@@ -4,10 +4,19 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useMotionValueEvent,
+} from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { NAV_ITEMS, type NavItem } from "@/types";
 import { cn } from "@/lib/utils";
+
+/* Split nav items: left group / center logo / right group */
+const LEFT_NAV = NAV_ITEMS.filter((item) => item.href !== "/contact-us");
+const RIGHT_NAV = NAV_ITEMS.filter((item) => item.href === "/contact-us");
 
 /* ------------------------------------------------------------------ */
 /*  Desktop dropdown for items with children                          */
@@ -44,31 +53,29 @@ function DesktopDropdown({
       <Link
         href={item.href}
         className={cn(
-          "flex items-center gap-1 py-2 text-sm font-medium transition-colors",
-          isActive
-            ? "text-accent"
-            : "text-foreground/70 hover:text-foreground"
+          "relative flex items-center gap-1.5 py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300",
+          isActive ? "text-accent" : "text-white/60 hover:text-white"
         )}
         aria-expanded={open}
         aria-haspopup="true"
       >
+        {isActive && (
+          <span
+            className="absolute -left-3.5 top-1/2 -translate-y-1/2 text-accent"
+            aria-hidden="true"
+          >
+            -
+          </span>
+        )}
         {item.label}
         <ChevronDown
           className={cn(
-            "h-3.5 w-3.5 transition-transform duration-200",
+            "h-3 w-3 transition-transform duration-200",
             open && "rotate-180"
           )}
           aria-hidden="true"
         />
       </Link>
-
-      {/* Active indicator */}
-      {isActive && (
-        <span
-          className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent"
-          aria-hidden="true"
-        />
-      )}
 
       <AnimatePresence>
         {open && item.children && (
@@ -77,14 +84,14 @@ function DesktopDropdown({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.15 }}
-            className="absolute left-0 top-full z-50 mt-1 min-w-[220px] rounded-lg border border-border bg-[#181b21] py-2 shadow-xl"
+            className="absolute left-0 top-full z-50 mt-2 min-w-[220px] overflow-hidden rounded-lg border border-white/[0.08] bg-[#0a0c10]/90 py-2 shadow-2xl backdrop-blur-xl"
             role="menu"
           >
             {item.children.map((child) => (
               <Link
                 key={child.href}
                 href={child.href}
-                className="block px-4 py-2.5 text-sm text-foreground/70 transition-colors hover:bg-foreground/5 hover:text-foreground"
+                className="block px-4 py-2.5 text-sm text-white/55 transition-colors hover:bg-white/5 hover:text-white"
                 role="menuitem"
               >
                 {child.label}
@@ -116,7 +123,6 @@ function MobileNav({
     setExpandedItem((prev) => (prev === label ? null : label));
   }
 
-  // Close the menu on route change
   useEffect(() => {
     onClose();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -126,7 +132,6 @@ function MobileNav({
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -136,19 +141,18 @@ function MobileNav({
             aria-hidden="true"
           />
 
-          {/* Panel */}
           <motion.nav
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed right-0 top-0 z-50 flex h-full w-72 flex-col bg-[#151720] shadow-2xl lg:hidden"
+            className="fixed right-0 top-0 z-50 flex h-full w-72 flex-col bg-[#0a0c10]/95 shadow-2xl backdrop-blur-xl lg:hidden"
             aria-label="Mobile navigation"
           >
             <div className="flex items-center justify-end p-4">
               <button
                 onClick={onClose}
-                className="rounded-full p-2 text-foreground/50 transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded-full p-2 text-white/50 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 aria-label="Close navigation"
               >
                 <X className="h-5 w-5" />
@@ -173,7 +177,7 @@ function MobileNav({
                           "flex-1 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                           isActive
                             ? "bg-accent/10 text-accent"
-                            : "text-foreground/70 hover:bg-foreground/5 hover:text-foreground"
+                            : "text-white/70 hover:bg-white/5 hover:text-white"
                         )}
                       >
                         {item.label}
@@ -181,7 +185,7 @@ function MobileNav({
                       {hasChildren && (
                         <button
                           onClick={() => toggleExpanded(item.label)}
-                          className="rounded-lg p-2 text-foreground/50 transition-colors hover:bg-foreground/5 hover:text-foreground"
+                          className="rounded-lg p-2 text-white/50 transition-colors hover:bg-white/5 hover:text-white"
                           aria-expanded={isExpanded}
                           aria-label={`Expand ${item.label} submenu`}
                         >
@@ -209,7 +213,7 @@ function MobileNav({
                             <li key={child.href}>
                               <Link
                                 href={child.href}
-                                className="block rounded-lg px-3 py-2 text-sm text-foreground/60 transition-colors hover:bg-foreground/5 hover:text-foreground"
+                                className="block rounded-lg px-3 py-2 text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white"
                               >
                                 {child.label}
                               </Link>
@@ -236,11 +240,16 @@ function MobileNav({
 export function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setScrolled(latest > 20);
+  });
 
   const closeMobile = useCallback(() => setMobileOpen(false), []);
   const toggleMobile = useCallback(() => setMobileOpen((p) => !p), []);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => {
@@ -248,76 +257,130 @@ export function Header() {
     };
   }, [mobileOpen]);
 
+  function checkActive(href: string) {
+    return href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(href + "/");
+  }
+
   return (
-    <header className="fixed inset-x-0 top-0 z-40 border-b border-border bg-[#111318]/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link href="/" className="shrink-0" aria-label="Ithaca Family Academy home">
+    <header
+      className={cn(
+        "fixed inset-x-0 top-0 z-40 transition-all duration-500 ease-out",
+        scrolled
+          ? "bg-[#0a0c10]/70 border-b border-white/[0.06] backdrop-blur-xl"
+          : "bg-transparent"
+      )}
+    >
+      <div
+        className={cn(
+          "mx-auto grid max-w-[1400px] grid-cols-[1fr_auto_1fr] px-6 sm:px-8 lg:px-12 transition-all duration-500 ease-out",
+          scrolled
+            ? "h-18 items-center"
+            : "h-24 lg:h-32 items-start pt-5 lg:pt-7"
+        )}
+      >
+        {/* Left slot: desktop nav */}
+        <div className="flex items-center">
+          <nav
+            className="hidden items-center gap-10 lg:flex"
+            aria-label="Main navigation"
+          >
+            {LEFT_NAV.map((item) => {
+              const active = checkActive(item.href);
+
+              if (item.children && item.children.length > 0) {
+                return (
+                  <DesktopDropdown
+                    key={item.href}
+                    item={item}
+                    isActive={active}
+                  />
+                );
+              }
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "relative py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300",
+                    active ? "text-accent" : "text-white/60 hover:text-white"
+                  )}
+                >
+                  {active && (
+                    <span
+                      className="absolute -left-3.5 top-1/2 -translate-y-1/2 text-accent"
+                      aria-hidden="true"
+                    >
+                      -
+                    </span>
+                  )}
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Center: logo */}
+        <Link
+          href="/"
+          className="shrink-0 justify-self-center"
+          aria-label="Ithaca Family Academy home"
+        >
           <Image
             src="/media/images/logo.png"
             alt="Ithaca Family Academy"
-            width={140}
-            height={40}
-            className="h-10 w-auto"
+            width={200}
+            height={60}
+            className={cn(
+              "w-auto transition-all duration-500 ease-out",
+              scrolled ? "h-12" : "h-20 lg:h-24"
+            )}
             priority
           />
         </Link>
 
-        {/* Desktop navigation */}
-        <nav className="hidden items-center gap-8 lg:flex" aria-label="Main navigation">
-          {NAV_ITEMS.map((item) => {
-            const isActive =
-              item.href === "/"
-                ? pathname === "/"
-                : pathname === item.href ||
-                  pathname.startsWith(item.href + "/");
-
-            if (item.children && item.children.length > 0) {
+        {/* Right slot: desktop nav + mobile hamburger */}
+        <div className="flex items-center justify-end">
+          <nav className="hidden items-center gap-10 lg:flex">
+            {RIGHT_NAV.map((item) => {
+              const active = checkActive(item.href);
               return (
-                <DesktopDropdown
-                  key={item.href}
-                  item={item}
-                  isActive={isActive}
-                />
-              );
-            }
-
-            return (
-              <div key={item.href} className="relative">
                 <Link
+                  key={item.href}
                   href={item.href}
                   className={cn(
-                    "py-2 text-sm font-medium transition-colors",
-                    isActive
-                      ? "text-accent"
-                      : "text-foreground/70 hover:text-foreground"
+                    "relative py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300",
+                    active ? "text-accent" : "text-white/60 hover:text-white"
                   )}
                 >
+                  {active && (
+                    <span
+                      className="absolute -left-3.5 top-1/2 -translate-y-1/2 text-accent"
+                      aria-hidden="true"
+                    >
+                      -
+                    </span>
+                  )}
                   {item.label}
                 </Link>
-                {isActive && (
-                  <span
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent"
-                    aria-hidden="true"
-                  />
-                )}
-              </div>
-            );
-          })}
-        </nav>
+              );
+            })}
+          </nav>
 
-        {/* Mobile hamburger */}
-        <button
-          onClick={toggleMobile}
-          className="rounded-lg p-2 text-foreground/70 transition-colors hover:bg-foreground/5 hover:text-foreground lg:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
-          aria-expanded={mobileOpen}
-        >
-          <Menu className="h-5 w-5" />
-        </button>
+          <button
+            onClick={toggleMobile}
+            className="rounded-lg p-2 text-white/70 transition-colors hover:text-white lg:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={mobileOpen}
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
-      {/* Mobile nav */}
       <MobileNav open={mobileOpen} onClose={closeMobile} pathname={pathname} />
     </header>
   );

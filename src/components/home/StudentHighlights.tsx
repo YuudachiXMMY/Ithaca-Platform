@@ -13,60 +13,155 @@ interface Highlight {
   readonly description: string;
   readonly image: string;
   readonly alt: string;
+  readonly tag: string;
 }
 
 const HIGHLIGHTS: readonly Highlight[] = [
   {
     title: "Honda Production Line Visit",
     description:
-      "Students toured the Honda EV production facility, witnessing cutting-edge manufacturing and sustainable engineering.",
+      "Touring the Honda EV production facility, witnessing cutting-edge manufacturing and sustainable engineering.",
     image: "/media/images/thumbnail-honda-ev.png",
     alt: "Students visiting Honda electric vehicle production line",
+    tag: "Field Visit",
   },
   {
     title: "EV Program Workshop",
     description:
-      "Hands-on sessions designing and assembling electric vehicle components, learning motor systems and energy management.",
+      "Designing and assembling EV components, learning motor systems and energy management.",
     image: "/media/images/screenshot-2025-09-15.png",
     alt: "Students working on electric vehicle components during workshop",
+    tag: "Workshop",
   },
   {
     title: "Industry Expert Interviews",
     description:
-      "Professional interviews with industry leaders, developing communication skills and gaining career insights.",
+      "Professional interviews with industry leaders, developing communication skills and career insights.",
     image: "/media/images/wechat-img-187.jpg",
     alt: "Student interviewing an industry expert",
+    tag: "Interview",
   },
   {
     title: "Team Collaboration",
     description:
-      "Cross-disciplinary projects combining technical expertise with creative problem-solving and leadership.",
+      "Cross-disciplinary projects combining technical expertise with creative problem-solving.",
     image: "/media/images/wechat-img-189.jpg",
     alt: "Students collaborating on a team project",
+    tag: "Teamwork",
   },
   {
     title: "Presentation Day",
     description:
-      "Semester projects showcased to educators and industry mentors, building confidence and public speaking skills.",
+      "Semester projects showcased to educators and industry mentors, building public speaking confidence.",
     image: "/media/images/screenshot-2025-09-16.png",
     alt: "Student presenting their project on presentation day",
+    tag: "Showcase",
   },
   {
     title: "Hands-On Innovation",
     description:
-      "From prototyping to coding, students build solutions that address real challenges in technology and society.",
+      "From prototyping to coding, building solutions that address real challenges in technology.",
     image: "/media/images/wechat-img-197.jpg",
     alt: "Students engaged in hands-on innovation activities",
+    tag: "Innovation",
   },
 ] as const;
 
 /* ------------------------------------------------------------------ */
-/*  StudentHighlights - GSAP horizontal scroll hijack                 */
+/*  Mosaic column layout - asymmetric grid structure                   */
+/*                                                                     */
+/*  ┌──────────────┬──────────┬─────────────┬──────────┐              */
+/*  │              │  EV Wksp │             │  Present │              */
+/*  │  Honda (2r)  │  45%     │  Team (2r)  │  58%     │              */
+/*  │              ├──────────┤             ├──────────┤              */
+/*  │              │  Expert  │             │  Innov   │              */
+/*  │              │  55%     │             │  42%     │              */
+/*  └──────────────┴──────────┴─────────────┴──────────┘              */
+/* ------------------------------------------------------------------ */
+
+interface HeroCol {
+  readonly type: "hero";
+  readonly index: number;
+  readonly width: number;
+}
+interface StackCol {
+  readonly type: "stack";
+  readonly indices: readonly [number, number];
+  readonly width: number;
+  readonly split: readonly [string, string];
+}
+type MosaicColumn = HeroCol | StackCol;
+
+const COLUMNS: readonly MosaicColumn[] = [
+  { type: "hero", index: 0, width: 520 },
+  { type: "stack", indices: [1, 2], width: 360, split: ["45%", "55%"] },
+  { type: "hero", index: 3, width: 440 },
+  { type: "stack", indices: [4, 5], width: 380, split: ["58%", "42%"] },
+] as const;
+
+/* ------------------------------------------------------------------ */
+/*  HighlightCell - edge-to-edge image with dense text overlay        */
+/* ------------------------------------------------------------------ */
+
+function HighlightCell({
+  highlight,
+  index,
+  showDescription,
+}: {
+  readonly highlight: Highlight;
+  readonly index: number;
+  readonly showDescription: boolean;
+}) {
+  return (
+    <article className="group absolute inset-0 overflow-hidden">
+      <Image
+        src={highlight.image}
+        alt={highlight.alt}
+        fill
+        sizes="(min-width: 768px) 520px, 340px"
+        className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+      />
+
+      {/* Gradient scrim */}
+      <div
+        className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
+        aria-hidden="true"
+      />
+
+      {/* Large mono index watermark */}
+      <span
+        className="absolute right-3 top-2 select-none font-mono text-[48px] font-bold leading-none text-white/[0.05] md:text-[64px]"
+        aria-hidden="true"
+      >
+        {String(index + 1).padStart(2, "0")}
+      </span>
+
+      {/* Dense data strip at bottom */}
+      <div className="absolute inset-x-0 bottom-0 p-3 md:p-4">
+        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-accent/70">
+          {highlight.tag}
+        </span>
+        <h3 className="mt-1 text-[13px] font-bold leading-tight text-white md:text-sm">
+          {highlight.title}
+        </h3>
+        {showDescription && (
+          <p className="mt-1.5 line-clamp-2 text-[10px] leading-snug text-white/40 md:text-[11px]">
+            {highlight.description}
+          </p>
+        )}
+      </div>
+    </article>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  StudentHighlights - GSAP horizontal scroll mosaic                 */
 /* ------------------------------------------------------------------ */
 
 export function StudentHighlights() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
 
   useEffect(() => {
@@ -85,9 +180,7 @@ export function StudentHighlights() {
         const distance =
           trackRef.current!.scrollWidth - window.innerWidth;
 
-        gsap.to(trackRef.current, {
-          x: -distance,
-          ease: "none",
+        const tl = gsap.timeline({
           scrollTrigger: {
             trigger: wrapRef.current,
             start: "top top",
@@ -97,6 +190,12 @@ export function StudentHighlights() {
             invalidateOnRefresh: true,
           },
         });
+
+        tl.to(trackRef.current, { x: -distance, ease: "none" }, 0);
+
+        if (progressRef.current) {
+          tl.to(progressRef.current, { scaleX: 1, ease: "none" }, 0);
+        }
       }, wrapRef);
     }
 
@@ -109,57 +208,110 @@ export function StudentHighlights() {
 
   return (
     <section aria-label="Student Highlights">
-      {/* Section heading - outside the scroll-hijack zone */}
-      <div className="bg-[#0e1015] px-5 pb-10 pt-12 sm:px-8 md:px-[6vw] md:pt-16">
-        <h2 className="text-2xl font-bold text-white md:text-4xl">
-          Student Highlights
-        </h2>
-        <p className="mt-3 max-w-lg text-sm text-white/45">
-          Real experiences from our programs that inspire the next generation
-          of innovators.
-        </p>
+      {/* ── Compact data-strip header ─────────────────────────── */}
+      <div className="bg-[#0e1015] px-5 sm:px-8 md:px-[6vw]">
+        <div className="flex items-end justify-between border-b border-white/[0.06] pb-4 pt-10 md:pt-14">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/25">
+              Highlights /{" "}
+              {String(HIGHLIGHTS.length).padStart(2, "0")} entries
+            </p>
+            <h2 className="mt-1.5 text-xl font-bold tracking-tight text-white md:text-3xl">
+              Student Highlights
+            </h2>
+          </div>
+          <p className="hidden max-w-xs text-right text-[11px] leading-relaxed text-white/30 md:block">
+            Real experiences from our programs that inspire the next
+            generation of innovators.
+          </p>
+        </div>
+
+        {/* Category index strip */}
+        <div className="flex gap-5 overflow-x-auto py-3 md:gap-6">
+          {HIGHLIGHTS.map((h, i) => (
+            <span
+              key={h.tag}
+              className="shrink-0 font-mono text-[9px] uppercase tracking-[0.15em] text-white/20"
+            >
+              {String(i + 1).padStart(2, "0")} {h.tag}
+            </span>
+          ))}
+        </div>
       </div>
 
-      {/* Horizontal scroll-hijack wrapper */}
-      <div ref={wrapRef} className="relative overflow-hidden bg-[#0e1015]">
+      {/* ── Horizontal scroll mosaic ──────────────────────────── */}
+      <div
+        ref={wrapRef}
+        className={`relative bg-[#0e1015] ${
+          reduce ? "overflow-x-auto" : "overflow-hidden"
+        }`}
+      >
         <div
           ref={trackRef}
-          className="flex min-h-[100dvh] items-center gap-5 px-5 sm:px-8 md:gap-6 md:px-[6vw]"
+          className="flex min-h-[100dvh] items-stretch gap-[2px] px-5 py-2 sm:px-8 md:px-[6vw]"
         >
-          {HIGHLIGHTS.map((highlight, i) => (
-            <article
-              key={highlight.title}
-              className="group w-[340px] shrink-0 overflow-hidden bg-[#111318] sm:w-[400px] md:w-[440px]"
-            >
-              <div className="relative aspect-[16/10] overflow-hidden">
-                <Image
-                  src={highlight.image}
-                  alt={highlight.alt}
-                  fill
-                  sizes="440px"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+          {COLUMNS.map((col, ci) => {
+            if (col.type === "hero") {
+              const h = HIGHLIGHTS[col.index];
+              return (
                 <div
-                  className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"
-                  aria-hidden="true"
-                />
-                {/* Card index in mono */}
-                <span className="absolute bottom-3 right-3 font-mono text-[10px] tracking-wider text-white/30">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
+                  key={ci}
+                  className="relative shrink-0"
+                  style={{ width: `${col.width}px` }}
+                >
+                  <HighlightCell
+                    highlight={h}
+                    index={col.index}
+                    showDescription
+                  />
+                </div>
+              );
+            }
+
+            /* Stacked pair with asymmetric split */
+            const [topIdx, botIdx] = col.indices;
+            const [topBasis, botBasis] = col.split;
+
+            return (
+              <div
+                key={ci}
+                className="flex shrink-0 flex-col gap-[2px]"
+                style={{ width: `${col.width}px` }}
+              >
+                <div
+                  className="relative overflow-hidden"
+                  style={{ flexBasis: topBasis, flexGrow: 1 }}
+                >
+                  <HighlightCell
+                    highlight={HIGHLIGHTS[topIdx]}
+                    index={topIdx}
+                    showDescription={false}
+                  />
+                </div>
+                <div
+                  className="relative overflow-hidden"
+                  style={{ flexBasis: botBasis, flexGrow: 1 }}
+                >
+                  <HighlightCell
+                    highlight={HIGHLIGHTS[botIdx]}
+                    index={botIdx}
+                    showDescription={false}
+                  />
+                </div>
               </div>
-              <div className="p-5 md:p-6">
-                <h3 className="text-sm font-bold text-white">
-                  {highlight.title}
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed text-white/45">
-                  {highlight.description}
-                </p>
-              </div>
-            </article>
-          ))}
-          {/* Trailing spacer so last card can reach center */}
+            );
+          })}
+
+          {/* Trailing spacer so last column can reach center */}
           <div className="w-[20vw] shrink-0" aria-hidden="true" />
+        </div>
+
+        {/* Thin progress indicator */}
+        <div className="absolute inset-x-0 bottom-0 h-[2px] bg-white/[0.04]">
+          <div
+            ref={progressRef}
+            className="h-full w-full origin-left scale-x-0 bg-accent/40"
+          />
         </div>
       </div>
     </section>

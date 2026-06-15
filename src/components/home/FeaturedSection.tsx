@@ -63,7 +63,7 @@ export function FeaturedSection() {
                 alt="Dr. Reza Moridi interview thumbnail"
                 fill
                 sizes="100vw"
-                className="object-cover"
+                className="z-[5] object-cover"
                 priority
               />
             )}
