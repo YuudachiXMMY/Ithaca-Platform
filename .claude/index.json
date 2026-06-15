@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-04-17T18:19:39Z",
+  "timestamp": "2026-06-14T23:51:42Z",
   "project": "ithaca-fa-web",
   "version": "0.1.0",
   "description": "Ithaca Family Academy official website - Next.js 16 + Prisma + Resend full-stack app",
   "scan": {
     "phase": "full",
     "truncated": false,
-    "totalFilesEstimated": 61,
-    "totalFilesScanned": 61,
+    "totalFilesEstimated": 63,
+    "totalFilesScanned": 63,
     "coveragePercent": 100,
     "ignoreRules": [
       "node_modules/**",
@@ -29,15 +29,16 @@
     "ignoredStats": {
       "node_modules": "~800+ packages",
       ".next": "build output",
-      "public/media": "29 images + 4 videos (binary, paths recorded only)"
+      "public/media": "27 images + 4 videos (binary, paths recorded only)"
     }
   },
   "modules": [
     {
       "path": "src/app",
       "language": "TypeScript/TSX",
-      "purpose": "Next.js App Router pages and API routes",
+      "purpose": "Next.js App Router pages (15 routes) and API routes (8 endpoints)",
       "entry": "src/app/layout.tsx",
+      "claudeMd": "src/app/CLAUDE.md",
       "interfaces": [
         "src/app/api/subscribe/route.ts",
         "src/app/api/contact/route.ts",
@@ -82,8 +83,9 @@
     {
       "path": "src/components",
       "language": "TypeScript/TSX",
-      "purpose": "Reusable React UI components",
+      "purpose": "Reusable React UI components (16 components across 7 subdirectories)",
       "entry": null,
+      "claudeMd": "src/components/CLAUDE.md",
       "importantFiles": [
         "src/components/layout/Header.tsx",
         "src/components/layout/Footer.tsx",
@@ -117,11 +119,13 @@
     {
       "path": "src/lib",
       "language": "TypeScript",
-      "purpose": "Shared utilities: Prisma client, auth config, Resend wrapper, CSS helper",
+      "purpose": "Shared utilities: Prisma client, auth config, Resend wrapper, rate limiter, HTML/CSS helpers",
+      "claudeMd": "src/lib/CLAUDE.md",
       "importantFiles": [
         "src/lib/prisma.ts",
         "src/lib/auth.ts",
         "src/lib/resend.ts",
+        "src/lib/rate-limit.ts",
         "src/lib/utils.ts"
       ],
       "tests": [],
@@ -155,6 +159,7 @@
       "path": "prisma",
       "language": "Prisma/TypeScript",
       "purpose": "Database schema (5 models) and admin seed script",
+      "claudeMd": "prisma/CLAUDE.md",
       "importantFiles": [
         "prisma/schema.prisma",
         "prisma/seed.ts"
@@ -188,9 +193,19 @@
       "gaps": []
     }
   ],
+  "rootConfig": [
+    "package.json",
+    "tsconfig.json",
+    "next.config.ts",
+    "eslint.config.mjs",
+    "postcss.config.mjs",
+    "Dockerfile",
+    ".dockerignore",
+    "docker-compose.dev.yml"
+  ],
   "techStack": {
     "runtime": "Node.js 20",
-    "framework": "Next.js 16 (App Router, standalone output)",
+    "framework": "Next.js 16.2.4 (App Router, standalone output)",
     "language": "TypeScript 5 (strict)",
     "styling": "Tailwind CSS v4",
     "database": "PostgreSQL 16",
@@ -198,7 +213,7 @@
     "auth": "next-auth 4 (Credentials + JWT)",
     "email": "Resend 6",
     "validation": "Zod v4",
-    "forms": "react-hook-form 7 + @hookform/resolvers",
+    "forms": "react-hook-form 7 + @hookform/resolvers 5",
     "animations": "framer-motion 12",
     "icons": "lucide-react",
     "containerization": "Docker (multi-stage Dockerfile)"
@@ -211,8 +226,8 @@
     "Popup"
   ],
   "apiEndpoints": [
-    { "method": "POST", "path": "/api/subscribe", "auth": false },
-    { "method": "POST", "path": "/api/contact", "auth": false },
+    { "method": "POST", "path": "/api/subscribe", "auth": false, "rateLimit": "10/60s" },
+    { "method": "POST", "path": "/api/contact", "auth": false, "rateLimit": "5/60s" },
     { "method": "GET|POST", "path": "/api/auth/[...nextauth]", "auth": false },
     { "method": "GET", "path": "/api/admin/subscribers", "auth": true },
     { "method": "DELETE", "path": "/api/admin/subscribers", "auth": true },
@@ -225,15 +240,29 @@
     { "method": "DELETE", "path": "/api/admin/popups", "auth": true },
     { "method": "GET", "path": "/api/admin/popups/active", "auth": false }
   ],
+  "claudeMdFiles": {
+    "root": "CLAUDE.md",
+    "modules": [
+      "src/app/CLAUDE.md",
+      "src/components/CLAUDE.md",
+      "src/lib/CLAUDE.md",
+      "prisma/CLAUDE.md"
+    ]
+  },
   "gapSummary": {
     "critical": [
       "No test suite of any kind (unit, integration, or E2E)"
     ],
     "recommended": [
       "Add Prisma migrations instead of db push for production safety",
-      "Add rate limiting on public API routes (/api/subscribe, /api/contact)",
       "Add CSRF protection for form submissions",
-      "Add input sanitization for HTML content in email campaigns and popups"
+      "Move Google Analytics tracking ID to environment variable",
+      "Replace in-memory rate limiter with Redis-backed solution before horizontal scaling",
+      "5 of 6 program pages use PlaceholderProgram (coming-soon); content needed"
+    ],
+    "resolved": [
+      "Rate limiting on public API routes (added since initial scan)",
+      "Input sanitization for HTML content in emails (added since initial scan)"
     ]
   },
   "nextScanSuggestions": []

@@ -1,0 +1,39 @@
+Codemap Generation Report — 2026-06-14
+=======================================
+
+Status: INITIAL GENERATION (no previous codemaps existed)
+
+Files Scanned: 60 TypeScript/TSX files + 2 Prisma files
+Total Token Estimate: ~2,900 tokens across 5 codemaps
+
+Generated Files:
+  docs/CODEMAPS/architecture.md  — System overview, data flow, auth flow, key decisions
+  docs/CODEMAPS/backend.md       — API routes, middleware chain, email architecture
+  docs/CODEMAPS/frontend.md      — Page tree, component hierarchy, state, styling
+  docs/CODEMAPS/data.md          — All 5 Prisma models with columns and types
+  docs/CODEMAPS/dependencies.md  — External services, runtime/dev deps, infrastructure
+
+Architecture Summary:
+  - Single Next.js 16 App Router app (standalone output)
+  - 5 public pages + 6 program subpages + 4 admin pages
+  - 8 API route files (2 public + 1 auth + 5 admin)
+  - 5 Prisma models (no inter-model foreign keys)
+  - 17 React components across 6 directories
+  - 5 lib utilities (prisma, auth, resend, rate-limit, utils)
+
+External Services:
+  - PostgreSQL 16 (via Prisma)
+  - Resend (email, optional in dev)
+  - Google Analytics (G-675W5PPJEJ)
+
+Notable Patterns:
+  - All API routes follow: Zod safeParse → auth check → Prisma → ApiResponse envelope
+  - Rate limiting on public routes (in-memory, per-IP sliding window)
+  - HTML escaping via custom escapeHtml() for email template interpolation
+  - Resend client nullable pattern with optional chaining
+
+No Test Infrastructure:
+  - No test files, no test framework configured
+  - Recommended: Vitest for unit/integration, Playwright for E2E
+
+Staleness: N/A (initial generation)

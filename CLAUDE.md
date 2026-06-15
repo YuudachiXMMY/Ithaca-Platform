@@ -6,6 +6,8 @@
 
 | Date       | Action  | Notes                                      |
 |------------|---------|---------------------------------------------|
+| 2026-06-14 | Updated | Full deep scan; added module-level CLAUDE.md files, updated index.json. |
+| 2026-06-14 | Updated | Sync: GA tracking, rate-limit, HTML escape, new scripts. |
 | 2026-04-17 | Created | Initial architecture scan; full coverage.   |
 
 ## Project Vision
@@ -38,8 +40,8 @@ Next.js 16 (App Router, standalone output)
   |                       /admin/emails
   |                       /admin/popups
   |
-  |-- API routes          /api/subscribe          POST  (public)
-  |                       /api/contact            POST  (public)
+  |-- API routes          /api/subscribe          POST  (public, rate-limited)
+  |                       /api/contact            POST  (public, rate-limited)
   |                       /api/auth/[...nextauth] GET|POST
   |                       /api/admin/subscribers   GET|DELETE (auth)
   |                       /api/admin/emails        GET|POST  (auth)
@@ -77,19 +79,24 @@ graph TD
     C --> C5["components/animations"]
     C --> C6["components/contact"]
     C --> C7["components/programs"]
+
+    click B "src/app/CLAUDE.md" "View src/app module docs"
+    click C "src/components/CLAUDE.md" "View src/components module docs"
+    click D "src/lib/CLAUDE.md" "View src/lib module docs"
+    click F "prisma/CLAUDE.md" "View prisma module docs"
 ```
 
 ## Module Index
 
-| Module Path           | Language   | Purpose                                      |
-|-----------------------|------------|----------------------------------------------|
-| `src/app`             | TSX        | Next.js App Router pages and API routes      |
-| `src/components`      | TSX        | Reusable React UI components                 |
-| `src/lib`             | TS         | Prisma client, auth config, Resend, utils    |
-| `src/types`           | TS         | Shared interfaces, constants, navigation     |
-| `prisma`              | Prisma/TS  | Database schema and admin seed script        |
-| `scripts`             | Bash       | Local development launcher (`dev.sh`)        |
-| `public`              | Static     | Images, videos, SVGs                         |
+| Module Path           | Language   | Purpose                                      | Module Docs |
+|-----------------------|------------|----------------------------------------------|-------------|
+| `src/app`             | TSX        | Next.js App Router pages and API routes      | [CLAUDE.md](src/app/CLAUDE.md) |
+| `src/components`      | TSX        | Reusable React UI components                 | [CLAUDE.md](src/components/CLAUDE.md) |
+| `src/lib`             | TS         | Prisma client, auth, Resend, rate-limit, utils | [CLAUDE.md](src/lib/CLAUDE.md) |
+| `src/types`           | TS         | Shared interfaces, constants, navigation     | (inline -- single file) |
+| `prisma`              | Prisma/TS  | Database schema and admin seed script        | [CLAUDE.md](prisma/CLAUDE.md) |
+| `scripts`             | Bash       | Local development launcher (`dev.sh`)        | (inline -- single file) |
+| `public`              | Static     | Images, videos, SVGs                         | (binary assets only) |
 
 ## Run & Develop
 
@@ -121,12 +128,14 @@ npm run dev                                       # http://localhost:3000
 | `npm run dev:up`   | Full local stack (Docker + dev)      |
 | `npm run dev:stop` | Stop all dev services                |
 | `npm run dev:clean`| Wipe DB volume and stop              |
+| `npm run dev:status`| Show dev service status             |
 | `npm run build`    | Production build (standalone)        |
 | `npm run start`    | Start production server              |
 | `npm run lint`     | ESLint check                         |
 | `npm run db:push`  | Push Prisma schema to DB             |
 | `npm run db:seed`  | Seed admin user                      |
 | `npm run db:studio`| Open Prisma Studio                   |
+| `npm run prisma:seed`| Alias for `db:seed`                |
 
 ### Environment Variables
 
@@ -139,17 +148,21 @@ npm run dev                                       # http://localhost:3000
 | `ADMIN_EMAIL`      | Seed     | Admin email for `prisma/seed.ts`         |
 | `ADMIN_PASSWORD`   | Seed     | Admin password for `prisma/seed.ts`      |
 
+**Note:** Google Analytics tracking ID (`G-675W5PPJEJ`) is hardcoded in `src/app/layout.tsx`,
+not configured via environment variable.
+
 ### Docker
 
-- **Dev**: `docker-compose.dev.yml` -- PostgreSQL 16 only; Next.js runs on host.
-- **Prod**: `Dockerfile` -- multi-stage build producing standalone Node.js server.
+- **Dev**: `docker-compose.dev.yml` -- PostgreSQL 16 only (port 5432); Next.js runs on host.
+  Credentials: `ithacafa` / `ithacafa_dev_2026` / database `ithacafa`.
+- **Prod**: `Dockerfile` -- multi-stage build producing standalone Node.js server on port 3000.
 
 ## Testing Strategy
 
 **No test suite exists yet.** There are no `tests/`, `__tests__/`, `*.spec.*`, or `*.test.*` files in the repository.
 
 Recommended approach:
-- **Unit tests**: Zod schemas, utility functions (`src/lib/utils.ts`)
+- **Unit tests**: Zod schemas, utility functions (`src/lib/utils.ts`, `src/lib/rate-limit.ts`)
 - **Integration tests**: API route handlers (subscribe, contact, admin CRUD)
 - **E2E tests**: Playwright for public page navigation and admin login flow
 
@@ -172,6 +185,11 @@ Recommended approach:
 - **Linting**: ESLint with `eslint-config-next` (core-web-vitals + TypeScript)
 - **CSS convention**: Dark-first palette (`#161616` background); accent `#ccdef0`
 - **Middleware**: JWT check on `/admin/*` routes (except `/admin/login`)
+- **Rate limiting**: In-memory sliding-window limiter (`src/lib/rate-limit.ts`) on public API routes
+  - `/api/subscribe`: 10 requests per 60 seconds per IP
+  - `/api/contact`: 5 requests per 60 seconds per IP
+- **HTML sanitization**: `escapeHtml()` in `src/lib/utils.ts` for user input in email templates
+- **Analytics**: Google Analytics (gtag.js) loaded via `next/script` in root layout
 
 ## AI Usage Guidelines
 
@@ -184,3 +202,9 @@ Recommended approach:
   (`resend?.emails.send(...)`) or the `requireResend()` helper for mandatory sends.
 - Client components use `"use client"` directive; server components are the default.
 - No test infrastructure exists yet -- set up Vitest or Jest before writing tests.
+- The admin layout (`src/app/admin/layout.tsx`) is a client component with
+  `SessionProvider` wrapping; it renders a sidebar for authenticated users and
+  bypasses it entirely for the `/admin/login` route.
+- Email campaigns use batch sending via `resend.batch.send()` with a batch size of 50.
+- Popup banners are fetched client-side on every page load and dismissed per session
+  via `sessionStorage`.
