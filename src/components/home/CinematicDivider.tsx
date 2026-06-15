@@ -1,22 +1,26 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import Image from "next/image";
 import { useReducedMotion } from "framer-motion";
 
 /* ------------------------------------------------------------------ */
-/*  CinematicDivider - scroll-pinned parallax zoom transition          */
+/*  CinematicDivider - full-viewport scroll-pinned video reveal        */
 /*                                                                     */
-/*  Creates a cinematic breathing moment between content-dense          */
-/*  sections. Background zooms via parallax while an accent line       */
-/*  expands and dissolves across the viewport center.                  */
+/*  MOTION_INTENSITY: 8 - cinematic 4-phase scroll animation:          */
+/*    Phase 1 (0-40%):  Video fades in from black + scales up          */
+/*    Phase 2 (25-55%): Title "Meet with Dr. Reza Moridi" fades in     */
+/*                      with a subtle upward drift                     */
+/*    Phase 3 (30-60%): Accent line fires, glow pulses at peak         */
+/*    Phase 4 (55-100%): Title + video dim back to black               */
 /* ------------------------------------------------------------------ */
 
 export function CinematicDivider() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
+  const videoWrapRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
 
   useEffect(() => {
@@ -36,49 +40,82 @@ export function CinematicDivider() {
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top top",
-            end: "+=60%",
+            end: "+=120%",
             pin: true,
-            scrub: 2,
+            scrub: 1.5,
           },
         });
 
-        // Background parallax zoom - linear for steady drift
-        if (imageRef.current) {
+        // Phase 1: Video scales up throughout the entire sequence
+        if (videoWrapRef.current) {
           tl.fromTo(
-            imageRef.current,
+            videoWrapRef.current,
             { scale: 1 },
-            { scale: 1.2, duration: 1, ease: "none" },
+            { scale: 1.15, duration: 1, ease: "none" },
             0,
           );
         }
 
-        // Soft radial glow - overlapping phases, no dead zone
-        if (glowRef.current) {
+        // Phase 1: Dark overlay lifts to reveal video (0-40%)
+        if (overlayRef.current) {
           tl.fromTo(
-            glowRef.current,
-            { opacity: 0, scale: 0.8 },
-            { opacity: 1, scale: 1, duration: 0.35, ease: "power3.out" },
-            0.1,
+            overlayRef.current,
+            { opacity: 1 },
+            { opacity: 0.55, duration: 0.4, ease: "power2.out" },
+            0,
           );
+
+          // Phase 3: Dark overlay returns (55-100%)
           tl.to(
-            glowRef.current,
-            { opacity: 0, scale: 1.4, duration: 0.5, ease: "power3.in" },
-            0.48,
+            overlayRef.current,
+            { opacity: 1, duration: 0.45, ease: "power2.in" },
+            0.55,
           );
         }
 
-        // Accent line: overlapping expand/dissolve for continuous flow
+        // Phase 2: Glow pulse at peak visibility (30-55%)
+        if (glowRef.current) {
+          tl.fromTo(
+            glowRef.current,
+            { opacity: 0, scale: 0.7 },
+            { opacity: 1, scale: 1, duration: 0.25, ease: "power3.out" },
+            0.3,
+          );
+          tl.to(
+            glowRef.current,
+            { opacity: 0, scale: 1.5, duration: 0.3, ease: "power3.in" },
+            0.5,
+          );
+        }
+
+        // Phase 2: Title text fades in with upward drift (25-50%)
+        if (titleRef.current) {
+          tl.fromTo(
+            titleRef.current,
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.25, ease: "power3.out" },
+            0.25,
+          );
+          // Title fades out as overlay returns (50-65%)
+          tl.to(
+            titleRef.current,
+            { opacity: 0, y: -20, duration: 0.15, ease: "power2.in" },
+            0.5,
+          );
+        }
+
+        // Phase 3: Accent line fires across center (25-60%)
         if (lineRef.current) {
           tl.fromTo(
             lineRef.current,
             { scaleX: 0, opacity: 0 },
-            { scaleX: 1, opacity: 1, duration: 0.38, ease: "power3.out" },
-            0.08,
+            { scaleX: 1, opacity: 1, duration: 0.3, ease: "power3.out" },
+            0.25,
           );
           tl.to(
             lineRef.current,
-            { scaleX: 1.8, opacity: 0, duration: 0.5, ease: "power3.in" },
-            0.46,
+            { scaleX: 2, opacity: 0, duration: 0.35, ease: "power3.in" },
+            0.5,
           );
         }
       }, sectionRef);
@@ -106,37 +143,62 @@ export function CinematicDivider() {
   return (
     <div
       ref={sectionRef}
-      className="relative flex min-h-[50dvh] items-center justify-center overflow-hidden bg-[#0a0c10]"
+      className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#0a0c10]"
       aria-hidden="true"
     >
-      {/* Parallax zoom background */}
-      <div ref={imageRef} className="absolute inset-[-15%]">
-        <Image
-          src="/media/images/homepage-hero-bg.jpg"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover opacity-[0.07]"
+      {/* Full-bleed video background */}
+      <div ref={videoWrapRef} className="absolute inset-[-10%]">
+        <video
+          src="/media/videos/dr-moridi-ai-talk.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
           aria-hidden="true"
+          className="h-full w-full object-cover"
         />
       </div>
 
-      {/* Top/bottom gradient blend into adjacent sections */}
+      {/* Dark overlay - animated by GSAP to reveal/conceal the video */}
       <div
-        className="absolute inset-0 bg-gradient-to-b from-[#0a0c10] via-transparent to-[#111318]"
+        ref={overlayRef}
+        className="absolute inset-0 bg-[#0a0c10]"
+        aria-hidden="true"
+      />
+
+      {/* Thin edge gradients for seamless section blending */}
+      <div
+        className="absolute inset-x-0 top-0 h-[12%] bg-gradient-to-b from-[#0a0c10] to-transparent"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-x-0 bottom-0 h-[12%] bg-gradient-to-t from-[#111318] to-transparent"
         aria-hidden="true"
       />
 
       {/* Soft radial glow behind the accent line */}
       <div
         ref={glowRef}
-        className="absolute left-1/2 top-1/2 h-32 w-[40%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/[0.06] opacity-0 blur-3xl"
+        className="absolute left-1/2 top-1/2 h-40 w-[50%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/[0.08] opacity-0 blur-3xl"
       />
+
+      {/* Title text - cinematic reveal */}
+      <div
+        ref={titleRef}
+        className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 text-center opacity-0"
+      >
+        <p className="text-[11px] font-semibold tracking-[0.25em] text-accent/70 uppercase">
+          Featured
+        </p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-white md:text-5xl">
+          Meet with Dr. Reza Moridi
+        </h2>
+      </div>
 
       {/* Expanding accent line */}
       <div
         ref={lineRef}
-        className="relative z-10 h-px w-[45%] origin-center scale-x-0 bg-gradient-to-r from-transparent via-accent/50 to-transparent"
+        className="relative z-10 h-px w-[50%] origin-center scale-x-0 bg-gradient-to-r from-transparent via-accent/60 to-transparent"
       />
     </div>
   );
