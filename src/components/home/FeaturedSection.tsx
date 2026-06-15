@@ -55,7 +55,7 @@ export function FeaturedSection() {
           viewport={{ once: true, amount: 0.2 }}
           transition={{ type: "spring", stiffness: 60, damping: 20 }}
         >
-          <div className="relative aspect-[21/9]">
+          <div className="relative aspect-video md:aspect-[21/9]">
             {/* Thumbnail overlay */}
             {!isPlaying && (
               <Image

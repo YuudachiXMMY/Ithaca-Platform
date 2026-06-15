@@ -68,7 +68,7 @@ const HIGHLIGHTS: readonly Highlight[] = [
 ] as const;
 
 /* ------------------------------------------------------------------ */
-/*  Mosaic column layout - asymmetric grid structure                   */
+/*  Desktop mosaic column layout - asymmetric grid structure           */
 /*                                                                     */
 /*  ┌──────────────┬──────────┬─────────────┬──────────┐              */
 /*  │              │  EV Wksp │             │  Present │              */
@@ -99,6 +99,9 @@ const COLUMNS: readonly MosaicColumn[] = [
   { type: "stack", indices: [4, 5], width: 380, split: ["58%", "42%"] },
 ] as const;
 
+/* Breakpoint constant - matches Tailwind md (768px) */
+const MD_BREAKPOINT = 768;
+
 /* ------------------------------------------------------------------ */
 /*  HighlightCell - edge-to-edge image with dense text overlay        */
 /* ------------------------------------------------------------------ */
@@ -118,7 +121,7 @@ function HighlightCell({
         src={highlight.image}
         alt={highlight.alt}
         fill
-        sizes="(min-width: 768px) 520px, 340px"
+        sizes="(min-width: 768px) 520px, 50vw"
         className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
       />
 
@@ -155,17 +158,43 @@ function HighlightCell({
 }
 
 /* ------------------------------------------------------------------ */
-/*  StudentHighlights - GSAP horizontal scroll mosaic                 */
+/*  Mobile grid layout - 2-column responsive grid                     */
 /* ------------------------------------------------------------------ */
 
-export function StudentHighlights() {
+function MobileHighlightsGrid() {
+  return (
+    <div className="grid grid-cols-2 gap-[2px] px-5 py-2 sm:px-8">
+      {HIGHLIGHTS.map((h, i) => (
+        <div
+          key={h.title}
+          className={`relative overflow-hidden ${
+            i < 2 ? "aspect-[3/4]" : "aspect-square"
+          }`}
+        >
+          <HighlightCell highlight={h} index={i} showDescription={i < 2} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Desktop horizontal scroll mosaic                                  */
+/* ------------------------------------------------------------------ */
+
+function DesktopHorizontalMosaic({
+  reduce,
+}: {
+  readonly reduce: boolean | null;
+}) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
 
   useEffect(() => {
-    if (reduce || !wrapRef.current || !trackRef.current) return;
+    /* Skip GSAP on mobile or when reduced motion is preferred */
+    if (reduce || window.innerWidth < MD_BREAKPOINT) return;
+    if (!wrapRef.current || !trackRef.current) return;
 
     let ctx: { revert: () => void } | undefined;
 
@@ -207,16 +236,97 @@ export function StudentHighlights() {
   }, [reduce]);
 
   return (
+    <div
+      ref={wrapRef}
+      className={`relative bg-[#0e1015] ${
+        reduce ? "overflow-x-auto" : "overflow-hidden"
+      }`}
+    >
+      <div
+        ref={trackRef}
+        className="flex min-h-[100dvh] items-stretch gap-[2px] px-5 py-2 sm:px-8 md:px-[6vw]"
+      >
+        {COLUMNS.map((col, ci) => {
+          if (col.type === "hero") {
+            const h = HIGHLIGHTS[col.index];
+            return (
+              <div
+                key={ci}
+                className="relative shrink-0"
+                style={{ width: `${col.width}px` }}
+              >
+                <HighlightCell
+                  highlight={h}
+                  index={col.index}
+                  showDescription
+                />
+              </div>
+            );
+          }
+
+          /* Stacked pair with asymmetric split */
+          const [topIdx, botIdx] = col.indices;
+          const [topBasis, botBasis] = col.split;
+
+          return (
+            <div
+              key={ci}
+              className="flex shrink-0 flex-col gap-[2px]"
+              style={{ width: `${col.width}px` }}
+            >
+              <div
+                className="relative overflow-hidden"
+                style={{ flexBasis: topBasis, flexGrow: 1 }}
+              >
+                <HighlightCell
+                  highlight={HIGHLIGHTS[topIdx]}
+                  index={topIdx}
+                  showDescription={false}
+                />
+              </div>
+              <div
+                className="relative overflow-hidden"
+                style={{ flexBasis: botBasis, flexGrow: 1 }}
+              >
+                <HighlightCell
+                  highlight={HIGHLIGHTS[botIdx]}
+                  index={botIdx}
+                  showDescription={false}
+                />
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Trailing spacer so last column can reach center */}
+        <div className="w-[20vw] shrink-0" aria-hidden="true" />
+      </div>
+
+      {/* Thin progress indicator */}
+      <div className="absolute inset-x-0 bottom-0 h-[2px] bg-white/[0.04]">
+        <div
+          ref={progressRef}
+          className="h-full w-full origin-left scale-x-0 bg-accent/40"
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  StudentHighlights - responsive: grid on mobile, GSAP scroll on md+*/
+/* ------------------------------------------------------------------ */
+
+export function StudentHighlights() {
+  const reduce = useReducedMotion();
+
+  return (
     <section aria-label="Student Highlights">
       {/* ── Compact data-strip header ─────────────────────────── */}
       <div className="bg-[#0e1015] px-5 sm:px-8 md:px-[6vw]">
         <div className="flex items-end justify-between border-b border-white/[0.06] pb-4 pt-10 md:pt-14">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/25">
-              Highlights /{" "}
-              {String(HIGHLIGHTS.length).padStart(2, "0")} entries
-            </p>
-            <h2 className="mt-1.5 text-xl font-bold tracking-tight text-white md:text-3xl">
+            <h2 className="text-xl font-bold tracking-tight text-white md:text-3xl">
               Student Highlights
             </h2>
           </div>
@@ -226,8 +336,8 @@ export function StudentHighlights() {
           </p>
         </div>
 
-        {/* Category index strip */}
-        <div className="flex gap-5 overflow-x-auto py-3 md:gap-6">
+        {/* Category index strip - hidden on mobile to prevent overflow */}
+        <div className="hidden gap-5 overflow-x-auto py-3 md:flex md:gap-6">
           {HIGHLIGHTS.map((h, i) => (
             <span
               key={h.tag}
@@ -239,80 +349,14 @@ export function StudentHighlights() {
         </div>
       </div>
 
-      {/* ── Horizontal scroll mosaic ──────────────────────────── */}
-      <div
-        ref={wrapRef}
-        className={`relative bg-[#0e1015] ${
-          reduce ? "overflow-x-auto" : "overflow-hidden"
-        }`}
-      >
-        <div
-          ref={trackRef}
-          className="flex min-h-[100dvh] items-stretch gap-[2px] px-5 py-2 sm:px-8 md:px-[6vw]"
-        >
-          {COLUMNS.map((col, ci) => {
-            if (col.type === "hero") {
-              const h = HIGHLIGHTS[col.index];
-              return (
-                <div
-                  key={ci}
-                  className="relative shrink-0"
-                  style={{ width: `${col.width}px` }}
-                >
-                  <HighlightCell
-                    highlight={h}
-                    index={col.index}
-                    showDescription
-                  />
-                </div>
-              );
-            }
+      {/* ── Mobile: 2-col grid (< md) ──────────────────────────── */}
+      <div className="bg-[#0e1015] md:hidden">
+        <MobileHighlightsGrid />
+      </div>
 
-            /* Stacked pair with asymmetric split */
-            const [topIdx, botIdx] = col.indices;
-            const [topBasis, botBasis] = col.split;
-
-            return (
-              <div
-                key={ci}
-                className="flex shrink-0 flex-col gap-[2px]"
-                style={{ width: `${col.width}px` }}
-              >
-                <div
-                  className="relative overflow-hidden"
-                  style={{ flexBasis: topBasis, flexGrow: 1 }}
-                >
-                  <HighlightCell
-                    highlight={HIGHLIGHTS[topIdx]}
-                    index={topIdx}
-                    showDescription={false}
-                  />
-                </div>
-                <div
-                  className="relative overflow-hidden"
-                  style={{ flexBasis: botBasis, flexGrow: 1 }}
-                >
-                  <HighlightCell
-                    highlight={HIGHLIGHTS[botIdx]}
-                    index={botIdx}
-                    showDescription={false}
-                  />
-                </div>
-              </div>
-            );
-          })}
-
-          {/* Trailing spacer so last column can reach center */}
-          <div className="w-[20vw] shrink-0" aria-hidden="true" />
-        </div>
-
-        {/* Thin progress indicator */}
-        <div className="absolute inset-x-0 bottom-0 h-[2px] bg-white/[0.04]">
-          <div
-            ref={progressRef}
-            className="h-full w-full origin-left scale-x-0 bg-accent/40"
-          />
-        </div>
+      {/* ── Desktop: GSAP horizontal scroll mosaic (md+) ───────── */}
+      <div className="hidden md:block">
+        <DesktopHorizontalMosaic reduce={reduce} />
       </div>
     </section>
   );
