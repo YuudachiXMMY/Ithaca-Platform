@@ -98,30 +98,6 @@ export function MissionSection() {
 
   return (
     <section aria-label="Our Mission">
-      {/* Mission statement - immersive background image with overlay */}
-      <div className="relative flex min-h-[60dvh] items-end overflow-hidden">
-        {/* Background image */}
-        <Image
-          src="/media/images/homepage-hero-bg.jpg"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover"
-          aria-hidden="true"
-        />
-        {/* Dark overlay for text readability */}
-        <div
-          className="absolute inset-0 bg-gradient-to-t from-[#0a0c10] via-[#0a0c10]/85 to-[#0a0c10]/50"
-          aria-hidden="true"
-        />
-        <div className="relative z-10 w-full px-5 pb-16 pt-32 sm:px-8 md:px-[6vw]">
-          <h2 className="max-w-4xl text-2xl font-bold leading-snug text-white md:text-4xl lg:text-5xl">
-            Empowering youth to explore the future and build the skills to
-            thrive in the AI era.
-          </h2>
-        </div>
-      </div>
-
       {/* Sticky-stack cards */}
       <div ref={stackRef} className="relative">
         {PILLARS.map((pillar, i) => (
