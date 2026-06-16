@@ -46,7 +46,7 @@ const PROGRAMS: readonly Program[] = [
     title: "Other Programs",
     description:
       "Explore our full range including AI Pioneers Interview, Ithaca Night, and seasonal camps.",
-    href: "/programs/summer-winter-camps",
+    href: "/programs",
     image: "/media/images/about-hero.jpg",
     alt: "Overview of Ithaca Family Academy programs",
   },
@@ -80,15 +80,22 @@ export function ProgramsShowcase() {
   return (
     <section className="bg-[#0a0c10] py-8 md:py-10" aria-label="Our Programs">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
-        <motion.h2
-          className="mb-6 text-2xl font-bold text-white md:text-4xl"
+        <motion.div
+          className="mb-6"
           initial={reduce ? false : { opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ type: "spring", stiffness: 80, damping: 20 }}
         >
-          Our Programs
-        </motion.h2>
+          <h2 className="text-2xl font-bold text-white md:text-4xl">
+            Our Programs
+          </h2>
+          <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/45">
+            From electric vehicles to AI startups, our project-based programs
+            connect students with real-world challenges and industry
+            professionals.
+          </p>
+        </motion.div>
 
         {/* Bento grid: 2fr | 1fr with 1px line separators */}
         <motion.div

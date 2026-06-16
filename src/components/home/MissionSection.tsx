@@ -131,10 +131,17 @@ export function MissionSection() {
                   i % 2 === 1 ? "md:order-1" : ""
                 }`}
               >
-                <h3 className="text-2xl font-bold text-white md:text-3xl lg:text-4xl">
+                <p className="font-mono text-[11px] tracking-[0.2em] text-accent/50 uppercase">
+                  {String(i + 1).padStart(2, "0")}
+                </p>
+                <h3 className="mt-3 text-2xl font-bold text-white md:text-3xl lg:text-4xl">
                   {pillar.title}
                 </h3>
-                <p className="mt-3 max-w-md text-sm leading-relaxed text-white/55">
+                <div
+                  className="mt-4 h-px w-10 bg-accent/20"
+                  aria-hidden="true"
+                />
+                <p className="mt-4 max-w-md text-base leading-relaxed text-white/60">
                   {pillar.description}
                 </p>
               </div>
