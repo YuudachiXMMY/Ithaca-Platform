@@ -18,7 +18,7 @@ export function Footer() {
           <div>
             <Link href="/" aria-label="Ithaca Family Academy home">
               <Image
-                src="/media/images/logo.png"
+                src="/media/images/site/logo.png"
                 alt="Ithaca Family Academy"
                 width={140}
                 height={40}

@@ -63,7 +63,7 @@ export default function ContactUsPage() {
         {/* Decorative blob */}
         <div className="absolute -top-20 -right-20 w-[500px] h-[500px] opacity-20 pointer-events-none">
           <Image
-            src="/media/images/contact-blob-55e41b4.png"
+            src="/media/images/site/contact-blob-55e41b4.png"
             alt=""
             fill
             className="object-contain"

@@ -330,7 +330,7 @@ export function Header() {
           aria-label="Ithaca Family Academy home"
         >
           <Image
-            src="/media/images/logo.png"
+            src="/media/images/site/logo.png"
             alt="Ithaca Family Academy"
             width={200}
             height={60}

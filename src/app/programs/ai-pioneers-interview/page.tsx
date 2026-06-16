@@ -9,7 +9,7 @@ export const metadata = {
 export default function AIPioneersInterviewPage() {
   return (
     <PlaceholderProgram
-      heroImage="/media/images/ev-challenge-stock.jpg"
+      heroImage="/media/images/programs/ev-challenge/ev-challenge-stock.jpg"
       heroAlt="AI pioneers sharing insights in interview sessions"
     />
   );

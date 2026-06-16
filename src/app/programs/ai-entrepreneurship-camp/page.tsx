@@ -79,19 +79,19 @@ const FAQ_ITEMS = [
 
 const GALLERY_IMAGES = [
   {
-    src: "/media/images/ai-camp-HB8A5465.jpg",
+    src: "/media/images/programs/ai-camp/ai-camp-HB8A5465.jpg",
     alt: "Students collaborating during AI camp workshop",
   },
   {
-    src: "/media/images/ai-camp-HB8A5242.jpg",
+    src: "/media/images/programs/ai-camp/ai-camp-HB8A5242.jpg",
     alt: "Student presenting AI project to mentors",
   },
   {
-    src: "/media/images/ai-camp-HB8A5065.jpg",
+    src: "/media/images/programs/ai-camp/ai-camp-HB8A5065.jpg",
     alt: "Team brainstorming session at AI camp",
   },
   {
-    src: "/media/images/ai-camp-98d3ff7.jpg",
+    src: "/media/images/programs/ai-camp/ai-camp-98d3ff7.jpg",
     alt: "AI camp participants group activity",
   },
 ] as const;
@@ -170,7 +170,7 @@ export default function AIEntrepreneurshipCampPage() {
       {/* Hero */}
       <section className="relative h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden">
         <Image
-          src="/media/images/ai-camp-hero.png"
+          src="/media/images/programs/ai-camp/ai-camp-hero.png"
           alt="AI Entrepreneurship Camp hero"
           fill
           className="object-cover"
@@ -273,7 +273,7 @@ export default function AIEntrepreneurshipCampPage() {
               and showcase their innovations to industry judges.
             </p>
             <Image
-              src="/media/images/ai-camp-blob-409afc5.png"
+              src="/media/images/programs/ai-camp/ai-camp-blob-409afc5.png"
               alt="AI Camp decorative illustration"
               width={400}
               height={300}

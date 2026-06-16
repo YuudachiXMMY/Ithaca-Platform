@@ -20,21 +20,21 @@ const PILLARS: readonly Pillar[] = [
     title: "Explore the Future",
     description:
       "From AI and engineering to entrepreneurship, our programs connect students with cutting-edge industries and real-world professionals.",
-    image: "/media/images/pillar-explore.png",
+    image: "/media/images/pillars/pillar-explore.png",
     alt: "Students exploring future technology and innovation",
   },
   {
     title: "Project-Based Learning",
     description:
       "Students are project owners. Through hands-on learning they tackle real challenges, build prototypes, and present their work.",
-    image: "/media/images/pillar-pbl.jpg",
+    image: "/media/images/pillars/pillar-pbl.jpg",
     alt: "Students engaged in project-based learning activities",
   },
   {
     title: "Ethics & Social Impact",
     description:
       "Our curriculum integrates responsible technology use, ensuring students understand the societal implications of the tools they build.",
-    image: "/media/images/pillar-ethics.jpg",
+    image: "/media/images/pillars/pillar-ethics.jpg",
     alt: "Students discussing AI ethics and social impact",
   },
 ] as const;

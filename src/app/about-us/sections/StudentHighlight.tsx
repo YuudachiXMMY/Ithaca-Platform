@@ -1,89 +1,109 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { GraduationCap, Mic, ArrowRight } from "lucide-react";
-import { FadeIn } from "@/components/animations/FadeIn";
 
 export function StudentHighlight() {
   return (
     <section
-      className="bg-[#14161d] py-32 md:py-40"
+      className="bg-[#14161d] py-8 md:py-10"
       aria-labelledby="highlight-heading"
     >
-      <div className="max-w-4xl mx-auto px-6">
-        <FadeIn>
-          <div className="text-center mb-10">
-            <h2
-              id="highlight-heading"
-              className="text-3xl md:text-4xl font-bold text-foreground"
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          {/* Left: student identity */}
+          <div className="md:col-span-4">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             >
-              Andy Song
-            </h2>
-          </div>
-        </FadeIn>
-
-        <FadeIn delay={0.15}>
-          <div className="bg-card-bg rounded-2xl border border-border overflow-hidden">
-            <div className="p-8 md:p-10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                  <Mic
-                    className="w-5 h-5 text-accent"
-                    aria-hidden="true"
-                  />
+              <h2
+                id="highlight-heading"
+                className="text-2xl md:text-3xl font-bold text-foreground mb-2"
+              >
+                Student Spotlight
+              </h2>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+                  <span className="text-sm font-bold text-accent">A</span>
                 </div>
-                <h3 className="text-xl font-bold text-foreground">
-                  AI Pioneers Interview Project
+                <div>
+                  <p className="text-base font-bold text-foreground leading-tight">
+                    Andy Song
+                  </p>
+                  <p className="text-xs text-foreground/40">
+                    AI Pioneers Interview Project
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-accent/5 border border-accent/10">
+                <GraduationCap
+                  className="w-4 h-4 text-accent shrink-0"
+                  aria-hidden="true"
+                />
+                <p className="text-foreground/60 text-xs">
+                  Graduated June 2025. Now at{" "}
+                  <strong className="text-foreground">Princeton University</strong>.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Right: interview details */}
+          <div className="md:col-span-8">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <Mic className="w-4 h-4 text-accent" aria-hidden="true" />
+                <h3 className="text-sm font-bold text-foreground">
+                  Industry Interviews
                 </h3>
               </div>
 
-              <p className="text-foreground/60 leading-relaxed mb-6">
+              <p className="text-foreground/50 text-sm leading-relaxed mb-4 max-w-[52ch]">
                 As part of the AI Pioneers Interview Project, Andy conducted
                 in-depth interviews with industry leaders:
               </p>
 
-              <ul className="space-y-3 mb-8" role="list">
-                <li className="flex items-start gap-3">
-                  <ArrowRight
-                    className="w-4 h-4 text-accent mt-1 shrink-0"
-                    aria-hidden="true"
-                  />
-                  <span className="text-foreground/60">
-                    <strong className="text-foreground">
-                      Carlos Orencio Horta
-                    </strong>
-                    , Director of AI, Scotiabank
-                  </span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <ArrowRight
-                    className="w-4 h-4 text-accent mt-1 shrink-0"
-                    aria-hidden="true"
-                  />
-                  <span className="text-foreground/60">
-                    <strong className="text-foreground">
-                      Tanaby Zibamanzar
-                    </strong>
-                    , Director of Data Analytics
-                  </span>
-                </li>
-              </ul>
-
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-accent/5 border border-accent/10">
-                <GraduationCap
-                  className="w-6 h-6 text-accent shrink-0"
-                  aria-hidden="true"
-                />
-                <p className="text-foreground/70 text-sm">
-                  Graduated June 2025. Began studies at{" "}
-                  <strong className="text-foreground">
-                    Princeton University
-                  </strong>{" "}
-                  in September 2025.
-                </p>
+              <div className="space-y-0" role="list">
+                {[
+                  {
+                    name: "Carlos Orencio Horta",
+                    role: "Director of AI, Scotiabank",
+                  },
+                  {
+                    name: "Tanaby Zibamanzar",
+                    role: "Director of Data Analytics",
+                  },
+                ].map((person) => (
+                  <div
+                    key={person.name}
+                    role="listitem"
+                    className="flex items-center gap-3 py-2.5 border-b border-border last:border-b-0"
+                  >
+                    <ArrowRight
+                      className="w-3.5 h-3.5 text-accent shrink-0"
+                      aria-hidden="true"
+                    />
+                    <span className="text-sm text-foreground/60">
+                      <strong className="text-foreground font-semibold">
+                        {person.name}
+                      </strong>
+                      , {person.role}
+                    </span>
+                  </div>
+                ))}
               </div>
-            </div>
+            </motion.div>
           </div>
-        </FadeIn>
+        </div>
       </div>
     </section>
   );

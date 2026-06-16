@@ -1,9 +1,7 @@
 "use client";
 
+import { motion } from "framer-motion";
 import type { TeamMember } from "@/types";
-import { FadeIn } from "@/components/animations/FadeIn";
-import { StaggerContainer } from "@/components/animations/StaggerContainer";
-import { StaggerItem } from "@/components/animations/StaggerItem";
 
 interface TeamSectionProps {
   readonly members: readonly TeamMember[];
@@ -25,53 +23,56 @@ const AVATAR_COLORS = [
 export function TeamSection({ members }: TeamSectionProps) {
   return (
     <section
-      className="bg-background py-32 md:py-40"
+      className="bg-background py-8 md:py-10"
       aria-labelledby="team-heading"
     >
-      <div className="max-w-6xl mx-auto px-6">
-        <FadeIn>
-          <h2
-            id="team-heading"
-            className="text-3xl md:text-4xl font-bold text-foreground text-center mb-6"
-          >
-            Our Team
-          </h2>
-          <p className="text-foreground/60 text-center max-w-2xl mx-auto mb-16 text-lg">
-            Experienced educators, engineers, and entrepreneurs dedicated to
-            student success.
-          </p>
-        </FadeIn>
-
-        <StaggerContainer
-          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
-          staggerDelay={0.1}
+      <div className="max-w-7xl mx-auto px-6">
+        <motion.h2
+          id="team-heading"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="text-2xl md:text-3xl font-bold text-foreground mb-5"
         >
+          Our Team
+        </motion.h2>
+
+        {/* Dense horizontal roster */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-0">
           {members.map((member, index) => (
-            <StaggerItem key={member.name}>
-              <article className="flex flex-col items-center text-center p-6 rounded-2xl bg-card-bg border border-border hover:border-accent/30 transition-colors h-full">
-                <div
-                  className={`w-20 h-20 rounded-full bg-gradient-to-br ${
-                    AVATAR_COLORS[index % AVATAR_COLORS.length]
-                  } flex items-center justify-center mb-5`}
-                  aria-hidden="true"
-                >
-                  <span className="text-2xl font-bold text-white">
-                    {getInitial(member.name)}
-                  </span>
-                </div>
-                <h3 className="text-lg font-bold text-foreground mb-1">
+            <motion.article
+              key={member.name}
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.06, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="flex items-start gap-3 py-4 pr-4 border-b lg:border-b-0 lg:border-r border-border last:border-b-0 last:lg:border-r-0"
+            >
+              <div
+                className={`w-9 h-9 rounded-full bg-gradient-to-br ${
+                  AVATAR_COLORS[index % AVATAR_COLORS.length]
+                } flex items-center justify-center shrink-0`}
+                aria-hidden="true"
+              >
+                <span className="text-xs font-bold text-white">
+                  {getInitial(member.name)}
+                </span>
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-sm font-bold text-foreground leading-tight">
                   {member.name}
                 </h3>
-                <p className="text-sm font-medium text-accent mb-3">
+                <p className="text-[11px] font-medium text-accent mb-0.5">
                   {member.title}
                 </p>
-                <p className="text-foreground/50 text-sm leading-relaxed">
+                <p className="text-foreground/40 text-[11px] leading-relaxed">
                   {member.description}
                 </p>
-              </article>
-            </StaggerItem>
+              </div>
+            </motion.article>
           ))}
-        </StaggerContainer>
+        </div>
       </div>
     </section>
   );

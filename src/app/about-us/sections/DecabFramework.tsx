@@ -1,92 +1,124 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FadeIn } from "@/components/animations/FadeIn";
 
 const DECAB_ITEMS = [
   {
     letter: "D",
     title: "Design & Principles",
-    color: "from-blue-500/20 to-blue-600/10",
-    borderColor: "border-blue-500/30",
-    textColor: "text-blue-400",
+    accent: "text-blue-400",
+    bg: "bg-blue-500/8",
+    border: "border-blue-500/20",
   },
   {
     letter: "E",
     title: "Electrical Engineering",
-    color: "from-amber-500/20 to-amber-600/10",
-    borderColor: "border-amber-500/30",
-    textColor: "text-amber-400",
+    accent: "text-amber-400",
+    bg: "bg-amber-500/8",
+    border: "border-amber-500/20",
   },
   {
     letter: "C",
     title: "Computer Programming",
-    color: "from-emerald-500/20 to-emerald-600/10",
-    borderColor: "border-emerald-500/30",
-    textColor: "text-emerald-400",
+    accent: "text-emerald-400",
+    bg: "bg-emerald-500/8",
+    border: "border-emerald-500/20",
   },
   {
     letter: "A",
     title: "Application of Math & Physics",
-    color: "from-purple-500/20 to-purple-600/10",
-    borderColor: "border-purple-500/30",
-    textColor: "text-purple-400",
+    accent: "text-purple-400",
+    bg: "bg-purple-500/8",
+    border: "border-purple-500/20",
   },
   {
     letter: "B",
     title: "Business, Collaboration & Communication",
-    color: "from-rose-500/20 to-rose-600/10",
-    borderColor: "border-rose-500/30",
-    textColor: "text-rose-400",
+    accent: "text-rose-400",
+    bg: "bg-rose-500/8",
+    border: "border-rose-500/20",
   },
 ] as const;
 
 export function DecabFramework() {
   return (
     <section
-      className="bg-[#14161d] py-32 md:py-40"
+      className="bg-[#14161d] py-8 md:py-10"
       aria-labelledby="decab-heading"
     >
-      <div className="max-w-5xl mx-auto px-6">
-        <FadeIn>
-          <h2
-            id="decab-heading"
-            className="text-3xl md:text-4xl font-bold text-foreground text-center mb-4"
-          >
-            DECAB Competency Framework
-          </h2>
-          <p className="text-foreground/50 text-center max-w-2xl mx-auto mb-20 text-lg">
-            Five integrated competencies that define student growth at Ithaca.
-          </p>
-        </FadeIn>
-
-        <div
-          className="flex flex-col gap-4"
-          role="list"
-          aria-label="DECAB competencies"
-        >
-          {DECAB_ITEMS.map((item, index) => (
-            <motion.div
-              key={item.letter}
-              role="listitem"
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+          {/* Left: heading + large DECAB acronym */}
+          <div className="md:col-span-4">
+            <motion.h2
+              id="decab-heading"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-              className={`flex items-center gap-5 p-5 md:p-6 rounded-xl bg-gradient-to-r ${item.color} border ${item.borderColor} hover:scale-[1.01] transition-transform`}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="text-2xl md:text-3xl font-bold text-foreground mb-2"
             >
-              <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
+              DECAB Framework
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+              className="text-foreground/40 text-sm leading-relaxed max-w-[34ch]"
+            >
+              Five integrated competencies that define student growth at Ithaca.
+            </motion.p>
+
+            {/* Large acronym display */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="hidden md:flex gap-1.5 mt-6"
+              aria-hidden="true"
+            >
+              {DECAB_ITEMS.map((item) => (
                 <span
-                  className={`text-2xl md:text-3xl font-black ${item.textColor}`}
+                  key={item.letter}
+                  className={`text-4xl font-black ${item.accent} opacity-60`}
                 >
                   {item.letter}
                 </span>
-              </div>
-              <span className="text-lg md:text-xl font-semibold text-foreground">
-                {item.title}
-              </span>
+              ))}
             </motion.div>
-          ))}
+          </div>
+
+          {/* Right: dense competency list */}
+          <div
+            className="md:col-span-8"
+            role="list"
+            aria-label="DECAB competencies"
+          >
+            {DECAB_ITEMS.map((item, index) => (
+              <motion.div
+                key={item.letter}
+                role="listitem"
+                initial={{ opacity: 0, x: 16 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.06, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                className="flex items-center gap-4 py-3 border-b border-border last:border-b-0 group"
+              >
+                <div
+                  className={`w-9 h-9 rounded-md ${item.bg} border ${item.border} flex items-center justify-center shrink-0`}
+                >
+                  <span className={`text-lg font-black ${item.accent}`}>
+                    {item.letter}
+                  </span>
+                </div>
+                <span className="text-sm font-semibold text-foreground group-hover:text-accent transition-colors">
+                  {item.title}
+                </span>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

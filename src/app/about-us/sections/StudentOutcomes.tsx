@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import {
   FolderOpen,
   Settings,
@@ -9,9 +10,6 @@ import {
   Megaphone,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { FadeIn } from "@/components/animations/FadeIn";
-import { StaggerContainer } from "@/components/animations/StaggerContainer";
-import { StaggerItem } from "@/components/animations/StaggerItem";
 
 interface Outcome {
   readonly icon: LucideIcon;
@@ -61,45 +59,47 @@ const OUTCOMES: readonly Outcome[] = [
 export function StudentOutcomes() {
   return (
     <section
-      className="bg-background py-32 md:py-40"
+      className="bg-background py-8 md:py-10"
       aria-labelledby="outcomes-heading"
     >
-      <div className="max-w-5xl mx-auto px-6">
-        <FadeIn>
-          <h2
-            id="outcomes-heading"
-            className="text-3xl md:text-4xl font-bold text-foreground text-center mb-6"
-          >
-            Student Outcomes
-          </h2>
-          <p className="text-foreground/60 text-center max-w-2xl mx-auto mb-20 text-lg">
-            What students achieve through Ithaca programs.
-          </p>
-        </FadeIn>
-
-        <StaggerContainer
-          className="grid sm:grid-cols-2 gap-6"
-          staggerDelay={0.08}
+      <div className="max-w-7xl mx-auto px-6">
+        <motion.h2
+          id="outcomes-heading"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="text-2xl md:text-3xl font-bold text-foreground mb-5"
         >
-          {OUTCOMES.map((outcome) => (
-            <StaggerItem key={outcome.title}>
-              <div className="flex flex-col p-6 rounded-2xl bg-card-bg border border-border hover:border-accent/30 transition-colors h-full">
-                <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4">
-                  <outcome.icon
-                    className="w-6 h-6 text-accent"
-                    aria-hidden="true"
-                  />
-                </div>
-                <h3 className="text-lg font-bold text-foreground mb-2">
+          Student Outcomes
+        </motion.h2>
+
+        {/* Dense 2x3 grid with tight spacing */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-0">
+          {OUTCOMES.map((outcome, i) => (
+            <motion.div
+              key={outcome.title}
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.04, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="flex items-start gap-3 py-3.5 border-b border-border"
+            >
+              <outcome.icon
+                className="w-4 h-4 text-accent shrink-0 mt-0.5"
+                aria-hidden="true"
+              />
+              <div className="min-w-0">
+                <h3 className="text-sm font-bold text-foreground mb-0.5 leading-tight">
                   {outcome.title}
                 </h3>
-                <p className="text-foreground/60 text-sm leading-relaxed">
+                <p className="text-foreground/45 text-xs leading-relaxed">
                   {outcome.description}
                 </p>
               </div>
-            </StaggerItem>
+            </motion.div>
           ))}
-        </StaggerContainer>
+        </div>
       </div>
     </section>
   );

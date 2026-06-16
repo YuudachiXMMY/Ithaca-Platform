@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import {
   Search,
   PenTool,
@@ -9,9 +10,6 @@ import {
   Presentation,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { FadeIn } from "@/components/animations/FadeIn";
-import { StaggerContainer } from "@/components/animations/StaggerContainer";
-import { StaggerItem } from "@/components/animations/StaggerItem";
 
 interface WorkflowStep {
   readonly label: string;
@@ -27,61 +25,77 @@ const WORKFLOW_STEPS: readonly WorkflowStep[] = [
   { label: "Present", icon: Presentation },
 ] as const;
 
+const TAGS = ["Small Teams", "Weekly Milestones", "Technical Reviews"] as const;
+
 export function HowWeTeach() {
   return (
     <section
-      className="bg-[#14161d] py-32 md:py-40"
+      className="bg-[#14161d] py-8 md:py-10"
       aria-labelledby="how-we-teach-heading"
     >
-      <div className="max-w-6xl mx-auto px-6">
-        <FadeIn>
-          <h2
-            id="how-we-teach-heading"
-            className="text-3xl md:text-4xl font-bold text-foreground text-center mb-6"
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Top bar: heading left, tags right */}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
-            How We Teach
-          </h2>
-          <p className="text-foreground/60 text-center max-w-2xl mx-auto mb-8 text-lg">
-            Studio-style, project-based model. Small teams work through weekly
-            milestones with technical reviews at every stage.
-          </p>
-        </FadeIn>
+            <h2
+              id="how-we-teach-heading"
+              className="text-2xl md:text-3xl font-bold text-foreground mb-1"
+            >
+              How We Teach
+            </h2>
+            <p className="text-foreground/50 text-sm max-w-[44ch]">
+              Studio-style, project-based model. Small teams work through weekly
+              milestones with technical reviews at every stage.
+            </p>
+          </motion.div>
 
-        <FadeIn delay={0.2}>
-          <div className="flex flex-wrap justify-center gap-3 mb-16">
-            {["Small Teams", "Weekly Milestones", "Technical Reviews"].map(
-              (tag) => (
-                <span
-                  key={tag}
-                  className="px-4 py-2 rounded-full bg-accent/10 text-foreground/70 text-sm font-medium border border-accent/20"
-                >
-                  {tag}
-                </span>
-              )
-            )}
-          </div>
-        </FadeIn>
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="flex gap-2 shrink-0"
+          >
+            {TAGS.map((tag) => (
+              <span
+                key={tag}
+                className="px-2.5 py-1 rounded-md bg-accent/8 text-foreground/60 text-[11px] font-medium border border-accent/15"
+              >
+                {tag}
+              </span>
+            ))}
+          </motion.div>
+        </div>
 
-        <StaggerContainer
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6"
-          staggerDelay={0.08}
-        >
-          {WORKFLOW_STEPS.map((step) => (
-            <StaggerItem key={step.label}>
-              <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-card-bg border border-border hover:border-accent/30 transition-colors">
-                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
-                  <step.icon
-                    className="w-6 h-6 text-accent"
-                    aria-hidden="true"
-                  />
-                </div>
-                <span className="text-sm font-semibold text-foreground text-center">
-                  {step.label}
-                </span>
-              </div>
-            </StaggerItem>
+        {/* 6-step workflow as a full-width horizontal strip */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-0">
+          {WORKFLOW_STEPS.map((step, i) => (
+            <motion.div
+              key={step.label}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="relative flex flex-col items-center gap-2 py-5 px-3 border-t border-border hover:bg-white/[0.02] transition-colors"
+            >
+              <span className="font-mono text-[10px] text-foreground/25 absolute top-2 right-3 tabular-nums">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <step.icon
+                className="w-5 h-5 text-accent"
+                aria-hidden="true"
+              />
+              <span className="text-xs font-semibold text-foreground text-center">
+                {step.label}
+              </span>
+            </motion.div>
           ))}
-        </StaggerContainer>
+        </div>
       </div>
     </section>
   );

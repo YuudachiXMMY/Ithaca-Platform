@@ -23,7 +23,7 @@ const PROGRAMS: readonly Program[] = [
     description:
       "Design, build, and race electric vehicles while learning sustainable engineering and energy systems.",
     href: "/programs/ev-challenge",
-    image: "/media/images/ev-challenge-stock.jpg",
+    image: "/media/images/programs/ev-challenge/ev-challenge-stock.jpg",
     alt: "Students working on electric vehicle challenge",
   },
   {
@@ -31,7 +31,7 @@ const PROGRAMS: readonly Program[] = [
     description:
       "Immerse in AI and entrepreneurship through mentorship, workshops, and real startup challenges.",
     href: "/programs/ai-entrepreneurship-camp",
-    image: "/media/images/ai-camp-HB8A5465.jpg",
+    image: "/media/images/programs/ai-camp/ai-camp-HB8A5465.jpg",
     alt: "Students at AI entrepreneurship camp",
   },
   {
@@ -39,7 +39,7 @@ const PROGRAMS: readonly Program[] = [
     description:
       "Tackle real-world engineering problems through collaborative project work, from concept to prototype.",
     href: "/programs/engineering-projects",
-    image: "/media/images/ai-camp-HB8A5242.jpg",
+    image: "/media/images/programs/ai-camp/ai-camp-HB8A5242.jpg",
     alt: "Students collaborating on engineering projects",
   },
   {
@@ -47,7 +47,7 @@ const PROGRAMS: readonly Program[] = [
     description:
       "Explore our full range including AI Pioneers Interview, Ithaca Night, and seasonal camps.",
     href: "/programs",
-    image: "/media/images/about-hero.jpg",
+    image: "/media/images/site/about-hero.jpg",
     alt: "Overview of Ithaca Family Academy programs",
   },
 ] as const;
