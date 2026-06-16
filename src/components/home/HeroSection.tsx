@@ -72,12 +72,14 @@ export function HeroSection() {
 
       if (!sectionRef.current) return;
 
+      const isMobile = window.innerWidth < 768;
+
       ctx = gsap.context(() => {
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top top",
-            end: "+=200%",
+            end: isMobile ? "+=120%" : "+=200%",
             pin: true,
             scrub: 1,
             anticipatePin: 1,

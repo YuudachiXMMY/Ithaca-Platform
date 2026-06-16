@@ -108,21 +108,21 @@ export function Footer() {
             <p>
               &copy; {currentYear} Ithaca Family Academy. All rights reserved.
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
               <Link
                 href="/privacy"
                 className="transition-colors hover:text-accent"
               >
                 Privacy policy
               </Link>
-              <span aria-hidden="true">|</span>
+              <span className="hidden sm:inline" aria-hidden="true">|</span>
               <Link
                 href="/terms"
                 className="transition-colors hover:text-accent"
               >
                 Terms of service
               </Link>
-              <span aria-hidden="true">|</span>
+              <span className="hidden sm:inline" aria-hidden="true">|</span>
               <a
                 href={`mailto:${CONTACT_INFO.email}`}
                 className="transition-colors hover:text-accent"

@@ -137,7 +137,7 @@ function BentoCell({
   return (
     <Link
       href={program.href}
-      className="group relative flex h-full min-h-[200px] flex-col justify-end overflow-hidden bg-[#0a0c10] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent md:min-h-[240px]"
+      className="group relative flex h-full min-h-[180px] flex-col justify-end overflow-hidden bg-[#0a0c10] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent sm:min-h-[220px] md:min-h-[240px]"
     >
       {/* Background image */}
       <Image
@@ -158,12 +158,12 @@ function BentoCell({
       <div className={`relative z-10 p-4 md:p-5 ${large ? "md:p-6" : ""}`}>
         <h3
           className={`font-bold text-white ${
-            large ? "text-lg md:text-xl" : "text-sm md:text-base"
+            large ? "text-base sm:text-lg md:text-xl" : "text-sm md:text-base"
           }`}
         >
           {program.title}
         </h3>
-        <p className="mt-1.5 max-w-md text-xs leading-relaxed text-white/60">
+        <p className="mt-1.5 hidden max-w-md text-xs leading-relaxed text-white/60 sm:block">
           {program.description}
         </p>
         <div className="mt-3 flex items-center gap-1.5 text-xs font-medium text-accent transition-colors duration-200 group-hover:text-accent-hover">

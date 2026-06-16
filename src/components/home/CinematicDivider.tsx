@@ -35,12 +35,14 @@ export function CinematicDivider() {
 
       if (!sectionRef.current) return;
 
+      const isMobile = window.innerWidth < 768;
+
       ctx = gsap.context(() => {
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top top",
-            end: "+=120%",
+            end: isMobile ? "+=70%" : "+=120%",
             pin: true,
             scrub: 1.5,
           },
@@ -190,7 +192,7 @@ export function CinematicDivider() {
         <p className="text-[11px] font-semibold tracking-[0.25em] text-accent/70 uppercase">
           Featured
         </p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-white md:text-5xl">
+        <h2 className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-5xl">
           Meet with Dr. Reza Moridi
         </h2>
       </div>

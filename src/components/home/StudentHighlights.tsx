@@ -141,14 +141,14 @@ function HighlightCell({
 
       {/* Dense data strip at bottom */}
       <div className="absolute inset-x-0 bottom-0 p-3 md:p-4">
-        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-accent/70">
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent/70 md:text-[9px]">
           {highlight.tag}
         </span>
-        <h3 className="mt-1 text-[13px] font-bold leading-tight text-white md:text-sm">
+        <h3 className="mt-1 text-sm font-bold leading-tight text-white md:text-sm">
           {highlight.title}
         </h3>
         {showDescription && (
-          <p className="mt-1.5 line-clamp-2 text-[10px] leading-snug text-white/40 md:text-[11px]">
+          <p className="mt-1.5 line-clamp-2 text-[11px] leading-snug text-white/40 md:text-[11px]">
             {highlight.description}
           </p>
         )}
@@ -242,10 +242,36 @@ function DesktopHorizontalMosaic({
         reduce ? "overflow-x-auto" : "overflow-hidden"
       }`}
     >
-      <div
-        ref={trackRef}
-        className="flex min-h-[100dvh] items-stretch gap-[2px] px-5 pb-2 pt-20 sm:px-8 md:px-[6vw]"
-      >
+      {/* Full-viewport column: nav clearance + data strip + mosaic */}
+      <div className="flex h-[100dvh] flex-col pt-18">
+        {/* Compact data-strip header - sits directly below fixed nav */}
+        <div className="shrink-0 px-5 sm:px-8 md:px-[6vw]">
+          <div className="flex items-end justify-between border-b border-white/[0.06] pb-3 pt-4">
+            <h2 className="text-xl font-bold tracking-tight text-white md:text-3xl">
+              Student Highlights
+            </h2>
+            <p className="max-w-xs text-right text-[11px] leading-relaxed text-white/30">
+              Real experiences from our programs that inspire the next
+              generation of innovators.
+            </p>
+          </div>
+          <div className="flex gap-6 overflow-x-auto py-2.5">
+            {HIGHLIGHTS.map((h, i) => (
+              <span
+                key={h.tag}
+                className="shrink-0 font-mono text-[9px] uppercase tracking-[0.15em] text-white/20"
+              >
+                {String(i + 1).padStart(2, "0")} {h.tag}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Horizontal scroll mosaic track - fills remaining viewport */}
+        <div
+          ref={trackRef}
+          className="flex flex-1 items-stretch gap-[2px] px-5 pb-2 sm:px-8 md:px-[6vw]"
+        >
         {COLUMNS.map((col, ci) => {
           if (col.type === "hero") {
             const h = HIGHLIGHTS[col.index];
@@ -301,6 +327,7 @@ function DesktopHorizontalMosaic({
         {/* Trailing spacer so last column can reach center */}
         <div className="w-[20vw] shrink-0" aria-hidden="true" />
       </div>
+      </div>
 
       {/* Thin progress indicator */}
       <div className="absolute inset-x-0 bottom-0 h-[2px] bg-white/[0.04]">
@@ -322,39 +349,19 @@ export function StudentHighlights() {
 
   return (
     <section aria-label="Student Highlights">
-      {/* ── Compact data-strip header ─────────────────────────── */}
-      <div className="bg-[#0e1015] px-5 sm:px-8 md:px-[6vw]">
-        <div className="flex items-end justify-between border-b border-white/[0.06] pb-4 pt-10 md:pt-14">
-          <div>
-            <h2 className="text-xl font-bold tracking-tight text-white md:text-3xl">
+      {/* ── Mobile: header + 2-col grid (< md) ─────────────────── */}
+      <div className="bg-[#0e1015] md:hidden">
+        <div className="px-5 sm:px-8">
+          <div className="flex items-end justify-between border-b border-white/[0.06] pb-4 pt-10">
+            <h2 className="text-xl font-bold tracking-tight text-white">
               Student Highlights
             </h2>
           </div>
-          <p className="hidden max-w-xs text-right text-[11px] leading-relaxed text-white/30 md:block">
-            Real experiences from our programs that inspire the next
-            generation of innovators.
-          </p>
         </div>
-
-        {/* Category index strip - hidden on mobile to prevent overflow */}
-        <div className="hidden gap-5 overflow-x-auto py-3 md:flex md:gap-6">
-          {HIGHLIGHTS.map((h, i) => (
-            <span
-              key={h.tag}
-              className="shrink-0 font-mono text-[9px] uppercase tracking-[0.15em] text-white/20"
-            >
-              {String(i + 1).padStart(2, "0")} {h.tag}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Mobile: 2-col grid (< md) ──────────────────────────── */}
-      <div className="bg-[#0e1015] md:hidden">
         <MobileHighlightsGrid />
       </div>
 
-      {/* ── Desktop: GSAP horizontal scroll mosaic (md+) ───────── */}
+      {/* ── Desktop: data-strip + mosaic pinned together (md+) ── */}
       <div className="hidden md:block">
         <DesktopHorizontalMosaic reduce={reduce} />
       </div>

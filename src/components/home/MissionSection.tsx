@@ -48,7 +48,11 @@ export function MissionSection() {
   const reduce = useReducedMotion();
 
   useEffect(() => {
+    /* Skip GSAP sticky-stack on mobile - pinning causes jank on
+       touch devices due to iOS Safari address-bar resize and
+       elastic overscroll conflicting with position:fixed. */
     if (reduce || !stackRef.current) return;
+    if (typeof window !== "undefined" && window.innerWidth < 768) return;
 
     let ctx: { revert: () => void } | undefined;
 
@@ -103,12 +107,12 @@ export function MissionSection() {
         {PILLARS.map((pillar, i) => (
           <div
             key={pillar.title}
-            className="mission-card sticky top-0 min-h-[100dvh] bg-[#111318]"
+            className="mission-card top-0 bg-[#111318] md:sticky md:min-h-[100dvh]"
           >
-            <div className="mx-auto grid min-h-[100dvh] max-w-[1400px] items-center md:grid-cols-2">
+            <div className="mx-auto grid max-w-[1400px] items-center md:min-h-[100dvh] md:grid-cols-2">
               {/* Image */}
               <div
-                className={`relative aspect-[4/3] overflow-hidden md:aspect-auto md:h-[100dvh] ${
+                className={`relative aspect-[16/10] overflow-hidden md:aspect-auto md:h-[100dvh] ${
                   i % 2 === 1 ? "md:order-2" : ""
                 }`}
               >

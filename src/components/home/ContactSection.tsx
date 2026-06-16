@@ -189,7 +189,7 @@ export function ContactSection() {
 
   return (
     <section
-      className="relative flex items-center justify-center bg-[#111318] px-5 py-16 sm:px-8 lg:min-h-[calc(100dvh-21rem)] lg:py-0"
+      className="relative flex items-center justify-center bg-[#111318] px-5 py-16 sm:px-8 lg:min-h-[calc(100dvh-25.5rem)] lg:pt-[4.5rem] lg:pb-0"
       aria-label="Contact Us"
     >
       <OrbitalField />
