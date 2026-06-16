@@ -41,6 +41,95 @@ const CONTACT_ITEMS: readonly ContactItem[] = [
 ] as const;
 
 /* ------------------------------------------------------------------ */
+/*  Floating particle positions                                       */
+/* ------------------------------------------------------------------ */
+
+const PARTICLES = [
+  { x: "12%", y: "18%", size: 4, dur: 6, delay: 0 },
+  { x: "86%", y: "30%", size: 3, dur: 7.5, delay: 0.8 },
+  { x: "22%", y: "74%", size: 4, dur: 8, delay: 1.6 },
+  { x: "74%", y: "70%", size: 3, dur: 6.5, delay: 2.4 },
+  { x: "48%", y: "10%", size: 3, dur: 9, delay: 3.2 },
+  { x: "90%", y: "80%", size: 4, dur: 7, delay: 1.2 },
+] as const;
+
+/* ------------------------------------------------------------------ */
+/*  OrbitalField - perpetual non-transition animation                 */
+/*  Three concentric rings rotating at different speeds/directions,   */
+/*  a breathing ambient glow, and scattered floating particles.       */
+/* ------------------------------------------------------------------ */
+
+function OrbitalField() {
+  const reduce = useReducedMotion();
+  if (reduce) return null;
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden"
+      aria-hidden="true"
+    >
+      {/* Breathing ambient glow at center */}
+      <motion.div
+        animate={{ opacity: [0.04, 0.12, 0.04] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute h-40 w-40 rounded-full bg-accent blur-[100px] md:h-56 md:w-56"
+      />
+
+      {/* Outer ring - slowest, clockwise */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+        className="absolute h-[18rem] w-[18rem] rounded-full border border-accent/[0.06] md:h-[26rem] md:w-[26rem]"
+        style={{ willChange: "transform" }}
+      >
+        <div className="absolute -left-1 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-accent/20" />
+        <div className="absolute -right-1 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-accent/10" />
+      </motion.div>
+
+      {/* Middle ring - counter-clockwise */}
+      <motion.div
+        animate={{ rotate: -360 }}
+        transition={{ duration: 26, repeat: Infinity, ease: "linear" }}
+        className="absolute h-[12rem] w-[12rem] rounded-full border border-accent/[0.04] md:h-[17rem] md:w-[17rem]"
+        style={{ willChange: "transform" }}
+      >
+        <div className="absolute left-1/2 -top-1 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-accent/25" />
+      </motion.div>
+
+      {/* Inner ring - fastest, clockwise */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
+        className="absolute h-[7rem] w-[7rem] rounded-full border border-accent/[0.08] md:h-[10rem] md:w-[10rem]"
+        style={{ willChange: "transform" }}
+      >
+        <div className="absolute -bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-accent/30" />
+        <div className="absolute -top-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-accent/15" />
+      </motion.div>
+
+      {/* Floating particles */}
+      {PARTICLES.map((p, i) => (
+        <motion.div
+          key={i}
+          animate={{
+            y: [0, -8, 0, 6, 0],
+            opacity: [0.12, 0.28, 0.12, 0.2, 0.12],
+          }}
+          transition={{
+            duration: p.dur,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: p.delay,
+          }}
+          className="absolute rounded-full bg-accent/20"
+          style={{ left: p.x, top: p.y, width: p.size, height: p.size }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  MagneticButton - spring-physics hover pull                        */
 /* ------------------------------------------------------------------ */
 
@@ -80,91 +169,114 @@ function MagneticButton({
       style={reduce ? undefined : { x: springX, y: springY }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="group inline-flex h-12 items-center gap-2 bg-accent px-8 text-sm font-semibold tracking-wide text-foreground-dark transition-colors duration-200 hover:bg-accent-hover active:scale-[0.97] active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      className="group/cta inline-flex h-12 items-center gap-2 bg-accent px-8 text-sm font-semibold tracking-wide text-foreground-dark transition-colors duration-200 hover:bg-accent-hover active:scale-[0.97] active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
     >
       <span>{children}</span>
-      <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+      <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover/cta:translate-x-1" />
     </motion.a>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/*  ContactSection - full-bleed CTA with magnetic button              */
+/*  ContactSection                                                    */
+/*  Centered, symmetric layout (VARIANCE=1) with generous spacing     */
+/*  (DENSITY=3) and perpetual orbital animation (MOTION=10).          */
+/*  Uses lg:min-h to share viewport with Footer as one screen.        */
 /* ------------------------------------------------------------------ */
 
 export function ContactSection() {
   const reduce = useReducedMotion();
 
   return (
-    <section className="bg-[#111318] py-12 md:py-16" aria-label="Contact Us">
-      <div className="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
-        <div className="grid gap-10 md:grid-cols-[1.2fr_1fr] md:items-start md:gap-16">
-          {/* Left - headline + subtext */}
-          <motion.div
-            initial={reduce ? false : { opacity: 0, x: -24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ type: "spring", stiffness: 80, damping: 20 }}
-          >
-            <h2 className="text-2xl font-bold text-white md:text-4xl lg:text-5xl">
-              Get In Touch
-            </h2>
-            <p className="mt-4 max-w-md text-sm leading-relaxed text-white/50">
-              Ready to set your child on the road to discovery? Contact us to
-              learn more about our programs and enrollment.
-            </p>
-          </motion.div>
+    <section
+      className="relative flex items-center justify-center bg-[#111318] px-5 py-16 sm:px-8 lg:min-h-[calc(100dvh-21rem)] lg:py-0"
+      aria-label="Contact Us"
+    >
+      <OrbitalField />
 
-          {/* Right - contact info with 1px separators + CTA */}
-          <motion.div
-            initial={reduce ? false : { opacity: 0, x: 24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{
-              type: "spring",
-              stiffness: 80,
-              damping: 20,
-              delay: 0.1,
-            }}
-          >
-            <ul className="divide-y divide-white/[0.06]">
-              {CONTACT_ITEMS.map((item) => {
-                const Icon = item.icon;
-                const inner = (
-                  <li key={item.label} className="flex items-center gap-4 py-4">
-                    <Icon className="h-4 w-4 shrink-0 text-accent/60" />
-                    <div className="min-w-0">
-                      <p className="font-mono text-[10px] tracking-[0.15em] text-white/30 uppercase">
-                        {item.label}
-                      </p>
-                      <p className="text-sm text-white">{item.value}</p>
-                    </div>
-                  </li>
-                );
+      <div className="relative z-10 mx-auto max-w-2xl text-center">
+        {/* Heading */}
+        <motion.h2
+          initial={reduce ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ type: "spring", stiffness: 80, damping: 20 }}
+          className="text-3xl font-bold text-white md:text-5xl"
+        >
+          Get In Touch
+        </motion.h2>
 
-                if (item.href) {
-                  return (
-                    <a
-                      key={item.label}
-                      href={item.href}
-                      className="block transition-opacity duration-200 hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-                    >
-                      {inner}
-                    </a>
-                  );
-                }
+        {/* Subtext */}
+        <motion.p
+          initial={reduce ? false : { opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{
+            type: "spring",
+            stiffness: 80,
+            damping: 20,
+            delay: 0.08,
+          }}
+          className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/50"
+        >
+          Ready to set your child on the road to discovery? Contact us to learn
+          more about our programs and enrollment.
+        </motion.p>
 
-                return <div key={item.label}>{inner}</div>;
-              })}
-            </ul>
+        {/* Contact details - centered horizontal row */}
+        <motion.ul
+          initial={reduce ? false : { opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{
+            type: "spring",
+            stiffness: 80,
+            damping: 20,
+            delay: 0.16,
+          }}
+          className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6"
+        >
+          {CONTACT_ITEMS.map((item) => {
+            const Icon = item.icon;
+            const content = (
+              <span className="flex items-center gap-2 text-sm text-white/50 transition-colors duration-200">
+                <Icon className="h-3.5 w-3.5 shrink-0 text-accent/50" />
+                {item.value}
+              </span>
+            );
 
-            <div className="mt-8">
-              <MagneticButton href="/contact-us">
-                Get in touch
-              </MagneticButton>
-            </div>
-          </motion.div>
-        </div>
+            return (
+              <li key={item.label}>
+                {item.href ? (
+                  <a
+                    href={item.href}
+                    className="[&_span]:hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  >
+                    {content}
+                  </a>
+                ) : (
+                  content
+                )}
+              </li>
+            );
+          })}
+        </motion.ul>
+
+        {/* CTA */}
+        <motion.div
+          initial={reduce ? false : { opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{
+            type: "spring",
+            stiffness: 80,
+            damping: 20,
+            delay: 0.24,
+          }}
+          className="mt-8"
+        >
+          <MagneticButton href="/contact-us">Get in touch</MagneticButton>
+        </motion.div>
       </div>
     </section>
   );

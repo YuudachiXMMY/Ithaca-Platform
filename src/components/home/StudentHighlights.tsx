@@ -244,7 +244,7 @@ function DesktopHorizontalMosaic({
     >
       <div
         ref={trackRef}
-        className="flex min-h-[100dvh] items-stretch gap-[2px] px-5 py-2 sm:px-8 md:px-[6vw]"
+        className="flex min-h-[100dvh] items-stretch gap-[2px] px-5 pb-2 pt-20 sm:px-8 md:px-[6vw]"
       >
         {COLUMNS.map((col, ci) => {
           if (col.type === "hero") {

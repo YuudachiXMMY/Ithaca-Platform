@@ -11,9 +11,9 @@ export function Footer() {
 
   return (
     <footer className="border-t border-border bg-[#0d0f14]" role="contentinfo">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Top grid */}
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {/* About column */}
           <div>
             <Link href="/" aria-label="Ithaca Family Academy home">
@@ -25,7 +25,7 @@ export function Footer() {
                 className="h-10 w-auto"
               />
             </Link>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-foreground/60">
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-foreground/60">
               Empowering youth to explore the future and build the skills to
               thrive in the AI era through project-based learning, innovation
               challenges, and mentorship.
@@ -37,7 +37,7 @@ export function Footer() {
             <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">
               Quick Links
             </h3>
-            <ul className="mt-4 space-y-2.5">
+            <ul className="mt-3 space-y-2">
               {QUICK_LINKS.map((item) => (
                 <li key={item.href}>
                   <Link
@@ -56,7 +56,7 @@ export function Footer() {
             <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">
               Contact Us
             </h3>
-            <ul className="mt-4 space-y-3">
+            <ul className="mt-3 space-y-2.5">
               <li>
                 <a
                   href={`mailto:${CONTACT_INFO.email}`}
@@ -92,25 +92,22 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Newsletter section */}
-        <div className="mt-10 border-t border-border pt-8">
-          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-            <div>
-              <h3 className="text-sm font-semibold text-foreground">
-                Stay updated
-              </h3>
-              <p className="mt-1 text-sm text-foreground/60">
-                Subscribe to our newsletter for the latest programs and events.
-              </p>
-            </div>
+        {/* Newsletter - compact inline row */}
+        <div className="mt-6 border-t border-border pt-5">
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+            <p className="text-sm text-foreground/60">
+              Stay updated with our latest programs and events.
+            </p>
             <NewsletterForm variant="dark" />
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-8 border-t border-border pt-6">
+        <div className="mt-4 border-t border-border pt-4">
           <div className="flex flex-col items-center gap-3 text-xs text-foreground/40 sm:flex-row sm:justify-between">
-            <p>&copy; {currentYear} Ithaca Family Academy. All rights reserved.</p>
+            <p>
+              &copy; {currentYear} Ithaca Family Academy. All rights reserved.
+            </p>
             <div className="flex items-center gap-4">
               <Link
                 href="/privacy"
