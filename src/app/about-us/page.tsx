@@ -16,11 +16,11 @@ import { NewsletterSection } from "./sections/NewsletterSection";
 export const metadata: Metadata = {
   title: "About Us | Ithaca Family Academy",
   description:
-    "Learn about Ithaca Family Academy — our mission, teaching philosophy, team, and how we empower youth to explore the future.",
+    "Learn about Ithaca Family Academy, our mission, teaching philosophy, team, and how we empower youth to explore the future.",
   openGraph: {
     title: "About Us | Ithaca Family Academy",
     description:
-      "Learn about Ithaca Family Academy — our mission, teaching philosophy, team, and how we empower youth to explore the future.",
+      "Learn about Ithaca Family Academy, our mission, teaching philosophy, team, and how we empower youth to explore the future.",
   },
 };
 

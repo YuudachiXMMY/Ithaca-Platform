@@ -6,47 +6,77 @@ interface TeamSectionProps {
 }
 
 export function TeamSection({ members }: TeamSectionProps) {
+  const [first, ...rest] = members;
+
   return (
-    <section className="bg-white py-24">
-      <div className="max-w-5xl mx-auto px-6">
-        <h2 className="text-3xl font-bold text-gray-900 mb-10">
+    <section className="bg-[#0c0e12] py-28" aria-labelledby="team-heading">
+      <div className="max-w-[1400px] mx-auto px-6">
+        <h2
+          id="team-heading"
+          className="text-2xl md:text-4xl font-bold text-white tracking-tight"
+        >
           Team &amp; Mentors
         </h2>
+        <p className="text-gray-400 mt-4 max-w-xl leading-relaxed">
+          Our team combines classroom expertise with industry experience to
+          guide students through real-world challenges.
+        </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {members.map((member) => (
-            <div key={member.name}>
-              {member.image ? (
-                <Image
-                  src={member.image}
-                  alt={member.name}
-                  width={182}
-                  height={182}
-                  className="rounded object-cover w-[182px] h-[182px]"
-                />
-              ) : (
-                <div className="w-[182px] h-[182px] rounded bg-gray-200" />
-              )}
-
-              <h4 className="text-base font-bold text-gray-900 mt-4">
-                {member.name}
-              </h4>
-
-              <div>
-                <p className="text-sm font-semibold text-gray-600">
-                  <strong>{member.title}</strong>
-                </p>
-                {member.name === "Mr. Grant Bourne" && (
-                  <p className="text-sm font-bold text-gray-900 mt-1">
-                    <strong>Race Driver</strong>
-                  </p>
+        {/* Asymmetric layout: featured member (large) + others (stacked right) */}
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-8 mt-12">
+          {/* Featured member */}
+          {first && (
+            <div>
+              <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-[#111318]">
+                {first.image && (
+                  <Image
+                    src={first.image}
+                    alt={first.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                  />
                 )}
-                <p className="text-sm text-gray-600 mt-1">
+              </div>
+              <h4 className="text-base font-bold text-white mt-5">
+                {first.name}
+              </h4>
+              <p className="text-sm font-medium text-[#ccdef0]">
+                {first.title}
+              </p>
+              <p className="text-sm text-gray-400 mt-2 leading-relaxed">
+                {first.description}
+              </p>
+            </div>
+          )}
+
+          {/* Remaining members in a grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {rest.map((member) => (
+              <div key={member.name}>
+                <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-[#111318]">
+                  {member.image && (
+                    <Image
+                      src={member.image}
+                      alt={member.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 20vw"
+                    />
+                  )}
+                </div>
+                <h4 className="text-sm font-bold text-white mt-4">
+                  {member.name}
+                </h4>
+                <p className="text-xs font-medium text-gray-500">
+                  {member.title}
+                </p>
+                <p className="text-xs text-gray-500 mt-1 leading-relaxed">
                   {member.description}
                 </p>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>
