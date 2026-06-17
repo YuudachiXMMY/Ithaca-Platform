@@ -1,44 +1,44 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 
 export function CTASection() {
   return (
-    <section
-      className="bg-[#14161d] py-8 md:py-10"
-      aria-labelledby="cta-heading"
-    >
-      <div className="max-w-7xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-6 border-t border-b border-border"
-        >
-          <div>
-            <h2
-              id="cta-heading"
-              className="text-2xl md:text-3xl font-bold text-foreground mb-1"
-            >
-              Ready to Get Started?
-            </h2>
-            <p className="text-foreground/50 text-sm max-w-[44ch]">
-              Connect with us to learn more about our programs and how we can
-              support your child&apos;s journey.
+    <section className="bg-white py-24">
+      <div className="max-w-5xl mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
+          <div className="md:col-span-7">
+            <h4 className="text-xl font-bold text-gray-900">
+              Educators &amp; Instructional Leads
+            </h4>
+            <p className="text-gray-600 mt-3 leading-relaxed">
+              Our teaching team blends classroom expertise with hands-on
+              engineering practice. Instructors guide students through core
+              concepts, workshop safety, and disciplined project execution -
+              helping them build confidence, troubleshoot effectively, and
+              develop strong learning habits through consistent feedback and
+              coaching.
             </p>
           </div>
 
-          <Link
-            href="/contact-us"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-foreground-dark font-semibold rounded-lg text-sm transition-all hover:bg-accent-hover hover:gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#14161d] shrink-0"
-          >
-            Connect Now
-            <ArrowRight className="w-4 h-4" aria-hidden="true" />
-          </Link>
-        </motion.div>
+          <div className="md:col-span-5">
+            <h4 className="text-xl font-bold text-gray-900">
+              Industry Mentors &amp; Guest Experts
+            </h4>
+            <p className="text-gray-600 mt-3 leading-relaxed">
+              We invite professionals from engineering, AI, and related
+              industries to mentor, review student work, and share real-world
+              perspectives. Through guest sessions, portfolio reviews, and
+              community connections, students learn what high standards look like
+              and how to effectively communicate their work to technical and
+              non-technical audiences.
+            </p>
+            <Link
+              href="/contact-us"
+              className="mt-6 inline-block px-8 py-3.5 bg-gray-900 text-white font-semibold rounded text-sm hover:bg-gray-800 transition-colors"
+            >
+              Connect Now
+            </Link>
+          </div>
+        </div>
       </div>
     </section>
   );

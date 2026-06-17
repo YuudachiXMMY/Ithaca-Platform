@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { TEAM_MEMBERS } from "@/types";
 import { HeroSection } from "./sections/HeroSection";
-import { PillarsSection } from "./sections/PillarsSection";
 import { LearningPathway } from "./sections/LearningPathway";
-import { HowWeTeach } from "./sections/HowWeTeach";
-import { EthicsSection } from "./sections/EthicsSection";
+import { HowWeTeachEthics } from "./sections/HowWeTeachEthics";
 import { DecabFramework } from "./sections/DecabFramework";
+import { OurPrograms } from "./sections/OurPrograms";
 import { StudentOutcomes } from "./sections/StudentOutcomes";
+import { StudentHighlights } from "./sections/StudentHighlights";
 import { StudentHighlight } from "./sections/StudentHighlight";
+import { CommunitySpotlight } from "./sections/CommunitySpotlight";
 import { TeamSection } from "./sections/TeamSection";
 import { CTASection } from "./sections/CTASection";
 import { NewsletterSection } from "./sections/NewsletterSection";
@@ -25,15 +26,16 @@ export const metadata: Metadata = {
 
 export default function AboutUsPage() {
   return (
-    <div className="flex flex-col">
+    <div>
       <HeroSection />
-      <PillarsSection />
       <LearningPathway />
-      <HowWeTeach />
-      <EthicsSection />
+      <HowWeTeachEthics />
       <DecabFramework />
+      <OurPrograms />
       <StudentOutcomes />
+      <StudentHighlights />
       <StudentHighlight />
+      <CommunitySpotlight />
       <TeamSection members={TEAM_MEMBERS} />
       <CTASection />
       <NewsletterSection />

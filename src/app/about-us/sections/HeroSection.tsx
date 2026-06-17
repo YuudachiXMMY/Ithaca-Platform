@@ -1,74 +1,85 @@
-"use client";
-
 import Image from "next/image";
-import { motion } from "framer-motion";
+
+interface MissionBlock {
+  readonly title: string;
+  readonly description: string;
+  readonly image: string;
+  readonly imageAlt: string;
+  readonly reversed: boolean;
+}
+
+const MISSION_BLOCKS: readonly MissionBlock[] = [
+  {
+    title: "Our Mission",
+    description:
+      "Ithaca empowers young people to explore the future and supports the next generation to take on responsibility in this fast-evolving world.",
+    image: "/media/images/pillars/pillar-explore.png",
+    imageAlt: "Students exploring and discovering at Ithaca",
+    reversed: false,
+  },
+  {
+    title: "We help teens explore the future.",
+    description:
+      "We guide students through real-world projects where they learn by building, testing, collaborating, and presenting. They can discover their strengths, interests, and a direction that is truly their own.",
+    image: "/media/images/pillars/pillar-pbl.jpg",
+    imageAlt: "Students working on project-based learning",
+    reversed: true,
+  },
+  {
+    title:
+      "At Ithaca, students are not passive learners. They are project owners.",
+    description:
+      "We use Project-Based Learning (PBL) to connect learning with real-world problems and challenges, and to develop practical skills that traditional academics alone cannot fully cover.",
+    image: "/media/images/programs/ai-camp/ai-camp-HB8A5465.jpg",
+    imageAlt: "Students owning their projects at AI camp",
+    reversed: false,
+  },
+  {
+    title: "We value social impact and AI ethics.",
+    description:
+      "Students learn how to use AI responsibly, cite properly, and build work that can be explained and defended through transparent review and public showcase formats.",
+    image: "/media/images/pillars/pillar-ethics.jpg",
+    imageAlt: "Students learning about AI ethics and social impact",
+    reversed: true,
+  },
+] as const;
 
 export function HeroSection() {
   return (
-    <section
-      className="relative w-full min-h-[100dvh] flex items-end overflow-hidden"
-      aria-label="About Ithaca Family Academy"
-    >
-      <Image
-        src="/media/images/site/about-hero.jpg"
-        alt="Students collaborating at Ithaca Family Academy"
-        fill
-        priority
-        className="object-cover"
-        sizes="100vw"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#111318] via-[#111318]/70 to-transparent" aria-hidden="true" />
+    <section className="bg-white py-24" aria-labelledby="about-heading">
+      <div className="max-w-5xl mx-auto px-6">
+        <h1
+          id="about-heading"
+          className="text-4xl md:text-5xl font-bold text-center text-gray-900 mb-12"
+        >
+          About Ithaca
+        </h1>
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pb-12 md:pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
-          {/* Left: main headline */}
-          <div className="md:col-span-7">
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.05]"
+        <div className="flex flex-col gap-12">
+          {MISSION_BLOCKS.map((block) => (
+            <div
+              key={block.title}
+              className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start"
             >
-              Preparing youth
-              <br />
-              for what comes next
-            </motion.h1>
-          </div>
-
-          {/* Right: descriptor + stats strip */}
-          <div className="md:col-span-5">
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="text-base text-white/70 leading-relaxed max-w-[42ch] mb-5"
-            >
-              Ithaca empowers young people to explore the future and supports the
-              next generation to take on responsibility in this fast-evolving world.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex gap-8"
-            >
-              {[
-                { value: "4", label: "Core programs" },
-                { value: "5", label: "DECAB pillars" },
-                { value: "6", label: "Stage workflow" },
-              ].map((stat) => (
-                <div key={stat.label} className="flex flex-col">
-                  <span className="font-mono text-2xl font-bold text-accent tabular-nums">
-                    {stat.value}
-                  </span>
-                  <span className="text-[11px] text-white/40 uppercase tracking-wider">
-                    {stat.label}
-                  </span>
-                </div>
-              ))}
-            </motion.div>
-          </div>
+              <div className={block.reversed ? "md:order-2" : undefined}>
+                <Image
+                  src={block.image}
+                  alt={block.imageAlt}
+                  width={800}
+                  height={400}
+                  priority={block.title === "Our Mission"}
+                  className="aspect-[2/1] rounded object-cover w-full"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
+              <div className={block.reversed ? "md:order-1" : undefined}>
+                <h4 className="text-xl font-bold text-gray-900">
+                  {block.title}
+                </h4>
+                <p className="text-gray-600 mt-3">{block.description}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

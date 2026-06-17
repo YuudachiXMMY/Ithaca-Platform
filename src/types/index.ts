@@ -52,24 +52,31 @@ export const TEAM_MEMBERS: TeamMember[] = [
     name: "Mr. Joshua Wang",
     title: "Founder & Principal",
     description:
-      "Editorial writer of leading business media, adjunct professor at universities.",
+      "Mr. Joshua Wang was an editorial writer of leading business media, adjunct professor at universities.",
+    image:
+      "https://img1.wsimg.com/isteam/ip/66d65d76-4785-410c-b8a1-b3b2d3199884/Weixin%20Image_20251125181810_444_1752.jpg/:/cr=t:4.88%25,l:0%25,w:100%25,h:84.37%25/rs=w:365,h:365,cg:true",
   },
   {
     name: "Mr. Jadyn Wu",
     title: "Dean of Education & Technology",
-    description:
-      "Focusing on AI and Engineering Education for Youth.",
+    description: "Focusing on AI and Engineering Education for Youth",
+    image:
+      "https://img1.wsimg.com/isteam/ip/66d65d76-4785-410c-b8a1-b3b2d3199884/Jadyn%20Wu.png/:/cr=t:7.94%25,l:0%25,w:100%25,h:79.29%25/rs=w:365,h:365,cg:true",
   },
   {
     name: "Ms. Kristen Perry",
     title: "Mentor of Business Module",
     description:
-      "Founder, educator, and investor supporting entrepreneurs tackling complex global challenges.",
+      "Ms. Kristen Perry is a founder, educator, and investor who focuses on supporting entrepreneurs looking to tackle complex global challenges.",
+    image:
+      "https://img1.wsimg.com/isteam/ip/66d65d76-4785-410c-b8a1-b3b2d3199884/Ms.%20Kristen%20Perry.png/:/cr=t:2.33%25,l:0%25,w:100%25,h:95.33%25/rs=w:365,h:365,cg:true",
   },
   {
     name: "Mr. Grant Bourne",
-    title: "EV Program Lead & Coach, Race Driver",
-    description: "2025 Pirelli GT4 Champion.",
+    title: "EV Program Lead & Coach",
+    description: "2025 Pirelli GT4 Champion",
+    image:
+      "https://img1.wsimg.com/isteam/ip/66d65d76-4785-410c-b8a1-b3b2d3199884/Weixin%20Image_20260102150322_1634_1752.png/:/cr=t:0%25,l:0%25,w:100%25,h:100%25/rs=w:365,h:365,cg:true",
   },
 ];
 
