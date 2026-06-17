@@ -30,10 +30,10 @@ const PROGRAMS: readonly ProgramCard[] = [
     href: "/programs/engineering-projects",
   },
   {
-    title: "AI Pioneers Interview",
+    title: "Elite Interviews",
     description:
-      "Exclusive interview series with leading AI researchers and industry pioneers shaping the future.",
-    href: "/programs/ai-pioneers-interview",
+      "A research and documentary program where students investigate real-world issues through expert interviews, producing portfolio-ready reports and published documentaries.",
+    href: "/programs/elite-interview",
   },
   {
     title: "Summer & Winter Camps",

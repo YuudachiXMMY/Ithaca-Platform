@@ -1,16 +1,5 @@
-import { PlaceholderProgram } from "@/components/programs/PlaceholderProgram";
+import { redirect } from "next/navigation";
 
-export const metadata = {
-  title: "AI Pioneers Interview | Ithaca Family Academy",
-  description:
-    "Exclusive interview series with leading AI researchers and industry pioneers shaping the future.",
-};
-
-export default function AIPioneersInterviewPage() {
-  return (
-    <PlaceholderProgram
-      heroImage="/media/images/programs/ev-challenge/ev-challenge-stock.jpg"
-      heroAlt="AI pioneers sharing insights in interview sessions"
-    />
-  );
+export default function AIPioneersInterviewRedirect() {
+  redirect("/programs/elite-interview");
 }

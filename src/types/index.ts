@@ -27,8 +27,8 @@ export const NAV_ITEMS: NavItem[] = [
         href: "/programs/engineering-projects",
       },
       {
-        label: "AI Pioneers Interview",
-        href: "/programs/ai-pioneers-interview",
+        label: "Elite Interviews",
+        href: "/programs/elite-interview",
       },
       {
         label: "Summer & Winter Camps",
