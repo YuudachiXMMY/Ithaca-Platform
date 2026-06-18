@@ -82,7 +82,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
 
 export const CONTACT_INFO = {
   address: "205 Placer Ct unit 325, North York ON",
-  email: "ithacafo@ithacafo.com",
+  email: "joshua.wang@ithacafo.com",
   phone: "+1(437) 226-8407",
   wechat: "joshuawong2015",
 } as const;

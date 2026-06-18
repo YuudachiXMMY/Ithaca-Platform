@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useLayoutEffect } from "react";
 import Link from "next/link";
 import {
   motion,
@@ -59,22 +59,32 @@ const fadeUp: Variants = {
 export function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
+  const gsapCtxRef = useRef<{ revert: () => void } | null>(null);
+
+  // Synchronous cleanup before DOM mutations — prevents removeChild errors
+  // caused by GSAP pin-spacers reparenting DOM elements
+  useLayoutEffect(() => {
+    return () => {
+      gsapCtxRef.current?.revert();
+      gsapCtxRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     if (reduce || !sectionRef.current) return;
 
-    let ctx: { revert: () => void } | undefined;
+    let cancelled = false;
 
     async function init() {
       const { gsap } = await import("gsap");
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
       gsap.registerPlugin(ScrollTrigger);
 
-      if (!sectionRef.current) return;
+      if (cancelled || !sectionRef.current) return;
 
       const isMobile = window.innerWidth < 768;
 
-      ctx = gsap.context(() => {
+      gsapCtxRef.current = gsap.context(() => {
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -124,24 +134,39 @@ export function HeroSection() {
           0.28,
         );
 
-        /* Hold (42-100%): empowerment text stays visible through unpin.
-           Exit overlay solidifies the background BEHIND the text (z-10)
-           so the hero scrolls away on a solid #111318 that matches
-           the mission cards, creating a seamless natural transition. */
+        /* Hold (42-65%): empowerment text stays visible.
+           Then everything fades out for a seamless handoff to
+           MissionSection's matching #111318 background. */
 
-        /* Phase 4 (72-90%): Exit overlay fades in behind text */
+        /* Phase 4 (60-85%): Exit overlay fades in gradually */
         tl.to(".hero-overlay-exit", {
           opacity: 1,
-          duration: 0.18,
+          duration: 0.25,
           ease: "power2.inOut",
-        }, 0.72);
+        }, 0.60);
+
+        /* Phase 5 (65-85%): Empowerment text + accent line fade out */
+        tl.to(".hero-empowerment-text", {
+          opacity: 0,
+          y: -30,
+          duration: 0.20,
+          ease: "power2.inOut",
+        }, 0.65);
+
+        tl.to(".hero-accent-line", {
+          opacity: 0,
+          duration: 0.15,
+          ease: "power2.inOut",
+        }, 0.65);
       }, sectionRef);
     }
 
     init();
 
     return () => {
-      ctx?.revert();
+      cancelled = true;
+      gsapCtxRef.current?.revert();
+      gsapCtxRef.current = null;
     };
   }, [reduce]);
 

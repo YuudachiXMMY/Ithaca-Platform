@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useLayoutEffect } from "react";
 import Image from "next/image";
 import { useReducedMotion } from "framer-motion";
 
@@ -46,6 +46,14 @@ const PILLARS: readonly Pillar[] = [
 export function MissionSection() {
   const stackRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+  const gsapCtxRef = useRef<{ revert: () => void } | null>(null);
+
+  useLayoutEffect(() => {
+    return () => {
+      gsapCtxRef.current?.revert();
+      gsapCtxRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     /* Skip GSAP sticky-stack on mobile - pinning causes jank on
@@ -54,16 +62,16 @@ export function MissionSection() {
     if (reduce || !stackRef.current) return;
     if (typeof window !== "undefined" && window.innerWidth < 768) return;
 
-    let ctx: { revert: () => void } | undefined;
+    let cancelled = false;
 
     async function init() {
       const { gsap } = await import("gsap");
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
       gsap.registerPlugin(ScrollTrigger);
 
-      if (!stackRef.current) return;
+      if (cancelled || !stackRef.current) return;
 
-      ctx = gsap.context(() => {
+      gsapCtxRef.current = gsap.context(() => {
         const cards = gsap.utils.toArray<HTMLElement>(".mission-card");
 
         cards.forEach((card, i) => {
@@ -96,7 +104,9 @@ export function MissionSection() {
     init();
 
     return () => {
-      ctx?.revert();
+      cancelled = true;
+      gsapCtxRef.current?.revert();
+      gsapCtxRef.current = null;
     };
   }, [reduce]);
 

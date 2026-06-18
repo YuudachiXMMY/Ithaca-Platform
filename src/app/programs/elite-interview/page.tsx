@@ -459,10 +459,10 @@ export default function EliteInterviewPage() {
           <p className="text-foreground/40 mb-12">
             Reach us at{" "}
             <a
-              href="mailto:ithacafo@ithacafo.com"
+              href="mailto:joshua.wang@ithacafo.com"
               className="text-accent hover:text-accent-hover transition-colors underline underline-offset-2"
             >
-              ithacafo@ithacafo.com
+              joshua.wang@ithacafo.com
             </a>{" "}
             if you need more information.
           </p>

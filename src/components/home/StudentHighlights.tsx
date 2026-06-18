@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useLayoutEffect } from "react";
 import Image from "next/image";
 import { useReducedMotion } from "framer-motion";
 
@@ -190,22 +190,30 @@ function DesktopHorizontalMosaic({
   const wrapRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
+  const gsapCtxRef = useRef<{ revert: () => void } | null>(null);
+
+  useLayoutEffect(() => {
+    return () => {
+      gsapCtxRef.current?.revert();
+      gsapCtxRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     /* Skip GSAP on mobile or when reduced motion is preferred */
     if (reduce || window.innerWidth < MD_BREAKPOINT) return;
     if (!wrapRef.current || !trackRef.current) return;
 
-    let ctx: { revert: () => void } | undefined;
+    let cancelled = false;
 
     async function init() {
       const { gsap } = await import("gsap");
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
       gsap.registerPlugin(ScrollTrigger);
 
-      if (!wrapRef.current || !trackRef.current) return;
+      if (cancelled || !wrapRef.current || !trackRef.current) return;
 
-      ctx = gsap.context(() => {
+      gsapCtxRef.current = gsap.context(() => {
         const distance =
           trackRef.current!.scrollWidth - window.innerWidth;
 
@@ -231,7 +239,9 @@ function DesktopHorizontalMosaic({
     init();
 
     return () => {
-      ctx?.revert();
+      cancelled = true;
+      gsapCtxRef.current?.revert();
+      gsapCtxRef.current = null;
     };
   }, [reduce]);
 

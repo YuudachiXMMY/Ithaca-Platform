@@ -10,8 +10,9 @@ export function FeaturedSection() {
   const reduce = useReducedMotion();
 
   return (
+    <div className="h-[200dvh] bg-[#111318]">
     <section
-      className="h-[100dvh] bg-[#111318] pt-[4.5rem] pb-8"
+      className="sticky top-0 h-[100dvh] bg-[#111318] pt-[4.5rem] pb-8"
       aria-label="Featured: Meet with Dr. Reza Moridi"
     >
       <div className="mx-auto flex h-full max-w-[1400px] flex-col justify-center px-5 sm:px-8 md:px-[6vw]">
@@ -72,5 +73,6 @@ export function FeaturedSection() {
         </motion.div>
       </div>
     </section>
+    </div>
   );
 }

@@ -58,7 +58,7 @@ export async function POST(
 
     await resend?.emails.send({
       from: "Ithaca Family Academy <noreply@ithacateens.com>",
-      to: "ithacafo@ithacafo.com",
+      to: "joshua.wang@ithacafo.com",
       subject: `New Contact Form Submission from ${escapeHtml(name)}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

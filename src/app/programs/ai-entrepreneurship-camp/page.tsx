@@ -341,12 +341,12 @@ export default function AIEntrepreneurshipCampPage() {
             <p className="text-foreground/60 leading-relaxed mb-6">
               Our curriculum aligns with the{" "}
               <a
-                href="https://otlf.ca"
+                href="https://aiec-youth.org"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors font-medium"
               >
-                High School AI Entrepreneurship Contest
+                AI Entrepreneurship Contest
               </a>
               , giving students the opportunity to compete at a recognized level
               and showcase their innovations to industry judges.
@@ -498,10 +498,10 @@ export default function AIEntrepreneurshipCampPage() {
           <p className="text-foreground/40 mb-12">
             Reach us at{" "}
             <a
-              href="mailto:ithacafo@ithacafo.com"
+              href="mailto:joshua.wang@ithacafo.com"
               className="text-accent hover:text-accent-hover transition-colors underline underline-offset-2"
             >
-              ithacafo@ithacafo.com
+              joshua.wang@ithacafo.com
             </a>{" "}
             if you need more information.
           </p>

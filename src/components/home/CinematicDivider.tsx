@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useLayoutEffect } from "react";
 import { useReducedMotion } from "framer-motion";
 
 /* ------------------------------------------------------------------ */
@@ -22,27 +22,35 @@ export function CinematicDivider() {
   const glowRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+  const gsapCtxRef = useRef<{ revert: () => void } | null>(null);
+
+  useLayoutEffect(() => {
+    return () => {
+      gsapCtxRef.current?.revert();
+      gsapCtxRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     if (reduce || !sectionRef.current) return;
 
-    let ctx: { revert: () => void } | undefined;
+    let cancelled = false;
 
     async function init() {
       const { gsap } = await import("gsap");
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
       gsap.registerPlugin(ScrollTrigger);
 
-      if (!sectionRef.current) return;
+      if (cancelled || !sectionRef.current) return;
 
       const isMobile = window.innerWidth < 768;
 
-      ctx = gsap.context(() => {
+      gsapCtxRef.current = gsap.context(() => {
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top top",
-            end: isMobile ? "+=70%" : "+=120%",
+            end: isMobile ? "+=110%" : "+=180%",
             pin: true,
             scrub: 1.5,
           },
@@ -67,11 +75,11 @@ export function CinematicDivider() {
             0,
           );
 
-          // Phase 3: Dark overlay returns (55-100%)
+          // Phase 3: Dark overlay returns (70-100%)
           tl.to(
             overlayRef.current,
-            { opacity: 1, duration: 0.45, ease: "power2.in" },
-            0.55,
+            { opacity: 1, duration: 0.3, ease: "power2.in" },
+            0.7,
           );
         }
 
@@ -86,7 +94,7 @@ export function CinematicDivider() {
           tl.to(
             glowRef.current,
             { opacity: 0, scale: 1.5, duration: 0.3, ease: "power3.in" },
-            0.5,
+            0.65,
           );
         }
 
@@ -98,11 +106,11 @@ export function CinematicDivider() {
             { opacity: 1, y: 0, duration: 0.25, ease: "power3.out" },
             0.25,
           );
-          // Title fades out as overlay returns (50-65%)
+          // Title fades out as overlay returns (65-80%)
           tl.to(
             titleRef.current,
             { opacity: 0, y: -20, duration: 0.15, ease: "power2.in" },
-            0.5,
+            0.65,
           );
         }
 
@@ -117,7 +125,7 @@ export function CinematicDivider() {
           tl.to(
             lineRef.current,
             { scaleX: 2, opacity: 0, duration: 0.35, ease: "power3.in" },
-            0.5,
+            0.65,
           );
         }
       }, sectionRef);
@@ -126,7 +134,9 @@ export function CinematicDivider() {
     init();
 
     return () => {
-      ctx?.revert();
+      cancelled = true;
+      gsapCtxRef.current?.revert();
+      gsapCtxRef.current = null;
     };
   }, [reduce]);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useLayoutEffect } from "react";
 import { useReducedMotion } from "framer-motion";
 
 /* ------------------------------------------------------------------ */
@@ -63,6 +63,7 @@ export function ImpactStats() {
   const headingRef = useRef<HTMLDivElement>(null);
   const glowBgRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+  const gsapCtxRef = useRef<{ revert: () => void } | null>(null);
 
   /* Direct DOM refs for GSAP - bypasses React reconciliation */
   const numberRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -70,19 +71,26 @@ export function ImpactStats() {
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  useLayoutEffect(() => {
+    return () => {
+      gsapCtxRef.current?.revert();
+      gsapCtxRef.current = null;
+    };
+  }, []);
+
   useEffect(() => {
     if (reduce || !sectionRef.current) return;
 
-    let ctx: { revert: () => void } | undefined;
+    let cancelled = false;
 
     async function init() {
       const { gsap } = await import("gsap");
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
       gsap.registerPlugin(ScrollTrigger);
 
-      if (!sectionRef.current) return;
+      if (cancelled || !sectionRef.current) return;
 
-      ctx = gsap.context(() => {
+      gsapCtxRef.current = gsap.context(() => {
         const tl = gsap.timeline({ paused: true });
 
         /* Phase 1: Background ambient glow blooms */
@@ -196,7 +204,9 @@ export function ImpactStats() {
     init();
 
     return () => {
-      ctx?.revert();
+      cancelled = true;
+      gsapCtxRef.current?.revert();
+      gsapCtxRef.current = null;
     };
   }, [reduce]);
 
