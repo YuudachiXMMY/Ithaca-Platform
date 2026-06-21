@@ -23,18 +23,10 @@ export const NAV_ITEMS: NavItem[] = [
         href: "/programs/ai-entrepreneurship-camp",
       },
       {
-        label: "Engineering Projects",
-        href: "/programs/engineering-projects",
-      },
-      {
         label: "Elite Interviews",
         href: "/programs/elite-interview",
       },
-      {
-        label: "Summer & Winter Camps",
-        href: "/programs/summer-winter-camps",
-      },
-      { label: "Ithaca Night", href: "/programs/ithaca-night" },
+      { label: "Other Programs", href: "/programs" },
     ],
   },
   { label: "Contact Us", href: "/contact-us" },

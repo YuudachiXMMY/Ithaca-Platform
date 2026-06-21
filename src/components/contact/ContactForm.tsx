@@ -30,7 +30,7 @@ type ContactFormData = z.infer<typeof contactSchema>;
 /* ------------------------------------------------------------------ */
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 16 },
   visible: { opacity: 1, y: 0 },
 };
 
@@ -56,7 +56,7 @@ export function ContactForm() {
       email: "",
       phone: "",
       message: "",
-      subscribe: false,
+      subscribe: true,
     },
   });
 
@@ -92,23 +92,23 @@ export function ContactForm() {
   if (submitState === "success") {
     return (
       <motion.div
-        className="bg-card-bg border border-border rounded-2xl p-10 text-center"
+        className="border-t border-border/50 pt-6 text-center"
         initial="hidden"
         animate="visible"
         variants={fadeUp}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4 }}
       >
-        <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
-        <h3 className="text-2xl font-bold text-foreground mb-3">
+        <CheckCircle className="w-10 h-10 text-green-400 mx-auto mb-3" />
+        <h3 className="text-xl font-bold text-foreground mb-2">
           Message Sent!
         </h3>
-        <p className="text-foreground/70 mb-6">
+        <p className="text-foreground/60 text-sm mb-4">
           Thank you for reaching out. We will get back to you shortly.
         </p>
         <button
           type="button"
           onClick={() => setSubmitState("idle")}
-          className="text-accent hover:text-accent-hover transition-colors font-medium"
+          className="text-accent hover:text-accent-hover transition-colors text-sm font-medium"
         >
           Send another message
         </button>
@@ -119,70 +119,71 @@ export function ContactForm() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="bg-card-bg border border-border rounded-2xl p-8 md:p-10 flex flex-col gap-6"
+      className="flex flex-col gap-4"
       noValidate
     >
       {/* Error banner */}
       {submitState === "error" && (
         <motion.div
-          className="flex items-start gap-3 bg-red-500/10 border border-red-500/30 rounded-xl p-4"
+          className="flex items-start gap-2.5 bg-red-500/10 border border-red-500/25 rounded-lg p-3"
           initial="hidden"
           animate="visible"
           variants={fadeUp}
           transition={{ duration: 0.3 }}
         >
-          <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+          <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
           <p className="text-red-300 text-sm">{errorMessage}</p>
         </motion.div>
       )}
 
-      {/* Name */}
-      <div>
-        <label
-          htmlFor="contact-name"
-          className="block text-sm font-medium text-foreground/80 mb-2"
-        >
-          Name <span className="text-red-400">*</span>
-        </label>
-        <input
-          id="contact-name"
-          type="text"
-          autoComplete="name"
-          className="w-full bg-background border border-border rounded-xl px-4 py-3 text-foreground placeholder-foreground/30 focus:outline-none focus:border-accent transition-colors"
-          placeholder="Your name"
-          {...register("name")}
-        />
-        {errors.name && (
-          <p className="text-red-400 text-sm mt-1.5">{errors.name.message}</p>
-        )}
-      </div>
+      {/* Name + Email side by side */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label
+            htmlFor="contact-name"
+            className="block text-xs font-medium text-foreground/70 mb-1.5"
+          >
+            Name <span className="text-red-400">*</span>
+          </label>
+          <input
+            id="contact-name"
+            type="text"
+            autoComplete="name"
+            className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder-foreground/25 focus:outline-none focus:border-accent transition-colors"
+            placeholder="Your name"
+            {...register("name")}
+          />
+          {errors.name && (
+            <p className="text-red-400 text-xs mt-1">{errors.name.message}</p>
+          )}
+        </div>
 
-      {/* Email */}
-      <div>
-        <label
-          htmlFor="contact-email"
-          className="block text-sm font-medium text-foreground/80 mb-2"
-        >
-          Email <span className="text-red-400">*</span>
-        </label>
-        <input
-          id="contact-email"
-          type="email"
-          autoComplete="email"
-          className="w-full bg-background border border-border rounded-xl px-4 py-3 text-foreground placeholder-foreground/30 focus:outline-none focus:border-accent transition-colors"
-          placeholder="you@example.com"
-          {...register("email")}
-        />
-        {errors.email && (
-          <p className="text-red-400 text-sm mt-1.5">{errors.email.message}</p>
-        )}
+        <div>
+          <label
+            htmlFor="contact-email"
+            className="block text-xs font-medium text-foreground/70 mb-1.5"
+          >
+            Email <span className="text-red-400">*</span>
+          </label>
+          <input
+            id="contact-email"
+            type="email"
+            autoComplete="email"
+            className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder-foreground/25 focus:outline-none focus:border-accent transition-colors"
+            placeholder="you@example.com"
+            {...register("email")}
+          />
+          {errors.email && (
+            <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>
+          )}
+        </div>
       </div>
 
       {/* Phone */}
       <div>
         <label
           htmlFor="contact-phone"
-          className="block text-sm font-medium text-foreground/80 mb-2"
+          className="block text-xs font-medium text-foreground/70 mb-1.5"
         >
           Phone
         </label>
@@ -190,12 +191,12 @@ export function ContactForm() {
           id="contact-phone"
           type="tel"
           autoComplete="tel"
-          className="w-full bg-background border border-border rounded-xl px-4 py-3 text-foreground placeholder-foreground/30 focus:outline-none focus:border-accent transition-colors"
+          className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder-foreground/25 focus:outline-none focus:border-accent transition-colors font-mono"
           placeholder="+1 (___) ___-____"
           {...register("phone")}
         />
         {errors.phone && (
-          <p className="text-red-400 text-sm mt-1.5">{errors.phone.message}</p>
+          <p className="text-red-400 text-xs mt-1">{errors.phone.message}</p>
         )}
       </div>
 
@@ -203,54 +204,55 @@ export function ContactForm() {
       <div>
         <label
           htmlFor="contact-message"
-          className="block text-sm font-medium text-foreground/80 mb-2"
+          className="block text-xs font-medium text-foreground/70 mb-1.5"
         >
           Message
         </label>
         <textarea
           id="contact-message"
-          rows={5}
-          className="w-full bg-background border border-border rounded-xl px-4 py-3 text-foreground placeholder-foreground/30 focus:outline-none focus:border-accent transition-colors resize-y"
+          rows={4}
+          className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder-foreground/25 focus:outline-none focus:border-accent transition-colors resize-y"
           placeholder="How can we help you?"
           {...register("message")}
         />
         {errors.message && (
-          <p className="text-red-400 text-sm mt-1.5">
+          <p className="text-red-400 text-xs mt-1">
             {errors.message.message}
           </p>
         )}
       </div>
 
-      {/* Subscribe checkbox */}
-      <label className="flex items-start gap-3 cursor-pointer select-none">
-        <input
-          type="checkbox"
-          className="mt-1 w-4 h-4 rounded border-border bg-background text-accent focus:ring-accent focus:ring-offset-0"
-          {...register("subscribe")}
-        />
-        <span className="text-sm text-foreground/70">
-          Sign me up for the email list to receive updates and announcements.
-        </span>
-      </label>
+      {/* Subscribe + Submit inline */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+        <label className="flex items-center gap-2 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            className="w-3.5 h-3.5 rounded border-border bg-background text-accent focus:ring-accent focus:ring-offset-0"
+            {...register("subscribe")}
+          />
+          <span className="text-xs text-foreground/55">
+            Subscribe to updates
+          </span>
+        </label>
 
-      {/* Submit */}
-      <button
-        type="submit"
-        disabled={submitState === "submitting"}
-        className="inline-flex items-center justify-center gap-2 bg-accent text-foreground-dark font-semibold px-8 py-4 rounded-full hover:bg-accent-hover transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-      >
-        {submitState === "submitting" ? (
-          <>
-            <Loader2 className="w-5 h-5 animate-spin" />
-            Sending...
-          </>
-        ) : (
-          <>
-            <Send className="w-5 h-5" />
-            Send Message
-          </>
-        )}
-      </button>
+        <button
+          type="submit"
+          disabled={submitState === "submitting"}
+          className="inline-flex items-center justify-center gap-2 bg-accent text-foreground-dark font-semibold px-6 py-2.5 text-sm rounded-full hover:bg-accent-hover active:scale-[0.98] active:-translate-y-[1px] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {submitState === "submitting" ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Sending...
+            </>
+          ) : (
+            <>
+              <Send className="w-4 h-4" />
+              Send
+            </>
+          )}
+        </button>
+      </div>
     </form>
   );
 }

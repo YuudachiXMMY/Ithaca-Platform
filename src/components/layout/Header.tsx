@@ -22,6 +22,10 @@ const RIGHT_NAV = NAV_ITEMS.filter((item) => item.href === "/contact-us");
 /*  Desktop dropdown for items with children                          */
 /* ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ */
+/*  Desktop dropdown for items with children                          */
+/* ------------------------------------------------------------------ */
+
 function DesktopDropdown({
   item,
   isActive,

@@ -29,8 +29,8 @@ const CONTACT_ITEMS: readonly ContactItem[] = [
   {
     icon: Phone,
     label: "Phone",
-    value: "+1 (519) 998-9368",
-    href: "tel:+15199989368",
+    value: "+1 (437) 226-8407",
+    href: "tel:+14372268407",
   },
   {
     icon: Mail,

@@ -126,38 +126,49 @@ export function HeroSection() {
           0.25,
         );
 
-        /* Phase 3b (28-42%): Empowerment text fades up */
+        /* Phase 3b (28-44%): Empowerment text dissolves in with blur */
         tl.fromTo(
           ".hero-empowerment-text",
-          { opacity: 0, y: 60 },
-          { opacity: 1, y: 0, duration: 0.14, ease: "power2.out" },
+          { opacity: 0, y: 60, filter: "blur(8px)" },
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.16, ease: "power2.out" },
           0.28,
         );
 
-        /* Hold (42-65%): empowerment text stays visible.
-           Then everything fades out for a seamless handoff to
-           MissionSection's matching #111318 background. */
+        /* Hold (44-57%): empowerment text stays visible.
+           Then a three-beat exit: bottom darkens → text dissolves → full coverage.
+           Exit ends at ~0.97 so there is almost no dead scroll before unpin. */
 
-        /* Phase 4 (60-85%): Exit overlay fades in gradually */
+        /* Phase 4a (57-75%): Bottom gradient rises for directional darkening */
+        tl.to(".hero-overlay-bottom", {
+          opacity: 1,
+          duration: 0.18,
+          ease: "power1.inOut",
+        }, 0.57);
+
+        /* Phase 5 (60-83%): Empowerment text dissolves with blur */
+        tl.to(".hero-empowerment-text", {
+          opacity: 0,
+          y: -20,
+          scale: 0.97,
+          filter: "blur(12px)",
+          duration: 0.23,
+          ease: "power1.inOut",
+        }, 0.60);
+
+        tl.to(".hero-accent-line", {
+          opacity: 0,
+          scaleX: 0,
+          filter: "blur(6px)",
+          duration: 0.18,
+          ease: "power1.inOut",
+        }, 0.60);
+
+        /* Phase 4b (72-97%): Solid exit overlay completes full coverage */
         tl.to(".hero-overlay-exit", {
           opacity: 1,
           duration: 0.25,
           ease: "power2.inOut",
-        }, 0.60);
-
-        /* Phase 5 (65-85%): Empowerment text + accent line fade out */
-        tl.to(".hero-empowerment-text", {
-          opacity: 0,
-          y: -30,
-          duration: 0.20,
-          ease: "power2.inOut",
-        }, 0.65);
-
-        tl.to(".hero-accent-line", {
-          opacity: 0,
-          duration: 0.15,
-          ease: "power2.inOut",
-        }, 0.65);
+        }, 0.72);
       }, sectionRef);
     }
 
@@ -204,7 +215,17 @@ export function HeroSection() {
           aria-hidden="true"
         />
 
-        {/* Exit overlay - fades to page background for seamless transition */}
+        {/* Bottom gradient overlay - directional darkening from bottom */}
+        <div
+          className="hero-overlay-bottom absolute inset-0 opacity-0"
+          style={{
+            background:
+              "linear-gradient(to top, #111318 0%, #111318 35%, transparent 100%)",
+          }}
+          aria-hidden="true"
+        />
+
+        {/* Exit overlay - completes transition to page background */}
         <div
           className="hero-overlay-exit absolute inset-0 bg-[#111318] opacity-0"
           aria-hidden="true"

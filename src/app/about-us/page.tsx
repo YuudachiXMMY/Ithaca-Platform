@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
 import { TEAM_MEMBERS } from "@/types";
 import { HeroSection } from "./sections/HeroSection";
-import { LearningPathway } from "./sections/LearningPathway";
-import { HowWeTeachEthics } from "./sections/HowWeTeachEthics";
-import { DecabFramework } from "./sections/DecabFramework";
-import { OurPrograms } from "./sections/OurPrograms";
-import { StudentOutcomes } from "./sections/StudentOutcomes";
-import { StudentHighlights } from "./sections/StudentHighlights";
-import { StudentHighlight } from "./sections/StudentHighlight";
-import { CommunitySpotlight } from "./sections/CommunitySpotlight";
-import { TeamSection } from "./sections/TeamSection";
-import { CTASection } from "./sections/CTASection";
-import { NewsletterSection } from "./sections/NewsletterSection";
+import { MissionGrid } from "./sections/MissionGrid";
+import { Approach } from "./sections/Approach";
+import { ProgramsBento } from "./sections/ProgramsBento";
+import { Outcomes } from "./sections/Outcomes";
+import { Highlights } from "./sections/Highlights";
+import { TeamGrid } from "./sections/TeamGrid";
+import { ConnectCTA } from "./sections/ConnectCTA";
 
 export const metadata: Metadata = {
   title: "About Us | Ithaca Family Academy",
@@ -28,17 +24,13 @@ export default function AboutUsPage() {
   return (
     <div>
       <HeroSection />
-      <LearningPathway />
-      <HowWeTeachEthics />
-      <DecabFramework />
-      <OurPrograms />
-      <StudentOutcomes />
-      <StudentHighlights />
-      <StudentHighlight />
-      <CommunitySpotlight />
-      <TeamSection members={TEAM_MEMBERS} />
-      <CTASection />
-      <NewsletterSection />
+      <MissionGrid />
+      <Approach />
+      <ProgramsBento />
+      <Outcomes />
+      <Highlights />
+      <TeamGrid members={TEAM_MEMBERS} />
+      <ConnectCTA />
     </div>
   );
 }

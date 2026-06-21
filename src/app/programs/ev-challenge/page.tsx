@@ -289,7 +289,7 @@ export default function EVChallengePage() {
             </div>
             <div className="relative h-[400px] lg:h-full lg:min-h-[520px] rounded-sm overflow-hidden">
               <Image
-                src="/media/images/programs/ev-challenge/EV25-10.jpg"
+                src="/media/images/programs/ev-challenge/EV25-10.s.png"
                 alt="Students collaborating during an EV build session"
                 fill
                 className="object-cover"
@@ -567,7 +567,7 @@ export default function EVChallengePage() {
                   Ready to Build Something Real?
                 </h2>
                 <p className="text-sm text-foreground/60 max-w-[34ch] mb-6">
-                  Join the Ithaca EV Lab and be part of a team that designs,
+                  Join the Ithaca EV Team and be part of a team that designs,
                   builds, and races an electric vehicle.
                 </p>
                 <Link
