@@ -6,7 +6,7 @@ import Link from "next/link";
 
 const PROGRAMS = [
   {
-    label: "EV Challenge",
+    label: "EV Team",
     href: "/programs/ev-challenge",
     image: "/media/images/programs/ev-challenge/EV25-10.s.png",
     description: "Build and race electric vehicles with industry mentors.",

@@ -18,7 +18,7 @@ const PROGRAMS: readonly ProgramCard[] = [
     href: "/programs/ai-entrepreneurship-camp",
   },
   {
-    title: "EV Challenge",
+    title: "EV Team",
     description:
       "Hands-on electric vehicle engineering challenge pushing students to design, build, and race.",
     href: "/programs/ev-challenge",

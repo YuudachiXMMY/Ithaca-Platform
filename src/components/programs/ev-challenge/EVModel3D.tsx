@@ -225,13 +225,21 @@ const F = {
 /* EV model (all structural lines + wheels)                           */
 /* ------------------------------------------------------------------ */
 
-function EVModel({ reduceMotion }: { reduceMotion: boolean }) {
+function EVModel({ reduceMotion, scrollProgress }: { reduceMotion: boolean; scrollProgress: { current: number } }) {
   const group = useRef<THREE.Group>(null);
+  const rotationRef = useRef(0);
+  const prevScrollRef = useRef(0);
 
-  useFrame((state) => {
-    if (!group.current || reduceMotion) return;
-    group.current.position.y =
-      Math.sin(state.clock.elapsedTime * 0.4) * 0.025;
+  useFrame((state, delta) => {
+    if (!group.current) return;
+    if (!reduceMotion) {
+      const scrollDelta = scrollProgress.current - prevScrollRef.current;
+      prevScrollRef.current = scrollProgress.current;
+      rotationRef.current += 0.15 * delta + scrollDelta * Math.PI * 1.5;
+      group.current.rotation.y = rotationRef.current;
+      group.current.position.y =
+        Math.sin(state.clock.elapsedTime * 0.4) * 0.025;
+    }
   });
 
   return (
@@ -384,13 +392,13 @@ function Particles({ count = 120 }: { count?: number }) {
 /* Scene composition                                                   */
 /* ------------------------------------------------------------------ */
 
-function Scene({ reduceMotion }: { reduceMotion: boolean }) {
+function Scene({ reduceMotion, scrollProgress }: { reduceMotion: boolean; scrollProgress: { current: number } }) {
   return (
     <>
       <ambientLight intensity={0.3} />
       <pointLight position={[5, 5, 5]} intensity={0.15} color={ACCENT} />
 
-      <EVModel reduceMotion={reduceMotion} />
+      <EVModel reduceMotion={reduceMotion} scrollProgress={scrollProgress} />
 
       {!reduceMotion && <Particles />}
 
@@ -410,8 +418,7 @@ function Scene({ reduceMotion }: { reduceMotion: boolean }) {
       <OrbitControls
         enableZoom={false}
         enablePan={false}
-        autoRotate={!reduceMotion}
-        autoRotateSpeed={0.8}
+        autoRotate={false}
         enableDamping
         dampingFactor={0.05}
         minPolarAngle={Math.PI * 0.25}
@@ -488,6 +495,7 @@ export default function EVModel3DSection() {
   const bizRef = useRef<HTMLDivElement>(null);
   const seamRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
+  const scrollProgressRef = useRef(0);
 
   useEffect(() => {
     if (reduce || !sectionRef.current) return;
@@ -501,6 +509,9 @@ export default function EVModel3DSection() {
           end: "+=400%",
           pin: true,
           scrub: 1,
+          onUpdate: (self) => {
+            scrollProgressRef.current = self.progress;
+          },
         },
       });
 
@@ -621,7 +632,7 @@ export default function EVModel3DSection() {
         gl={{ antialias: true, alpha: true }}
         style={{ background: "transparent" }}
       >
-        <Scene reduceMotion={reduce} />
+        <Scene reduceMotion={reduce} scrollProgress={scrollProgressRef} />
       </Canvas>
     </Suspense>
   );

@@ -7,7 +7,7 @@ const PATHWAY_STEPS = [
   "Rocket Lab",
   "Engineering Systems",
   "Drone Lab",
-  "EV Challenge / AI Camp",
+  "EV Team / AI Camp",
 ] as const;
 
 const COMPETENCIES = [
@@ -90,44 +90,6 @@ export function DecabFramework() {
             </motion.div>
           ))}
         </div>
-        {/* Learning Pathway */}
-        {/* <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.5 }}
-          className="mt-12 border-t border-white/[0.06] pt-8"
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-[2fr_5fr] gap-4 items-start">
-            <div>
-              <h3 className="text-xl font-bold text-white">
-                Learning Pathway
-              </h3>
-              <p className="text-sm text-gray-400 mt-1 leading-relaxed">
-                Progressing from foundational tool literacy to advanced
-                engineering and AI projects.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-2 lg:justify-end items-center">
-              {PATHWAY_STEPS.map((step, i) => (
-                <span key={step} className="flex items-center gap-2">
-                  <span className="font-mono text-sm text-white/70 bg-white/[0.04] border border-white/[0.08] px-3 py-1.5 rounded">
-                    {step}
-                  </span>
-                  {i < PATHWAY_STEPS.length - 1 && (
-                    <span
-                      className="text-white/20 text-xs"
-                      aria-hidden="true"
-                    >
-                      &rarr;
-                    </span>
-                  )}
-                </span>
-              ))}
-            </div>
-          </div>
-        </motion.div> */}
       </div>
     </section>
   );

@@ -5,7 +5,7 @@ const PATHWAY_STEPS = [
   "Rocket Lab",
   "Engineering Systems",
   "Drone Lab",
-  "EV Challenge / AI Camp",
+  "EV Team / AI Camp",
 ] as const;
 
 export function LearningPathway() {

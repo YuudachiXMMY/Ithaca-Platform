@@ -17,7 +17,7 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Programs",
     href: "/programs",
     children: [
-      { label: "EV Challenge", href: "/programs/ev-challenge" },
+      { label: "EV Team", href: "/programs/ev-challenge" },
       {
         label: "AI Entrepreneurship Camp",
         href: "/programs/ai-entrepreneurship-camp",

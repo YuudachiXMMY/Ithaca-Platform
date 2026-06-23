@@ -19,7 +19,7 @@ interface Program {
 
 const PROGRAMS: readonly Program[] = [
   {
-    title: "EV Challenge",
+    title: "EV Team",
     description:
       "Design, build, and race electric vehicles while learning sustainable engineering and energy systems.",
     href: "/programs/ev-challenge",
@@ -105,7 +105,7 @@ export function ProgramsShowcase() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.15 }}
         >
-          {/* Featured cell - EV Challenge, spans 2 rows */}
+          {/* Featured cell - EV Team, spans 2 rows */}
           <motion.div className="md:row-span-2" variants={cellReveal}>
             <BentoCell program={PROGRAMS[0]} large />
           </motion.div>
