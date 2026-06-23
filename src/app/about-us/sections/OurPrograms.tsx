@@ -5,20 +5,20 @@ const PROGRAMS = [
   {
     label: "EV Challenge",
     href: "/programs/ev-challenge",
-    image: "/media/images/programs/ev-challenge/ev-challenge-stock.jpg",
+    image: "/media/images/programs/ev-challenge/EV25-10.s.png",
     description: "Build and race electric vehicles with industry mentors.",
   },
   {
     label: "AI Entrepreneurship Camp",
     href: "/programs/ai-entrepreneurship-camp",
-    image: "/media/images/programs/ai-camp/ai-camp-hero.png",
+    image: "/media/images/programs/ai-entrepreneurship/AI-Entrep_88.jpg",
     description: "Develop AI-powered solutions to real business problems.",
   },
   {
-    label: "Engineering Projects",
+    label: "Elite Interviews",
     href: "/programs/engineering-projects",
-    image: "/media/images/programs/ai-entrepreneurship/AI-Entrep_10.jpg",
-    description: "Hands-on engineering from drones to rocket systems.",
+    image: "/media/images/programs/ai-interview/25_Mr. Carmi Levy.png",
+    description: "A research and documentary program where students investigate real-world issues through expert interviews, producing portfolio-ready reports and published documentaries.",
   },
   {
     label: "All Programs",

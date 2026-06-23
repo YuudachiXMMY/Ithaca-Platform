@@ -8,25 +8,25 @@ const PROGRAMS = [
   {
     label: "EV Challenge",
     href: "/programs/ev-challenge",
-    image: "/media/images/programs/ev-challenge/ev-challenge-stock.jpg",
+    image: "/media/images/programs/ev-challenge/EV25-10.s.png",
     description: "Build and race electric vehicles with industry mentors.",
   },
   {
     label: "AI Entrepreneurship Camp",
     href: "/programs/ai-entrepreneurship-camp",
-    image: "/media/images/programs/ai-camp/ai-camp-hero.png",
+    image: "/media/images/programs/ai-entrepreneurship/AI-Entrep_88.jpg",
     description: "Develop AI-powered solutions to real business problems.",
   },
   {
-    label: "Engineering Projects",
+    label: "Elite Interviews",
     href: "/programs/engineering-projects",
-    image: "/media/images/programs/ai-entrepreneurship/AI-Entrep_10.jpg",
-    description: "Hands-on engineering from drones to rocket systems.",
+    image: "/media/images/programs/ai-interview/25_Mr. Carmi Levy.png",
+    description: "Students investigate real-world issues through expert interviews, producing reports and documentaries.",
   },
   {
     label: "All Programs",
     href: "/programs",
-    image: "/media/images/programs/ai-entrepreneurship/AI-Entrep_20.jpg",
+    image: "/media/images/programs/ai-entrepreneurship/AI-Entrep_29.jpg",
     description: "Explore our full range of programs and camps.",
   },
 ] as const;
@@ -34,10 +34,10 @@ const PROGRAMS = [
 export function ProgramsBento() {
   return (
     <section
-      className="bg-[#111318] py-12 lg:py-16"
+      className="bg-[#111318] py-12 lg:py-16 lg:min-h-[100dvh] flex flex-col"
       aria-labelledby="programs-heading"
     >
-      <div className="max-w-[1400px] mx-auto px-4 lg:px-6">
+      <div className="max-w-[1400px] mx-auto px-4 lg:px-6 w-full flex flex-col flex-1">
         <motion.h2
           id="programs-heading"
           initial={{ opacity: 0, y: 20 }}
@@ -50,15 +50,16 @@ export function ProgramsBento() {
         </motion.h2>
 
         {/* Bento: hero card left (tall) + 3 stacked right */}
-        <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-3 mt-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-3 mt-6 flex-1">
           {/* Hero program card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.5, delay: 0.05 }}
+            className="h-full"
           >
-            <Link href={PROGRAMS[0].href} className="group block">
+            <Link href={PROGRAMS[0].href} className="group block h-full">
               <div className="relative aspect-[4/3] lg:aspect-auto lg:h-full min-h-[240px] rounded-lg overflow-hidden">
                 <Image
                   src={PROGRAMS[0].image}

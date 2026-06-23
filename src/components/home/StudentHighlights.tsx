@@ -21,7 +21,7 @@ const HIGHLIGHTS: readonly Highlight[] = [
     title: "Honda Production Line Visit",
     description:
       "Touring the Honda EV production facility, witnessing cutting-edge manufacturing and sustainable engineering.",
-    image: "/media/images/highlights/thumbnail-honda-ev.png",
+    image: "/media/images/highlights/wechat-img-189.jpg",
     alt: "Students visiting Honda electric vehicle production line",
     tag: "Field Visit",
   },
@@ -29,7 +29,7 @@ const HIGHLIGHTS: readonly Highlight[] = [
     title: "EV Program Workshop",
     description:
       "Designing and assembling EV components, learning motor systems and energy management.",
-    image: "/media/images/highlights/screenshot-2025-09-15.png",
+    image: "/media/images/programs/ev-challenge/EV25-5s.png",
     alt: "Students working on electric vehicle components during workshop",
     tag: "Workshop",
   },
@@ -45,7 +45,7 @@ const HIGHLIGHTS: readonly Highlight[] = [
     title: "Team Collaboration",
     description:
       "Cross-disciplinary projects combining technical expertise with creative problem-solving.",
-    image: "/media/images/highlights/wechat-img-189.jpg",
+    image: "/media/images/programs/ev-challenge/EV25-7.jpg",
     alt: "Students collaborating on a team project",
     tag: "Teamwork",
   },
@@ -53,7 +53,7 @@ const HIGHLIGHTS: readonly Highlight[] = [
     title: "Presentation Day",
     description:
       "Semester projects showcased to educators and industry mentors, building public speaking confidence.",
-    image: "/media/images/highlights/screenshot-2025-09-16.png",
+    image: "/media/images/highlights/wechat-img-197.jpg",
     alt: "Student presenting their project on presentation day",
     tag: "Showcase",
   },
@@ -61,7 +61,7 @@ const HIGHLIGHTS: readonly Highlight[] = [
     title: "Hands-On Innovation",
     description:
       "From prototyping to coding, building solutions that address real challenges in technology.",
-    image: "/media/images/highlights/wechat-img-197.jpg",
+    image: "/media/images/programs/app.png",
     alt: "Students engaged in hands-on innovation activities",
     tag: "Innovation",
   },

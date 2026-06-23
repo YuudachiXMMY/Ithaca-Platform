@@ -15,7 +15,7 @@ const MISSION_BLOCKS = [
     title: "Students are project owners.",
     description:
       "We use Project-Based Learning to connect learning with real-world problems and develop practical skills that traditional academics alone cannot fully cover.",
-    image: "/media/images/programs/ai-camp/ai-camp-HB8A5465.jpg",
+    image: "/media/images/programs/ai-entrepreneurship/AI-Entrep_75.jpg",
     imageAlt: "Students owning their projects at AI camp",
   },
   {
@@ -34,13 +34,13 @@ export function MissionGrid() {
       aria-labelledby="mission-heading"
     >
       <div className="max-w-[1400px] mx-auto px-4 lg:px-6">
-        {/* Full-width mission statement */}
+        {/* Section heading */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col gap-3"
+          className="flex flex-col gap-3 mb-10 lg:mb-14"
         >
           <h2
             id="mission-heading"
@@ -55,66 +55,55 @@ export function MissionGrid() {
           </p>
         </motion.div>
 
-        {/* Balanced grid: left image (2fr) + right two stacked (3fr) */}
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-4 mt-8">
-          {/* Left: tall portrait image block */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.5, delay: 0.05 }}
-          >
-            <div className="relative aspect-[3/4] lg:aspect-auto lg:h-full rounded-lg overflow-hidden">
-              <Image
-                src={MISSION_BLOCKS[0].image}
-                alt={MISSION_BLOCKS[0].imageAlt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 40vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 p-5">
-                <h3 className="text-base font-bold text-white">
-                  {MISSION_BLOCKS[0].title}
-                </h3>
-                <p className="text-sm text-white/60 mt-1 leading-relaxed max-w-xs">
-                  {MISSION_BLOCKS[0].description}
-                </p>
-              </div>
-            </div>
-          </motion.div>
+        {/* Zigzag rows */}
+        <div className="flex flex-col gap-8 lg:gap-12">
+          {MISSION_BLOCKS.map((block, i) => {
+            const imageFirst = i % 2 === 0;
 
-          {/* Right: two landscape blocks stacked */}
-          <div className="grid grid-cols-1 gap-4">
-            {MISSION_BLOCKS.slice(1).map((block, i) => (
+            return (
               <motion.div
                 key={block.title}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.5, delay: 0.1 + i * 0.05 }}
-                className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-4 items-center"
+                transition={{
+                  duration: 0.5,
+                  delay: 0.05,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center"
               >
-                <div className="relative aspect-[16/10] rounded-lg overflow-hidden">
+                {/* Image block */}
+                <div
+                  className={`relative aspect-[4/3] rounded-lg overflow-hidden ${
+                    imageFirst ? "lg:order-1" : "lg:order-2"
+                  }`}
+                >
                   <Image
                     src={block.image}
                     alt={block.imageAlt}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 35vw"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
                   />
                 </div>
-                <div>
-                  <h3 className="text-base font-bold text-white">
+
+                {/* Text block */}
+                <div
+                  className={`flex flex-col justify-center ${
+                    imageFirst ? "lg:order-2" : "lg:order-1"
+                  }`}
+                >
+                  <h3 className="text-xl md:text-2xl font-bold text-white leading-tight">
                     {block.title}
                   </h3>
-                  <p className="text-sm text-gray-400 mt-1 leading-relaxed">
+                  <p className="text-base text-gray-400 mt-3 leading-relaxed max-w-lg">
                     {block.description}
                   </p>
                 </div>
               </motion.div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </div>
     </section>

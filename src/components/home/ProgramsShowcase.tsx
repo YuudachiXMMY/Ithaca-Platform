@@ -23,7 +23,7 @@ const PROGRAMS: readonly Program[] = [
     description:
       "Design, build, and race electric vehicles while learning sustainable engineering and energy systems.",
     href: "/programs/ev-challenge",
-    image: "/media/images/programs/ev-challenge/ev-challenge-stock.jpg",
+    image: "/media/images/programs/ev-challenge/EV25-10.s.png",
     alt: "Students working on electric vehicle challenge",
   },
   {
@@ -31,23 +31,23 @@ const PROGRAMS: readonly Program[] = [
     description:
       "Immerse in AI and entrepreneurship through mentorship, workshops, and real startup challenges.",
     href: "/programs/ai-entrepreneurship-camp",
-    image: "/media/images/programs/ai-camp/ai-camp-HB8A5465.jpg",
+    image: "/media/images/programs/ai-entrepreneurship/AI-Entrep_68.jpg",
     alt: "Students at AI entrepreneurship camp",
   },
   {
-    title: "Engineering Projects",
+    title: "Elite Interviews",
     description:
-      "Tackle real-world engineering problems through collaborative project work, from concept to prototype.",
-    href: "/programs/engineering-projects",
-    image: "/media/images/programs/ai-camp/ai-camp-HB8A5242.jpg",
-    alt: "Students collaborating on engineering projects",
+      "A research and documentary program where students investigate real-world issues through expert interviews, producing portfolio-ready reports and published documentaries.",
+    href: "/programs/elite-interviews",
+    image: "/media/images/programs/ai-interview/25_Mr. Carmi Levy.png",
+    alt: "Students interviewing Mr. Carmi Levy",
   },
   {
     title: "Other Programs",
     description:
       "Explore our full range including AI Pioneers Interview, Ithaca Night, and seasonal camps.",
     href: "/programs",
-    image: "/media/images/site/about-hero.jpg",
+    image: "/media/images/programs/ai-entrepreneurship/AIEC2026/AIEC2026-clossette_2s.png",
     alt: "Overview of Ithaca Family Academy programs",
   },
 ] as const;

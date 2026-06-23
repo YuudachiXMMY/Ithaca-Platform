@@ -3,6 +3,7 @@ import { TEAM_MEMBERS } from "@/types";
 import { HeroSection } from "./sections/HeroSection";
 import { MissionGrid } from "./sections/MissionGrid";
 import { Approach } from "./sections/Approach";
+import { DecabFramework } from "./sections/DecabFramework";
 import { ProgramsBento } from "./sections/ProgramsBento";
 import { Outcomes } from "./sections/Outcomes";
 import { Highlights } from "./sections/Highlights";
@@ -26,6 +27,7 @@ export default function AboutUsPage() {
       <HeroSection />
       <MissionGrid />
       <Approach />
+      <DecabFramework />
       <ProgramsBento />
       <Outcomes />
       <Highlights />
