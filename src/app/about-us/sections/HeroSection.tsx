@@ -5,8 +5,8 @@ import Image from "next/image";
 
 const FACTS = [
   { label: "Founded", value: "2024" },
-  { label: "Location", value: "Ontario, CA" },
-  { label: "Ages", value: "13-18" },
+  { label: "Location", value: "Ontario, Canada" },
+  { label: "Grades", value: "4-12" },
 ] as const;
 
 export function HeroSection() {

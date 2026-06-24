@@ -14,13 +14,13 @@ const PROGRAM_DETAILS = [
   { label: "Target", value: "Grades 8 - 12" },
   { label: "Length", value: "13 Weeks (including Pitch Day)" },
   { label: "Team Size", value: "5 - 8 students per team" },
-  { label: "Schedule", value: "January 10 to March 28, 2026" },
+  { label: "Schedule", value: "September 2026" },
   {
     label: "Class Hours",
     value:
-      "1:00 PM - 3:00 PM Main Class; 3:00 PM - 4:00 PM Contest Coaching (optional)",
+      "1:00 PM - 3:00 PM Main Class; 3:00 PM - 4:00 PM Contest Coaching",
   },
-  { label: "Pitch Day", value: "April 2026 (TBD)" },
+  { label: "Pitch Day", value: "December 2026 (to be arranged)" },
 ] as const;
 
 const GOALS = [
@@ -150,7 +150,8 @@ export default function AIEntrepreneurshipCampPage() {
           </h1>
           <p className="text-lg text-foreground/60 leading-relaxed max-w-[44ch] mb-10">
             From first idea to investor-ready pitch in 13 weeks. For students in
-            Grades 8 through 12.
+            Grades 8 through 12.<br/><br/>
+            Start Date: September 2026
           </p>
           <Link
             href="/contact-us"
@@ -165,7 +166,7 @@ export default function AIEntrepreneurshipCampPage() {
         <div className="hidden lg:grid grid-cols-2 grid-rows-2 gap-2 h-full p-2 order-2">
           <div className="relative row-span-2 rounded-xl overflow-hidden">
             <Image
-              src="/media/images/programs/ai-entrepreneurship/AI-Entrep_01.jpg"
+              src="/media/images/programs/ai-entrepreneurship/AIEC2026/OTLFInnovationDay-2026-Presentations-188.jpg"
               alt="Students collaborating on AI projects"
               fill
               className="object-cover"
@@ -175,7 +176,7 @@ export default function AIEntrepreneurshipCampPage() {
           </div>
           <div className="relative rounded-xl overflow-hidden">
             <Image
-              src="/media/images/programs/ai-entrepreneurship/AI-Entrep_15.jpg"
+              src="/media/images/programs/ai-entrepreneurship/AI-Entrep_70.jpg"
               alt="Student presenting their startup pitch"
               fill
               className="object-cover"
@@ -185,7 +186,7 @@ export default function AIEntrepreneurshipCampPage() {
           </div>
           <div className="relative rounded-xl overflow-hidden">
             <Image
-              src="/media/images/programs/ai-entrepreneurship/AI-Entrep_25.jpg"
+              src="/media/images/programs/ai-entrepreneurship/AIEC2026/OTLFInnovationDay-2026-Presentations-179.jpg"
               alt="Workshop session in progress"
               fill
               className="object-cover"
@@ -249,7 +250,7 @@ export default function AIEntrepreneurshipCampPage() {
             </div>
             <div className="relative h-[180px] md:h-[280px] rounded-xl overflow-hidden">
               <Image
-                src="/media/images/programs/ai-entrepreneurship/AI-Entrep_12.jpg"
+                src="/media/images/programs/ai-entrepreneurship/AIEC2026/AIEC2026-clossette_2s.png"
                 alt="Team brainstorming session"
                 fill
                 className="object-cover"
@@ -258,7 +259,7 @@ export default function AIEntrepreneurshipCampPage() {
             </div>
             <div className="relative h-[180px] md:h-[280px] rounded-xl overflow-hidden">
               <Image
-                src="/media/images/programs/ai-entrepreneurship/AI-Entrep_20.jpg"
+                src="/media/images/programs/ai-entrepreneurship/AI-Entrep_65.jpg"
                 alt="Mentor coaching students"
                 fill
                 className="object-cover"
@@ -267,7 +268,7 @@ export default function AIEntrepreneurshipCampPage() {
             </div>
             <div className="relative h-[180px] md:h-[280px] md:col-span-2 rounded-xl overflow-hidden">
               <Image
-                src="/media/images/programs/ai-entrepreneurship/AI-Entrep_35.jpg"
+                src="/media/images/programs/ai-entrepreneurship/AI-Entrep_79.jpg"
                 alt="Student demo day presentation"
                 fill
                 className="object-cover"
@@ -284,7 +285,7 @@ export default function AIEntrepreneurshipCampPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-8 lg:gap-14">
             <div className="relative h-[300px] lg:h-auto rounded-xl overflow-hidden">
               <Image
-                src="/media/images/programs/ai-entrepreneurship/AI-Entrep_40.jpg"
+                src="/media/images/programs/ai-entrepreneurship/AI-Entrep_12.jpg"
                 alt="Students in an AI workshop"
                 fill
                 className="object-cover"
@@ -388,7 +389,7 @@ export default function AIEntrepreneurshipCampPage() {
             </div>
             <div className="relative h-[220px] md:h-[300px] rounded-xl overflow-hidden">
               <Image
-                src="/media/images/programs/ai-entrepreneurship/AI-Entrep_65.jpg"
+                src="/media/images/programs/ai-entrepreneurship/AIEC2026/OTLFInnovationDay-2026-Presentations-164.jpg"
                 alt="Team working on pitch deck"
                 fill
                 className="object-cover"
@@ -423,7 +424,7 @@ export default function AIEntrepreneurshipCampPage() {
 
             <div className="relative h-[300px] lg:h-auto rounded-xl overflow-hidden">
               <Image
-                src="/media/images/programs/ai-entrepreneurship/AI-Entrep_45.jpg"
+                src="/media/images/programs/ai-entrepreneurship/AI-Entrep_89.jpg"
                 alt="Students presenting their final projects"
                 fill
                 className="object-cover"
@@ -443,7 +444,7 @@ export default function AIEntrepreneurshipCampPage() {
 
           <div className="relative h-[260px] md:h-[400px] rounded-xl overflow-hidden mb-12">
             <Image
-              src="/media/images/programs/ai-camp/ai-camp-HB8A5242.jpg"
+              src="/media/images/programs/ai-entrepreneurship/AI-Entrep_93.jpg"
               alt="Ithaca teaching team with students"
               fill
               className="object-cover"
@@ -496,12 +497,12 @@ export default function AIEntrepreneurshipCampPage() {
             Frequently Asked Questions
           </h2>
           <p className="text-foreground/40 mb-12">
-            Reach us at{" "}
+            {" "}
             <a
-              href="mailto:joshua.wang@ithacafo.com"
+              href="/contact-us"
               className="text-accent hover:text-accent-hover transition-colors underline underline-offset-2"
             >
-              joshua.wang@ithacafo.com
+              Contact us
             </a>{" "}
             if you need more information.
           </p>

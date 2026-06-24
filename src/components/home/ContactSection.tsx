@@ -8,6 +8,7 @@ import {
   useReducedMotion,
 } from "framer-motion";
 import { MapPin, Phone, Mail, ArrowRight } from "lucide-react";
+import { CONTACT_INFO } from "@/types";
 
 /* ------------------------------------------------------------------ */
 /*  Contact data                                                      */
@@ -24,19 +25,19 @@ const CONTACT_ITEMS: readonly ContactItem[] = [
   {
     icon: MapPin,
     label: "Address",
-    value: "Waterloo, Ontario, Canada",
+    value: CONTACT_INFO.address,
   },
   {
     icon: Phone,
     label: "Phone",
-    value: "+1 (437) 226-8407",
-    href: "tel:+14372268407",
+    value: CONTACT_INFO.phone,
+    href: `tel:${CONTACT_INFO.phone.replace(/[^+\d]/g, "")}`,
   },
   {
     icon: Mail,
     label: "Email",
-    value: "info@ithacateens.com",
-    href: "mailto:info@ithacateens.com",
+    value: CONTACT_INFO.email,
+    href: `mailto:${CONTACT_INFO.email}`,
   },
 ] as const;
 

@@ -31,9 +31,9 @@ const PILLARS: readonly Pillar[] = [
     alt: "Students engaged in project-based learning activities",
   },
   {
-    title: "Ethics & Social Impact",
+    title: "Social Impact & AI Ethics",
     description:
-      "Our curriculum integrates responsible technology use, ensuring students understand the societal implications of the tools they build.",
+      "Students learn to use AI responsibly, cite properly, and build work that can be explained and defended. We value social impact and ethical technology use.",
     image: "/media/images/pillars/pillar-ethics.jpg",
     alt: "Students discussing AI ethics and social impact",
   },

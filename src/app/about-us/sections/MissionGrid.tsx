@@ -19,7 +19,7 @@ const MISSION_BLOCKS = [
     imageAlt: "Students owning their projects at AI camp",
   },
   {
-    title: "We value AI ethics.",
+    title: "We value social impact and AI ethics.",
     description:
       "Students learn to use AI responsibly, cite properly, and build work that can be explained and defended through transparent review and public showcase formats.",
     image: "/media/images/pillars/pillar-ethics.jpg",
