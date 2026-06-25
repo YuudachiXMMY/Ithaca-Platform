@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import {
   motion,
   useScroll,
@@ -11,6 +11,77 @@ import { MapPin, Mail, Phone, MessageCircle } from "lucide-react";
 import { CONTACT_INFO } from "@/types/index";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { useTranslations } from "next-intl";
+
+/* ------------------------------------------------------------------ */
+/* Lazy-loaded Google Maps iframe                                      */
+/* ------------------------------------------------------------------ */
+
+const MAPS_EMBED_SRC =
+  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2882.5!2d-79.4!3d43.78!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2s205+Placer+Ct+unit+325%2C+North+York+ON!5e0!3m2!1sen!2sca!4v1";
+
+function LazyMap() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  const handleIntersect = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      if (entries[0]?.isIntersecting) setVisible(true);
+    },
+    [],
+  );
+
+  /* Observe viewport entry to lazy-mount the iframe */
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(handleIntersect, {
+      rootMargin: "200px",
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [handleIntersect]);
+
+  /* On unmount: blank the iframe src BEFORE React removes the DOM node.
+     This releases Google Maps' heavy JS runtime synchronously so the
+     browser doesn't block the main thread tearing it down during
+     the navigation transition. */
+  useEffect(() => {
+    return () => {
+      if (iframeRef.current) {
+        iframeRef.current.src = "about:blank";
+      }
+    };
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className="rounded-xl overflow-hidden border border-border/60 h-[350px] lg:h-full lg:min-h-[400px]"
+      style={{ contain: "strict" }}
+    >
+      {visible ? (
+        <iframe
+          ref={iframeRef}
+          title="Ithaca Family Academy Location"
+          src={MAPS_EMBED_SRC}
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          className="w-full h-full"
+        />
+      ) : (
+        <div className="w-full h-full bg-border/10 flex items-center justify-center">
+          <MapPin className="w-8 h-8 text-foreground/20" />
+        </div>
+      )}
+    </div>
+  );
+}
 
 /* ------------------------------------------------------------------ */
 /* Page                                                                */
@@ -189,19 +260,7 @@ export default function ContactUsPage() {
             <h2 className="text-xl md:text-2xl font-bold text-foreground mb-5">
               {t("page.findUs")}
             </h2>
-            <div className="rounded-xl overflow-hidden border border-border/60 h-[350px] lg:h-full lg:min-h-[400px]">
-              <iframe
-                title="Ithaca Family Academy Location"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2882.5!2d-79.4!3d43.78!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2s205+Placer+Ct+unit+325%2C+North+York+ON!5e0!3m2!1sen!2sca!4v1"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="w-full h-full"
-              />
-            </div>
+            <LazyMap />
           </motion.div>
         </div>
       </section>

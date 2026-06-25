@@ -54,22 +54,27 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const gaTrackingId = process.env.NEXT_PUBLIC_GA_TRACKING_ID;
 
   return (
     <html lang={locale} className={`${outfit.variable} ${notoSansSC.variable} h-full antialiased`}>
       <head>
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-675W5PPJEJ"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-675W5PPJEJ');
-          `}
-        </Script>
+        {gaTrackingId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaTrackingId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${gaTrackingId}');
+              `}
+            </Script>
+          </>
+        )}
       </head>
       <body className="min-h-full flex flex-col font-sans">
         <NextIntlClientProvider messages={messages}>

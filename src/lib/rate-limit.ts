@@ -1,72 +1,174 @@
 import { NextResponse } from "next/server";
 import type { ApiResponse } from "@/types";
 
+// ---------------------------------------------------------------------------
+// In-memory fallback (used when Upstash env vars are absent)
+// ---------------------------------------------------------------------------
+
 interface RateLimitEntry {
   timestamps: number[];
 }
 
 const store = new Map<string, RateLimitEntry>();
 
-// Clean up stale entries every 5 minutes
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
-
 let lastCleanup = Date.now();
 
 function cleanup(windowMs: number) {
   const now = Date.now();
   if (now - lastCleanup < CLEANUP_INTERVAL_MS) return;
   lastCleanup = now;
-
   const cutoff = now - windowMs;
   for (const [key, entry] of store) {
-    entry.timestamps = entry.timestamps.filter((t) => t > cutoff);
-    if (entry.timestamps.length === 0) store.delete(key);
+    const next = { ...entry, timestamps: entry.timestamps.filter((t) => t > cutoff) };
+    if (next.timestamps.length === 0) {
+      store.delete(key);
+    } else {
+      store.set(key, next);
+    }
   }
 }
 
-/**
- * Extract client IP from the request.
- * Next.js forwards the real IP via x-forwarded-for when behind a proxy.
- */
+function memoryRateLimit(
+  key: string,
+  maxRequests: number,
+  windowMs: number,
+): { allowed: boolean; remaining: number; resetAt: number } {
+  const now = Date.now();
+  const cutoff = now - windowMs;
+
+  cleanup(windowMs);
+
+  const entry = store.get(key) ?? { timestamps: [] };
+  const filtered = entry.timestamps.filter((t) => t > cutoff);
+
+  if (filtered.length >= maxRequests) {
+    const oldestInWindow = filtered[0];
+    return {
+      allowed: false,
+      remaining: 0,
+      resetAt: oldestInWindow + windowMs,
+    };
+  }
+
+  store.set(key, { timestamps: [...filtered, now] });
+  return {
+    allowed: true,
+    remaining: maxRequests - filtered.length - 1,
+    resetAt: now + windowMs,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
 function getClientIp(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for");
   if (forwarded) return forwarded.split(",")[0].trim();
   return "unknown";
 }
 
-interface RateLimitOptions {
-  /** Maximum requests allowed within the window */
+export interface RateLimitOptions {
   maxRequests: number;
-  /** Time window in milliseconds */
   windowMs: number;
+  /** Key namespace for per-route isolation (e.g. "subscribe", "contact") */
+  namespace?: string;
 }
 
-/**
- * Simple in-memory sliding-window rate limiter.
- * Returns null if the request is allowed, or a NextResponse if rate-limited.
- */
-export function rateLimit(
+// ---------------------------------------------------------------------------
+// Upstash Redis client + Ratelimit (lazily initialised, module-level cache)
+// ---------------------------------------------------------------------------
+
+type UpstashRatelimit = import("@upstash/ratelimit").Ratelimit;
+
+let upstashRatelimit: UpstashRatelimit | null = null;
+let upstashInitialised = false;
+
+async function getUpstashRatelimit(
+  maxRequests: number,
+  windowMs: number,
+): Promise<UpstashRatelimit | null> {
+  if (upstashInitialised) return upstashRatelimit;
+  upstashInitialised = true;
+
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+
+  try {
+    const { Redis } = await import("@upstash/redis");
+    const { Ratelimit } = await import("@upstash/ratelimit");
+
+    const redis = new Redis({ url, token });
+    const windowSeconds = Math.ceil(windowMs / 1000);
+
+    upstashRatelimit = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(maxRequests, `${windowSeconds} s`),
+      analytics: false,
+    });
+  } catch (err) {
+    console.warn("[rate-limit] Upstash init failed, falling back to memory:", err);
+    upstashRatelimit = null;
+  }
+
+  return upstashRatelimit;
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
+
+export async function rateLimit(
   request: Request,
   options: RateLimitOptions,
-): NextResponse<ApiResponse> | null {
-  const { maxRequests, windowMs } = options;
+): Promise<NextResponse<ApiResponse> | null> {
+  const { maxRequests, windowMs, namespace = "default" } = options;
   const ip = getClientIp(request);
-  const now = Date.now();
-  const cutoff = now - windowMs;
+  const key = `${namespace}:${ip}`;
 
-  cleanup(windowMs);
+  const rl = await getUpstashRatelimit(maxRequests, windowMs);
 
-  const entry = store.get(ip) ?? { timestamps: [] };
-  entry.timestamps = entry.timestamps.filter((t) => t > cutoff);
+  if (rl) {
+    try {
+      const { success, remaining, reset } = await rl.limit(key);
+      if (!success) {
+        const retryAfter = Math.ceil((reset - Date.now()) / 1000);
+        return NextResponse.json(
+          { success: false, error: "Too many requests. Please try again later." },
+          {
+            status: 429,
+            headers: {
+              "Retry-After": String(Math.max(retryAfter, 0)),
+              "X-RateLimit-Limit": String(maxRequests),
+              "X-RateLimit-Remaining": "0",
+            },
+          },
+        );
+      }
+      return null;
+    } catch (err) {
+      console.warn("[rate-limit] Upstash request failed, falling back to memory:", err);
+    }
+  }
 
-  if (entry.timestamps.length >= maxRequests) {
+  // Memory fallback
+  const result = memoryRateLimit(key, maxRequests, windowMs);
+  if (!result.allowed) {
+    const retryAfter = Math.ceil((result.resetAt - Date.now()) / 1000);
     return NextResponse.json(
       { success: false, error: "Too many requests. Please try again later." },
-      { status: 429 },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(Math.max(retryAfter, 0)),
+          "X-RateLimit-Limit": String(maxRequests),
+          "X-RateLimit-Remaining": "0",
+        },
+      },
     );
   }
 
-  entry.timestamps.push(now);
-  store.set(ip, entry);
   return null;
 }

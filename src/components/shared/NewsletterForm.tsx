@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+import { useCsrfToken } from "@/hooks/use-csrf-token";
 
 const subscribeSchema = z.object({
   email: z.email(),
@@ -26,6 +27,7 @@ export function NewsletterForm({
   className,
 }: NewsletterFormProps) {
   const t = useTranslations("contact");
+  const { getToken } = useCsrfToken();
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [message, setMessage] = useState("");
 
@@ -42,10 +44,22 @@ export function NewsletterForm({
     setStatus("loading");
     setMessage("");
 
+    let csrfToken: string;
+    try {
+      csrfToken = await getToken();
+    } catch {
+      setStatus("error");
+      setMessage(t("newsletter.genericError"));
+      return;
+    }
+
     try {
       const response = await fetch("/api/subscribe", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": csrfToken,
+        },
         body: JSON.stringify(data),
       });
 

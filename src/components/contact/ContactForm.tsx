@@ -7,6 +7,7 @@ import { z } from "zod/v4";
 import { motion } from "framer-motion";
 import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useCsrfToken } from "@/hooks/use-csrf-token";
 
 /* ------------------------------------------------------------------ */
 /* Schema                                                             */
@@ -41,6 +42,7 @@ const fadeUp = {
 
 export function ContactForm() {
   const t = useTranslations("contact");
+  const { getToken } = useCsrfToken();
   const [submitState, setSubmitState] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
@@ -66,10 +68,22 @@ export function ContactForm() {
     setSubmitState("submitting");
     setErrorMessage("");
 
+    let csrfToken: string;
+    try {
+      csrfToken = await getToken();
+    } catch {
+      setSubmitState("error");
+      setErrorMessage(t("form.genericError"));
+      return;
+    }
+
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": csrfToken,
+        },
         body: JSON.stringify(data),
       });
 

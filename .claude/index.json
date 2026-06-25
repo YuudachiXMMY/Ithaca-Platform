@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-06-25T00:00:00Z",
+  "timestamp": "2026-06-25T10:35:59Z",
   "project": "ithaca-fa-web",
   "version": "0.1.0",
   "description": "Ithaca Family Academy official website - Next.js 16 + Prisma + Resend + next-intl full-stack app",
   "scan": {
     "phase": "full",
     "truncated": false,
-    "totalFilesEstimated": 85,
-    "totalFilesScanned": 85,
+    "totalFilesEstimated": 72,
+    "totalFilesScanned": 72,
     "coveragePercent": 100,
     "ignoreRules": [
       "node_modules/**",
@@ -36,7 +36,7 @@
     {
       "path": "src/app",
       "language": "TypeScript/TSX",
-      "purpose": "Next.js App Router pages (16 routes including redirect + 404) and API routes (8 endpoints)",
+      "purpose": "Next.js App Router pages (17 routes including redirect + 404) and API routes (8 endpoints)",
       "entry": "src/app/layout.tsx",
       "claudeMd": "src/app/CLAUDE.md",
       "interfaces": [
@@ -68,34 +68,17 @@
         "src/app/admin/emails/page.tsx",
         "src/app/admin/popups/page.tsx"
       ],
-      "aboutUsSections": {
-        "active": [
-          "src/app/about-us/sections/HeroSection.tsx",
-          "src/app/about-us/sections/MissionGrid.tsx",
-          "src/app/about-us/sections/Approach.tsx",
-          "src/app/about-us/sections/DecabFramework.tsx",
-          "src/app/about-us/sections/ProgramsBento.tsx",
-          "src/app/about-us/sections/Outcomes.tsx",
-          "src/app/about-us/sections/Highlights.tsx",
-          "src/app/about-us/sections/TeamGrid.tsx",
-          "src/app/about-us/sections/ConnectCTA.tsx"
-        ],
-        "inactive": [
-          "src/app/about-us/sections/HowWeTeach.tsx",
-          "src/app/about-us/sections/EthicsSection.tsx",
-          "src/app/about-us/sections/PillarsSection.tsx",
-          "src/app/about-us/sections/HowWeTeachEthics.tsx",
-          "src/app/about-us/sections/StudentOutcomes.tsx",
-          "src/app/about-us/sections/StudentHighlights.tsx",
-          "src/app/about-us/sections/StudentHighlight.tsx",
-          "src/app/about-us/sections/CommunitySpotlight.tsx",
-          "src/app/about-us/sections/TeamSection.tsx",
-          "src/app/about-us/sections/NewsletterSection.tsx",
-          "src/app/about-us/sections/CTASection.tsx",
-          "src/app/about-us/sections/LearningPathway.tsx",
-          "src/app/about-us/sections/OurPrograms.tsx"
-        ]
-      },
+      "aboutUsSections": [
+        "src/app/about-us/sections/HeroSection.tsx",
+        "src/app/about-us/sections/MissionGrid.tsx",
+        "src/app/about-us/sections/Approach.tsx",
+        "src/app/about-us/sections/DecabFramework.tsx",
+        "src/app/about-us/sections/ProgramsBento.tsx",
+        "src/app/about-us/sections/Outcomes.tsx",
+        "src/app/about-us/sections/Highlights.tsx",
+        "src/app/about-us/sections/TeamGrid.tsx",
+        "src/app/about-us/sections/ConnectCTA.tsx"
+      ],
       "tests": [],
       "config": [
         "src/middleware.ts"
@@ -109,7 +92,7 @@
       },
       "gaps": [
         "No test files exist",
-        "13 unused about-us section files (candidates for cleanup)"
+        "3 of 7 program pages use PlaceholderProgram (coming-soon); content needed"
       ]
     },
     {
@@ -239,18 +222,18 @@
         "tests": false,
         "dataModel": "N/A"
       },
-      "gaps": [
-        "No automated tool to verify en/zh key parity"
-      ]
+      "gaps": []
     },
     {
       "path": "prisma",
       "language": "Prisma/TypeScript",
-      "purpose": "Database schema (5 models) and admin seed script",
+      "purpose": "Database schema (5 models), versioned migrations, and admin seed script",
       "claudeMd": "prisma/CLAUDE.md",
       "importantFiles": [
         "prisma/schema.prisma",
-        "prisma/seed.ts"
+        "prisma/seed.ts",
+        "prisma/migrations/0_init/migration.sql",
+        "prisma/migrations/migration_lock.toml"
       ],
       "tests": [],
       "coverage": {
@@ -260,16 +243,16 @@
         "dataModel": true
       },
       "gaps": [
-        "No test files exist for Prisma seed script",
         "No test files exist"
       ]
     },
     {
       "path": "scripts",
-      "language": "Bash",
-      "purpose": "Local dev launcher: Docker Postgres + schema sync + seed + dev server",
+      "language": "Bash/TypeScript",
+      "purpose": "Dev tooling: local stack launcher (dev.sh) and i18n key parity checker (check-i18n.ts)",
       "importantFiles": [
-        "scripts/dev.sh"
+        "scripts/dev.sh",
+        "scripts/check-i18n.ts"
       ],
       "tests": [],
       "coverage": {
@@ -339,7 +322,8 @@
     "namespaces": ["common", "nav", "home", "about", "programs", "contact", "admin", "metadata"],
     "totalTranslationFiles": 16,
     "configFiles": ["src/i18n/routing.ts", "src/i18n/request.ts"],
-    "switcherComponent": "src/components/shared/LanguageSwitcher.tsx"
+    "switcherComponent": "src/components/shared/LanguageSwitcher.tsx",
+    "parityCheckScript": "scripts/check-i18n.ts"
   },
   "claudeMdFiles": {
     "root": "CLAUDE.md",
@@ -358,16 +342,17 @@
       "Add CSRF protection for form submissions",
       "Move Google Analytics tracking ID to environment variable",
       "Replace in-memory rate limiter with Redis-backed solution before horizontal scaling",
-      "3 of 7 program pages use PlaceholderProgram (coming-soon); content needed",
-      "Clean up 13 unused about-us section files from earlier design iterations",
-      "Add automated en/zh translation key parity check"
+      "3 of 7 program pages use PlaceholderProgram (coming-soon); content needed"
     ],
     "resolved": [
       "Rate limiting on public API routes",
       "Input sanitization for HTML content in emails",
       "i18n bilingual support (en/zh) via next-intl",
       "Custom 404 page",
-      "Elite Interview program page (was previously a placeholder)"
+      "Elite Interview program page (was previously a placeholder)",
+      "13 inactive about-us section files cleaned up",
+      "i18n key parity check script added (scripts/check-i18n.ts)",
+      "Prisma migrations (versioned) instead of db push"
     ]
   },
   "nextScanSuggestions": []

@@ -6,7 +6,8 @@
 
 | Date       | Action  | Notes                                      |
 |------------|---------|---------------------------------------------|
-| 2026-06-25 | Updated | Full rescan: i18n docs, font/color corrections, new components (CinematicDivider, ImpactStats, EVModel3D, LanguageSwitcher), about-us redesign (22 sections), elite-interview route, 404 page, GSAP/Three.js deps, module docs updated. |
+| 2026-06-25 | Updated | Incremental rescan: confirmed about-us cleanup (13 legacy section files removed, 9 active remain), verified all modules unchanged, updated index.json inactive refs, scripts module now 2 files (dev.sh + check-i18n.ts). |
+| 2026-06-25 | Updated | Full rescan: i18n docs, font/color corrections, new components (CinematicDivider, ImpactStats, EVModel3D, LanguageSwitcher), about-us redesign (9 active sections, 13 legacy removed), elite-interview route, 404 page, GSAP/Three.js deps, module docs updated. |
 | 2026-06-14 | Updated | Full deep scan; added module-level CLAUDE.md files, updated index.json. |
 | 2026-06-14 | Updated | Sync: GA tracking, rate-limit, HTML escape, new scripts. |
 | 2026-04-17 | Created | Initial architecture scan; full coverage.   |
@@ -106,7 +107,7 @@ graph TD
 | `src/i18n`            | TS         | next-intl routing config and locale request handler | (inline -- 2 files) |
 | `messages`            | JSON       | Translation files: 8 namespaces x 2 locales (en/zh) | (inline -- JSON assets) |
 | `prisma`              | Prisma/TS  | Database schema and admin seed script        | [CLAUDE.md](prisma/CLAUDE.md) |
-| `scripts`             | Bash       | Local development launcher (`dev.sh`)        | (inline -- single file) |
+| `scripts`             | Bash/TS    | Dev tooling: `dev.sh` (local stack), `check-i18n.ts` (key parity) | (inline -- 2 files) |
 | `public`              | Static     | Images, videos, SVGs                         | (binary assets only) |
 
 ## Run & Develop
@@ -150,6 +151,7 @@ npm run dev                                       # http://localhost:3000
 | `npm run db:seed`  | Seed admin user                      |
 | `npm run db:studio`| Open Prisma Studio                   |
 | `npm run prisma:seed`| Alias for `db:seed`                |
+| `npm run i18n:check` | Check i18n key parity (en vs zh)   |
 
 ### Environment Variables
 
@@ -170,6 +172,7 @@ not configured via environment variable.
 - **Dev**: `docker-compose.dev.yml` -- PostgreSQL 16 only (port 5432); Next.js runs on host.
   Credentials: `ithacafa` / `ithacafa_dev_2026` / database `ithacafa`.
 - **Prod**: `Dockerfile` -- multi-stage build producing standalone Node.js server on port 3000.
+  Runs `prisma migrate deploy` before starting the server.
 
 ## Testing Strategy
 
@@ -187,7 +190,7 @@ Recommended approach:
 - **Styling**: Tailwind CSS v4 via `@tailwindcss/postcss`; CSS custom properties for theming in `globals.css`
 - **Font**: Outfit (Latin) + Noto Sans SC (Chinese) via `next/font/google`
 - **UI library**: No external component library; hand-rolled `Button`, `SectionHeading`, etc.
-- **Animations**: Framer Motion (`framer-motion`) for scroll/entry animations; GSAP (`gsap`) for scroll-driven and timeline animations (CinematicDivider, ImpactStats, EVModel3D)
+- **Animations**: Framer Motion (`framer-motion`) for scroll/entry animations; GSAP (`gsap`) for scroll-driven and timeline animations (CinematicDivider, ImpactStats, EVModel3D, WorkshopToRolesTransition)
 - **3D rendering**: React Three Fiber (`@react-three/fiber` + `@react-three/drei` + `three`) for 3D model viewers (EV Challenge page)
 - **i18n**: `next-intl` v4 with cookie-based locale switching (`NEXT_LOCALE` cookie); locales: `en` (default), `zh`; URL prefix: `never` (no locale segment in URLs); message namespaces: `common`, `nav`, `home`, `about`, `programs`, `contact`, `admin`, `metadata`
 - **Icons**: `lucide-react`
@@ -239,6 +242,7 @@ The site uses `next-intl` v4 for bilingual English/Chinese support.
 - **Metadata**: `export async function generateMetadata() { const t = await getTranslations("metadata.subKey"); ... }`
 - **Nested keys**: Access via dot notation, e.g., `t("hero.title")`
 - **Team data**: `TEAM_MEMBERS` in `src/types/index.ts` stores translation keys (not raw text); resolved at render time via `t(member.title)`
+- **Key parity check**: `npm run i18n:check` runs `scripts/check-i18n.ts` to detect missing keys between en and zh
 
 ## AI Usage Guidelines
 
@@ -254,6 +258,7 @@ The site uses `next-intl` v4 for bilingual English/Chinese support.
   (server) from `next-intl`. Add keys to both `messages/en/*.json` and `messages/zh/*.json`.
   The locale is detected via `NEXT_LOCALE` cookie -> `Accept-Language` header -> default `'en'`.
   The `next.config.ts` wraps the config with `createNextIntlPlugin()`.
+  Run `npm run i18n:check` to verify en/zh key parity after adding translation keys.
 - No test infrastructure exists yet -- set up Vitest or Jest before writing tests.
 - The admin layout (`src/app/admin/layout.tsx`) is a client component with
   `SessionProvider` wrapping; it renders a sidebar for authenticated users and
@@ -261,9 +266,9 @@ The site uses `next-intl` v4 for bilingual English/Chinese support.
 - Email campaigns use batch sending via `resend.batch.send()` with a batch size of 50.
 - Popup banners are fetched client-side on every page load and dismissed per session
   via `sessionStorage`.
-- **GSAP animations**: Components using GSAP (CinematicDivider, ImpactStats, EVModel3D)
-  must register ScrollTrigger via `gsap.registerPlugin(ScrollTrigger)` and clean up contexts
-  in `useLayoutEffect` return. Always check `useReducedMotion()` from Framer Motion and
-  provide graceful fallbacks.
+- **GSAP animations**: Components using GSAP (CinematicDivider, ImpactStats, EVModel3D,
+  WorkshopToRolesTransition) must register ScrollTrigger via `gsap.registerPlugin(ScrollTrigger)`
+  and clean up contexts in `useLayoutEffect` return. Always check `useReducedMotion()`
+  from Framer Motion and provide graceful fallbacks.
 - **Three.js components**: Use `dynamic(() => import(...), { ssr: false })` for Three.js
   components to prevent server-side rendering issues.

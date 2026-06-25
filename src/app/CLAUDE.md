@@ -6,6 +6,7 @@
 
 | Date       | Action  | Notes                         |
 |------------|---------|-------------------------------|
+| 2026-06-25 | Updated | Incremental rescan: confirmed 13 inactive about-us section files fully removed; 9 active sections remain. No other file changes detected. |
 | 2026-06-25 | Updated | Full rescan: i18n integration details, about-us redesign (9 active + 13 inactive sections), elite-interview route, ai-pioneers-interview redirect, 404 page, font/color corrections, GSAP/Three.js deps, homepage sections (ImpactStats, CinematicDivider). |
 | 2026-06-25 | Updated | Removed 13 inactive about-us legacy section files; about-us now has 9 active sections. |
 | 2026-06-14 | Created | Initial module documentation. |
@@ -27,7 +28,7 @@ This directory is the Next.js App Router entry point. It contains:
 | `layout.tsx` | Root layout: Outfit + Noto Sans SC fonts, `NextIntlClientProvider` wrapping, GA scripts, Header/Footer/PopupBanner. Uses `getLocale()`/`getMessages()`/`getTranslations()` from `next-intl/server`. |
 | `page.tsx` | Homepage: assembles HeroSection, MissionSection, ProgramsShowcase, ImpactStats, CinematicDivider, FeaturedSection, StudentHighlights, ContactSection |
 | `not-found.tsx` | Custom 404 page with accent-colored "Back to home" link |
-| `globals.css` | CSS variables (`#111318` bg, `#f0f1f3` fg, `#ccdef0` accent), Tailwind v4 import, grain texture overlay, skip-to-content |
+| `globals.css` | CSS variables (`#111318` bg, `#f0f1f3` fg, `#ccdef0` accent), Tailwind v4 import, grain texture overlay, skip-to-content, EV Challenge glassmorphism panels |
 | `../middleware.ts` | Intercepts `/admin/*` requests; redirects unauthenticated users to `/admin/login` |
 
 ## Public Pages
@@ -48,7 +49,8 @@ This directory is the Next.js App Router entry point. It contains:
 
 ### About-Us Sections (9 files in `about-us/sections/`)
 
-The about-us page was redesigned. The page component (`about-us/page.tsx`) currently imports 9 active sections:
+The about-us page was redesigned. All legacy section files have been removed.
+The page component (`about-us/page.tsx`) imports 9 active sections:
 
 | Section | File | Description |
 |---------|------|-------------|
@@ -118,8 +120,6 @@ All pages and components use `next-intl` for translated text:
 - **Metadata**: `generateMetadata()` uses `getTranslations("metadata.subKey")`
 - The root layout wraps everything in `NextIntlClientProvider` with messages loaded
   from `src/i18n/request.ts`
-
-40 files in `src/` use `useTranslations` or `getTranslations`.
 
 ## Key Dependencies & Configuration
 

@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod/v4";
 import { prisma } from "@/lib/prisma";
 import { resend } from "@/lib/resend";
+import { assertCsrf } from "@/lib/csrf";
 import { rateLimit } from "@/lib/rate-limit";
 import { escapeHtml } from "@/lib/utils";
 
@@ -16,9 +17,16 @@ const contactSchema = z.object({
 });
 
 export async function POST(
-  request: Request,
+  request: NextRequest,
 ): Promise<NextResponse<ApiResponse>> {
-  const limited = rateLimit(request, { maxRequests: 5, windowMs: 60_000 });
+  const csrfError = assertCsrf(request);
+  if (csrfError) return csrfError;
+
+  const limited = await rateLimit(request, {
+    maxRequests: 5,
+    windowMs: 60_000,
+    namespace: "contact",
+  });
   if (limited) return limited;
 
   try {

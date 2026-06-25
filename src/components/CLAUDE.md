@@ -6,6 +6,7 @@
 
 | Date       | Action  | Notes                         |
 |------------|---------|-------------------------------|
+| 2026-06-25 | Verified | Incremental rescan: no file changes detected. 21 components across 7 subdirectories confirmed. |
 | 2026-06-25 | Updated | Full rescan: detailed descriptions for CinematicDivider (GSAP 4-phase scroll-pinned video), ImpactStats (GSAP counter animation), EVModel3D (Three.js wireframe trike with dual-track UI), WorkshopToRolesTransition (GSAP photo grid + role cards), LanguageSwitcher (cookie-based EN/ZH toggle). Total: 21 components across 7 subdirectories. |
 | 2026-06-14 | Created | Initial module documentation. |
 
