@@ -89,19 +89,24 @@ for bootstrapping the admin user.
 ## Key Dependencies & Configuration
 
 - `@prisma/client` -- generated client
-- `prisma` CLI -- schema management (`db push`, `generate`, `studio`)
+- `prisma` CLI -- schema management (`migrate dev`, `migrate deploy`, `generate`, `studio`)
 - `bcryptjs` -- used in seed script for password hashing
 - Database: PostgreSQL 16 (dev: Docker, prod: external)
 
 ## Schema Management
 
-The project uses `prisma db push` (not migrations) for schema synchronization.
-This is suitable for early-stage development but lacks migration history tracking.
+The project uses **Prisma Migrate** for versioned schema management.
 
-**Important considerations:**
-- `db push` can cause data loss on destructive changes (column removal, type change)
-- For production, consider switching to `prisma migrate dev` for versioned migrations
-- No `migrations/` directory exists
+**Commands:**
+- `npm run db:migrate` -- create and apply a new migration (development)
+- `npm run db:migrate:deploy` -- apply pending migrations (production / CI)
+- `npm run db:migrate:status` -- check which migrations are applied
+- `npm run db:migrate:reset` -- reset DB and reapply all migrations (destructive)
+
+**Workflow for schema changes:**
+1. Edit `schema.prisma`
+2. Run `npm run db:migrate` (creates SQL file in `prisma/migrations/` and applies it)
+3. Commit the generated migration file to version control
 
 ## Seed Script
 
@@ -121,18 +126,22 @@ Run via: `npm run db:seed` or `npx tsx prisma/seed.ts`
 
 ## FAQ
 
-**Q: Why `db push` instead of `migrate`?**
-A: The project is early-stage with a small team. `db push` is faster for iteration.
-Switch to `migrate` before production to preserve migration history.
-
 **Q: How do I add a new model?**
-A: Add the model to `schema.prisma`, run `npx prisma db push`, then run
-`npx prisma generate` to update the client types.
+A: Add the model to `schema.prisma`, run `npm run db:migrate` to create and apply
+a migration, then commit the generated SQL file in `prisma/migrations/`.
+
+**Q: How do I apply migrations to an existing production database?**
+A: If the database already has the tables (created via `db push`), run
+`npx prisma migrate resolve --applied 0_init` to mark the baseline migration
+as already applied, then `npm run db:migrate:deploy` for any subsequent migrations.
 
 ## Related Files
 
 ```
 prisma/
-  schema.prisma    # 5 models: Subscriber, ContactMessage, AdminUser, EmailCampaign, Popup
-  seed.ts          # Admin user bootstrap
+  schema.prisma              # 5 models: Subscriber, ContactMessage, AdminUser, EmailCampaign, Popup
+  seed.ts                    # Admin user bootstrap
+  migrations/
+    migration_lock.toml      # Locks DB provider to PostgreSQL
+    0_init/migration.sql     # Baseline: creates all 5 tables + indexes
 ```

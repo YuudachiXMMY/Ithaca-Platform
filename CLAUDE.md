@@ -6,6 +6,7 @@
 
 | Date       | Action  | Notes                                      |
 |------------|---------|---------------------------------------------|
+| 2026-06-25 | Updated | Full rescan: i18n docs, font/color corrections, new components (CinematicDivider, ImpactStats, EVModel3D, LanguageSwitcher), about-us redesign (22 sections), elite-interview route, 404 page, GSAP/Three.js deps, module docs updated. |
 | 2026-06-14 | Updated | Full deep scan; added module-level CLAUDE.md files, updated index.json. |
 | 2026-06-14 | Updated | Sync: GA tracking, rate-limit, HTML escape, new scripts. |
 | 2026-04-17 | Created | Initial architecture scan; full coverage.   |
@@ -29,10 +30,16 @@ The site serves two audiences:
 ```
 Next.js 16 (App Router, standalone output)
   |
+  |-- i18n                next-intl v4 (en/zh bilingual)
+  |                       Locale detection: cookie (NEXT_LOCALE) -> Accept-Language -> default 'en'
+  |                       Message files: messages/{en,zh}/*.json (8 namespaces)
+  |                       URL prefix: none (localePrefix: 'never')
+  |
   |-- Public pages        /                (homepage)
   |                       /about-us
-  |                       /programs/*
+  |                       /programs/*      (6 program sub-pages + index)
   |                       /contact-us
+  |                       /not-found       (custom 404)
   |
   |-- Admin panel         /admin           (JWT-protected)
   |                       /admin/login
@@ -64,6 +71,8 @@ graph TD
     A --> C["src/components -- React Components"]
     A --> D["src/lib -- Shared Utilities"]
     A --> E["src/types -- TypeScript Types & Constants"]
+    A --> I["src/i18n -- Internationalization Config"]
+    A --> M["messages -- Translation Files (en/zh)"]
     A --> F["prisma -- Database Schema & Seeds"]
     A --> G["scripts -- Dev Tooling"]
     A --> H["public -- Static Assets"]
@@ -94,6 +103,8 @@ graph TD
 | `src/components`      | TSX        | Reusable React UI components                 | [CLAUDE.md](src/components/CLAUDE.md) |
 | `src/lib`             | TS         | Prisma client, auth, Resend, rate-limit, utils | [CLAUDE.md](src/lib/CLAUDE.md) |
 | `src/types`           | TS         | Shared interfaces, constants, navigation     | (inline -- single file) |
+| `src/i18n`            | TS         | next-intl routing config and locale request handler | (inline -- 2 files) |
+| `messages`            | JSON       | Translation files: 8 namespaces x 2 locales (en/zh) | (inline -- JSON assets) |
 | `prisma`              | Prisma/TS  | Database schema and admin seed script        | [CLAUDE.md](prisma/CLAUDE.md) |
 | `scripts`             | Bash       | Local development launcher (`dev.sh`)        | (inline -- single file) |
 | `public`              | Static     | Images, videos, SVGs                         | (binary assets only) |
@@ -115,7 +126,7 @@ graph TD
 # Or manually:
 docker compose -f docker-compose.dev.yml up -d   # start PostgreSQL
 npm install
-npx prisma db push                                # sync schema
+npx prisma migrate deploy                         # apply migrations
 npx tsx prisma/seed.ts                            # seed admin user
 npm run dev                                       # http://localhost:3000
 ```
@@ -132,7 +143,10 @@ npm run dev                                       # http://localhost:3000
 | `npm run build`    | Production build (standalone)        |
 | `npm run start`    | Start production server              |
 | `npm run lint`     | ESLint check                         |
-| `npm run db:push`  | Push Prisma schema to DB             |
+| `npm run db:migrate`| Run Prisma migrations (dev)          |
+| `npm run db:migrate:deploy`| Apply migrations (production) |
+| `npm run db:migrate:status`| Show migration status         |
+| `npm run db:migrate:reset`| Reset DB and reapply all       |
 | `npm run db:seed`  | Seed admin user                      |
 | `npm run db:studio`| Open Prisma Studio                   |
 | `npm run prisma:seed`| Alias for `db:seed`                |
@@ -171,9 +185,11 @@ Recommended approach:
 - **Language**: TypeScript (strict mode), TSX for components
 - **Framework**: Next.js 16 App Router with `output: "standalone"`
 - **Styling**: Tailwind CSS v4 via `@tailwindcss/postcss`; CSS custom properties for theming in `globals.css`
-- **Font**: Montserrat (Google Fonts via `next/font`)
+- **Font**: Outfit (Latin) + Noto Sans SC (Chinese) via `next/font/google`
 - **UI library**: No external component library; hand-rolled `Button`, `SectionHeading`, etc.
-- **Animations**: Framer Motion (`framer-motion`) for scroll/entry animations
+- **Animations**: Framer Motion (`framer-motion`) for scroll/entry animations; GSAP (`gsap`) for scroll-driven and timeline animations (CinematicDivider, ImpactStats, EVModel3D)
+- **3D rendering**: React Three Fiber (`@react-three/fiber` + `@react-three/drei` + `three`) for 3D model viewers (EV Challenge page)
+- **i18n**: `next-intl` v4 with cookie-based locale switching (`NEXT_LOCALE` cookie); locales: `en` (default), `zh`; URL prefix: `never` (no locale segment in URLs); message namespaces: `common`, `nav`, `home`, `about`, `programs`, `contact`, `admin`, `metadata`
 - **Icons**: `lucide-react`
 - **Forms**: `react-hook-form` + `@hookform/resolvers` + `zod/v4`
 - **Auth**: `next-auth` v4 with Credentials provider, JWT strategy
@@ -183,13 +199,46 @@ Recommended approach:
 - **API response envelope**: `{ success: boolean; data?: T; error?: string }`
 - **Path aliases**: `@/*` maps to `./src/*`
 - **Linting**: ESLint with `eslint-config-next` (core-web-vitals + TypeScript)
-- **CSS convention**: Dark-first palette (`#161616` background); accent `#ccdef0`
+- **CSS convention**: Dark-first palette (`#111318` background, `#f0f1f3` foreground); accent `#ccdef0`; grain texture overlay on body
 - **Middleware**: JWT check on `/admin/*` routes (except `/admin/login`)
 - **Rate limiting**: In-memory sliding-window limiter (`src/lib/rate-limit.ts`) on public API routes
   - `/api/subscribe`: 10 requests per 60 seconds per IP
   - `/api/contact`: 5 requests per 60 seconds per IP
 - **HTML sanitization**: `escapeHtml()` in `src/lib/utils.ts` for user input in email templates
 - **Analytics**: Google Analytics (gtag.js) loaded via `next/script` in root layout
+
+## Internationalization (i18n)
+
+The site uses `next-intl` v4 for bilingual English/Chinese support.
+
+### Architecture
+
+- **Locale detection** (in `src/i18n/request.ts`): `NEXT_LOCALE` cookie -> `Accept-Language` header -> fallback `en`
+- **Locale switching**: `LanguageSwitcher` component sets `NEXT_LOCALE` cookie (1-year expiry) and calls `router.refresh()`
+- **URL strategy**: `localePrefix: 'never'` -- no locale segment in URLs; same URL serves both languages
+- **Root layout**: `NextIntlClientProvider` wraps all content; `html lang` attribute set dynamically
+- **Config integration**: `next.config.ts` wraps the Next.js config with `createNextIntlPlugin()`
+
+### Message Namespaces
+
+| Namespace  | File pattern                    | Coverage                           |
+|------------|---------------------------------|------------------------------------|
+| `common`   | `messages/{locale}/common.json` | Footer text, team member bios      |
+| `nav`      | `messages/{locale}/nav.json`    | Navigation labels                  |
+| `home`     | `messages/{locale}/home.json`   | All homepage sections              |
+| `about`    | `messages/{locale}/about.json`  | About-us page sections             |
+| `programs` | `messages/{locale}/programs.json` | All program pages                |
+| `contact`  | `messages/{locale}/contact.json`| Contact page, forms, newsletter    |
+| `admin`    | `messages/{locale}/admin.json`  | Admin panel UI strings             |
+| `metadata` | `messages/{locale}/metadata.json` | Page titles, OG tags             |
+
+### i18n Patterns
+
+- **Server components**: `const t = await getTranslations("namespace")`
+- **Client components**: `const t = useTranslations("namespace")`
+- **Metadata**: `export async function generateMetadata() { const t = await getTranslations("metadata.subKey"); ... }`
+- **Nested keys**: Access via dot notation, e.g., `t("hero.title")`
+- **Team data**: `TEAM_MEMBERS` in `src/types/index.ts` stores translation keys (not raw text); resolved at render time via `t(member.title)`
 
 ## AI Usage Guidelines
 
@@ -201,6 +250,10 @@ Recommended approach:
 - The `resend` client may be `null` in development; always use optional chaining
   (`resend?.emails.send(...)`) or the `requireResend()` helper for mandatory sends.
 - Client components use `"use client"` directive; server components are the default.
+- **i18n**: All user-facing text must use `useTranslations()` (client) or `getTranslations()`
+  (server) from `next-intl`. Add keys to both `messages/en/*.json` and `messages/zh/*.json`.
+  The locale is detected via `NEXT_LOCALE` cookie -> `Accept-Language` header -> default `'en'`.
+  The `next.config.ts` wraps the config with `createNextIntlPlugin()`.
 - No test infrastructure exists yet -- set up Vitest or Jest before writing tests.
 - The admin layout (`src/app/admin/layout.tsx`) is a client component with
   `SessionProvider` wrapping; it renders a sidebar for authenticated users and
@@ -208,3 +261,9 @@ Recommended approach:
 - Email campaigns use batch sending via `resend.batch.send()` with a batch size of 50.
 - Popup banners are fetched client-side on every page load and dismissed per session
   via `sessionStorage`.
+- **GSAP animations**: Components using GSAP (CinematicDivider, ImpactStats, EVModel3D)
+  must register ScrollTrigger via `gsap.registerPlugin(ScrollTrigger)` and clean up contexts
+  in `useLayoutEffect` return. Always check `useReducedMotion()` from Framer Motion and
+  provide graceful fallbacks.
+- **Three.js components**: Use `dynamic(() => import(...), { ssr: false })` for Three.js
+  components to prevent server-side rendering issues.

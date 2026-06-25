@@ -130,17 +130,20 @@ until docker compose -f "$COMPOSE_FILE" exec -T db pg_isready -U ithacafa -d ith
 done
 success "PostgreSQL is ready."
 
+# ─── Load environment variables ───────────────
+
+info "Loading environment from .env.local..."
+export $(grep -E "^(ADMIN_EMAIL|ADMIN_PASSWORD|DATABASE_URL)=" "$DEV_ENV_FILE" | sed 's/"//g' | xargs) 2>/dev/null || true
+
 # ─── Run Prisma migrations ─────────────────
 
-info "Syncing database schema..."
-npx prisma db push --skip-generate 2>&1 | grep -E "(created|applied|already)" || true
-success "Database schema synced."
+info "Applying database migrations..."
+npx prisma migrate deploy 2>&1 | tail -5
+success "Database migrations applied."
 
 # ─── Seed admin user ───────────────────────
 
 info "Seeding admin user..."
-# Source .env.local for seed script
-export $(grep -E "^(ADMIN_EMAIL|ADMIN_PASSWORD|DATABASE_URL)=" "$DEV_ENV_FILE" | sed 's/"//g' | xargs) 2>/dev/null || true
 npx tsx prisma/seed.ts 2>&1 || warn "Seed skipped (may already exist)"
 
 # ─── Start Next.js dev server ──────────────

@@ -44,12 +44,14 @@ COPY --from=build /app/public ./public
 # Copy prisma directory (for runtime migrations)
 COPY --from=build /app/prisma ./prisma
 
-# Copy prisma client (generated in node_modules)
+# Copy prisma client and CLI (needed for runtime migrations)
 COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=build /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=build /app/node_modules/prisma ./node_modules/prisma
 
 EXPOSE 3000
 
 USER nextjs
 
-CMD ["node", "server.js"]
+# Run migrations then start server
+CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]

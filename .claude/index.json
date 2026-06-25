@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-06-14T23:51:42Z",
+  "timestamp": "2026-06-25T00:00:00Z",
   "project": "ithaca-fa-web",
   "version": "0.1.0",
-  "description": "Ithaca Family Academy official website - Next.js 16 + Prisma + Resend full-stack app",
+  "description": "Ithaca Family Academy official website - Next.js 16 + Prisma + Resend + next-intl full-stack app",
   "scan": {
     "phase": "full",
     "truncated": false,
-    "totalFilesEstimated": 63,
-    "totalFilesScanned": 63,
+    "totalFilesEstimated": 85,
+    "totalFilesScanned": 85,
     "coveragePercent": 100,
     "ignoreRules": [
       "node_modules/**",
@@ -29,14 +29,14 @@
     "ignoredStats": {
       "node_modules": "~800+ packages",
       ".next": "build output",
-      "public/media": "27 images + 4 videos (binary, paths recorded only)"
+      "public/media": "~100+ images + 4 videos (binary, paths recorded only)"
     }
   },
   "modules": [
     {
       "path": "src/app",
       "language": "TypeScript/TSX",
-      "purpose": "Next.js App Router pages (15 routes) and API routes (8 endpoints)",
+      "purpose": "Next.js App Router pages (16 routes including redirect + 404) and API routes (8 endpoints)",
       "entry": "src/app/layout.tsx",
       "claudeMd": "src/app/CLAUDE.md",
       "interfaces": [
@@ -51,11 +51,13 @@
       ],
       "pages": [
         "src/app/page.tsx",
+        "src/app/not-found.tsx",
         "src/app/about-us/page.tsx",
         "src/app/contact-us/page.tsx",
         "src/app/programs/page.tsx",
         "src/app/programs/ev-challenge/page.tsx",
         "src/app/programs/ai-entrepreneurship-camp/page.tsx",
+        "src/app/programs/elite-interview/page.tsx",
         "src/app/programs/engineering-projects/page.tsx",
         "src/app/programs/ai-pioneers-interview/page.tsx",
         "src/app/programs/summer-winter-camps/page.tsx",
@@ -66,6 +68,34 @@
         "src/app/admin/emails/page.tsx",
         "src/app/admin/popups/page.tsx"
       ],
+      "aboutUsSections": {
+        "active": [
+          "src/app/about-us/sections/HeroSection.tsx",
+          "src/app/about-us/sections/MissionGrid.tsx",
+          "src/app/about-us/sections/Approach.tsx",
+          "src/app/about-us/sections/DecabFramework.tsx",
+          "src/app/about-us/sections/ProgramsBento.tsx",
+          "src/app/about-us/sections/Outcomes.tsx",
+          "src/app/about-us/sections/Highlights.tsx",
+          "src/app/about-us/sections/TeamGrid.tsx",
+          "src/app/about-us/sections/ConnectCTA.tsx"
+        ],
+        "inactive": [
+          "src/app/about-us/sections/HowWeTeach.tsx",
+          "src/app/about-us/sections/EthicsSection.tsx",
+          "src/app/about-us/sections/PillarsSection.tsx",
+          "src/app/about-us/sections/HowWeTeachEthics.tsx",
+          "src/app/about-us/sections/StudentOutcomes.tsx",
+          "src/app/about-us/sections/StudentHighlights.tsx",
+          "src/app/about-us/sections/StudentHighlight.tsx",
+          "src/app/about-us/sections/CommunitySpotlight.tsx",
+          "src/app/about-us/sections/TeamSection.tsx",
+          "src/app/about-us/sections/NewsletterSection.tsx",
+          "src/app/about-us/sections/CTASection.tsx",
+          "src/app/about-us/sections/LearningPathway.tsx",
+          "src/app/about-us/sections/OurPrograms.tsx"
+        ]
+      },
       "tests": [],
       "config": [
         "src/middleware.ts"
@@ -74,16 +104,18 @@
         "entry": true,
         "interfaces": true,
         "tests": false,
-        "dataModel": true
+        "dataModel": true,
+        "i18n": true
       },
       "gaps": [
-        "No test files exist"
+        "No test files exist",
+        "13 unused about-us section files (candidates for cleanup)"
       ]
     },
     {
       "path": "src/components",
       "language": "TypeScript/TSX",
-      "purpose": "Reusable React UI components (16 components across 7 subdirectories)",
+      "purpose": "Reusable React UI components (21 components across 7 subdirectories)",
       "entry": null,
       "claudeMd": "src/components/CLAUDE.md",
       "importantFiles": [
@@ -91,26 +123,32 @@
         "src/components/layout/Footer.tsx",
         "src/components/shared/PopupBanner.tsx",
         "src/components/shared/NewsletterForm.tsx",
+        "src/components/shared/LanguageSwitcher.tsx",
         "src/components/contact/ContactForm.tsx",
         "src/components/ui/Button.tsx",
         "src/components/ui/SectionHeading.tsx",
         "src/components/home/HeroSection.tsx",
         "src/components/home/MissionSection.tsx",
         "src/components/home/ProgramsShowcase.tsx",
+        "src/components/home/ImpactStats.tsx",
+        "src/components/home/CinematicDivider.tsx",
         "src/components/home/FeaturedSection.tsx",
         "src/components/home/StudentHighlights.tsx",
         "src/components/home/ContactSection.tsx",
         "src/components/animations/FadeIn.tsx",
         "src/components/animations/StaggerContainer.tsx",
         "src/components/animations/StaggerItem.tsx",
-        "src/components/programs/PlaceholderProgram.tsx"
+        "src/components/programs/PlaceholderProgram.tsx",
+        "src/components/programs/ev-challenge/EVModel3D.tsx",
+        "src/components/programs/ev-challenge/WorkshopToRolesTransition.tsx"
       ],
       "tests": [],
       "coverage": {
         "entry": true,
         "interfaces": true,
         "tests": false,
-        "dataModel": "N/A"
+        "dataModel": "N/A",
+        "i18n": true
       },
       "gaps": [
         "No test files exist"
@@ -142,7 +180,7 @@
     {
       "path": "src/types",
       "language": "TypeScript",
-      "purpose": "Shared interfaces (ApiResponse, NavItem, TeamMember) and constants (NAV_ITEMS, TEAM_MEMBERS, CONTACT_INFO)",
+      "purpose": "Shared interfaces (ApiResponse, NavItem, TeamMember) and constants (NAV_ITEMS with i18n keys, TEAM_MEMBERS with translation keys, CONTACT_INFO)",
       "importantFiles": [
         "src/types/index.ts"
       ],
@@ -154,6 +192,56 @@
         "dataModel": true
       },
       "gaps": []
+    },
+    {
+      "path": "src/i18n",
+      "language": "TypeScript",
+      "purpose": "next-intl configuration: locale routing (en/zh, localePrefix: never) and request-time locale detection (cookie -> Accept-Language -> default en)",
+      "importantFiles": [
+        "src/i18n/routing.ts",
+        "src/i18n/request.ts"
+      ],
+      "tests": [],
+      "coverage": {
+        "entry": true,
+        "interfaces": true,
+        "tests": false,
+        "dataModel": "N/A"
+      },
+      "gaps": []
+    },
+    {
+      "path": "messages",
+      "language": "JSON",
+      "purpose": "Translation files: 8 namespaces x 2 locales (en, zh) = 16 JSON files",
+      "importantFiles": [
+        "messages/en/common.json",
+        "messages/en/nav.json",
+        "messages/en/home.json",
+        "messages/en/about.json",
+        "messages/en/programs.json",
+        "messages/en/contact.json",
+        "messages/en/admin.json",
+        "messages/en/metadata.json",
+        "messages/zh/common.json",
+        "messages/zh/nav.json",
+        "messages/zh/home.json",
+        "messages/zh/about.json",
+        "messages/zh/programs.json",
+        "messages/zh/contact.json",
+        "messages/zh/admin.json",
+        "messages/zh/metadata.json"
+      ],
+      "tests": [],
+      "coverage": {
+        "entry": true,
+        "interfaces": "N/A",
+        "tests": false,
+        "dataModel": "N/A"
+      },
+      "gaps": [
+        "No automated tool to verify en/zh key parity"
+      ]
     },
     {
       "path": "prisma",
@@ -172,7 +260,7 @@
         "dataModel": true
       },
       "gaps": [
-        "No migration files (using db push)",
+        "No test files exist for Prisma seed script",
         "No test files exist"
       ]
     },
@@ -214,7 +302,9 @@
     "email": "Resend 6",
     "validation": "Zod v4",
     "forms": "react-hook-form 7 + @hookform/resolvers 5",
-    "animations": "framer-motion 12",
+    "animations": "framer-motion 12 + gsap 3.15",
+    "3d": "@react-three/fiber 9 + @react-three/drei 10 + three 0.184",
+    "i18n": "next-intl 4.13 (en/zh, cookie-based, no URL prefix)",
     "icons": "lucide-react",
     "containerization": "Docker (multi-stage Dockerfile)"
   },
@@ -240,6 +330,17 @@
     { "method": "DELETE", "path": "/api/admin/popups", "auth": true },
     { "method": "GET", "path": "/api/admin/popups/active", "auth": false }
   ],
+  "i18n": {
+    "library": "next-intl 4.13",
+    "locales": ["en", "zh"],
+    "defaultLocale": "en",
+    "localePrefix": "never",
+    "detectionStrategy": "cookie (NEXT_LOCALE) -> Accept-Language -> default en",
+    "namespaces": ["common", "nav", "home", "about", "programs", "contact", "admin", "metadata"],
+    "totalTranslationFiles": 16,
+    "configFiles": ["src/i18n/routing.ts", "src/i18n/request.ts"],
+    "switcherComponent": "src/components/shared/LanguageSwitcher.tsx"
+  },
   "claudeMdFiles": {
     "root": "CLAUDE.md",
     "modules": [
@@ -254,15 +355,19 @@
       "No test suite of any kind (unit, integration, or E2E)"
     ],
     "recommended": [
-      "Add Prisma migrations instead of db push for production safety",
       "Add CSRF protection for form submissions",
       "Move Google Analytics tracking ID to environment variable",
       "Replace in-memory rate limiter with Redis-backed solution before horizontal scaling",
-      "5 of 6 program pages use PlaceholderProgram (coming-soon); content needed"
+      "3 of 7 program pages use PlaceholderProgram (coming-soon); content needed",
+      "Clean up 13 unused about-us section files from earlier design iterations",
+      "Add automated en/zh translation key parity check"
     ],
     "resolved": [
-      "Rate limiting on public API routes (added since initial scan)",
-      "Input sanitization for HTML content in emails (added since initial scan)"
+      "Rate limiting on public API routes",
+      "Input sanitization for HTML content in emails",
+      "i18n bilingual support (en/zh) via next-intl",
+      "Custom 404 page",
+      "Elite Interview program page (was previously a placeholder)"
     ]
   },
   "nextScanSuggestions": []
