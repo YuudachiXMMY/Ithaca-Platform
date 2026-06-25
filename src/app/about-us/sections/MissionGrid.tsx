@@ -2,32 +2,38 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
-const MISSION_BLOCKS = [
-  {
-    title: "We help teens explore the future.",
-    description:
-      "We guide students through real-world projects where they learn by building, testing, collaborating, and presenting. They discover their strengths and a direction that is truly their own.",
-    image: "/media/images/pillars/pillar-pbl.jpg",
-    imageAlt: "Students working on project-based learning",
-  },
-  {
-    title: "Students are project owners.",
-    description:
-      "We use Project-Based Learning to connect learning with real-world problems and develop practical skills that traditional academics alone cannot fully cover.",
-    image: "/media/images/programs/ai-entrepreneurship/AI-Entrep_75.jpg",
-    imageAlt: "Students owning their projects at AI camp",
-  },
-  {
-    title: "We value social impact and AI ethics.",
-    description:
-      "Students learn to use AI responsibly, cite properly, and build work that can be explained and defended through transparent review and public showcase formats.",
-    image: "/media/images/pillars/pillar-ethics.jpg",
-    imageAlt: "Students learning about AI ethics and social impact",
-  },
+const MISSION_IMAGES = [
+  "/media/images/pillars/pillar-pbl.jpg",
+  "/media/images/programs/ai-entrepreneurship/AI-Entrep_75.jpg",
+  "/media/images/pillars/pillar-ethics.jpg",
 ] as const;
 
 export function MissionGrid() {
+  const t = useTranslations("about");
+
+  const blocks = [
+    {
+      title: t("mission.block0.title"),
+      description: t("mission.block0.description"),
+      image: MISSION_IMAGES[0],
+      imageAlt: t("mission.block0.imageAlt"),
+    },
+    {
+      title: t("mission.block1.title"),
+      description: t("mission.block1.description"),
+      image: MISSION_IMAGES[1],
+      imageAlt: t("mission.block1.imageAlt"),
+    },
+    {
+      title: t("mission.block2.title"),
+      description: t("mission.block2.description"),
+      image: MISSION_IMAGES[2],
+      imageAlt: t("mission.block2.imageAlt"),
+    },
+  ];
+
   return (
     <section
       className="bg-[#111318] py-12 lg:py-16"
@@ -46,18 +52,16 @@ export function MissionGrid() {
             id="mission-heading"
             className="text-2xl md:text-4xl font-bold text-white tracking-tight leading-tight"
           >
-            Our Mission
+            {t("mission.heading")}
           </h2>
           <p className="text-base text-gray-400 leading-relaxed max-w-xl">
-            Ithaca empowers young people to explore the future and supports the
-            next generation to take on responsibility in this fast-evolving
-            world.
+            {t("mission.subtitle")}
           </p>
         </motion.div>
 
         {/* Zigzag rows */}
         <div className="flex flex-col gap-8 lg:gap-12">
-          {MISSION_BLOCKS.map((block, i) => {
+          {blocks.map((block, i) => {
             const imageFirst = i % 2 === 0;
 
             return (

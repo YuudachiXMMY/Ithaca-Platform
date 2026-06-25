@@ -6,6 +6,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "framer-motion";
 import { Compass, Wrench, Gauge, Users } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -46,36 +47,14 @@ const PHOTOS = [
   },
 ] as const;
 
-const ROLES = [
-  {
-    id: "design",
-    title: "Engineering Design",
-    description:
-      "CAD modeling, structural analysis, and electrical systems layout for the EV chassis and powertrain.",
-    Icon: Compass,
-  },
-  {
-    id: "assembly",
-    title: "Assembly & Testing",
-    description:
-      "Hands-on fabrication, component integration, and systematic performance validation on the vehicle.",
-    Icon: Wrench,
-  },
-  {
-    id: "racing",
-    title: "Racing & Test Driving",
-    description:
-      "Track testing protocols, endurance race strategy, and driver skill development under competition conditions.",
-    Icon: Gauge,
-  },
-  {
-    id: "operations",
-    title: "Team Operations",
-    description:
-      "Sponsorship outreach, budget planning, logistics coordination, and cross-functional project management.",
-    Icon: Users,
-  },
-] as const;
+const ROLE_ICONS = {
+  design: Compass,
+  assembly: Wrench,
+  racing: Gauge,
+  operations: Users,
+} as const;
+
+const ROLE_KEYS = ["design", "assembly", "racing", "operations"] as const;
 
 /*
  * Extreme radial scatter vectors (MOTION_INTENSITY=10).
@@ -109,6 +88,7 @@ const CARD_ENTRY = [
 export default function WorkshopToRolesTransition() {
   const outerRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+  const t = useTranslations("programs.evChallenge.workshopToRoles");
 
   useEffect(() => {
     if (reduce || !outerRef.current) return;
@@ -248,7 +228,7 @@ export default function WorkshopToRolesTransition() {
         <section className="py-20 md:py-32">
           <div className="px-6 md:px-12 lg:px-[8vw]">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight mb-8">
-              From Workshop to Track
+              {t("workshopTitle")}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 auto-rows-[160px] md:auto-rows-[200px] lg:auto-rows-[240px]">
               {PHOTOS.map((p) => (
@@ -269,52 +249,57 @@ export default function WorkshopToRolesTransition() {
           </div>
         </section>
         <section className="relative border-t border-border py-24 md:py-40 overflow-hidden">
-          {/* Ambient background layers */}
           <div className="ev-roles-bg absolute inset-0 pointer-events-none" />
           <div className="ev-roles-grid absolute inset-0 pointer-events-none" />
 
           <div className="relative px-6 md:px-12 lg:px-[8vw]">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tighter mb-16 md:mb-24">
-              Team Roles
+              {t("rolesTitle")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-[7fr_5fr] gap-6 md:gap-10 lg:gap-14">
               <div className="flex flex-col gap-6 md:gap-10">
-                {[ROLES[0], ROLES[2]].map((role) => (
-                  <div
-                    key={role.id}
-                    className="group border border-border rounded-sm p-8 lg:p-10 transition-colors hover:border-accent/40 hover:bg-foreground/[0.02] cursor-default"
-                  >
-                    <role.Icon
-                      className="w-8 h-8 lg:w-10 lg:h-10 text-accent/50 mb-6 transition-colors group-hover:text-accent"
-                      strokeWidth={1.5}
-                    />
-                    <h3 className="font-semibold text-base lg:text-lg text-foreground mb-3">
-                      {role.title}
-                    </h3>
-                    <p className="text-sm text-foreground/50 leading-relaxed max-w-[36ch]">
-                      {role.description}
-                    </p>
-                  </div>
-                ))}
+                {([ROLE_KEYS[0], ROLE_KEYS[2]] as const).map((key) => {
+                  const Icon = ROLE_ICONS[key];
+                  return (
+                    <div
+                      key={key}
+                      className="group border border-border rounded-sm p-8 lg:p-10 transition-colors hover:border-accent/40 hover:bg-foreground/[0.02] cursor-default"
+                    >
+                      <Icon
+                        className="w-8 h-8 lg:w-10 lg:h-10 text-accent/50 mb-6 transition-colors group-hover:text-accent"
+                        strokeWidth={1.5}
+                      />
+                      <h3 className="font-semibold text-base lg:text-lg text-foreground mb-3">
+                        {t(`roles.${key}.title`)}
+                      </h3>
+                      <p className="text-sm text-foreground/50 leading-relaxed max-w-[36ch]">
+                        {t(`roles.${key}.description`)}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
               <div className="flex flex-col gap-6 md:gap-10 md:mt-16">
-                {[ROLES[1], ROLES[3]].map((role) => (
-                  <div
-                    key={role.id}
-                    className="group border border-border rounded-sm p-8 lg:p-10 transition-colors hover:border-accent/40 hover:bg-foreground/[0.02] cursor-default"
-                  >
-                    <role.Icon
-                      className="w-8 h-8 lg:w-10 lg:h-10 text-accent/50 mb-6 transition-colors group-hover:text-accent"
-                      strokeWidth={1.5}
-                    />
-                    <h3 className="font-semibold text-base lg:text-lg text-foreground mb-3">
-                      {role.title}
-                    </h3>
-                    <p className="text-sm text-foreground/50 leading-relaxed max-w-[36ch]">
-                      {role.description}
-                    </p>
-                  </div>
-                ))}
+                {([ROLE_KEYS[1], ROLE_KEYS[3]] as const).map((key) => {
+                  const Icon = ROLE_ICONS[key];
+                  return (
+                    <div
+                      key={key}
+                      className="group border border-border rounded-sm p-8 lg:p-10 transition-colors hover:border-accent/40 hover:bg-foreground/[0.02] cursor-default"
+                    >
+                      <Icon
+                        className="w-8 h-8 lg:w-10 lg:h-10 text-accent/50 mb-6 transition-colors group-hover:text-accent"
+                        strokeWidth={1.5}
+                      />
+                      <h3 className="font-semibold text-base lg:text-lg text-foreground mb-3">
+                        {t(`roles.${key}.title`)}
+                      </h3>
+                      <p className="text-sm text-foreground/50 leading-relaxed max-w-[36ch]">
+                        {t(`roles.${key}.description`)}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -338,7 +323,7 @@ export default function WorkshopToRolesTransition() {
         {/* Layer 1: Workshop photos (visible at start, scatter on scroll) */}
         <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-12 lg:px-[8vw] py-8">
           <h2 className="wtr-h-out text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tighter mb-6 md:mb-10">
-            From Workshop to Track
+            {t("workshopTitle")}
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 auto-rows-[120px] md:auto-rows-[170px] lg:auto-rows-[210px]">
             {PHOTOS.map((p) => (
@@ -365,48 +350,54 @@ export default function WorkshopToRolesTransition() {
           <div className="wtr-bg ev-roles-grid absolute inset-0 pointer-events-none will-change-[opacity]" />
 
           <h2 className="wtr-h-in relative text-2xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tighter mb-4 md:mb-12 lg:mb-16">
-            Team Roles
+            {t("rolesTitle")}
           </h2>
           <div className="relative grid grid-cols-2 md:grid-cols-[7fr_5fr] gap-2 md:gap-8 lg:gap-12">
             {/* Left column: Engineering Design + Racing */}
             <div className="flex flex-col gap-2 md:gap-8 lg:gap-10">
-              {[ROLES[0], ROLES[2]].map((role) => (
-                <div
-                  key={role.id}
-                  className="wtr-card group border border-border rounded-sm p-3 md:p-8 lg:p-10 transition-colors hover:border-accent/40 hover:bg-foreground/[0.02] cursor-default will-change-transform"
-                >
-                  <role.Icon
-                    className="w-5 h-5 md:w-8 md:h-8 lg:w-10 lg:h-10 text-accent/50 mb-2 md:mb-5 lg:mb-6 transition-colors group-hover:text-accent"
-                    strokeWidth={1.5}
-                  />
-                  <h3 className="font-semibold text-xs md:text-base lg:text-lg text-foreground mb-1 md:mb-2 lg:mb-3">
-                    {role.title}
-                  </h3>
-                  <p className="text-[11px] md:text-sm text-foreground/50 leading-relaxed max-w-[36ch] hidden sm:block">
-                    {role.description}
-                  </p>
-                </div>
-              ))}
+              {([ROLE_KEYS[0], ROLE_KEYS[2]] as const).map((key) => {
+                const Icon = ROLE_ICONS[key];
+                return (
+                  <div
+                    key={key}
+                    className="wtr-card group border border-border rounded-sm p-3 md:p-8 lg:p-10 transition-colors hover:border-accent/40 hover:bg-foreground/[0.02] cursor-default will-change-transform"
+                  >
+                    <Icon
+                      className="w-5 h-5 md:w-8 md:h-8 lg:w-10 lg:h-10 text-accent/50 mb-2 md:mb-5 lg:mb-6 transition-colors group-hover:text-accent"
+                      strokeWidth={1.5}
+                    />
+                    <h3 className="font-semibold text-xs md:text-base lg:text-lg text-foreground mb-1 md:mb-2 lg:mb-3">
+                      {t(`roles.${key}.title`)}
+                    </h3>
+                    <p className="text-[11px] md:text-sm text-foreground/50 leading-relaxed max-w-[36ch] hidden sm:block">
+                      {t(`roles.${key}.description`)}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
             {/* Right column: Assembly + Operations (offset down for asymmetry) */}
             <div className="flex flex-col gap-2 md:gap-8 lg:gap-10 md:mt-12 lg:mt-20">
-              {[ROLES[1], ROLES[3]].map((role) => (
-                <div
-                  key={role.id}
-                  className="wtr-card group border border-border rounded-sm p-3 md:p-8 lg:p-10 transition-colors hover:border-accent/40 hover:bg-foreground/[0.02] cursor-default will-change-transform"
-                >
-                  <role.Icon
-                    className="w-5 h-5 md:w-8 md:h-8 lg:w-10 lg:h-10 text-accent/50 mb-2 md:mb-5 lg:mb-6 transition-colors group-hover:text-accent"
-                    strokeWidth={1.5}
-                  />
-                  <h3 className="font-semibold text-xs md:text-base lg:text-lg text-foreground mb-1 md:mb-2 lg:mb-3">
-                    {role.title}
-                  </h3>
-                  <p className="text-[11px] md:text-sm text-foreground/50 leading-relaxed max-w-[36ch] hidden sm:block">
-                    {role.description}
-                  </p>
-                </div>
-              ))}
+              {([ROLE_KEYS[1], ROLE_KEYS[3]] as const).map((key) => {
+                const Icon = ROLE_ICONS[key];
+                return (
+                  <div
+                    key={key}
+                    className="wtr-card group border border-border rounded-sm p-3 md:p-8 lg:p-10 transition-colors hover:border-accent/40 hover:bg-foreground/[0.02] cursor-default will-change-transform"
+                  >
+                    <Icon
+                      className="w-5 h-5 md:w-8 md:h-8 lg:w-10 lg:h-10 text-accent/50 mb-2 md:mb-5 lg:mb-6 transition-colors group-hover:text-accent"
+                      strokeWidth={1.5}
+                    />
+                    <h3 className="font-semibold text-xs md:text-base lg:text-lg text-foreground mb-1 md:mb-2 lg:mb-3">
+                      {t(`roles.${key}.title`)}
+                    </h3>
+                    <p className="text-[11px] md:text-sm text-foreground/50 leading-relaxed max-w-[36ch] hidden sm:block">
+                      {t(`roles.${key}.description`)}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

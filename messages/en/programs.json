@@ -1,0 +1,528 @@
+{
+  "programs": {
+    "index": {
+      "title": "Our Programs",
+      "subtitle": "Empowering youth to explore the future through hands-on, project-based learning experiences.",
+      "learnMore": "Learn More",
+      "cards": {
+        "aiCamp": {
+          "title": "AI Entrepreneurship Camp",
+          "description": "A 13-week program where students build AI-powered startups, develop MVPs, and pitch to real investors."
+        },
+        "evTeam": {
+          "title": "EV Team",
+          "description": "Hands-on electric vehicle engineering challenge pushing students to design, build, and race."
+        },
+        "engineering": {
+          "title": "Engineering Projects",
+          "description": "Real-world engineering projects covering robotics, IoT, and sustainable technology solutions."
+        },
+        "eliteInterview": {
+          "title": "Elite Interviews",
+          "description": "A research and documentary program where students investigate real-world issues through expert interviews, producing portfolio-ready reports and published documentaries."
+        },
+        "summerWinter": {
+          "title": "Summer & Winter Camps",
+          "description": "Intensive seasonal camps blending technology, creativity, and outdoor experiences."
+        },
+        "ithacaNight": {
+          "title": "Ithaca Night",
+          "description": "Community showcase events where students present their work and celebrate achievements."
+        }
+      }
+    },
+    "placeholder": {
+      "title": "Stories Coming Soon!",
+      "description": "Your support and contributions will enable us to meet our goals and fund our mission.",
+      "contactUs": "Contact Us"
+    },
+    "aiCamp": {
+      "meta": {
+        "title": "AI Entrepreneurship Camp | Ithaca Family Academy",
+        "description": "A 13-week program where students build AI-powered startups, develop MVPs, and pitch to real investors."
+      },
+      "hero": {
+        "title": "AI Entrepreneurship Camp",
+        "subtitle": "From first idea to investor-ready pitch in 13 weeks. For students in Grades 8 through 12.",
+        "startDate": "Start Date: September 2026",
+        "registerNow": "Register Now"
+      },
+      "overview": {
+        "title": "Program Overview",
+        "p1": "As AI transforms every industry, computational thinking and entrepreneurial skills have become critical for the next generation. The Ithaca AI Entrepreneurship Camp equips students with hands-on experience in AI application, business innovation, and project incubation.",
+        "p2": "Our inaugural cohort ran from September to November 2025 in collaboration with the University of Waterloo AI Team. The second cohort begins January 10, 2026 and continues through June, withthe final roadshow scheduled for June 13, 2026. Our teams participated and won the AIEC 2026 Grand Prize.. The third cohort will be held from September to December 2026, with the final roadshow scheduled for December 2026. The teams from the third cohort will continue to prepare for and participate in AIEC 2027.",
+        "p3": "Students move from idea to product, from pitch to real contests, entering future careers with greater maturity."
+      },
+      "structure": {
+        "title": "Program Structure",
+        "details": {
+          "target": {
+            "label": "Target",
+            "value": "Grades 8 - 12"
+          },
+          "length": {
+            "label": "Length",
+            "value": "13 Weeks (including Pitch Day)"
+          },
+          "teamSize": {
+            "label": "Team Size",
+            "value": "5 - 8 students per team"
+          },
+          "schedule": {
+            "label": "Schedule",
+            "value": "September 2026"
+          },
+          "classHours": {
+            "label": "Class Hours",
+            "value": "1:00 PM - 3:00 PM Main Class; 3:00 PM - 4:00 PM Contest Coaching"
+          },
+          "pitchDay": {
+            "label": "Pitch Day",
+            "value": "December 2026 (to be arranged)"
+          }
+        },
+        "fieldTrips": {
+          "title": "March Break Field Trips",
+          "description": "During March Break, students visit leading financial institutions including {fidelity}, {vanguard}, {russell}, and the {rbc}. These visits provide first-hand exposure to the intersection of technology and finance.",
+          "fidelity": "Fidelity",
+          "vanguard": "Vanguard",
+          "russell": "Russell",
+          "rbc": "RBC Trading Floor"
+        }
+      },
+      "contest": {
+        "title": "Contest Alignment",
+        "intro": "Our curriculum aligns with the AI Entrepreneurship Contest, giving students the opportunity to compete at a recognized level and showcase their innovations to industry judges.",
+        "linkText": "AI Entrepreneurship Contest",
+        "optional": "We offer an optional 12-hour competition enhancement module:",
+        "modules": {
+          "0": "Rules interpretation and problem statement refinement",
+          "1": "Business plan and technical documentation coaching",
+          "2": "Mock pitches and Q&A preparation"
+        },
+        "learnMore": "Learn more about the program"
+      },
+      "goals": {
+        "title": "Goals & Outcomes",
+        "footer": "Through our dual path, students move from idea to product, from pitch to real contests, entering future careers with greater maturity.",
+        "items": {
+          "competitive": {
+            "title": "Highly competitive experiences and skills",
+            "description": "Students develop real-world entrepreneurship capabilities by working through a rigorous innovation pipeline, from problem discovery to customer validation to investor-ready pitching."
+          },
+          "portfolio": {
+            "title": "A portfolio-ready AI startup project",
+            "description": "Each team delivers a complete project package: an innovation prototype, MVP demo video, market-validation brief, pitch deck, growth report, and social-media coverage materials."
+          },
+          "mentors": {
+            "title": "Access to a high-value mentor community",
+            "description": "Students connect with professionals from engineering, AI, and finance. Outstanding participants may receive mentor recommendation letters for university applications."
+          },
+          "exposure": {
+            "title": "Substantive AI entrepreneurship exposure",
+            "description": "Through field trips to leading financial institutions and hands-on workshops, students gain first-hand exposure to the intersection of technology and business innovation."
+          }
+        }
+      },
+      "team": {
+        "title": "Team & Support",
+        "educators": {
+          "title": "Educators & Instructional Leads",
+          "description": "Our teaching team blends classroom expertise with hands-on engineering practice. Instructors guide students through core concepts, workshop safety, and disciplined project execution, helping them build confidence, troubleshoot effectively, and develop strong learning habits through structured feedback and coaching."
+        },
+        "mentors": {
+          "title": "Industry Mentors & Guest Experts",
+          "description": "We invite professionals from engineering, AI, and related industries to mentor, review student work, and share real-world perspectives. Students learn what high standards look like through guest sessions, portfolio reviews, and community connections.",
+          "cta": "Connect with Mentors"
+        }
+      },
+      "faq": {
+        "title": "Frequently Asked Questions",
+        "contactPrompt": "if you need more information.",
+        "contactLink": "Contact us",
+        "items": {
+          "whatIsIthaca": {
+            "question": "What is Ithaca?",
+            "answer": "Ithaca Family Academy is a youth organization empowering young people to explore the future and build the skills to thrive in the AI era. Students learn through real-world projects: building, testing, collaborating, and presenting."
+          },
+          "services": {
+            "question": "What services does Ithaca offer?",
+            "answer": "Ithaca offers a range of programs including the EV Challenge, AI Entrepreneurship Camp, Engineering Projects, AI Pioneers Interview, Summer and Winter Camps, and Ithaca Night events."
+          },
+          "whoCanParticipate": {
+            "question": "Who can participate in Ithaca programs?",
+            "answer": "Students in Grades 4 through 12 are eligible to join our programs. We group participants by age and experience level to ensure the best learning environment for everyone."
+          },
+          "onlyCoders": {
+            "question": "Is this only for advanced coders?",
+            "answer": "No. This is an entrepreneurship and product development program. Teams are cross-functional, with roles in design, business, and communication alongside technical work. Technical depth is supported but not required to participate and succeed."
+          },
+          "takeaway": {
+            "question": "What exactly do students take away?",
+            "answer": "Students receive a complete six-item package: an innovation project, MVP demo video and market-validation brief, pitch deck and video, growth report, social-media coverage, and alumni-community access. Outstanding students may also receive mentor recommendation letters."
+          },
+          "when": {
+            "question": "When does it run?",
+            "answer": "The program runs from January 10 to March 28, 2026. Main classes are held from 1:00 PM to 3:00 PM, with an optional contest coaching session from 3:00 PM to 4:00 PM. Pitch Day is scheduled for April 2026 (date TBD)."
+          }
+        }
+      },
+      "cta": {
+        "title": "Ready to Join?",
+        "subtitle": "Secure your spot in the next cohort and start building the future with AI.",
+        "registerNow": "Register Now",
+        "requestBrochure": "Request Brochure"
+      }
+    },
+    "evChallenge": {
+      "hero": {
+        "title": "Build. Race. Lead.",
+        "subtitle": "Design and build a real electric vehicle. Run a team. Compete at the Waterloo EV Challenge.",
+        "registerNow": "Register Now"
+      },
+      "stats": {
+        "season": "Season",
+        "grades": "Grades",
+        "duration": "Duration",
+        "cadence": "Cadence",
+        "window": "Window"
+      },
+      "mission": {
+        "title": "We don't just build a car.",
+        "description": "We build an EV, run a team, and race at competition. Through engineering and business training, we prepare the next generation of builders, operators, and leaders.",
+        "quote": "\"When you set out for Ithaca, hope the voyage is long, full of adventure, full of discovery.\"",
+        "quoteAuthor": "- Cavafy"
+      },
+      "model3d": {
+        "machineName": "The Machine",
+        "machineDesc": "Custom-built electric trike. Aluminum tube frame. Designed and assembled by students.",
+        "dragToRotate": "Drag to rotate",
+        "twoTracksTitle": "Two Tracks, One Vehicle",
+        "trackA": "Track A",
+        "trackB": "Track B",
+        "engineering": {
+          "title": "Engineering",
+          "description": "Design, build, and test a functioning electric vehicle. CAD modeling, chassis fabrication, electrical wiring, battery systems, and iterative performance testing."
+        },
+        "business": {
+          "title": "Business",
+          "description": "Run the team as a real operation. Sponsorship acquisition, budget management, logistics coordination, and organizational skills that make a racing team function."
+        },
+        "specs": {
+          "drivetrain": "Drivetrain",
+          "drivetrainValue": "Electric",
+          "layout": "Layout",
+          "layoutValue": "3-wheel trike",
+          "frame": "Frame",
+          "frameValue": "Aluminum tube",
+          "builtBy": "Built by",
+          "builtByValue": "Students"
+        }
+      },
+      "workshopToRoles": {
+        "workshopTitle": "From Workshop to Track",
+        "rolesTitle": "Team Roles",
+        "roles": {
+          "design": {
+            "title": "Engineering Design",
+            "description": "CAD modeling, structural analysis, and electrical systems layout for the EV chassis and powertrain."
+          },
+          "assembly": {
+            "title": "Assembly & Testing",
+            "description": "Hands-on fabrication, component integration, and systematic performance validation on the vehicle."
+          },
+          "racing": {
+            "title": "Racing & Test Driving",
+            "description": "Track testing protocols, endurance race strategy, and driver skill development under competition conditions."
+          },
+          "operations": {
+            "title": "Team Operations",
+            "description": "Sponsorship outreach, budget planning, logistics coordination, and cross-functional project management."
+          }
+        }
+      },
+      "programDetails": {
+        "title": "Program Details",
+        "details": {
+          "target": {
+            "label": "Target",
+            "value": "Grades 8 - 11, Greater Toronto Area"
+          },
+          "duration": {
+            "label": "Duration",
+            "value": "September 2026 - May 2027 (9 months)"
+          },
+          "schedule": {
+            "label": "Schedule",
+            "value": "Bi-weekly Saturdays"
+          },
+          "morning": {
+            "label": "Morning",
+            "value": "10:00 AM - 12:00 PM"
+          },
+          "afternoon": {
+            "label": "Afternoon",
+            "value": "1:00 PM - 3:00 PM"
+          },
+          "season": {
+            "label": "Season",
+            "value": "Season 3 (2026 - 2027)"
+          }
+        }
+      },
+      "gains": {
+        "title": "What You Walk Away With",
+        "items": {
+          "engineering": {
+            "title": "Real engineering project experience",
+            "description": "Design thinking, hands-on fabrication, and cross-discipline collaboration on a vehicle that actually races."
+          },
+          "business": {
+            "title": "Business and leadership capabilities",
+            "description": "Fundraising, sponsorship acquisition, resource management, and the experience of building a team from scratch."
+          },
+          "university": {
+            "title": "Competitive university applications",
+            "description": "A distinctive portfolio piece for top engineering and business programs across North America."
+          }
+        }
+      },
+      "competition": {
+        "title": "Waterloo EV Challenge 2027",
+        "description": "Organized by the University of Waterloo Faculty of Engineering, the EV Challenge is a high school electric vehicle endurance race. Teams design, build, and drive their own EVs, evaluated on engineering quality, vehicle performance, driving strategy, and team collaboration.",
+        "tags": {
+          "engineering": "Engineering",
+          "teamwork": "Teamwork",
+          "endurance": "Endurance Racing"
+        },
+        "date": "Late May 2027 / University of Waterloo",
+        "officialPage": "Official competition page"
+      },
+      "pastSeasons": {
+        "title": "Past Seasons",
+        "subtitle": "From first welds to race day at Waterloo.",
+        "season1": "Season 1",
+        "season2": "Season 2",
+        "season1Label": "2025-26 Highlights",
+        "season2Label": "2024-25 Highlights"
+      },
+      "cta": {
+        "title": "Ready to Build Something Real?",
+        "subtitle": "Join the Ithaca EV Team and be part of a team that designs, builds, and races an electric vehicle.",
+        "registerNow": "Register Now"
+      },
+      "faq": {
+        "title": "FAQ",
+        "contactPrompt": "Have more questions?",
+        "contactLink": "Get in touch",
+        "items": {
+          "whoCanJoin": {
+            "question": "Who can join the EV team?",
+            "answer": "Students in Grades 8 through 11 in the Greater Toronto Area. We welcome anyone interested in engineering, automotive technology, or team-based projects. No prior experience is required."
+          },
+          "experience": {
+            "question": "Do I need engineering experience?",
+            "answer": "No. The program teaches everything from the ground up. Roles span engineering design, assembly, test driving, and team operations. Every team member contributes regardless of technical background."
+          },
+          "whatIsWaterloo": {
+            "question": "What is the Waterloo EV Challenge?",
+            "answer": "An electric vehicle endurance race organized by the University of Waterloo Faculty of Engineering. High school teams design, build, and race their own EVs. The 2027 competition is scheduled for late May."
+          },
+          "schedule": {
+            "question": "What does the schedule look like?",
+            "answer": "Sessions run bi-weekly on Saturdays from September 2026 through May 2027. Morning session covers 10:00 AM to 12:00 PM, afternoon session runs 1:00 PM to 3:00 PM."
+          },
+          "takeaway": {
+            "question": "What will my child take away?",
+            "answer": "Beyond the EV itself, students gain project management skills, technical documentation experience, presentation abilities, and real sponsorship negotiation practice. These are portfolio-ready experiences for university applications."
+          }
+        }
+      }
+    },
+    "eliteInterview": {
+      "meta": {
+        "title": "Elite Interviews | Ithaca Family Academy",
+        "description": "A 10-week research and documentary program where students investigate AI and Canada's future through interviews with experts in academia, industry, and policy."
+      },
+      "hero": {
+        "title": "Elite Interviews",
+        "subtitle": "AI and Canada's Future",
+        "description": "Ten weeks of fieldwork. Five research angles. One documentary.",
+        "pills": {
+          "fall": "Fall 2026",
+          "grades": "G9-G12",
+          "cohort": "Small Cohort",
+          "duration": "8-10 Weeks"
+        },
+        "applyNow": "Apply Now"
+      },
+      "question": {
+        "quote": "\u201cCanada pioneered deep learning. Why hasn\u2019t that translated into economic leadership?\u201d",
+        "body": "Geoffrey Hinton in Toronto. Yoshua Bengio in Montreal. Deep learning was born here. Yet commercialization, talent, and productivity have steadily migrated south. This is the question your team will investigate, and the story your documentary will tell."
+      },
+      "whyNow": {
+        "title": "Why Now",
+        "description": "On June 4, 2026, the federal government released its national AI strategy \u201cAI for All.\u201d An entire semester of student research coincides with the nation asking the same questions.",
+        "stats": {
+          "gdp": {
+            "value": "$200B",
+            "label": "GDP Growth Target"
+          },
+          "jobs": {
+            "value": "250,000",
+            "label": "New AI-Related Positions"
+          },
+          "adoption": {
+            "value": "12% \u2192 60%",
+            "label": "Enterprise AI Adoption by 2034"
+          }
+        }
+      },
+      "tracks": {
+        "title": "Five Research Tracks",
+        "subtitle": "Each student claims one track and owns it for the semester.",
+        "items": {
+          "talent": {
+            "name": "Talent",
+            "question": "Why does top AI talent keep flowing south? Is immigration policy a trump card or an illusion?"
+          },
+          "capital": {
+            "name": "Capital",
+            "question": "World-class research, scale-up fatigue. From Element AI to Cohere."
+          },
+          "policy": {
+            "name": "Policy",
+            "question": "From $20B in sovereign compute to \u201cAI for All\u201d - do government milestones actually work?"
+          },
+          "industry": {
+            "name": "Industry",
+            "question": "Banks, hospitals, farms still struggle to adopt AI. What is blocking real productivity gains?"
+          },
+          "education": {
+            "name": "Education",
+            "question": "Is Ontario preparing high schoolers for the AI era? You are the stakeholder on this one."
+          }
+        }
+      },
+      "interviewSectors": {
+        "title": "Who You'll Interview",
+        "sectors": {
+          "academia": {
+            "title": "Academia",
+            "roles": {
+              "0": "University professors",
+              "1": "Researchers",
+              "2": "Graduate students and postdocs"
+            }
+          },
+          "industry": {
+            "title": "Industry & Startups",
+            "roles": {
+              "0": "AI engineers",
+              "1": "Founders",
+              "2": "Major AI research labs"
+            }
+          },
+          "policy": {
+            "title": "Policy & Public",
+            "roles": {
+              "0": "Policy researchers",
+              "1": "Think tank scholars",
+              "2": "Legislators' offices"
+            }
+          }
+        }
+      },
+      "journey": {
+        "title": "Ten Weeks, Three Phases",
+        "phases": {
+          "research": {
+            "phase": "01",
+            "title": "Research",
+            "duration": "Weeks 1-3",
+            "tasks": {
+              "0": "Background literature review",
+              "1": "Interview outline design",
+              "2": "Guest outreach and scheduling"
+            }
+          },
+          "fieldwork": {
+            "phase": "02",
+            "title": "Fieldwork",
+            "duration": "Weeks 4-7",
+            "tasks": {
+              "0": "Lead and support interviewing",
+              "1": "Camera and audio operation",
+              "2": "Note-taking and role rotation"
+            }
+          },
+          "production": {
+            "phase": "03",
+            "title": "Production",
+            "duration": "Weeks 8-10",
+            "tasks": {
+              "0": "Research report drafting",
+              "1": "Documentary rough-cut editing",
+              "2": "Screening and public release"
+            }
+          }
+        }
+      },
+      "produce": {
+        "title": "What You'll Produce",
+        "report": {
+          "badge": "Portfolio-Ready",
+          "title": "English Research Report",
+          "description": "Literature review, interview evidence, and original conclusions. Directly usable as a university application portfolio piece.",
+          "tags": {
+            "0": "Literature Review",
+            "1": "Interview Evidence",
+            "2": "Original Analysis"
+          }
+        },
+        "documentary": {
+          "badge": "8-12 Min, Published",
+          "title": "English Mini-Documentary",
+          "description": "Interview footage, narration, and data visualization. Edited and publicly released.",
+          "tags": {
+            "0": "Interview Clips",
+            "1": "Narration",
+            "2": "Data Viz"
+          }
+        },
+        "disclaimer": "All interviews follow formal consent and likeness-release protocols. Guests confirm before publication. Screening events are open to families."
+      },
+      "faq": {
+        "title": "Frequently Asked Questions",
+        "contactEmail": "joshua.wang@ithacafo.com",
+        "items": {
+          "whatIsProgram": {
+            "question": "What is the Elite Interviews program?",
+            "answer": "A research and documentary program where students investigate a major societal question through real interviews with experts in academia, industry, and policy. Each student claims one research track and contributes to a team documentary."
+          },
+          "experience": {
+            "question": "Do students need prior interview or filmmaking experience?",
+            "answer": "No. The research phase covers methodology, interview technique, and documentary production basics. Students learn by doing, with mentor guidance at every step."
+          },
+          "takeaway": {
+            "question": "What do students take away?",
+            "answer": "Two portfolio-ready deliverables in English: a research report suitable for university applications, and an 8-12 minute documentary that is publicly released. Both demonstrate real-world research and communication skills."
+          },
+          "contacts": {
+            "question": "How are interview contacts arranged?",
+            "answer": "Our mentors provide guaranteed initial introductions to domain experts. Students also develop their own outreach skills through guided cold-contact exercises. All interviews follow consent and likeness-release protocols."
+          },
+          "language": {
+            "question": "Is the program conducted in English or Chinese?",
+            "answer": "All deliverables are produced in English. Interviews may be conducted in either language depending on the guest. Classroom instruction is primarily in English."
+          }
+        }
+      },
+      "cta": {
+        "title": "Ready to Investigate?",
+        "subtitle": "Secure your spot in the 2026 Fall cohort and start building a research portfolio that matters.",
+        "applyNow": "Apply Now"
+      }
+    }
+  }
+}

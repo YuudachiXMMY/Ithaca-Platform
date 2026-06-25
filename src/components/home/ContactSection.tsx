@@ -9,6 +9,7 @@ import {
 } from "framer-motion";
 import { MapPin, Phone, Mail, ArrowRight } from "lucide-react";
 import { CONTACT_INFO } from "@/types";
+import { useTranslations } from "next-intl";
 
 /* ------------------------------------------------------------------ */
 /*  Contact data                                                      */
@@ -16,7 +17,7 @@ import { CONTACT_INFO } from "@/types";
 
 interface ContactItem {
   readonly icon: React.ComponentType<{ className?: string }>;
-  readonly label: string;
+  readonly labelKey: string;
   readonly value: string;
   readonly href?: string;
 }
@@ -24,18 +25,18 @@ interface ContactItem {
 const CONTACT_ITEMS: readonly ContactItem[] = [
   {
     icon: MapPin,
-    label: "Address",
+    labelKey: "contact.addressLabel",
     value: CONTACT_INFO.address,
   },
   {
     icon: Phone,
-    label: "Phone",
+    labelKey: "contact.phoneLabel",
     value: CONTACT_INFO.phone,
     href: `tel:${CONTACT_INFO.phone.replace(/[^+\d]/g, "")}`,
   },
   {
     icon: Mail,
-    label: "Email",
+    labelKey: "contact.emailLabel",
     value: CONTACT_INFO.email,
     href: `mailto:${CONTACT_INFO.email}`,
   },
@@ -187,6 +188,7 @@ function MagneticButton({
 
 export function ContactSection() {
   const reduce = useReducedMotion();
+  const t = useTranslations("home");
 
   return (
     <section
@@ -204,7 +206,7 @@ export function ContactSection() {
           transition={{ type: "spring", stiffness: 80, damping: 20 }}
           className="text-3xl font-bold text-white md:text-5xl"
         >
-          Get In Touch
+          {t("contact.heading")}
         </motion.h2>
 
         {/* Subtext */}
@@ -220,8 +222,7 @@ export function ContactSection() {
           }}
           className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/50"
         >
-          Ready to set your child on the road to discovery? Contact us to learn
-          more about our programs and enrollment.
+          {t("contact.subtext")}
         </motion.p>
 
         {/* Contact details - centered horizontal row */}
@@ -247,7 +248,7 @@ export function ContactSection() {
             );
 
             return (
-              <li key={item.label}>
+              <li key={item.labelKey}>
                 {item.href ? (
                   <a
                     href={item.href}
@@ -276,7 +277,7 @@ export function ContactSection() {
           }}
           className="mt-8"
         >
-          <MagneticButton href="/contact-us">Get in touch</MagneticButton>
+          <MagneticButton href="/contact-us">{t("contact.cta")}</MagneticButton>
         </motion.div>
       </div>
     </section>

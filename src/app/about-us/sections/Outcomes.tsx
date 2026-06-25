@@ -2,50 +2,31 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
-const FEATURED = [
-  {
-    title: "Portfolio-Ready Deliverables",
-    description:
-      "Students graduate with tangible artifacts: prototype demos, project reports, and presentation materials for applications and competitions.",
-    image: "/media/images/programs/ai-entrepreneurship/AI-Entrep_03.jpg",
-  },
-  {
-    title: "Engineering & Systems Thinking",
-    description:
-      "From building and testing to iteration, students develop the habit of reasoning with structure, constraints, and real-world tradeoffs.",
-    image: "/media/images/programs/ai-entrepreneurship/AI-Entrep_08.jpg",
-  },
+const FEATURED_IMAGES = [
+  "/media/images/programs/ai-entrepreneurship/AI-Entrep_03.jpg",
+  "/media/images/programs/ai-entrepreneurship/AI-Entrep_08.jpg",
 ] as const;
 
-const COMPACT = [
-  {
-    num: "01",
-    title: "AI Literacy with Responsibility",
-    description:
-      "Effective and ethical AI tool usage, with proper citation, process documentation, and defensible decision-making.",
-  },
-  {
-    num: "02",
-    title: "Business & Validation Mindset",
-    description:
-      "Problem definition, user understanding, and basic business logic: learning how value is created and communicated.",
-  },
-  {
-    num: "03",
-    title: "Collaboration & Leadership",
-    description:
-      "Through team roles and real deadlines, students build collaboration habits beyond traditional classroom settings.",
-  },
-  {
-    num: "04",
-    title: "Communication & Pitch Skills",
-    description:
-      "Clear presentation under time pressure, handling questions, and telling a coherent story from problem to solution.",
-  },
-] as const;
+const FEATURED_KEYS = ["portfolio", "engineering"] as const;
+const COMPACT_NUMS = ["01", "02", "03", "04"] as const;
 
 export function Outcomes() {
+  const t = useTranslations("about");
+
+  const featured = FEATURED_KEYS.map((key, i) => ({
+    title: t(`outcomes.featured.${key}.title`),
+    description: t(`outcomes.featured.${key}.description`),
+    image: FEATURED_IMAGES[i],
+  }));
+
+  const compact = COMPACT_NUMS.map((num) => ({
+    num,
+    title: t(`outcomes.compact.${num}.title`),
+    description: t(`outcomes.compact.${num}.description`),
+  }));
+
   return (
     <section
       className="bg-[#0c0e12] py-20 lg:py-28"
@@ -63,17 +44,16 @@ export function Outcomes() {
             id="outcomes-heading"
             className="text-2xl md:text-4xl font-bold text-white tracking-tight"
           >
-            Student Outcomes
+            {t("outcomes.heading")}
           </h2>
           <p className="text-base text-gray-400 mt-3 max-w-[56ch] leading-relaxed">
-            Every program is designed around what students take away, not just
-            what they sit through.
+            {t("outcomes.subtitle")}
           </p>
         </motion.div>
 
         {/* Featured outcomes: image cards with overlay text */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10">
-          {FEATURED.map((outcome, i) => (
+          {featured.map((outcome, i) => (
             <motion.div
               key={outcome.title}
               initial={{ opacity: 0, y: 24 }}
@@ -109,9 +89,9 @@ export function Outcomes() {
 
         {/* Compact outcomes: numbered grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-0 mt-12">
-          {COMPACT.map((outcome, i) => (
+          {compact.map((outcome, i) => (
             <motion.div
-              key={outcome.title}
+              key={outcome.num}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}

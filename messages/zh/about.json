@@ -1,0 +1,177 @@
+{
+  "about": {
+    "hero": {
+      "title": "关于伊萨卡",
+      "subtitle": "通过工程、AI 和创业，赋能青少年探索未来。",
+      "facts": {
+        "founded": "创立年份",
+        "location": "所在地",
+        "grades": "年级范围",
+        "foundedValue": "2024",
+        "locationValue": "加拿大安大略省",
+        "gradesValue": "4-12 年级"
+      }
+    },
+    "mission": {
+      "heading": "我们的使命",
+      "subtitle": "伊萨卡家庭学院赋能青少年探索未来，支持新一代在这个快速演变的世界中承担责任。",
+      "block0": {
+        "title": "我们帮助青少年探索未来。",
+        "description": "我们引导学生参与真实项目，让他们在构建、测试、协作和展示中学习。他们发现自己的优势，找到真正属于自己的方向。",
+        "imageAlt": "学生进行项目式学习"
+      },
+      "block1": {
+        "title": "学生是项目的主人。",
+        "description": "我们采用项目式学习（PBL），将学习与现实问题相结合，培养传统学术教育无法单独涵盖的实践技能。",
+        "imageAlt": "学生在 AI 营地主导项目"
+      },
+      "block2": {
+        "title": "我们重视社会影响与 AI 伦理。",
+        "description": "学生学习负责任地使用 AI，正确引用来源，并通过透明评审和公开展示构建可解释、可答辩的作品。",
+        "imageAlt": "学生学习 AI 伦理与社会影响"
+      }
+    },
+    "approach": {
+      "ariaLabel": "我们的教学方式",
+      "howWeTeach": {
+        "imageAlt": "学生通过动手项目学习",
+        "heading": "教学方式",
+        "description": "我们采用工作室式、项目驱动的教学模式，让学生在构建中学习。每个班组在小团队中工作，设有明确的每周里程碑、结构化的导师辅导和频繁的技术评审。"
+      },
+      "ethics": {
+        "imageAlt": "学生讨论 AI 伦理与诚信",
+        "heading": "伦理与诚信",
+        "description": "我们对安全、学术诚信和负责任的技术使用保持高标准。学生学习正确引用来源，透明记录 AI 辅助工作，并维护可通过演示和问答进行审查的设计日志。"
+      }
+    },
+    "decab": {
+      "heading": "DECAB 能力图谱",
+      "subtitle": "我们的框架从五个维度跟踪学生成长，确保在技术深度、应用推理和现实执行方面实现均衡发展。",
+      "competencies": {
+        "d": {
+          "name": "设计与原理",
+          "description": "创意解题、系统设计与设计思维。"
+        },
+        "e": {
+          "name": "电气工程",
+          "description": "电路设计、电子学与硬件原型制作。"
+        },
+        "c": {
+          "name": "计算机编程",
+          "description": "软件开发、算法与计算思维。"
+        },
+        "a": {
+          "name": "数学与物理应用",
+          "description": "结合数学和物理进行真实世界的应用推理。"
+        },
+        "b": {
+          "name": "商业与沟通",
+          "description": "协作、路演与专业沟通能力。"
+        }
+      }
+    },
+    "programs": {
+      "heading": "我们的项目",
+      "evTeam": {
+        "label": "EV 团队",
+        "description": "在行业导师的带领下，构建并驾驶电动车。"
+      },
+      "aiCamp": {
+        "label": "AI 创业训练营",
+        "description": "开发 AI 驱动的解决方案，解决真实商业问题。"
+      },
+      "eliteInterviews": {
+        "label": "精英访谈",
+        "description": "学生通过专家访谈调查真实世界问题，撰写报告并制作纪录片。"
+      },
+      "allPrograms": {
+        "label": "全部项目",
+        "description": "探索我们的完整项目与营地列表。"
+      }
+    },
+    "outcomes": {
+      "heading": "学生成果",
+      "subtitle": "每个项目都围绕学生真正带走的收获来设计，而不仅仅是他们坐在那里经历的内容。",
+      "featured": {
+        "portfolio": {
+          "title": "可用于申请的作品集",
+          "description": "学生毕业时拥有切实的成果：原型演示、项目报告，以及用于申请和竞赛的演示材料。"
+        },
+        "engineering": {
+          "title": "工程与系统思维",
+          "description": "从构建、测试到迭代，学生养成运用结构、约束和真实世界权衡进行推理的习惯。"
+        }
+      },
+      "compact": {
+        "01": {
+          "title": "负责任的 AI 素养",
+          "description": "高效且合乎道德地使用 AI 工具，包括正确引用、过程记录和可答辩的决策。"
+        },
+        "02": {
+          "title": "商业与验证思维",
+          "description": "问题定义、用户理解和基本商业逻辑：学习如何创造和传达价值。"
+        },
+        "03": {
+          "title": "协作与领导力",
+          "description": "通过团队角色和真实截止日期，学生在传统课堂之外培养协作习惯。"
+        },
+        "04": {
+          "title": "沟通与路演技能",
+          "description": "在时间压力下清晰表达，应对问题，从问题到解决方案讲述连贯的故事。"
+        }
+      }
+    },
+    "highlights": {
+      "heading": "学生风采",
+      "andySong": {
+        "name": "Andy Song",
+        "program": "AI 先锋访谈项目",
+        "description": "Andy 访谈了丰业银行 AI 总监 Carlos Orencio Horta 先生和数据分析总监 Tanaby Zibamanzar 先生。Andy 于 2025 年 6 月高中毕业，并于 2025 年 9 月开始在普林斯顿大学就读。",
+        "iframeTitle": "Andy Song 访谈丰业银行高管"
+      },
+      "videos": {
+        "0": {
+          "title": "伊萨卡 EV 团队参观本田生产线",
+          "caption": "学生参观本田生产线，了解汽车制造中的 AI 应用。"
+        },
+        "1": {
+          "title": "EV 项目动手工作坊体验",
+          "caption": "在 EV 工作坊的动手实践体验。"
+        },
+        "2": {
+          "title": "学生访谈 Peter Teertstra 博士",
+          "caption": "访谈滑铁卢大学工程学院 Teertstra 博士。"
+        }
+      },
+      "community": {
+        "heading": "社区聚焦",
+        "imageAlt": "社区聚焦照片",
+        "caption": "滑铁卢大学工程学院教授、Sedra 学生设计中心主任 Peter Teertstra 博士带领伊萨卡学生参观校园。",
+        "prevAriaLabel": "上一张图片",
+        "nextAriaLabel": "下一张图片",
+        "dotAriaLabel": "跳转到第"
+      }
+    },
+    "team": {
+      "heading": "团队与导师",
+      "subtitle": "我们的团队结合了课堂专业知识与行业经验，引导学生应对真实世界的挑战。"
+    },
+    "connect": {
+      "ariaLabel": "加入我们",
+      "imageAlt": "导师与学生在伊萨卡合作",
+      "heading": "加入我们",
+      "educators": {
+        "heading": "教育者与教学负责人",
+        "description": "我们的教学团队融合了课堂专业知识与工程实践经验。讲师引导学生掌握核心概念、工坊安全和严谨的项目执行。"
+      },
+      "mentors": {
+        "heading": "行业导师与特邀专家",
+        "description": "我们邀请来自工程、AI 及相关行业的专业人士担任导师，审阅学生作品，分享真实世界的视角。"
+      },
+      "newsletter": {
+        "heading": "订阅资讯"
+      },
+      "cta": "立即联系"
+    }
+  }
+}

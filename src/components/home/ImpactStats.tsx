@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useLayoutEffect } from "react";
 import { useReducedMotion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 /* ------------------------------------------------------------------ */
 /*  Stats data                                                         */
@@ -10,34 +11,34 @@ import { useReducedMotion } from "framer-motion";
 interface Stat {
   readonly value: number;
   readonly suffix: string;
-  readonly label: string;
-  readonly detail: string;
+  readonly labelKey: string;
+  readonly detailKey: string;
 }
 
 const STATS: readonly Stat[] = [
   {
     value: 200,
     suffix: "+",
-    label: "Students",
-    detail: "Inspired through hands-on programs",
+    labelKey: "impact.stat1Label",
+    detailKey: "impact.stat1Detail",
   },
   {
     value: 6,
     suffix: "",
-    label: "Programs",
-    detail: "From EV engineering to AI entrepreneurship",
+    labelKey: "impact.stat2Label",
+    detailKey: "impact.stat2Detail",
   },
   {
     value: 10,
     suffix: "+",
-    label: "Mentors",
-    detail: "Industry leaders guiding the next generation",
+    labelKey: "impact.stat3Label",
+    detailKey: "impact.stat3Detail",
   },
   {
     value: 50,
     suffix: "+",
-    label: "Projects",
-    detail: "Real-world challenges tackled by students",
+    labelKey: "impact.stat4Label",
+    detailKey: "impact.stat4Detail",
   },
 ] as const;
 
@@ -64,6 +65,7 @@ export function ImpactStats() {
   const glowBgRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const gsapCtxRef = useRef<{ revert: () => void } | null>(null);
+  const t = useTranslations("home");
 
   /* Direct DOM refs for GSAP - bypasses React reconciliation */
   const numberRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -217,13 +219,13 @@ export function ImpactStats() {
         <div className="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
           <div className="mb-12 text-center md:mb-16">
             <h2 className="text-2xl font-bold tracking-tight text-white md:text-4xl">
-              Building something that matters
+              {t("impact.heading")}
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-px overflow-hidden bg-white/[0.04] md:grid-cols-4">
             {STATS.map((stat) => (
               <div
-                key={stat.label}
+                key={stat.labelKey}
                 className="bg-[#0a0c10] p-6 text-center md:p-10"
               >
                 <p className="font-mono text-4xl font-bold tracking-tight text-white md:text-5xl lg:text-6xl">
@@ -232,10 +234,10 @@ export function ImpactStats() {
                 </p>
                 <div className="mx-auto mt-3 h-px w-12 bg-accent/40" />
                 <p className="mt-3 text-sm font-semibold text-accent/70">
-                  {stat.label}
+                  {t(stat.labelKey)}
                 </p>
                 <p className="mt-1.5 text-xs leading-relaxed text-white/35">
-                  {stat.detail}
+                  {t(stat.detailKey)}
                 </p>
               </div>
             ))}
@@ -266,7 +268,7 @@ export function ImpactStats() {
           style={{ clipPath: "inset(0 100% 0 0)", opacity: 0 }}
         >
           <h2 className="text-2xl font-bold tracking-tight text-white md:text-4xl">
-            Building something that matters
+            {t("impact.heading")}
           </h2>
         </div>
 
@@ -274,7 +276,7 @@ export function ImpactStats() {
         <div className="grid grid-cols-2 gap-px overflow-hidden bg-white/[0.04] md:grid-cols-4">
           {STATS.map((stat, i) => (
             <div
-              key={stat.label}
+              key={stat.labelKey}
               ref={(el) => {
                 cardRefs.current[i] = el;
               }}
@@ -310,10 +312,10 @@ export function ImpactStats() {
               />
 
               <p className="mt-3 text-sm font-semibold text-accent/70">
-                {stat.label}
+                {t(stat.labelKey)}
               </p>
               <p className="mt-1.5 text-xs leading-relaxed text-white/35">
-                {stat.detail}
+                {t(stat.detailKey)}
               </p>
             </div>
           ))}

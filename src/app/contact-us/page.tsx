@@ -10,51 +10,14 @@ import {
 import { MapPin, Mail, Phone, MessageCircle } from "lucide-react";
 import { CONTACT_INFO } from "@/types/index";
 import { ContactForm } from "@/components/contact/ContactForm";
-
-/* ------------------------------------------------------------------ */
-/* Constants                                                           */
-/* ------------------------------------------------------------------ */
-
-const CONTACT_CHANNELS = [
-  {
-    icon: MapPin,
-    label: "Address",
-    value: CONTACT_INFO.address,
-    href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(CONTACT_INFO.address)}`,
-    external: true,
-    mono: false,
-  },
-  {
-    icon: Mail,
-    label: "Email",
-    value: CONTACT_INFO.email,
-    href: `mailto:${CONTACT_INFO.email}`,
-    external: false,
-    mono: false,
-  },
-  {
-    icon: Phone,
-    label: "Phone",
-    value: CONTACT_INFO.phone,
-    href: `tel:${CONTACT_INFO.phone.replace(/[^+\d]/g, "")}`,
-    external: false,
-    mono: true,
-  },
-  {
-    icon: MessageCircle,
-    label: "WeChat",
-    value: CONTACT_INFO.wechat,
-    href: undefined,
-    external: false,
-    mono: true,
-  },
-] as const;
+import { useTranslations } from "next-intl";
 
 /* ------------------------------------------------------------------ */
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 
 export default function ContactUsPage() {
+  const t = useTranslations("contact");
   const heroRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
 
@@ -65,6 +28,41 @@ export default function ContactUsPage() {
 
   const heroFade = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 40]);
+
+  const CONTACT_CHANNELS = [
+    {
+      icon: MapPin,
+      label: t("page.channels.address"),
+      value: CONTACT_INFO.address,
+      href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(CONTACT_INFO.address)}`,
+      external: true,
+      mono: false,
+    },
+    {
+      icon: Mail,
+      label: t("page.channels.email"),
+      value: CONTACT_INFO.email,
+      href: `mailto:${CONTACT_INFO.email}`,
+      external: false,
+      mono: false,
+    },
+    {
+      icon: Phone,
+      label: t("page.channels.phone"),
+      value: CONTACT_INFO.phone,
+      href: `tel:${CONTACT_INFO.phone.replace(/[^+\d]/g, "")}`,
+      external: false,
+      mono: true,
+    },
+    {
+      icon: MessageCircle,
+      label: t("page.channels.wechat"),
+      value: CONTACT_INFO.wechat,
+      href: undefined,
+      external: false,
+      mono: true,
+    },
+  ] as const;
 
   return (
     <div className="bg-background min-h-screen">
@@ -93,7 +91,7 @@ export default function ContactUsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
-            Contact Us
+            {t("page.title")}
           </motion.h1>
           <motion.p
             className="text-base md:text-lg text-foreground/60 max-w-xl mx-auto"
@@ -105,8 +103,7 @@ export default function ContactUsPage() {
               ease: [0.16, 1, 0.3, 1],
             }}
           >
-            Have a question or want to learn more? We would love to hear from
-            you.
+            {t("page.description")}
           </motion.p>
         </motion.div>
       </section>
@@ -173,7 +170,7 @@ export default function ContactUsPage() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
             <h2 className="text-xl md:text-2xl font-bold text-foreground mb-5">
-              Send Us a Message
+              {t("page.sendMessage")}
             </h2>
             <ContactForm />
           </motion.div>
@@ -190,7 +187,7 @@ export default function ContactUsPage() {
             }}
           >
             <h2 className="text-xl md:text-2xl font-bold text-foreground mb-5">
-              Find Us
+              {t("page.findUs")}
             </h2>
             <div className="rounded-xl overflow-hidden border border-border/60 h-[350px] lg:h-full lg:min-h-[400px]">
               <iframe

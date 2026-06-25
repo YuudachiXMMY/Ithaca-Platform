@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface PlaceholderProgramProps {
   readonly heroImage: string;
@@ -19,6 +20,8 @@ export function PlaceholderProgram({
   heroImage,
   heroAlt,
 }: PlaceholderProgramProps) {
+  const t = useTranslations("programs.placeholder");
+
   return (
     <div className="bg-background min-h-screen">
       {/* Hero */}
@@ -40,17 +43,16 @@ export function PlaceholderProgram({
           transition={{ duration: 0.7 }}
         >
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-            Stories Coming Soon!
+            {t("title")}
           </h1>
           <p className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto mb-10">
-            Your support and contributions will enable us to meet our goals and
-            fund our mission.
+            {t("description")}
           </p>
           <Link
             href="/contact-us"
             className="inline-flex items-center gap-2 bg-accent text-foreground-dark font-semibold px-8 py-4 rounded-full hover:bg-accent-hover transition-colors"
           >
-            Contact Us
+            {t("contactUs")}
             <ArrowRight className="w-5 h-5" />
           </Link>
         </motion.div>

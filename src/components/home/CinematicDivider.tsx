@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useLayoutEffect } from "react";
 import { useReducedMotion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 /* ------------------------------------------------------------------ */
 /*  CinematicDivider - full-viewport scroll-pinned video reveal        */
@@ -23,6 +24,7 @@ export function CinematicDivider() {
   const titleRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const gsapCtxRef = useRef<{ revert: () => void } | null>(null);
+  const t = useTranslations("home");
 
   useLayoutEffect(() => {
     return () => {
@@ -200,10 +202,10 @@ export function CinematicDivider() {
         className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 text-center opacity-0"
       >
         <p className="text-[11px] font-semibold tracking-[0.25em] text-accent/70 uppercase">
-          Featured
+          {t("cinematic.eyebrow")}
         </p>
         <h2 className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-5xl">
-          Meet with Dr. Reza Moridi
+          {t("cinematic.title")}
         </h2>
       </div>
 

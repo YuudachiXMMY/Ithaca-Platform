@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Users, MessageSquare, Mail, Megaphone, Loader2 } from "lucide-react";
 
 interface DashboardStats {
@@ -10,17 +11,18 @@ interface DashboardStats {
   activePopups: number;
 }
 
-const STAT_CARDS = [
-  { key: "totalSubscribers", label: "Total Subscribers", icon: Users },
-  { key: "totalContacts", label: "Total Contacts", icon: MessageSquare },
-  { key: "campaignsSent", label: "Campaigns Sent", icon: Mail },
-  { key: "activePopups", label: "Active Popups", icon: Megaphone },
-] as const;
-
 export default function AdminDashboardPage() {
+  const t = useTranslations("admin");
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const STAT_CARDS = [
+    { key: "totalSubscribers" as const, label: t("dashboard.stats.totalSubscribers"), icon: Users },
+    { key: "totalContacts" as const, label: t("dashboard.stats.totalContacts"), icon: MessageSquare },
+    { key: "campaignsSent" as const, label: t("dashboard.stats.campaignsSent"), icon: Mail },
+    { key: "activePopups" as const, label: t("dashboard.stats.activePopups"), icon: Megaphone },
+  ];
 
   const fetchStats = useCallback(async () => {
     try {
@@ -54,11 +56,11 @@ export default function AdminDashboardPage() {
         activePopups,
       });
     } catch {
-      setError("Failed to load dashboard statistics");
+      setError(t("dashboard.error"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchStats();
@@ -82,7 +84,7 @@ export default function AdminDashboardPage() {
 
   return (
     <div>
-      <h1 className="mb-8 text-2xl font-bold text-[#f7f7f7]">Dashboard</h1>
+      <h1 className="mb-8 text-2xl font-bold text-[#f7f7f7]">{t("dashboard.title")}</h1>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {STAT_CARDS.map((card) => {

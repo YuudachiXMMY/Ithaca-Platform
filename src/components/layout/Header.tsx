@@ -11,8 +11,10 @@ import {
   useMotionValueEvent,
 } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { NAV_ITEMS, type NavItem } from "@/types";
 import { cn } from "@/lib/utils";
+import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
 
 /* Split nav items: left group / center logo / right group */
 const LEFT_NAV = NAV_ITEMS.filter((item) => item.href !== "/contact-us");
@@ -33,6 +35,7 @@ function DesktopDropdown({
   item: NavItem;
   isActive: boolean;
 }) {
+  const t = useTranslations("nav");
   const [open, setOpen] = useState(false);
   const closeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -71,7 +74,7 @@ function DesktopDropdown({
             -
           </span>
         )}
-        {item.label}
+        {t(item.label)}
         <ChevronDown
           className={cn(
             "h-3 w-3 transition-transform duration-200",
@@ -98,7 +101,7 @@ function DesktopDropdown({
                 className="block px-4 py-2.5 text-sm text-white/55 transition-colors hover:bg-white/5 hover:text-white"
                 role="menuitem"
               >
-                {child.label}
+                {t(child.label)}
               </Link>
             ))}
           </motion.div>
@@ -121,6 +124,7 @@ function MobileNav({
   onClose: () => void;
   pathname: string;
 }) {
+  const t = useTranslations("nav");
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
   function toggleExpanded(label: string) {
@@ -184,14 +188,14 @@ function MobileNav({
                             : "text-white/70 hover:bg-white/5 hover:text-white"
                         )}
                       >
-                        {item.label}
+                        {t(item.label)}
                       </Link>
                       {hasChildren && (
                         <button
                           onClick={() => toggleExpanded(item.label)}
                           className="rounded-lg p-2 text-white/50 transition-colors hover:bg-white/5 hover:text-white"
                           aria-expanded={isExpanded}
-                          aria-label={`Expand ${item.label} submenu`}
+                          aria-label={`Expand ${t(item.label)} submenu`}
                         >
                           <ChevronDown
                             className={cn(
@@ -219,7 +223,7 @@ function MobileNav({
                                 href={child.href}
                                 className="block rounded-lg px-3 py-2 text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white"
                               >
-                                {child.label}
+                                {t(child.label)}
                               </Link>
                             </li>
                           ))}
@@ -230,6 +234,10 @@ function MobileNav({
                 );
               })}
             </ul>
+
+            <div className="border-t border-white/10 p-4">
+              <LanguageSwitcher />
+            </div>
           </motion.nav>
         </>
       )}
@@ -242,6 +250,7 @@ function MobileNav({
 /* ------------------------------------------------------------------ */
 
 export function Header() {
+  const t = useTranslations("nav");
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -320,7 +329,7 @@ export function Header() {
                       -
                     </span>
                   )}
-                  {item.label}
+                  {t(item.label)}
                 </Link>
               );
             })}
@@ -368,11 +377,15 @@ export function Header() {
                       -
                     </span>
                   )}
-                  {item.label}
+                  {t(item.label)}
                 </Link>
               );
             })}
           </nav>
+
+          <div className="hidden lg:flex items-center ml-6">
+            <LanguageSwitcher />
+          </div>
 
           <button
             onClick={toggleMobile}

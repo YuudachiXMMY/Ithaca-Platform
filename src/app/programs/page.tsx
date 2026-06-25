@@ -3,48 +3,43 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface ProgramCard {
-  readonly title: string;
-  readonly description: string;
+  readonly titleKey: string;
+  readonly descriptionKey: string;
   readonly href: string;
 }
 
 const PROGRAMS: readonly ProgramCard[] = [
   {
-    title: "AI Entrepreneurship Camp",
-    description:
-      "A 13-week program where students build AI-powered startups, develop MVPs, and pitch to real investors.",
+    titleKey: "cards.aiCamp.title",
+    descriptionKey: "cards.aiCamp.description",
     href: "/programs/ai-entrepreneurship-camp",
   },
   {
-    title: "EV Team",
-    description:
-      "Hands-on electric vehicle engineering challenge pushing students to design, build, and race.",
+    titleKey: "cards.evTeam.title",
+    descriptionKey: "cards.evTeam.description",
     href: "/programs/ev-challenge",
   },
   {
-    title: "Engineering Projects",
-    description:
-      "Real-world engineering projects covering robotics, IoT, and sustainable technology solutions.",
+    titleKey: "cards.engineering.title",
+    descriptionKey: "cards.engineering.description",
     href: "/programs/engineering-projects",
   },
   {
-    title: "Elite Interviews",
-    description:
-      "A research and documentary program where students investigate real-world issues through expert interviews, producing portfolio-ready reports and published documentaries.",
+    titleKey: "cards.eliteInterview.title",
+    descriptionKey: "cards.eliteInterview.description",
     href: "/programs/elite-interview",
   },
   {
-    title: "Summer & Winter Camps",
-    description:
-      "Intensive seasonal camps blending technology, creativity, and outdoor experiences.",
+    titleKey: "cards.summerWinter.title",
+    descriptionKey: "cards.summerWinter.description",
     href: "/programs/summer-winter-camps",
   },
   {
-    title: "Ithaca Night",
-    description:
-      "Community showcase events where students present their work and celebrate achievements.",
+    titleKey: "cards.ithacaNight.title",
+    descriptionKey: "cards.ithacaNight.description",
     href: "/programs/ithaca-night",
   },
 ] as const;
@@ -63,6 +58,8 @@ const cardVariants = {
 };
 
 export default function ProgramsPage() {
+  const t = useTranslations("programs.index");
+
   return (
     <div className="bg-background min-h-screen">
       {/* Hero */}
@@ -74,7 +71,7 @@ export default function ProgramsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            Our Programs
+            {t("title")}
           </motion.h1>
           <motion.p
             className="text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto"
@@ -82,8 +79,7 @@ export default function ProgramsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.15 }}
           >
-            Empowering youth to explore the future through hands-on,
-            project-based learning experiences.
+            {t("subtitle")}
           </motion.p>
         </div>
       </section>
@@ -103,13 +99,13 @@ export default function ProgramsPage() {
                 className="group block bg-card-bg border border-border rounded-2xl p-8 h-full hover:border-accent/50 transition-colors"
               >
                 <h2 className="text-xl font-semibold text-foreground mb-3 group-hover:text-accent transition-colors">
-                  {program.title}
+                  {t(program.titleKey)}
                 </h2>
                 <p className="text-foreground/60 mb-6 leading-relaxed">
-                  {program.description}
+                  {t(program.descriptionKey)}
                 </p>
                 <span className="inline-flex items-center gap-2 text-accent font-medium text-sm">
-                  Learn More
+                  {t("learnMore")}
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Link>

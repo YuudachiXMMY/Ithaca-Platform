@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import {
   Plus,
   Send,
@@ -37,6 +38,7 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default function AdminEmailsPage() {
+  const t = useTranslations("admin.emails");
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,17 +63,17 @@ export default function AdminEmailsPage() {
       const data = await res.json();
 
       if (!data.success) {
-        setError(data.error ?? "Failed to load campaigns");
+        setError(data.error ?? t("errors.load"));
         return;
       }
 
       setCampaigns(data.data);
     } catch {
-      setError("Failed to load campaigns");
+      setError(t("errors.load"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchCampaigns();
@@ -90,7 +92,7 @@ export default function AdminEmailsPage() {
       const data = await res.json();
 
       if (!data.success) {
-        setError(data.error ?? "Failed to create campaign");
+        setError(data.error ?? t("errors.create"));
         return;
       }
 
@@ -98,16 +100,12 @@ export default function AdminEmailsPage() {
       setShowForm(false);
       await fetchCampaigns();
     } catch {
-      setError("Failed to create campaign");
+      setError(t("errors.create"));
     }
   };
 
   const handleSend = async (id: string) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to send this campaign to all active subscribers?",
-      )
-    ) {
+    if (!window.confirm(t("confirmSend"))) {
       return;
     }
 
@@ -124,13 +122,13 @@ export default function AdminEmailsPage() {
       const data = await res.json();
 
       if (!data.success) {
-        setError(data.error ?? "Failed to send campaign");
+        setError(data.error ?? t("errors.send"));
         return;
       }
 
       await fetchCampaigns();
     } catch {
-      setError("Failed to send campaign");
+      setError(t("errors.send"));
     } finally {
       setSendingId(null);
     }
@@ -139,7 +137,7 @@ export default function AdminEmailsPage() {
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[#f7f7f7]">Email Campaigns</h1>
+        <h1 className="text-2xl font-bold text-[#f7f7f7]">{t("title")}</h1>
         <button
           onClick={() => setShowForm(!showForm)}
           className="flex items-center gap-2 rounded-lg bg-[#ccdef0] px-4 py-2 text-sm font-semibold text-[#161616] transition-colors hover:bg-[#b8d0e8]"
@@ -147,12 +145,12 @@ export default function AdminEmailsPage() {
           {showForm ? (
             <>
               <X className="h-4 w-4" />
-              <span>Cancel</span>
+              <span>{t("cancel")}</span>
             </>
           ) : (
             <>
               <Plus className="h-4 w-4" />
-              <span>New Campaign</span>
+              <span>{t("newCampaign")}</span>
             </>
           )}
         </button>
@@ -168,7 +166,7 @@ export default function AdminEmailsPage() {
       {showForm && (
         <div className="mb-8 rounded-xl border border-[#2a2a2a] bg-[#1e1e1e] p-6">
           <h2 className="mb-4 text-lg font-semibold text-[#f7f7f7]">
-            Create New Campaign
+            {t("createForm.title")}
           </h2>
 
           <form onSubmit={handleSubmit(onCreateCampaign)} className="space-y-4">
@@ -177,13 +175,13 @@ export default function AdminEmailsPage() {
                 htmlFor="subject"
                 className="mb-1.5 block text-sm font-medium text-[#ccc]"
               >
-                Subject
+                {t("createForm.subject")}
               </label>
               <input
                 {...register("subject")}
                 id="subject"
                 type="text"
-                placeholder="Email subject line"
+                placeholder={t("createForm.subjectPlaceholder")}
                 className="w-full rounded-lg border border-[#2a2a2a] bg-[#161616] px-4 py-2.5 text-sm text-[#f7f7f7] placeholder-[#555] transition-colors focus:border-[#ccdef0] focus:outline-none"
               />
               {errors.subject && (
@@ -198,13 +196,13 @@ export default function AdminEmailsPage() {
                 htmlFor="body"
                 className="mb-1.5 block text-sm font-medium text-[#ccc]"
               >
-                Body (HTML)
+                {t("createForm.body")}
               </label>
               <textarea
                 {...register("body")}
                 id="body"
                 rows={10}
-                placeholder="<h1>Hello!</h1><p>Your email content here...</p>"
+                placeholder={t("createForm.bodyPlaceholder")}
                 className="w-full rounded-lg border border-[#2a2a2a] bg-[#161616] px-4 py-2.5 font-mono text-sm text-[#f7f7f7] placeholder-[#555] transition-colors focus:border-[#ccdef0] focus:outline-none"
               />
               {errors.body && (
@@ -225,7 +223,7 @@ export default function AdminEmailsPage() {
                 ) : (
                   <Plus className="h-4 w-4" />
                 )}
-                <span>Create Campaign</span>
+                <span>{t("createForm.createCampaign")}</span>
               </button>
             </div>
           </form>
@@ -239,26 +237,26 @@ export default function AdminEmailsPage() {
           </div>
         ) : campaigns.length === 0 ? (
           <div className="px-6 py-16 text-center text-[#888]">
-            No campaigns yet. Create your first one above.
+            {t("empty")}
           </div>
         ) : (
           <table className="w-full" role="table">
             <thead>
               <tr className="border-b border-[#2a2a2a] text-left">
                 <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#888]">
-                  Subject
+                  {t("table.subject")}
                 </th>
                 <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#888]">
-                  Status
+                  {t("table.status")}
                 </th>
                 <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#888]">
-                  Recipients
+                  {t("table.recipients")}
                 </th>
                 <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#888]">
-                  Date
+                  {t("table.date")}
                 </th>
                 <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#888]">
-                  Actions
+                  {t("table.actions")}
                 </th>
               </tr>
             </thead>
@@ -291,14 +289,14 @@ export default function AdminEmailsPage() {
                         onClick={() => handleSend(campaign.id)}
                         disabled={sendingId === campaign.id}
                         className="flex items-center gap-1.5 rounded-lg bg-[#ccdef0]/10 px-3 py-1.5 text-xs font-medium text-[#ccdef0] transition-colors hover:bg-[#ccdef0]/20 disabled:opacity-50"
-                        aria-label={`Send campaign: ${campaign.subject}`}
+                        aria-label={t("sendAriaLabel", { subject: campaign.subject })}
                       >
                         {sendingId === campaign.id ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />
                         ) : (
                           <Send className="h-3.5 w-3.5" />
                         )}
-                        <span>Send</span>
+                        <span>{t("send")}</span>
                       </button>
                     )}
                   </td>

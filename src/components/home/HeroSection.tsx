@@ -7,17 +7,7 @@ import {
   useReducedMotion,
   type Variants,
 } from "framer-motion";
-
-/* ------------------------------------------------------------------ */
-/*  Quote split into visual lines for stagger reveal                  */
-/* ------------------------------------------------------------------ */
-
-const QUOTE_LINES = [
-  "\u201CAs you set out for Ithaca",
-  "hope your road is a long one,",
-  "full of adventure,",
-  "full of discovery.\u201D",
-] as const;
+import { useTranslations } from "next-intl";
 
 /* ------------------------------------------------------------------ */
 /*  Animation variants (initial load via Framer Motion)               */
@@ -60,6 +50,14 @@ export function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const gsapCtxRef = useRef<{ revert: () => void } | null>(null);
+  const t = useTranslations("home");
+
+  const quoteLines = [
+    t("hero.quote1"),
+    t("hero.quote2"),
+    t("hero.quote3"),
+    t("hero.quote4"),
+  ];
 
   // Synchronous cleanup before DOM mutations — prevents removeChild errors
   // caused by GSAP pin-spacers reparenting DOM elements
@@ -239,7 +237,7 @@ export function HeroSection() {
               initial={reduce ? "visible" : "hidden"}
               animate="visible"
             >
-              {QUOTE_LINES.map((line) => (
+              {quoteLines.map((line) => (
                 <div key={line} className="overflow-hidden">
                   <motion.p
                     className="text-[clamp(1.75rem,5vw,3.75rem)] font-light leading-[1.12] tracking-tight text-white"
@@ -258,7 +256,7 @@ export function HeroSection() {
               animate="visible"
               custom={1.6}
             >
-              C. P. Cavafy
+              {t("hero.author")}
             </motion.p>
 
             <motion.div
@@ -272,13 +270,13 @@ export function HeroSection() {
                 href="/programs"
                 className="inline-flex h-12 items-center justify-center bg-accent px-8 text-sm font-semibold tracking-wide text-foreground-dark transition-all duration-200 hover:bg-accent-hover active:scale-[0.97] active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
-                View programs
+                {t("hero.ctaPrograms")}
               </Link>
               <Link
                 href="/contact-us"
                 className="inline-flex h-12 items-center justify-center border border-white/25 px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:border-white/60 hover:bg-white/5 active:scale-[0.97] active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
-                Get in touch
+                {t("hero.ctaContact")}
               </Link>
             </motion.div>
           </div>
@@ -292,8 +290,7 @@ export function HeroSection() {
               aria-hidden="true"
             />
             <h2 className="hero-empowerment-text max-w-4xl text-2xl font-bold leading-snug text-white opacity-0 md:text-4xl lg:text-5xl">
-              Empowering youth to explore the future and build the skills to
-              thrive in the AI era.
+              {t("hero.empowerment")}
             </h2>
           </div>
         </div>
@@ -304,8 +301,7 @@ export function HeroSection() {
         <div className="bg-[#111318] px-5 py-24 sm:px-8 md:px-[6vw]">
           <div className="mb-8 h-px w-16 bg-accent" aria-hidden="true" />
           <h2 className="max-w-4xl text-2xl font-bold leading-snug text-white md:text-4xl lg:text-5xl">
-            Empowering youth to explore the future and build the skills to
-            thrive in the AI era.
+            {t("hero.empowerment")}
           </h2>
         </div>
       )}

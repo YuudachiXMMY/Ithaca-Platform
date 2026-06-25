@@ -1,0 +1,177 @@
+{
+  "about": {
+    "hero": {
+      "title": "About Ithaca",
+      "subtitle": "Empowering youth to explore the future through engineering, AI, and entrepreneurship.",
+      "facts": {
+        "founded": "Founded",
+        "location": "Location",
+        "grades": "Grades",
+        "foundedValue": "2024",
+        "locationValue": "Ontario, Canada",
+        "gradesValue": "4-12"
+      }
+    },
+    "mission": {
+      "heading": "Our Mission",
+      "subtitle": "Ithaca empowers young people to explore the future and supports the next generation to take on responsibility in this fast-evolving world.",
+      "block0": {
+        "title": "We help teens explore the future.",
+        "description": "We guide students through real-world projects where they learn by building, testing, collaborating, and presenting. They discover their strengths and a direction that is truly their own.",
+        "imageAlt": "Students working on project-based learning"
+      },
+      "block1": {
+        "title": "Students are project owners.",
+        "description": "We use Project-Based Learning to connect learning with real-world problems and develop practical skills that traditional academics alone cannot fully cover.",
+        "imageAlt": "Students owning their projects at AI camp"
+      },
+      "block2": {
+        "title": "We value social impact and AI ethics.",
+        "description": "Students learn to use AI responsibly, cite properly, and build work that can be explained and defended through transparent review and public showcase formats.",
+        "imageAlt": "Students learning about AI ethics and social impact"
+      }
+    },
+    "approach": {
+      "ariaLabel": "Our Approach",
+      "howWeTeach": {
+        "imageAlt": "Students learning through hands-on projects",
+        "heading": "How We Teach",
+        "description": "We teach through a studio-style, project-based model where students learn by building. Each cohort works in small teams with clear weekly milestones, structured mentoring, and frequent technical reviews."
+      },
+      "ethics": {
+        "imageAlt": "Students discussing AI ethics and integrity",
+        "heading": "Ethics & Integrity",
+        "description": "We hold a high bar for safety, academic honesty, and responsible technology use. Students learn to cite sources properly, document AI-assisted work transparently, and maintain design logs that can be reviewed through demonstrations and Q&A."
+      }
+    },
+    "decab": {
+      "heading": "DECAB Competency Map",
+      "subtitle": "Our framework tracks student growth across five dimensions, ensuring balanced development in technical depth, applied reasoning, and real-world execution.",
+      "competencies": {
+        "d": {
+          "name": "Design & Principles",
+          "description": "Creative problem-solving, system design, and design thinking."
+        },
+        "e": {
+          "name": "Electrical Engineering",
+          "description": "Circuit design, electronics, and hardware prototyping."
+        },
+        "c": {
+          "name": "Computer Programming",
+          "description": "Software development, algorithms, and computational thinking."
+        },
+        "a": {
+          "name": "Application of Math & Physics",
+          "description": "Applied reasoning with real-world math and physics."
+        },
+        "b": {
+          "name": "Business & Communication",
+          "description": "Collaboration, pitching, and professional communication."
+        }
+      }
+    },
+    "programs": {
+      "heading": "Our Programs",
+      "evTeam": {
+        "label": "EV Team",
+        "description": "Build and race electric vehicles with industry mentors."
+      },
+      "aiCamp": {
+        "label": "AI Entrepreneurship Camp",
+        "description": "Develop AI-powered solutions to real business problems."
+      },
+      "eliteInterviews": {
+        "label": "Elite Interviews",
+        "description": "Students investigate real-world issues through expert interviews, producing reports and documentaries."
+      },
+      "allPrograms": {
+        "label": "All Programs",
+        "description": "Explore our full range of programs and camps."
+      }
+    },
+    "outcomes": {
+      "heading": "Student Outcomes",
+      "subtitle": "Every program is designed around what students take away, not just what they sit through.",
+      "featured": {
+        "portfolio": {
+          "title": "Portfolio-Ready Deliverables",
+          "description": "Students graduate with tangible artifacts: prototype demos, project reports, and presentation materials for applications and competitions."
+        },
+        "engineering": {
+          "title": "Engineering & Systems Thinking",
+          "description": "From building and testing to iteration, students develop the habit of reasoning with structure, constraints, and real-world tradeoffs."
+        }
+      },
+      "compact": {
+        "01": {
+          "title": "AI Literacy with Responsibility",
+          "description": "Effective and ethical AI tool usage, with proper citation, process documentation, and defensible decision-making."
+        },
+        "02": {
+          "title": "Business & Validation Mindset",
+          "description": "Problem definition, user understanding, and basic business logic: learning how value is created and communicated."
+        },
+        "03": {
+          "title": "Collaboration & Leadership",
+          "description": "Through team roles and real deadlines, students build collaboration habits beyond traditional classroom settings."
+        },
+        "04": {
+          "title": "Communication & Pitch Skills",
+          "description": "Clear presentation under time pressure, handling questions, and telling a coherent story from problem to solution."
+        }
+      }
+    },
+    "highlights": {
+      "heading": "Student Highlights",
+      "andySong": {
+        "name": "Andy Song",
+        "program": "AI Pioneers Interview Project",
+        "description": "Andy interviewed Mr. Carlos Orencio Horta, Director of AI at Scotiabank, and Mr. Tanaby Zibamanzar, Director of Data Analytics. Andy graduated from high school in June 2025 and began his studies at Princeton University in September 2025.",
+        "iframeTitle": "Andy Song interviewing Scotiabank executives"
+      },
+      "videos": {
+        "0": {
+          "title": "Ithaca EV team visits Honda production line",
+          "caption": "Students visited Honda's production line to learn about AI in car manufacturing."
+        },
+        "1": {
+          "title": "EV program hands-on workshop experience",
+          "caption": "Hands-on experience in the EV workshop."
+        },
+        "2": {
+          "title": "Student interview with Dr. Peter Teertstra",
+          "caption": "Interview with Dr. Teertstra, Faculty of Engineering, University of Waterloo."
+        }
+      },
+      "community": {
+        "heading": "Community Spotlight",
+        "imageAlt": "Community spotlight photo",
+        "caption": "Dr. Peter Teertstra, Professor at the Faculty of Engineering, University of Waterloo, and Director of the Sedra Student Design Centre, leading the Ithaca students on a tour.",
+        "prevAriaLabel": "Previous image",
+        "nextAriaLabel": "Next image",
+        "dotAriaLabel": "Go to image"
+      }
+    },
+    "team": {
+      "heading": "Team & Mentors",
+      "subtitle": "Our team combines classroom expertise with industry experience to guide students through real-world challenges."
+    },
+    "connect": {
+      "ariaLabel": "Join Us",
+      "imageAlt": "Mentors and students collaborating at Ithaca",
+      "heading": "Join Us",
+      "educators": {
+        "heading": "Educators & Instructional Leads",
+        "description": "Our teaching team blends classroom expertise with hands-on engineering practice. Instructors guide students through core concepts, workshop safety, and disciplined project execution."
+      },
+      "mentors": {
+        "heading": "Industry Mentors & Guest Experts",
+        "description": "We invite professionals from engineering, AI, and related industries to mentor, review student work, and share real-world perspectives."
+      },
+      "newsletter": {
+        "heading": "Stay Updated"
+      },
+      "cta": "Connect Now"
+    }
+  }
+}

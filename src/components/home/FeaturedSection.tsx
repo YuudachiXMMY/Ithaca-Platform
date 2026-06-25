@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 /* ------------------------------------------------------------------ */
 /*  FeaturedSection - full-width Vimeo embed                          */
@@ -8,6 +9,7 @@ import { motion, useReducedMotion } from "framer-motion";
 
 export function FeaturedSection() {
   const reduce = useReducedMotion();
+  const t = useTranslations("home");
 
   return (
     <div className="h-[200dvh] bg-[#111318]">
@@ -53,21 +55,17 @@ export function FeaturedSection() {
               aria-hidden="true"
             />
             <p className="text-[11px] font-semibold tracking-[0.2em] text-accent uppercase">
-              Featured
+              {t("featured.eyebrow")}
             </p>
             <h2 className="mt-2 text-xl font-bold text-white md:text-2xl">
-              Meet with Dr. Reza Moridi
+              {t("featured.title")}
             </h2>
           </div>
 
           {/* Description */}
           <div className="border-t border-white/10 pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-10">
             <p className="text-sm leading-relaxed text-white/55">
-              Our students sat down with Dr. Reza Moridi, former Ontario
-              Minister of Research, Innovation and Science, for an exclusive
-              interview on the future of AI and its impact on the next
-              generation. He shared his vision for how young people can prepare
-              for an AI-driven world and why programs like Ithaca are essential.
+              {t("featured.description")}
             </p>
           </div>
         </motion.div>

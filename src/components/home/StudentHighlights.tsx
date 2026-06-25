@@ -3,67 +3,62 @@
 import { useRef, useEffect, useLayoutEffect } from "react";
 import Image from "next/image";
 import { useReducedMotion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 /* ------------------------------------------------------------------ */
 /*  Highlight data                                                    */
 /* ------------------------------------------------------------------ */
 
 interface Highlight {
-  readonly title: string;
-  readonly description: string;
+  readonly titleKey: string;
+  readonly descriptionKey: string;
   readonly image: string;
-  readonly alt: string;
-  readonly tag: string;
+  readonly altKey: string;
+  readonly tagKey: string;
 }
 
 const HIGHLIGHTS: readonly Highlight[] = [
   {
-    title: "Honda Production Line Visit",
-    description:
-      "Touring the Honda EV production facility, witnessing cutting-edge manufacturing and sustainable engineering.",
+    titleKey: "highlights.item1Title",
+    descriptionKey: "highlights.item1Description",
     image: "/media/images/highlights/wechat-img-189.jpg",
-    alt: "Students visiting Honda electric vehicle production line",
-    tag: "Field Visit",
+    altKey: "highlights.item1Alt",
+    tagKey: "highlights.item1Tag",
   },
   {
-    title: "EV Program Workshop",
-    description:
-      "Designing and assembling EV components, learning motor systems and energy management.",
+    titleKey: "highlights.item2Title",
+    descriptionKey: "highlights.item2Description",
     image: "/media/images/programs/ev-challenge/EV25-5s.png",
-    alt: "Students working on electric vehicle components during workshop",
-    tag: "Workshop",
+    altKey: "highlights.item2Alt",
+    tagKey: "highlights.item2Tag",
   },
   {
-    title: "Industry Expert Interviews",
-    description:
-      "Professional interviews with industry leaders, developing communication skills and career insights.",
+    titleKey: "highlights.item3Title",
+    descriptionKey: "highlights.item3Description",
     image: "/media/images/highlights/wechat-img-187.jpg",
-    alt: "Student interviewing an industry expert",
-    tag: "Interview",
+    altKey: "highlights.item3Alt",
+    tagKey: "highlights.item3Tag",
   },
   {
-    title: "Team Collaboration",
-    description:
-      "Cross-disciplinary projects combining technical expertise with creative problem-solving.",
-    image: "/media/images/programs/ev-challenge/EV25-7.jpg",
-    alt: "Students collaborating on a team project",
-    tag: "Teamwork",
+    titleKey: "highlights.item4Title",
+    descriptionKey: "highlights.item4Description",
+    image: "/media/images/programs/ev-challenge/EV25-7-fixed.jpg",
+    altKey: "highlights.item4Alt",
+    tagKey: "highlights.item4Tag",
   },
   {
-    title: "Presentation Day",
-    description:
-      "Semester projects showcased to educators and industry mentors, building public speaking confidence.",
+    titleKey: "highlights.item5Title",
+    descriptionKey: "highlights.item5Description",
     image: "/media/images/highlights/wechat-img-197.jpg",
-    alt: "Student presenting their project on presentation day",
-    tag: "Showcase",
+    altKey: "highlights.item5Alt",
+    tagKey: "highlights.item5Tag",
   },
   {
-    title: "Hands-On Innovation",
-    description:
-      "From prototyping to coding, building solutions that address real challenges in technology.",
+    titleKey: "highlights.item6Title",
+    descriptionKey: "highlights.item6Description",
     image: "/media/images/programs/app.png",
-    alt: "Students engaged in hands-on innovation activities",
-    tag: "Innovation",
+    altKey: "highlights.item6Alt",
+    tagKey: "highlights.item6Tag",
   },
 ] as const;
 
@@ -115,11 +110,13 @@ function HighlightCell({
   readonly index: number;
   readonly showDescription: boolean;
 }) {
+  const t = useTranslations("home");
+
   return (
     <article className="group absolute inset-0 overflow-hidden">
       <Image
         src={highlight.image}
-        alt={highlight.alt}
+        alt={t(highlight.altKey)}
         fill
         sizes="(min-width: 768px) 520px, 50vw"
         className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
@@ -142,14 +139,14 @@ function HighlightCell({
       {/* Dense data strip at bottom */}
       <div className="absolute inset-x-0 bottom-0 p-3 md:p-4">
         <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent/70 md:text-[9px]">
-          {highlight.tag}
+          {t(highlight.tagKey)}
         </span>
         <h3 className="mt-1 text-sm font-bold leading-tight text-white md:text-sm">
-          {highlight.title}
+          {t(highlight.titleKey)}
         </h3>
         {showDescription && (
           <p className="mt-1.5 line-clamp-2 text-[11px] leading-snug text-white/40 md:text-[11px]">
-            {highlight.description}
+            {t(highlight.descriptionKey)}
           </p>
         )}
       </div>
@@ -166,7 +163,7 @@ function MobileHighlightsGrid() {
     <div className="grid grid-cols-2 gap-[2px] px-5 py-2 sm:px-8">
       {HIGHLIGHTS.map((h, i) => (
         <div
-          key={h.title}
+          key={h.titleKey}
           className={`relative overflow-hidden ${
             i < 2 ? "aspect-[3/4]" : "aspect-square"
           }`}
@@ -191,6 +188,7 @@ function DesktopHorizontalMosaic({
   const trackRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
   const gsapCtxRef = useRef<{ revert: () => void } | null>(null);
+  const t = useTranslations("home");
 
   useLayoutEffect(() => {
     return () => {
@@ -258,20 +256,19 @@ function DesktopHorizontalMosaic({
         <div className="shrink-0 px-5 sm:px-8 md:px-[6vw]">
           <div className="flex items-end justify-between border-b border-white/[0.06] pb-3 pt-4">
             <h2 className="text-xl font-bold tracking-tight text-white md:text-3xl">
-              Student Highlights
+              {t("highlights.heading")}
             </h2>
             <p className="max-w-xs text-right text-[11px] leading-relaxed text-white/30">
-              Real experiences from our programs that inspire the next
-              generation of innovators.
+              {t("highlights.subheading")}
             </p>
           </div>
           <div className="flex gap-6 overflow-x-auto py-2.5">
             {HIGHLIGHTS.map((h, i) => (
               <span
-                key={h.tag}
+                key={h.tagKey}
                 className="shrink-0 font-mono text-[9px] uppercase tracking-[0.15em] text-white/20"
               >
-                {String(i + 1).padStart(2, "0")} {h.tag}
+                {String(i + 1).padStart(2, "0")} {t(h.tagKey)}
               </span>
             ))}
           </div>
@@ -356,6 +353,7 @@ function DesktopHorizontalMosaic({
 
 export function StudentHighlights() {
   const reduce = useReducedMotion();
+  const t = useTranslations("home");
 
   return (
     <section aria-label="Student Highlights">
@@ -364,7 +362,7 @@ export function StudentHighlights() {
         <div className="px-5 sm:px-8">
           <div className="flex items-end justify-between border-b border-white/[0.06] pb-4 pt-10">
             <h2 className="text-xl font-bold tracking-tight text-white">
-              Student Highlights
+              {t("highlights.heading")}
             </h2>
           </div>
         </div>

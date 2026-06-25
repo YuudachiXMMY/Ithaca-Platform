@@ -4,51 +4,48 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 /* ------------------------------------------------------------------ */
 /*  Program data with images                                          */
 /* ------------------------------------------------------------------ */
 
 interface Program {
-  readonly title: string;
-  readonly description: string;
+  readonly titleKey: string;
+  readonly descriptionKey: string;
   readonly href: string;
   readonly image: string;
-  readonly alt: string;
+  readonly altKey: string;
 }
 
 const PROGRAMS: readonly Program[] = [
   {
-    title: "EV Team",
-    description:
-      "Design, build, and race electric vehicles while learning sustainable engineering and energy systems.",
+    titleKey: "programs.ev.title",
+    descriptionKey: "programs.ev.description",
     href: "/programs/ev-challenge",
     image: "/media/images/programs/ev-challenge/EV25-10.s.png",
-    alt: "Students working on electric vehicle challenge",
+    altKey: "programs.ev.alt",
   },
   {
-    title: "AI Entrepreneurship Camp",
-    description:
-      "Immerse in AI and entrepreneurship through mentorship, workshops, and real startup challenges.",
+    titleKey: "programs.ai.title",
+    descriptionKey: "programs.ai.description",
     href: "/programs/ai-entrepreneurship-camp",
     image: "/media/images/programs/ai-entrepreneurship/AI-Entrep_68.jpg",
-    alt: "Students at AI entrepreneurship camp",
+    altKey: "programs.ai.alt",
   },
   {
-    title: "Elite Interviews",
-    description:
-      "A research and documentary program where students investigate real-world issues through expert interviews, producing portfolio-ready reports and published documentaries.",
+    titleKey: "programs.elite.title",
+    descriptionKey: "programs.elite.description",
     href: "/programs/elite-interviews",
     image: "/media/images/programs/ai-interview/25_Mr. Carmi Levy.png",
-    alt: "Students interviewing Mr. Carmi Levy",
+    altKey: "programs.elite.alt",
   },
   {
-    title: "Other Programs",
-    description:
-      "Explore our full range including AI Pioneers Interview, Ithaca Night, and seasonal camps.",
+    titleKey: "programs.other.title",
+    descriptionKey: "programs.other.description",
     href: "/programs",
     image: "/media/images/programs/ai-entrepreneurship/AIEC2026/AIEC2026-clossette_2s.png",
-    alt: "Overview of Ithaca Family Academy programs",
+    altKey: "programs.other.alt",
   },
 ] as const;
 
@@ -76,6 +73,7 @@ const cellReveal: Variants = {
 
 export function ProgramsShowcase() {
   const reduce = useReducedMotion();
+  const t = useTranslations("home");
 
   return (
     <section className="bg-[#0a0c10] py-8 md:py-10" aria-label="Our Programs">
@@ -88,12 +86,10 @@ export function ProgramsShowcase() {
           transition={{ type: "spring", stiffness: 80, damping: 20 }}
         >
           <h2 className="text-2xl font-bold text-white md:text-4xl">
-            Our Programs
+            {t("programs.heading")}
           </h2>
           <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/45">
-            From electric vehicles to AI startups, our project-based programs
-            connect students with real-world challenges and industry
-            professionals.
+            {t("programs.subheading")}
           </p>
         </motion.div>
 
@@ -141,6 +137,8 @@ function BentoCell({
   readonly program: Program;
   readonly large?: boolean;
 }) {
+  const t = useTranslations("home");
+
   return (
     <Link
       href={program.href}
@@ -149,7 +147,7 @@ function BentoCell({
       {/* Background image */}
       <Image
         src={program.image}
-        alt={program.alt}
+        alt={t(program.altKey)}
         fill
         sizes={large ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 100vw, 34vw"}
         className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -168,13 +166,13 @@ function BentoCell({
             large ? "text-base sm:text-lg md:text-xl" : "text-sm md:text-base"
           }`}
         >
-          {program.title}
+          {t(program.titleKey)}
         </h3>
         <p className="mt-1.5 hidden max-w-md text-xs leading-relaxed text-white/60 sm:block">
-          {program.description}
+          {t(program.descriptionKey)}
         </p>
         <div className="mt-3 flex items-center gap-1.5 text-xs font-medium text-accent transition-colors duration-200 group-hover:text-accent-hover">
-          <span>Learn more</span>
+          <span>{t("programs.learnMore")}</span>
           <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import type { TeamMember } from "@/types";
 
 interface TeamGridProps {
@@ -9,6 +10,9 @@ interface TeamGridProps {
 }
 
 export function TeamGrid({ members }: TeamGridProps) {
+  const t = useTranslations("about");
+  const tCommon = useTranslations("common");
+
   return (
     <section
       className="bg-[#0c0e12] py-12 lg:py-16"
@@ -25,11 +29,10 @@ export function TeamGrid({ members }: TeamGridProps) {
             id="team-heading"
             className="text-2xl md:text-4xl font-bold text-white tracking-tight"
           >
-            Team &amp; Mentors
+            {t("team.heading")}
           </h2>
           <p className="text-base text-gray-400 mt-2 max-w-md leading-relaxed">
-            Our team combines classroom expertise with industry experience to
-            guide students through real-world challenges.
+            {t("team.subtitle")}
           </p>
         </motion.div>
 
@@ -58,10 +61,11 @@ export function TeamGrid({ members }: TeamGridProps) {
                 {member.name}
               </h4>
               <p className="text-xs font-medium text-[#ccdef0]/70">
-                {member.title}
+                {/* member.title/description are translation keys like "team.joshuaWang.title" */}
+                {tCommon(member.title as never)}
               </p>
               <p className="text-xs text-gray-400 mt-1 leading-relaxed">
-                {member.description}
+                {tCommon(member.description as never)}
               </p>
             </motion.div>
           ))}

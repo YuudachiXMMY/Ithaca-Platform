@@ -6,9 +6,10 @@ import { z } from "zod/v4";
 import { useState } from "react";
 import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 const subscribeSchema = z.object({
-  email: z.email("Please enter a valid email address"),
+  email: z.email(),
 });
 
 type SubscribeFormData = z.infer<typeof subscribeSchema>;
@@ -24,6 +25,7 @@ export function NewsletterForm({
   variant = "dark",
   className,
 }: NewsletterFormProps) {
+  const t = useTranslations("contact");
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [message, setMessage] = useState("");
 
@@ -51,16 +53,16 @@ export function NewsletterForm({
 
       if (!response.ok) {
         setStatus("error");
-        setMessage(result.error ?? "Subscription failed. Please try again.");
+        setMessage(result.error ?? t("newsletter.errorFallback"));
         return;
       }
 
       setStatus("success");
-      setMessage("Thank you for subscribing!");
+      setMessage(t("newsletter.successMessage"));
       reset();
     } catch {
       setStatus("error");
-      setMessage("Something went wrong. Please try again later.");
+      setMessage(t("newsletter.genericError"));
     }
   }
 
@@ -75,12 +77,12 @@ export function NewsletterForm({
         aria-label="Newsletter signup"
       >
         <label htmlFor="newsletter-email" className="sr-only">
-          Email address
+          {t("newsletter.emailLabel")}
         </label>
         <input
           id="newsletter-email"
           type="email"
-          placeholder="Enter your email"
+          placeholder={t("newsletter.emailPlaceholder")}
           autoComplete="email"
           aria-invalid={errors.email ? "true" : undefined}
           aria-describedby={
@@ -112,7 +114,7 @@ export function NewsletterForm({
           {status === "loading" && (
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
           )}
-          Sign up
+          {t("newsletter.submitButton")}
         </button>
       </form>
 
@@ -123,7 +125,7 @@ export function NewsletterForm({
           role="alert"
         >
           <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
-          {errors.email.message}
+          {t("newsletter.errors.emailInvalid")}
         </p>
       )}
 

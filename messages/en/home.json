@@ -1,0 +1,106 @@
+{
+  "home": {
+    "hero": {
+      "quote1": "\u201CAs you set out for Ithaca",
+      "quote2": "hope your road is a long one,",
+      "quote3": "full of adventure,",
+      "quote4": "full of discovery.\u201D",
+      "author": "C. P. Cavafy",
+      "ctaPrograms": "View programs",
+      "ctaContact": "Get in touch",
+      "empowerment": "Empowering youth to explore the future and build the skills to thrive in the AI era."
+    },
+    "mission": {
+      "pillar1Title": "Explore the Future",
+      "pillar1Description": "From AI and engineering to entrepreneurship, our programs connect students with cutting-edge industries and real-world professionals.",
+      "pillar1Alt": "Students exploring future technology and innovation",
+      "pillar2Title": "Project-Based Learning",
+      "pillar2Description": "Students are project owners. Through hands-on learning they tackle real challenges, build prototypes, and present their work.",
+      "pillar2Alt": "Students engaged in project-based learning activities",
+      "pillar3Title": "Social Impact & AI Ethics",
+      "pillar3Description": "Students learn to use AI responsibly, cite properly, and build work that can be explained and defended. We value social impact and ethical technology use.",
+      "pillar3Alt": "Students discussing AI ethics and social impact"
+    },
+    "programs": {
+      "heading": "Our Programs",
+      "subheading": "From electric vehicles to AI startups, our project-based programs connect students with real-world challenges and industry professionals.",
+      "learnMore": "Learn more",
+      "ev": {
+        "title": "EV Team",
+        "description": "Design, build, and race electric vehicles while learning sustainable engineering and energy systems.",
+        "alt": "Students working on electric vehicle challenge"
+      },
+      "ai": {
+        "title": "AI Entrepreneurship Camp",
+        "description": "Immerse in AI and entrepreneurship through mentorship, workshops, and real startup challenges.",
+        "alt": "Students at AI entrepreneurship camp"
+      },
+      "elite": {
+        "title": "Elite Interviews",
+        "description": "A research and documentary program where students investigate real-world issues through expert interviews, producing portfolio-ready reports and published documentaries.",
+        "alt": "Students interviewing Mr. Carmi Levy"
+      },
+      "other": {
+        "title": "Other Programs",
+        "description": "Explore our full range including AI Pioneers Interview, Ithaca Night, and seasonal camps.",
+        "alt": "Overview of Ithaca Family Academy programs"
+      }
+    },
+    "impact": {
+      "heading": "Building something that matters",
+      "stat1Label": "Students",
+      "stat1Detail": "Inspired through hands-on programs",
+      "stat2Label": "Programs",
+      "stat2Detail": "From EV engineering to AI entrepreneurship",
+      "stat3Label": "Mentors",
+      "stat3Detail": "Industry leaders guiding the next generation",
+      "stat4Label": "Projects",
+      "stat4Detail": "Real-world challenges tackled by students"
+    },
+    "cinematic": {
+      "eyebrow": "Featured",
+      "title": "Meet with Dr. Reza Moridi"
+    },
+    "featured": {
+      "eyebrow": "Featured",
+      "title": "Meet with Dr. Reza Moridi",
+      "description": "Our students sat down with Dr. Reza Moridi, former Ontario Minister of Research, Innovation and Science, for an exclusive interview on the future of AI and its impact on the next generation. He shared his vision for how young people can prepare for an AI-driven world and why programs like Ithaca are essential."
+    },
+    "highlights": {
+      "heading": "Student Highlights",
+      "subheading": "Real experiences from our programs that inspire the next generation of innovators.",
+      "item1Title": "Honda Production Line Visit",
+      "item1Description": "Touring the Honda EV production facility, witnessing cutting-edge manufacturing and sustainable engineering.",
+      "item1Alt": "Students visiting Honda electric vehicle production line",
+      "item1Tag": "Field Visit",
+      "item2Title": "EV Program Workshop",
+      "item2Description": "Designing and assembling EV components, learning motor systems and energy management.",
+      "item2Alt": "Students working on electric vehicle components during workshop",
+      "item2Tag": "Workshop",
+      "item3Title": "Industry Expert Interviews",
+      "item3Description": "Professional interviews with industry leaders, developing communication skills and career insights.",
+      "item3Alt": "Student interviewing an industry expert",
+      "item3Tag": "Interview",
+      "item4Title": "Team Collaboration",
+      "item4Description": "Cross-disciplinary projects combining technical expertise with creative problem-solving.",
+      "item4Alt": "Students collaborating on a team project",
+      "item4Tag": "Teamwork",
+      "item5Title": "Presentation Day",
+      "item5Description": "Semester projects showcased to educators and industry mentors, building public speaking confidence.",
+      "item5Alt": "Student presenting their project on presentation day",
+      "item5Tag": "Showcase",
+      "item6Title": "Hands-On Innovation",
+      "item6Description": "From prototyping to coding, building solutions that address real challenges in technology.",
+      "item6Alt": "Students engaged in hands-on innovation activities",
+      "item6Tag": "Innovation"
+    },
+    "contact": {
+      "heading": "Get In Touch",
+      "subtext": "Ready to set your child on the road to discovery? Contact us to learn more about our programs and enrollment.",
+      "cta": "Get in touch",
+      "addressLabel": "Address",
+      "phoneLabel": "Phone",
+      "emailLabel": "Email"
+    }
+  }
+}

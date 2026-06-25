@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, ChevronDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 import WorkshopToRolesTransition from "@/components/programs/ev-challenge/WorkshopToRolesTransition";
 
 const EVModel3DSection = dynamic(
@@ -17,74 +18,6 @@ const EVModel3DSection = dynamic(
     ),
   },
 );
-
-/* ------------------------------------------------------------------ */
-/* Constants                                                          */
-/* ------------------------------------------------------------------ */
-
-const STATS = [
-  { label: "Season", value: "03" },
-  { label: "Grades", value: "8 - 11" },
-  { label: "Duration", value: "9 mo" },
-  { label: "Cadence", value: "Bi-weekly Sat" },
-  { label: "Window", value: "Sep 2026 - May 2027" },
-] as const;
-
-const PROGRAM_DETAILS = [
-  { label: "Target", value: "Grades 8 - 11, Greater Toronto Area" },
-  { label: "Duration", value: "September 2026 - May 2027 (9 months)" },
-  { label: "Schedule", value: "Bi-weekly Saturdays" },
-  { label: "Morning", value: "10:00 AM - 12:00 PM" },
-  { label: "Afternoon", value: "1:00 PM - 3:00 PM" },
-  { label: "Season", value: "Season 3 (2026 - 2027)" },
-] as const;
-
-
-const STUDENT_GAINS = [
-  {
-    title: "Real engineering project experience",
-    description:
-      "Design thinking, hands-on fabrication, and cross-discipline collaboration on a vehicle that actually races.",
-  },
-  {
-    title: "Business and leadership capabilities",
-    description:
-      "Fundraising, sponsorship acquisition, resource management, and the experience of building a team from scratch.",
-  },
-  {
-    title: "Competitive university applications",
-    description:
-      "A distinctive portfolio piece for top engineering and business programs across North America.",
-  },
-] as const;
-
-const FAQ_ITEMS = [
-  {
-    question: "Who can join the EV team?",
-    answer:
-      "Students in Grades 8 through 11 in the Greater Toronto Area. We welcome anyone interested in engineering, automotive technology, or team-based projects. No prior experience is required.",
-  },
-  {
-    question: "Do I need engineering experience?",
-    answer:
-      "No. The program teaches everything from the ground up. Roles span engineering design, assembly, test driving, and team operations. Every team member contributes regardless of technical background.",
-  },
-  {
-    question: "What is the Waterloo EV Challenge?",
-    answer:
-      "An electric vehicle endurance race organized by the University of Waterloo Faculty of Engineering. High school teams design, build, and race their own EVs. The 2027 competition is scheduled for late May.",
-  },
-  {
-    question: "What does the schedule look like?",
-    answer:
-      "Sessions run bi-weekly on Saturdays from September 2026 through May 2027. Morning session covers 10:00 AM to 12:00 PM, afternoon session runs 1:00 PM to 3:00 PM.",
-  },
-  {
-    question: "What will my child take away?",
-    answer:
-      "Beyond the EV itself, students gain project management skills, technical documentation experience, presentation abilities, and real sponsorship negotiation practice. These are portfolio-ready experiences for university applications.",
-  },
-] as const;
 
 /* ------------------------------------------------------------------ */
 /* Sub-components                                                     */
@@ -135,7 +68,32 @@ function AccordionItem({
 /* ------------------------------------------------------------------ */
 
 export default function EVChallengePage() {
+  const t = useTranslations("programs.evChallenge");
   const shouldReduceMotion = useReducedMotion();
+
+  const STAT_KEYS = ["season", "grades", "duration", "cadence", "window"] as const;
+  const STAT_VALUES = ["03", "8 - 11", "9 mo", "Bi-weekly Sat", "Sep 2026 - May 2027"] as const;
+
+  const PROGRAM_DETAIL_KEYS = [
+    "target",
+    "duration",
+    "schedule",
+    "morning",
+    "afternoon",
+    "season",
+  ] as const;
+
+  const GAIN_KEYS = ["engineering", "business", "university"] as const;
+
+  const COMPETITION_TAGS = ["engineering", "teamwork", "endurance"] as const;
+
+  const FAQ_KEYS = [
+    "whoCanJoin",
+    "experience",
+    "whatIsWaterloo",
+    "schedule",
+    "takeaway",
+  ] as const;
 
   /* Hero scroll-linked parallax */
   const heroRef = useRef<HTMLElement>(null);
@@ -171,28 +129,27 @@ export default function EVChallengePage() {
         >
           <div className="max-w-[540px] mb-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground tracking-tighter leading-[1.05] mb-4">
-              Build. Race. Lead.
+              {t("hero.title")}
             </h1>
             <p className="text-foreground/70 leading-relaxed max-w-[38ch] mb-6">
-              Design and build a real electric vehicle. Run a team. Compete at
-              the Waterloo EV Challenge.
+              {t("hero.subtitle")}
             </p>
             <Link
               href="/contact-us"
               className="inline-flex items-center gap-2 bg-accent text-foreground-dark font-semibold px-6 py-3 rounded-full hover:bg-accent-hover transition-colors active:scale-[0.98]"
             >
-              Register Now
+              {t("hero.registerNow")}
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
           <div className="border-t border-foreground/15 py-3 flex flex-wrap gap-x-4 gap-y-1.5 sm:gap-x-6">
-            {STATS.map((s) => (
-              <div key={s.label} className="flex items-baseline gap-2">
+            {STAT_KEYS.map((key, i) => (
+              <div key={key} className="flex items-baseline gap-2">
                 <span className="text-[10px] text-foreground/35 uppercase tracking-wider">
-                  {s.label}
+                  {t(`stats.${key}`)}
                 </span>
                 <span className="font-mono text-xs text-foreground/70">
-                  {s.value}
+                  {STAT_VALUES[i]}
                 </span>
               </div>
             ))}
@@ -212,7 +169,7 @@ export default function EVChallengePage() {
                 transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
                 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tighter leading-[1.1] mb-6"
               >
-                We don&apos;t just build a car.
+                {t("mission.title")}
               </motion.h2>
               <motion.p
                 initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
@@ -221,9 +178,7 @@ export default function EVChallengePage() {
                 transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
                 className="text-base md:text-lg text-foreground/60 leading-relaxed max-w-[48ch] mb-8"
               >
-                We build an EV, run a team, and race at competition. Through
-                engineering and business training, we prepare the next
-                generation of builders, operators, and leaders.
+                {t("mission.description")}
               </motion.p>
               <motion.blockquote
                 initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
@@ -233,11 +188,10 @@ export default function EVChallengePage() {
                 className="border-l-2 border-accent/30 pl-4"
               >
                 <p className="text-foreground/40 italic text-sm leading-relaxed max-w-[40ch]">
-                  &quot;When you set out for Ithaca, hope the voyage is long,
-                  full of adventure, full of discovery.&quot;
+                  {t("mission.quote")}
                 </p>
                 <cite className="text-foreground/25 text-xs mt-2 block not-italic">
-                  - Cavafy
+                  {t("mission.quoteAuthor")}
                 </cite>
               </motion.blockquote>
             </div>
@@ -272,16 +226,16 @@ export default function EVChallengePage() {
           <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-16 lg:gap-24 items-start">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight mb-12">
-                Program Details
+                {t("programDetails.title")}
               </h2>
               <div className="space-y-6">
-                {PROGRAM_DETAILS.map((d) => (
-                  <div key={d.label}>
+                {PROGRAM_DETAIL_KEYS.map((key) => (
+                  <div key={key}>
                     <span className="text-[10px] text-foreground/35 uppercase tracking-wider block mb-1">
-                      {d.label}
+                      {t(`programDetails.details.${key}.label`)}
                     </span>
                     <span className="text-base text-foreground/70 font-mono">
-                      {d.value}
+                      {t(`programDetails.details.${key}.value`)}
                     </span>
                   </div>
                 ))}
@@ -304,15 +258,14 @@ export default function EVChallengePage() {
       <section className="border-t border-border lg:min-h-[calc(100dvh-var(--nav-h))] lg:flex lg:items-center">
         <div className="px-6 md:px-12 lg:px-[8vw] py-16 md:py-24 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-12 lg:gap-20 items-center">
-            {/* Left: headline + vertical list */}
             <div>
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground tracking-tight mb-14">
-                What You Walk Away With
+                {t("gains.title")}
               </h2>
               <div className="space-y-10">
-                {STUDENT_GAINS.map((gain, i) => (
+                {GAIN_KEYS.map((key, i) => (
                   <motion.div
-                    key={gain.title}
+                    key={key}
                     initial={shouldReduceMotion ? false : { opacity: 0, x: -24 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true, amount: 0.3 }}
@@ -324,17 +277,16 @@ export default function EVChallengePage() {
                     className="relative pl-6 border-l-2 border-accent/20 hover:border-accent/50 transition-colors"
                   >
                     <h3 className="text-base md:text-lg font-bold text-foreground mb-2">
-                      {gain.title}
+                      {t(`gains.items.${key}.title`)}
                     </h3>
                     <p className="text-sm text-foreground/55 leading-relaxed max-w-[48ch]">
-                      {gain.description}
+                      {t(`gains.items.${key}.description`)}
                     </p>
                   </motion.div>
                 ))}
               </div>
             </div>
 
-            {/* Right: single tall photo */}
             <motion.div
               initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.96 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -367,27 +319,23 @@ export default function EVChallengePage() {
         <div className="relative z-10 px-6 md:px-12 lg:px-[8vw] py-24">
           <div className="max-w-[480px]">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight mb-6">
-              Waterloo EV Challenge 2027
+              {t("competition.title")}
             </h2>
             <p className="text-sm text-foreground/60 leading-relaxed mb-8 max-w-[44ch]">
-              Organized by the University of Waterloo Faculty of Engineering,
-              the EV Challenge is a high school electric vehicle endurance
-              race. Teams design, build, and drive their own EVs, evaluated on
-              engineering quality, vehicle performance, driving strategy, and
-              team collaboration.
+              {t("competition.description")}
             </p>
             <div className="flex flex-wrap gap-2 mb-6">
-              {["Engineering", "Teamwork", "Endurance Racing"].map((cat) => (
+              {COMPETITION_TAGS.map((key) => (
                 <span
-                  key={cat}
+                  key={key}
                   className="text-xs border border-accent/30 text-accent px-3 py-1.5 rounded-full"
                 >
-                  {cat}
+                  {t(`competition.tags.${key}`)}
                 </span>
               ))}
             </div>
             <p className="text-foreground/30 text-xs mb-6 font-mono">
-              Late May 2027 / University of Waterloo
+              {t("competition.date")}
             </p>
             <a
               href="https://uwaterloo.ca/electric-vehicle-challenge"
@@ -395,22 +343,21 @@ export default function EVChallengePage() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-accent hover:text-accent-hover transition-colors font-medium text-xs"
             >
-              Official competition page
+              {t("competition.officialPage")}
               <ArrowRight className="w-3.5 h-3.5" />
             </a>
           </div>
         </div>
       </section>
 
-      {/* ── 8. Past Seasons ── */}
+      {/* ── Past Seasons ── */}
       <section className="ev-ambient-c border-t border-border py-24 md:py-40">
-        {/* Heading - normal content padding */}
         <div className="px-6 md:px-12 lg:px-[8vw]">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tighter leading-[1.05] mb-3">
-            Past Seasons
+            {t("pastSeasons.title")}
           </h2>
           <p className="text-sm text-foreground/40 mb-14 md:mb-20 max-w-[50ch]">
-            From first welds to race day at Waterloo.
+            {t("pastSeasons.subtitle")}
           </p>
         </div>
 
@@ -438,26 +385,21 @@ export default function EVChallengePage() {
           <div className="flex items-center gap-3 mt-4">
             <div className="h-px w-10 bg-accent/50" />
             <span className="font-mono text-[11px] text-accent/70 tracking-wider">
-              Season 2
+              {t("pastSeasons.season2")}
             </span>
             <span className="text-[11px] text-foreground/30">
-              2025-26 Highlights
+              {t("pastSeasons.season1Label")}
             </span>
           </div>
         </div>
 
-        {/* Secondary videos - two organized groups with asymmetric offset */}
+        {/* Secondary videos */}
         <div className="px-6 md:px-12 lg:px-[8vw] mt-12 md:mt-20 space-y-3 lg:space-y-4">
-          {/* Season 1 highlights - landscape, left-aligned, constrained width */}
           <motion.div
             initial={shouldReduceMotion ? false : { opacity: 0, y: 32 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.15 }}
-            transition={{
-              duration: 0.7,
-              delay: 0.05,
-              ease: [0.16, 1, 0.3, 1],
-            }}
+            transition={{ duration: 0.7, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
             className="lg:max-w-[62%]"
           >
             <div
@@ -475,84 +417,34 @@ export default function EVChallengePage() {
             <div className="flex items-center gap-2 mt-3">
               <div className="h-px w-6 bg-foreground/15" />
               <span className="font-mono text-[10px] text-foreground/30 tracking-wider">
-                Season 1
+                {t("pastSeasons.season1")}
               </span>
             </div>
           </motion.div>
 
-          {/* Portrait clips - tight trio, right-aligned, constrained width */}
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:gap-3 lg:max-w-[52%] lg:ml-auto">
-            <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{
-                duration: 0.6,
-                delay: 0.1,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-            >
-              <div
-                className="relative rounded-sm overflow-hidden bg-card-bg border border-border hover:border-accent/15 transition-colors"
-                style={{ paddingTop: "177.78%" }}
+            {(["1202133768", "1202133767", "1202133769"] as const).map((videoId, i) => (
+              <motion.div
+                key={videoId}
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{ duration: 0.6, delay: 0.1 + i * 0.06, ease: [0.16, 1, 0.3, 1] }}
               >
-                <iframe
-                  src="https://player.vimeo.com/video/1202133768?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479"
-                  className="absolute inset-0 h-full w-full"
-                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  title="Students welding the EV chassis"
-                />
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{
-                duration: 0.6,
-                delay: 0.16,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-            >
-              <div
-                className="relative rounded-sm overflow-hidden bg-card-bg border border-border hover:border-accent/15 transition-colors"
-                style={{ paddingTop: "177.78%" }}
-              >
-                <iframe
-                  src="https://player.vimeo.com/video/1202133767?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479"
-                  className="absolute inset-0 h-full w-full"
-                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  title="Ithaca EV team at Waterloo competition"
-                />
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{
-                duration: 0.6,
-                delay: 0.22,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-            >
-              <div
-                className="relative rounded-sm overflow-hidden bg-card-bg border border-border hover:border-accent/15 transition-colors"
-                style={{ paddingTop: "177.78%" }}
-              >
-                <iframe
-                  src="https://player.vimeo.com/video/1202133769?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479"
-                  className="absolute inset-0 h-full w-full"
-                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  title="Workshop highlights from the EV build"
-                />
-              </div>
-            </motion.div>
+                <div
+                  className="relative rounded-sm overflow-hidden bg-card-bg border border-border hover:border-accent/15 transition-colors"
+                  style={{ paddingTop: "177.78%" }}
+                >
+                  <iframe
+                    src={`https://player.vimeo.com/video/${videoId}?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479`}
+                    className="absolute inset-0 h-full w-full"
+                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    title="EV team clip"
+                  />
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -564,17 +456,16 @@ export default function EVChallengePage() {
             <div className="flex flex-col justify-between">
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight mb-4">
-                  Ready to Build Something Real?
+                  {t("cta.title")}
                 </h2>
                 <p className="text-sm text-foreground/60 max-w-[34ch] mb-6">
-                  Join the Ithaca EV Team and be part of a team that designs,
-                  builds, and races an electric vehicle.
+                  {t("cta.subtitle")}
                 </p>
                 <Link
                   href="/contact-us"
                   className="inline-flex items-center gap-2 bg-accent text-foreground-dark font-semibold px-6 py-3 rounded-full hover:bg-accent-hover transition-colors active:scale-[0.98]"
                 >
-                  Register Now
+                  {t("cta.registerNow")}
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -589,21 +480,21 @@ export default function EVChallengePage() {
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-foreground mb-2">FAQ</h3>
+              <h3 className="text-lg font-bold text-foreground mb-2">{t("faq.title")}</h3>
               <p className="text-foreground/40 text-xs mb-5">
-                Have more questions?{" "}
+                {t("faq.contactPrompt")}{" "}
                 <Link
                   href="/contact-us"
                   className="text-accent hover:text-accent-hover transition-colors underline underline-offset-2"
                 >
-                  Get in touch
+                  {t("faq.contactLink")}
                 </Link>
                 .
               </p>
               <div>
-                {FAQ_ITEMS.map((faq) => (
-                  <AccordionItem key={faq.question} title={faq.question}>
-                    <p>{faq.answer}</p>
+                {FAQ_KEYS.map((key) => (
+                  <AccordionItem key={key} title={t(`faq.items.${key}.question`)}>
+                    <p>{t(`faq.items.${key}.answer`)}</p>
                   </AccordionItem>
                 ))}
               </div>

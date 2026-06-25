@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import {
   Trash2,
   Download,
@@ -25,6 +26,7 @@ interface Pagination {
 }
 
 export default function AdminSubscribersPage() {
+  const t = useTranslations("admin.subscribers");
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [pagination, setPagination] = useState<Pagination>({
     total: 0,
@@ -47,25 +49,25 @@ export default function AdminSubscribersPage() {
       const data = await res.json();
 
       if (!data.success) {
-        setError(data.error ?? "Failed to load subscribers");
+        setError(data.error ?? t("errors.load"));
         return;
       }
 
       setSubscribers(data.data.subscribers);
       setPagination(data.data.pagination);
     } catch {
-      setError("Failed to load subscribers");
+      setError(t("errors.load"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchSubscribers(1);
   }, [fetchSubscribers]);
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this subscriber?")) {
+    if (!window.confirm(t("confirmDelete"))) {
       return;
     }
 
@@ -81,20 +83,25 @@ export default function AdminSubscribersPage() {
       const data = await res.json();
 
       if (!data.success) {
-        setError(data.error ?? "Failed to delete subscriber");
+        setError(data.error ?? t("errors.delete"));
         return;
       }
 
       await fetchSubscribers(pagination.page);
     } catch {
-      setError("Failed to delete subscriber");
+      setError(t("errors.delete"));
     } finally {
       setDeletingId(null);
     }
   };
 
   const handleExportCSV = () => {
-    const headers = ["Email", "Name", "Status", "Subscribed At"];
+    const headers = [
+      t("table.email"),
+      t("table.name"),
+      t("table.status"),
+      t("table.date"),
+    ];
     const rows = subscribers.map((s) => [
       s.email,
       s.name ?? "",
@@ -123,14 +130,14 @@ export default function AdminSubscribersPage() {
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[#f7f7f7]">Subscribers</h1>
+        <h1 className="text-2xl font-bold text-[#f7f7f7]">{t("title")}</h1>
         <button
           onClick={handleExportCSV}
           disabled={subscribers.length === 0}
           className="flex items-center gap-2 rounded-lg border border-[#2a2a2a] bg-[#1e1e1e] px-4 py-2 text-sm text-[#f7f7f7] transition-colors hover:bg-[#2a2a2a] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Download className="h-4 w-4" />
-          <span>Export CSV</span>
+          <span>{t("exportCsv")}</span>
         </button>
       </div>
 
@@ -147,26 +154,26 @@ export default function AdminSubscribersPage() {
           </div>
         ) : subscribers.length === 0 ? (
           <div className="px-6 py-16 text-center text-[#888]">
-            No subscribers yet
+            {t("empty")}
           </div>
         ) : (
           <table className="w-full" role="table">
             <thead>
               <tr className="border-b border-[#2a2a2a] text-left">
                 <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#888]">
-                  Email
+                  {t("table.email")}
                 </th>
                 <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#888]">
-                  Name
+                  {t("table.name")}
                 </th>
                 <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#888]">
-                  Status
+                  {t("table.status")}
                 </th>
                 <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#888]">
-                  Date
+                  {t("table.date")}
                 </th>
                 <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#888]">
-                  Actions
+                  {t("table.actions")}
                 </th>
               </tr>
             </thead>
@@ -198,7 +205,7 @@ export default function AdminSubscribersPage() {
                       onClick={() => handleDelete(subscriber.id)}
                       disabled={deletingId === subscriber.id}
                       className="text-[#888] transition-colors hover:text-red-400 disabled:opacity-50"
-                      aria-label={`Delete subscriber ${subscriber.email}`}
+                      aria-label={t("deleteAriaLabel", { email: subscriber.email })}
                     >
                       {deletingId === subscriber.id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -217,9 +224,11 @@ export default function AdminSubscribersPage() {
       {pagination.totalPages > 1 && (
         <div className="mt-4 flex items-center justify-between">
           <p className="text-sm text-[#888]">
-            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-            {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
-            {pagination.total}
+            {t("pagination.showing", {
+              from: (pagination.page - 1) * pagination.limit + 1,
+              to: Math.min(pagination.page * pagination.limit, pagination.total),
+              total: pagination.total,
+            })}
           </p>
 
           <div className="flex items-center gap-2">
@@ -229,7 +238,7 @@ export default function AdminSubscribersPage() {
               className="flex items-center gap-1 rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-sm text-[#ccc] transition-colors hover:bg-[#1e1e1e] disabled:cursor-not-allowed disabled:opacity-50"
             >
               <ChevronLeft className="h-4 w-4" />
-              <span>Previous</span>
+              <span>{t("pagination.previous")}</span>
             </button>
             <span className="px-2 text-sm text-[#888]">
               {pagination.page} / {pagination.totalPages}
@@ -239,7 +248,7 @@ export default function AdminSubscribersPage() {
               disabled={pagination.page >= pagination.totalPages}
               className="flex items-center gap-1 rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-sm text-[#ccc] transition-colors hover:bg-[#1e1e1e] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <span>Next</span>
+              <span>{t("pagination.next")}</span>
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>

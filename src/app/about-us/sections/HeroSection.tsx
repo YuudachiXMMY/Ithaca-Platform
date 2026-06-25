@@ -2,14 +2,17 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-
-const FACTS = [
-  { label: "Founded", value: "2024" },
-  { label: "Location", value: "Ontario, Canada" },
-  { label: "Grades", value: "4-12" },
-] as const;
+import { useTranslations } from "next-intl";
 
 export function HeroSection() {
+  const t = useTranslations("about");
+
+  const facts = [
+    { labelKey: "hero.facts.founded", valueKey: "hero.facts.foundedValue" },
+    { labelKey: "hero.facts.location", valueKey: "hero.facts.locationValue" },
+    { labelKey: "hero.facts.grades", valueKey: "hero.facts.gradesValue" },
+  ] as const;
+
   return (
     <section
       className="relative min-h-[100dvh] overflow-hidden"
@@ -42,22 +45,21 @@ export function HeroSection() {
             id="about-heading"
             className="text-5xl md:text-7xl font-bold text-white tracking-tighter leading-none"
           >
-            About Ithaca
+            {t("hero.title")}
           </h1>
           <p className="text-base text-white/50 mt-4 leading-relaxed">
-            Empowering youth to explore the future through engineering, AI, and
-            entrepreneurship.
+            {t("hero.subtitle")}
           </p>
 
           {/* Monospace data strip */}
           <div className="flex gap-8 mt-6 border-t border-white/10 pt-4">
-            {FACTS.map((fact) => (
-              <div key={fact.label}>
+            {facts.map((fact) => (
+              <div key={fact.labelKey}>
                 <span className="font-mono text-xs uppercase tracking-[0.15em] text-white/30 block">
-                  {fact.label}
+                  {t(fact.labelKey)}
                 </span>
                 <span className="font-mono text-base text-white/70 block mt-0.5">
-                  {fact.value}
+                  {t(fact.valueKey)}
                 </span>
               </div>
             ))}

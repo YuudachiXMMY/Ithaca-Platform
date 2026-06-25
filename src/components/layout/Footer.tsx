@@ -1,12 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Mail, Phone, MapPin } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { NAV_ITEMS, CONTACT_INFO } from "@/types";
 import { NewsletterForm } from "@/components/shared/NewsletterForm";
 
 const QUICK_LINKS = NAV_ITEMS.filter((item) => item.href !== "/");
 
-export function Footer() {
+export async function Footer() {
+  const t = await getTranslations("common");
+  const tNav = await getTranslations("nav");
   const currentYear = new Date().getFullYear();
 
   return (
@@ -26,16 +29,14 @@ export function Footer() {
               />
             </Link>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-foreground/60">
-              Empowering youth to explore the future and build the skills to
-              thrive in the AI era through project-based learning, innovation
-              challenges, and mentorship.
+              {t("footer.tagline")}
             </p>
           </div>
 
           {/* Quick Links column */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">
-              Quick Links
+              {t("footer.quickLinks")}
             </h3>
             <ul className="mt-3 space-y-2">
               {QUICK_LINKS.map((item) => (
@@ -44,7 +45,7 @@ export function Footer() {
                     href={item.href}
                     className="text-sm text-foreground/60 transition-colors hover:text-accent"
                   >
-                    {item.label}
+                    {tNav(item.label)}
                   </Link>
                 </li>
               ))}
@@ -54,7 +55,7 @@ export function Footer() {
           {/* Contact Info column */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">
-              Contact Us
+              {t("footer.contactUs")}
             </h3>
             <ul className="mt-3 space-y-2.5">
               <li>
@@ -96,7 +97,7 @@ export function Footer() {
         <div className="mt-6 border-t border-border pt-5">
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
             <p className="text-sm text-foreground/60">
-              Stay updated with our latest programs and events.
+              {t("footer.newsletter")}
             </p>
             <NewsletterForm variant="dark" />
           </div>
@@ -106,21 +107,21 @@ export function Footer() {
         <div className="mt-4 border-t border-border pt-4">
           <div className="flex flex-col items-center gap-3 text-xs text-foreground/40 sm:flex-row sm:justify-between">
             <p>
-              &copy; {currentYear} Ithaca Family Academy. All rights reserved.
+              &copy; {currentYear} Ithaca Family Academy. {t("footer.rights")}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
               <Link
                 href="/privacy"
                 className="transition-colors hover:text-accent"
               >
-                Privacy policy
+                {t("footer.privacy")}
               </Link>
               <span className="hidden sm:inline" aria-hidden="true">|</span>
               <Link
                 href="/terms"
                 className="transition-colors hover:text-accent"
               >
-                Terms of service
+                {t("footer.terms")}
               </Link>
               <span className="hidden sm:inline" aria-hidden="true">|</span>
               <a

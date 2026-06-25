@@ -1,0 +1,12 @@
+{
+  "nav": {
+    "home": "Home",
+    "aboutUs": "About Us",
+    "programs": "Programs",
+    "contactUs": "Contact Us",
+    "evTeam": "EV Team",
+    "aiEntrepreneurshipCamp": "AI Entrepreneurship Camp",
+    "eliteInterviews": "Elite Interviews",
+    "otherPrograms": "Other Programs"
+  }
+}

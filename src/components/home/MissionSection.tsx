@@ -3,39 +3,37 @@
 import { useRef, useEffect, useLayoutEffect } from "react";
 import Image from "next/image";
 import { useReducedMotion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 /* ------------------------------------------------------------------ */
 /*  Pillar data                                                       */
 /* ------------------------------------------------------------------ */
 
 interface Pillar {
-  readonly title: string;
-  readonly description: string;
+  readonly titleKey: string;
+  readonly descriptionKey: string;
   readonly image: string;
-  readonly alt: string;
+  readonly altKey: string;
 }
 
 const PILLARS: readonly Pillar[] = [
   {
-    title: "Explore the Future",
-    description:
-      "From AI and engineering to entrepreneurship, our programs connect students with cutting-edge industries and real-world professionals.",
+    titleKey: "mission.pillar1Title",
+    descriptionKey: "mission.pillar1Description",
     image: "/media/images/pillars/pillar-explore.png",
-    alt: "Students exploring future technology and innovation",
+    altKey: "mission.pillar1Alt",
   },
   {
-    title: "Project-Based Learning",
-    description:
-      "Students are project owners. Through hands-on learning they tackle real challenges, build prototypes, and present their work.",
+    titleKey: "mission.pillar2Title",
+    descriptionKey: "mission.pillar2Description",
     image: "/media/images/pillars/pillar-pbl.jpg",
-    alt: "Students engaged in project-based learning activities",
+    altKey: "mission.pillar2Alt",
   },
   {
-    title: "Social Impact & AI Ethics",
-    description:
-      "Students learn to use AI responsibly, cite properly, and build work that can be explained and defended. We value social impact and ethical technology use.",
+    titleKey: "mission.pillar3Title",
+    descriptionKey: "mission.pillar3Description",
     image: "/media/images/pillars/pillar-ethics.jpg",
-    alt: "Students discussing AI ethics and social impact",
+    altKey: "mission.pillar3Alt",
   },
 ] as const;
 
@@ -47,6 +45,7 @@ export function MissionSection() {
   const stackRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const gsapCtxRef = useRef<{ revert: () => void } | null>(null);
+  const t = useTranslations("home");
 
   useLayoutEffect(() => {
     return () => {
@@ -116,7 +115,7 @@ export function MissionSection() {
       <div ref={stackRef} className="relative">
         {PILLARS.map((pillar, i) => (
           <div
-            key={pillar.title}
+            key={pillar.titleKey}
             className="mission-card top-0 bg-[#111318] md:sticky md:min-h-[100dvh]"
           >
             <div className="mx-auto grid max-w-[1400px] items-center md:min-h-[100dvh] md:grid-cols-2">
@@ -128,7 +127,7 @@ export function MissionSection() {
               >
                 <Image
                   src={pillar.image}
-                  alt={pillar.alt}
+                  alt={t(pillar.altKey)}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
@@ -145,14 +144,14 @@ export function MissionSection() {
                   {String(i + 1).padStart(2, "0")}
                 </p>
                 <h3 className="mt-3 text-2xl font-bold text-white md:text-3xl lg:text-4xl">
-                  {pillar.title}
+                  {t(pillar.titleKey)}
                 </h3>
                 <div
                   className="mt-4 h-px w-10 bg-accent/20"
                   aria-hidden="true"
                 />
                 <p className="mt-4 max-w-md text-base leading-relaxed text-white/60">
-                  {pillar.description}
+                  {t(pillar.descriptionKey)}
                 </p>
               </div>
             </div>

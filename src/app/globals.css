@@ -22,13 +22,13 @@
   --color-accent-hover: var(--accent-hover);
   --color-card-bg: var(--card-bg);
   --color-border: var(--border);
-  --font-sans: var(--font-outfit);
+  --font-sans: var(--font-outfit), var(--font-noto-sans-sc);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-outfit), Arial, Helvetica, sans-serif;
+  font-family: var(--font-outfit), var(--font-noto-sans-sc), Arial, Helvetica, sans-serif;
 }
 
 /* Balanced text wrapping for headings */

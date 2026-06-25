@@ -1,175 +1,78 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronDown } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
-export const metadata = {
-  title: "Elite Interviews | Ithaca Family Academy",
-  description:
-    "A 10-week research and documentary program where students investigate AI and Canada's future through interviews with experts in academia, industry, and policy.",
-};
-
-/* ------------------------------------------------------------------ */
-/* Constants                                                          */
-/* ------------------------------------------------------------------ */
-
-const RESEARCH_TRACKS = [
-  {
-    id: "01",
-    name: "Talent",
-    question:
-      "Why does top AI talent keep flowing south? Is immigration policy a trump card or an illusion?",
-  },
-  {
-    id: "02",
-    name: "Capital",
-    question:
-      "World-class research, scale-up fatigue. From Element AI to Cohere.",
-  },
-  {
-    id: "03",
-    name: "Policy",
-    question:
-      'From $20B in sovereign compute to "AI for All" - do government milestones actually work?',
-  },
-  {
-    id: "04",
-    name: "Industry",
-    question:
-      "Banks, hospitals, farms still struggle to adopt AI. What is blocking real productivity gains?",
-  },
-  {
-    id: "05",
-    name: "Education",
-    question:
-      "Is Ontario preparing high schoolers for the AI era? You are the stakeholder on this one.",
-  },
-] as const;
-
-const INTERVIEW_SECTORS = [
-  {
-    title: "Academia",
-    roles: [
-      "University professors",
-      "Researchers",
-      "Graduate students and postdocs",
-    ],
-  },
-  {
-    title: "Industry & Startups",
-    roles: ["AI engineers", "Founders", "Major AI research labs"],
-  },
-  {
-    title: "Policy & Public",
-    roles: [
-      "Policy researchers",
-      "Think tank scholars",
-      "Legislators' offices",
-    ],
-  },
-] as const;
-
-const JOURNEY_PHASES = [
-  {
-    phase: "01",
-    title: "Research",
-    duration: "Weeks 1-3",
-    tasks: [
-      "Background literature review",
-      "Interview outline design",
-      "Guest outreach and scheduling",
-    ],
-  },
-  {
-    phase: "02",
-    title: "Fieldwork",
-    duration: "Weeks 4-7",
-    tasks: [
-      "Lead and support interviewing",
-      "Camera and audio operation",
-      "Note-taking and role rotation",
-    ],
-  },
-  {
-    phase: "03",
-    title: "Production",
-    duration: "Weeks 8-10",
-    tasks: [
-      "Research report drafting",
-      "Documentary rough-cut editing",
-      "Screening and public release",
-    ],
-  },
-] as const;
-
-const FAQ_ITEMS = [
-  {
-    question: "What is the Elite Interviews program?",
-    answer:
-      "A research and documentary program where students investigate a major societal question through real interviews with experts in academia, industry, and policy. Each student claims one research track and contributes to a team documentary.",
-  },
-  {
-    question: "Do students need prior interview or filmmaking experience?",
-    answer:
-      "No. The research phase covers methodology, interview technique, and documentary production basics. Students learn by doing, with mentor guidance at every step.",
-  },
-  {
-    question: "What do students take away?",
-    answer:
-      "Two portfolio-ready deliverables in English: a research report suitable for university applications, and an 8-12 minute documentary that is publicly released. Both demonstrate real-world research and communication skills.",
-  },
-  {
-    question: "How are interview contacts arranged?",
-    answer:
-      "Our mentors provide guaranteed initial introductions to domain experts. Students also develop their own outreach skills through guided cold-contact exercises. All interviews follow consent and likeness-release protocols.",
-  },
-  {
-    question: "Is the program conducted in English or Chinese?",
-    answer:
-      "All deliverables are produced in English. Interviews may be conducted in either language depending on the guest. Classroom instruction is primarily in English.",
-  },
-] as const;
+export async function generateMetadata() {
+  const t = await getTranslations("programs.eliteInterview.meta");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 /* ------------------------------------------------------------------ */
 /* Page                                                               */
 /* ------------------------------------------------------------------ */
 
-export default function EliteInterviewPage() {
+export default async function EliteInterviewPage() {
+  const t = await getTranslations("programs.eliteInterview");
+
+  const TRACK_KEYS = ["talent", "capital", "policy", "industry", "education"] as const;
+  const TRACK_IDS = ["01", "02", "03", "04", "05"] as const;
+
+  const SECTOR_KEYS = ["academia", "industry", "policy"] as const;
+
+  const PHASE_KEYS = ["research", "fieldwork", "production"] as const;
+  const TASK_KEYS = ["0", "1", "2"] as const;
+
+  const REPORT_TAGS = ["0", "1", "2"] as const;
+  const DOC_TAGS = ["0", "1", "2"] as const;
+
+  const HERO_PILL_KEYS = ["fall", "grades", "cohort", "duration"] as const;
+
+  const FAQ_KEYS = [
+    "whatIsProgram",
+    "experience",
+    "takeaway",
+    "contacts",
+    "language",
+  ] as const;
+
   return (
     <div className="bg-background min-h-screen">
       {/* ── 1. Hero: Extreme Asymmetric Split (5:7) ── */}
       <section className="min-h-[85dvh] grid grid-cols-1 lg:grid-cols-[5fr_7fr] items-center gap-0">
         <div className="px-6 md:px-12 lg:pl-[12vw] lg:pr-12 py-24 lg:py-0 order-2 lg:order-1">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground tracking-tighter leading-[1.05] mb-3">
-            Elite Interviews
+            {t("hero.title")}
           </h1>
           <p className="text-xl md:text-2xl font-light text-foreground/50 tracking-tight mb-8">
-            AI and Canada&apos;s Future
+            {t("hero.subtitle")}
           </p>
           <p className="text-lg text-foreground/60 leading-relaxed max-w-[44ch] mb-10">
-            Ten weeks of fieldwork. Five research angles. One documentary.
+            {t("hero.description")}
           </p>
           <div className="flex flex-wrap gap-3 mb-10">
-            {["Fall 2026", "G9-G12", "Small Cohort", "8-10 Weeks"].map(
-              (pill) => (
-                <span
-                  key={pill}
-                  className="text-xs font-medium text-foreground/50 border border-border px-4 py-2 rounded-full"
-                >
-                  {pill}
-                </span>
-              ),
-            )}
+            {HERO_PILL_KEYS.map((key) => (
+              <span
+                key={key}
+                className="text-xs font-medium text-foreground/50 border border-border px-4 py-2 rounded-full"
+              >
+                {t(`hero.pills.${key}`)}
+              </span>
+            ))}
           </div>
           <Link
             href="/contact-us"
             className="inline-flex items-center gap-2 bg-accent text-foreground-dark font-semibold px-8 py-4 rounded-full hover:bg-accent-hover transition-colors active:scale-[0.98]"
           >
-            Apply Now
+            {t("hero.applyNow")}
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
 
-        {/* Desktop image - bleeds to right edge */}
+        {/* Desktop image */}
         <div className="hidden lg:block relative h-full min-h-[85dvh] overflow-hidden">
           <Image
             src="/media/images/site/about-hero.jpg"
@@ -199,16 +102,11 @@ export default function EliteInterviewPage() {
       <section className="py-20 md:py-28 bg-card-bg">
         <div className="px-6 md:px-12 lg:px-[8vw]">
           <blockquote className="text-2xl md:text-3xl lg:text-4xl font-light text-foreground/90 leading-snug tracking-tight max-w-[22ch] mb-12">
-            &ldquo;Canada pioneered deep learning. Why hasn&apos;t that
-            translated into economic leadership?&rdquo;
+            {t("question.quote")}
           </blockquote>
           <div className="lg:pl-[20vw]">
             <p className="text-foreground/60 leading-relaxed max-w-[55ch]">
-              Geoffrey Hinton in Toronto. Yoshua Bengio in Montreal. Deep
-              learning was born here. Yet commercialization, talent, and
-              productivity have steadily migrated south. This is the question
-              your team will investigate, and the story your documentary will
-              tell.
+              {t("question.body")}
             </p>
           </div>
         </div>
@@ -219,39 +117,36 @@ export default function EliteInterviewPage() {
         <div className="px-6 md:px-12 lg:px-[8vw]">
           <div className="max-w-[55ch] mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight mb-6">
-              Why Now
+              {t("whyNow.title")}
             </h2>
             <p className="text-foreground/60 leading-relaxed">
-              On June 4, 2026, the federal government released its national AI
-              strategy &ldquo;AI for All.&rdquo; An entire semester of student
-              research coincides with the nation asking the same questions.
+              {t("whyNow.description")}
             </p>
           </div>
 
-          {/* Asymmetric staggered stat blocks */}
           <div className="space-y-4">
             <div className="bg-card-bg rounded-xl p-8 md:p-12 lg:max-w-[70%]">
               <span className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground tracking-tighter block mb-3">
-                $200B
+                {t("whyNow.stats.gdp.value")}
               </span>
               <span className="text-sm text-foreground/40 uppercase tracking-wide">
-                GDP Growth Target
+                {t("whyNow.stats.gdp.label")}
               </span>
             </div>
             <div className="bg-card-bg rounded-xl p-8 md:p-12 lg:max-w-[50%] lg:ml-auto">
               <span className="text-4xl md:text-5xl font-bold text-foreground tracking-tighter block mb-3">
-                250,000
+                {t("whyNow.stats.jobs.value")}
               </span>
               <span className="text-sm text-foreground/40 uppercase tracking-wide">
-                New AI-Related Positions
+                {t("whyNow.stats.jobs.label")}
               </span>
             </div>
             <div className="bg-card-bg rounded-xl p-8 md:p-12 lg:max-w-[55%] lg:ml-[25%]">
               <span className="text-4xl md:text-5xl font-bold text-accent tracking-tighter block mb-3">
-                12% &rarr; 60%
+                {t("whyNow.stats.adoption.value")}
               </span>
               <span className="text-sm text-foreground/40 uppercase tracking-wide">
-                Enterprise AI Adoption by 2034
+                {t("whyNow.stats.adoption.label")}
               </span>
             </div>
           </div>
@@ -264,26 +159,26 @@ export default function EliteInterviewPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-12 lg:gap-16">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight mb-4">
-                Five Research Tracks
+                {t("tracks.title")}
               </h2>
               <p className="text-foreground/60 leading-relaxed mb-12 max-w-[50ch]">
-                Each student claims one track and owns it for the semester.
+                {t("tracks.subtitle")}
               </p>
               <div>
-                {RESEARCH_TRACKS.map((track) => (
+                {TRACK_KEYS.map((key, i) => (
                   <div
-                    key={track.id}
+                    key={key}
                     className="flex gap-6 py-6 border-b border-border last:border-b-0"
                   >
                     <span className="text-4xl md:text-5xl font-extralight text-foreground/15 leading-none shrink-0 w-16 tabular-nums">
-                      {track.id}
+                      {TRACK_IDS[i]}
                     </span>
                     <div className="pt-1">
                       <h3 className="text-lg font-semibold text-foreground mb-1.5">
-                        {track.name}
+                        {t(`tracks.items.${key}.name`)}
                       </h3>
                       <p className="text-foreground/60 leading-relaxed">
-                        {track.question}
+                        {t(`tracks.items.${key}.question`)}
                       </p>
                     </div>
                   </div>
@@ -304,11 +199,11 @@ export default function EliteInterviewPage() {
         </div>
       </section>
 
-      {/* ── 5. Who You'll Interview: Panoramic + Asymmetric Grid ── */}
+      {/* ── 5. Who You'll Interview ── */}
       <section className="py-20 md:py-28">
         <div className="px-6 md:px-12 lg:px-[8vw]">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight mb-8">
-            Who You&apos;ll Interview
+            {t("interviewSectors.title")}
           </h2>
 
           <div className="relative h-[240px] md:h-[360px] rounded-xl overflow-hidden mb-12">
@@ -322,18 +217,15 @@ export default function EliteInterviewPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-[2fr_1.5fr_1.5fr] gap-8 md:gap-12">
-            {INTERVIEW_SECTORS.map((sector) => (
-              <div key={sector.title}>
+            {SECTOR_KEYS.map((sKey) => (
+              <div key={sKey}>
                 <h3 className="text-xl font-bold text-foreground mb-4">
-                  {sector.title}
+                  {t(`interviewSectors.sectors.${sKey}.title`)}
                 </h3>
                 <ul className="space-y-2">
-                  {sector.roles.map((role) => (
-                    <li
-                      key={role}
-                      className="text-foreground/60 leading-relaxed"
-                    >
-                      {role}
+                  {TASK_KEYS.map((rKey) => (
+                    <li key={rKey} className="text-foreground/60 leading-relaxed">
+                      {t(`interviewSectors.sectors.${sKey}.roles.${rKey}`)}
                     </li>
                   ))}
                 </ul>
@@ -343,33 +235,32 @@ export default function EliteInterviewPage() {
         </div>
       </section>
 
-      {/* ── 6. The Journey: Unequal Phase Cards ── */}
+      {/* ── 6. The Journey: Three Phases ── */}
       <section className="py-20 md:py-28 bg-card-bg">
         <div className="px-6 md:px-12 lg:px-[8vw]">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight mb-12">
-            Ten Weeks, Three Phases
+            {t("journey.title")}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-[1fr_1.5fr_1fr] gap-4">
-            {JOURNEY_PHASES.map((p) => (
+            {PHASE_KEYS.map((pKey) => (
               <div
-                key={p.phase}
+                key={pKey}
                 className="bg-background rounded-xl p-8 md:p-10"
               >
                 <span className="text-xs font-medium text-accent uppercase tracking-[0.2em] block mb-4">
-                  Phase {p.phase}
+                  Phase {t(`journey.phases.${pKey}.phase`)}
                 </span>
                 <h3 className="text-2xl font-bold text-foreground mb-2">
-                  {p.title}
+                  {t(`journey.phases.${pKey}.title`)}
                 </h3>
-                <p className="text-sm text-foreground/40 mb-6">{p.duration}</p>
+                <p className="text-sm text-foreground/40 mb-6">
+                  {t(`journey.phases.${pKey}.duration`)}
+                </p>
                 <ul className="space-y-2.5">
-                  {p.tasks.map((task) => (
-                    <li
-                      key={task}
-                      className="text-foreground/60 text-sm leading-relaxed"
-                    >
-                      {task}
+                  {TASK_KEYS.map((tKey) => (
+                    <li key={tKey} className="text-foreground/60 text-sm leading-relaxed">
+                      {t(`journey.phases.${pKey}.tasks.${tKey}`)}
                     </li>
                   ))}
                 </ul>
@@ -379,37 +270,32 @@ export default function EliteInterviewPage() {
         </div>
       </section>
 
-      {/* ── 7. What You'll Produce: Asymmetric 3:2 Split ── */}
+      {/* ── 7. What You'll Produce ── */}
       <section className="py-20 md:py-28">
         <div className="px-6 md:px-12 lg:px-[8vw]">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight mb-12">
-            What You&apos;ll Produce
+            {t("produce.title")}
           </h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4">
             {/* Research Report */}
             <div className="bg-card-bg rounded-xl p-8 md:p-12">
               <span className="text-xs font-medium text-accent uppercase tracking-[0.2em] block mb-4">
-                Portfolio-Ready
+                {t("produce.report.badge")}
               </span>
               <h3 className="text-2xl font-bold text-foreground mb-4">
-                English Research Report
+                {t("produce.report.title")}
               </h3>
               <p className="text-foreground/60 leading-relaxed mb-6 max-w-[50ch]">
-                Literature review, interview evidence, and original conclusions.
-                Directly usable as a university application portfolio piece.
+                {t("produce.report.description")}
               </p>
               <div className="flex flex-wrap gap-3">
-                {[
-                  "Literature Review",
-                  "Interview Evidence",
-                  "Original Analysis",
-                ].map((tag) => (
+                {REPORT_TAGS.map((key) => (
                   <span
-                    key={tag}
+                    key={key}
                     className="text-xs text-foreground/40 border border-border/50 px-3 py-1.5 rounded-full"
                   >
-                    {tag}
+                    {t(`produce.report.tags.${key}`)}
                   </span>
                 ))}
               </div>
@@ -418,22 +304,21 @@ export default function EliteInterviewPage() {
             {/* Documentary */}
             <div className="bg-card-bg rounded-xl p-8 md:p-12 flex flex-col">
               <span className="text-xs font-medium text-accent uppercase tracking-[0.2em] block mb-4">
-                8-12 Min, Published
+                {t("produce.documentary.badge")}
               </span>
               <h3 className="text-2xl font-bold text-foreground mb-4">
-                English Mini-Documentary
+                {t("produce.documentary.title")}
               </h3>
               <p className="text-foreground/60 leading-relaxed mb-6 max-w-[50ch]">
-                Interview footage, narration, and data visualization. Edited and
-                publicly released.
+                {t("produce.documentary.description")}
               </p>
               <div className="flex flex-wrap gap-3 mt-auto">
-                {["Interview Clips", "Narration", "Data Viz"].map((tag) => (
+                {DOC_TAGS.map((key) => (
                   <span
-                    key={tag}
+                    key={key}
                     className="text-xs text-foreground/40 border border-border/50 px-3 py-1.5 rounded-full"
                   >
-                    {tag}
+                    {t(`produce.documentary.tags.${key}`)}
                   </span>
                 ))}
               </div>
@@ -442,9 +327,7 @@ export default function EliteInterviewPage() {
 
           <div className="mt-8 border-l-2 border-accent/30 pl-6 max-w-[60ch]">
             <p className="text-foreground/40 text-sm leading-relaxed">
-              All interviews follow formal consent and likeness-release
-              protocols. Guests confirm before publication. Screening events are
-              open to families.
+              {t("produce.disclaimer")}
             </p>
           </div>
         </div>
@@ -454,32 +337,32 @@ export default function EliteInterviewPage() {
       <section className="py-20 md:py-28 bg-card-bg">
         <div className="max-w-3xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight mb-4">
-            Frequently Asked Questions
+            {t("faq.title")}
           </h2>
           <p className="text-foreground/40 mb-12">
             Reach us at{" "}
             <a
-              href="mailto:joshua.wang@ithacafo.com"
+              href={`mailto:${t("faq.contactEmail")}`}
               className="text-accent hover:text-accent-hover transition-colors underline underline-offset-2"
             >
-              joshua.wang@ithacafo.com
+              {t("faq.contactEmail")}
             </a>{" "}
             if you need more information.
           </p>
           <div>
-            {FAQ_ITEMS.map((faq) => (
+            {FAQ_KEYS.map((key) => (
               <details
-                key={faq.question}
+                key={key}
                 className="group border-b border-border"
               >
                 <summary className="flex items-center justify-between py-6 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                   <span className="text-lg font-medium text-foreground pr-4 group-hover:text-accent transition-colors">
-                    {faq.question}
+                    {t(`faq.items.${key}.question`)}
                   </span>
                   <ChevronDown className="w-5 h-5 text-foreground/40 shrink-0 transition-transform duration-300 group-open:rotate-180" />
                 </summary>
                 <div className="pb-6 text-foreground/60 leading-relaxed max-w-[65ch]">
-                  {faq.answer}
+                  {t(`faq.items.${key}.answer`)}
                 </div>
               </details>
             ))}
@@ -487,7 +370,7 @@ export default function EliteInterviewPage() {
         </div>
       </section>
 
-      {/* ── 9. CTA: Photo Background ── */}
+      {/* ── 9. CTA ── */}
       <section className="relative py-24 md:py-32">
         <Image
           src="/media/images/programs/ai-camp/ai-camp-HB8A5465.jpg"
@@ -499,17 +382,16 @@ export default function EliteInterviewPage() {
         <div className="absolute inset-0 bg-background/80" />
         <div className="relative z-10 text-center px-6">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-            Ready to Investigate?
+            {t("cta.title")}
           </h2>
           <p className="text-foreground/60 max-w-xl mx-auto mb-10">
-            Secure your spot in the 2026 Fall cohort and start building a
-            research portfolio that matters.
+            {t("cta.subtitle")}
           </p>
           <Link
             href="/contact-us"
             className="inline-flex items-center gap-2 bg-accent text-foreground-dark font-semibold px-8 py-4 rounded-full hover:bg-accent-hover transition-colors active:scale-[0.98]"
           >
-            Apply Now
+            {t("cta.applyNow")}
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>

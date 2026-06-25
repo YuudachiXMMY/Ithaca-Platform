@@ -2,12 +2,15 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 export function Approach() {
+  const t = useTranslations("about");
+
   return (
     <section
       className="bg-[#0c0e12] py-12 lg:py-16"
-      aria-label="Our Approach"
+      aria-label={t("approach.ariaLabel")}
     >
       <div className="max-w-[1400px] mx-auto px-4 lg:px-6">
         {/* Block 1: Full-width cinematic image + offset text */}
@@ -20,7 +23,7 @@ export function Approach() {
           <div className="relative aspect-[21/9] rounded-lg overflow-hidden">
             <Image
               src="/media/images/programs/ai-camp/ai-camp-HB8A5242.jpg"
-              alt="Students learning through hands-on projects"
+              alt={t("approach.howWeTeach.imageAlt")}
               fill
               className="object-cover"
               sizes="100vw"
@@ -36,12 +39,9 @@ export function Approach() {
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.5, delay: 0.05 }}
           >
-            <h3 className="text-xl font-bold text-white">How We Teach</h3>
+            <h3 className="text-xl font-bold text-white">{t("approach.howWeTeach.heading")}</h3>
             <p className="text-base text-gray-400 mt-2 leading-relaxed max-w-2xl">
-              We teach through a studio-style, project-based model where
-              students learn by building. Each cohort works in small teams with
-              clear weekly milestones, structured mentoring, and frequent
-              technical reviews.
+              {t("approach.howWeTeach.description")}
             </p>
           </motion.div>
         </div>
@@ -57,7 +57,7 @@ export function Approach() {
           <div className="relative aspect-[3/2] rounded-lg overflow-hidden">
             <Image
               src="/media/images/programs/ai-camp/ai-camp-HB8A5065.jpg"
-              alt="Students discussing AI ethics and integrity"
+              alt={t("approach.ethics.imageAlt")}
               fill
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 60vw"
@@ -65,13 +65,10 @@ export function Approach() {
           </div>
           <div>
             <h3 className="text-xl font-bold text-white">
-              Ethics &amp; Integrity
+              {t("approach.ethics.heading")}
             </h3>
             <p className="text-base text-gray-400 mt-2 leading-relaxed">
-              We hold a high bar for safety, academic honesty, and responsible
-              technology use. Students learn to cite sources properly, document
-              AI-assisted work transparently, and maintain design logs that can
-              be reviewed through demonstrations and Q&amp;A.
+              {t("approach.ethics.description")}
             </p>
           </div>
         </motion.div>

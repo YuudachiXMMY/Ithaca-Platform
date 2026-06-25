@@ -1,0 +1,134 @@
+{
+  "admin": {
+    "sidebar": {
+      "title": "IFA 管理",
+      "dashboard": "仪表盘",
+      "subscribers": "订阅者",
+      "emailCampaigns": "邮件营销",
+      "popups": "弹窗横幅",
+      "signOut": "退出登录"
+    },
+    "dashboard": {
+      "title": "仪表盘",
+      "stats": {
+        "totalSubscribers": "总订阅者",
+        "totalContacts": "总联系人",
+        "campaignsSent": "已发送营销",
+        "activePopups": "活跃弹窗"
+      },
+      "error": "加载仪表盘统计失败"
+    },
+    "login": {
+      "orgName": "Ithaca Family Academy",
+      "panelLabel": "管理面板",
+      "signIn": "登录",
+      "email": "邮箱",
+      "emailPlaceholder": "admin@example.com",
+      "password": "密码",
+      "passwordPlaceholder": "请输入密码",
+      "signingIn": "登录中...",
+      "invalidCredentials": "邮箱或密码无效",
+      "emailRequired": "请输入有效的邮箱地址",
+      "passwordRequired": "密码不能为空"
+    },
+    "subscribers": {
+      "title": "订阅者",
+      "exportCsv": "导出 CSV",
+      "empty": "暂无订阅者",
+      "table": {
+        "email": "邮箱",
+        "name": "姓名",
+        "status": "状态",
+        "date": "日期",
+        "actions": "操作"
+      },
+      "deleteAriaLabel": "删除订阅者 {email}",
+      "confirmDelete": "确定要删除此订阅者吗？",
+      "pagination": {
+        "showing": "显示第 {from} 至 {to} 条，共 {total} 条",
+        "previous": "上一页",
+        "next": "下一页"
+      },
+      "errors": {
+        "load": "加载订阅者失败",
+        "delete": "删除订阅者失败"
+      }
+    },
+    "emails": {
+      "title": "邮件营销",
+      "newCampaign": "新建营销",
+      "cancel": "取消",
+      "createForm": {
+        "title": "新建营销活动",
+        "subject": "主题",
+        "subjectPlaceholder": "邮件主题行",
+        "body": "正文（HTML）",
+        "bodyPlaceholder": "<h1>你好！</h1><p>在此输入邮件内容...</p>",
+        "createCampaign": "创建营销活动",
+        "subjectRequired": "主题不能为空",
+        "bodyRequired": "邮件正文不能为空"
+      },
+      "table": {
+        "subject": "主题",
+        "status": "状态",
+        "recipients": "收件人",
+        "date": "日期",
+        "actions": "操作"
+      },
+      "send": "发送",
+      "empty": "暂无营销活动，请在上方创建第一个。",
+      "confirmSend": "确定要将此营销活动发送给所有活跃订阅者吗？",
+      "sendAriaLabel": "发送营销活动：{subject}",
+      "errors": {
+        "load": "加载营销活动失败",
+        "create": "创建营销活动失败",
+        "send": "发送营销活动失败"
+      }
+    },
+    "popups": {
+      "title": "弹窗横幅",
+      "newPopup": "新建弹窗",
+      "cancel": "取消",
+      "form": {
+        "createTitle": "新建弹窗",
+        "editTitle": "编辑弹窗",
+        "title": "标题",
+        "titlePlaceholder": "弹窗标题",
+        "content": "内容",
+        "contentPlaceholder": "弹窗内容（支持 HTML）",
+        "buttonText": "按钮文字（可选）",
+        "buttonTextPlaceholder": "了解更多",
+        "buttonLink": "按钮链接（可选）",
+        "buttonLinkPlaceholder": "https://example.com",
+        "startDate": "开始时间（可选）",
+        "endDate": "结束时间（可选）",
+        "active": "启用",
+        "cancelBtn": "取消",
+        "update": "更新",
+        "create": "创建",
+        "titleRequired": "标题不能为空",
+        "contentRequired": "内容不能为空"
+      },
+      "table": {
+        "title": "标题",
+        "status": "状态",
+        "dateRange": "日期范围",
+        "created": "创建时间",
+        "actions": "操作"
+      },
+      "statusActive": "活跃",
+      "statusInactive": "未激活",
+      "always": "始终显示",
+      "editAriaLabel": "编辑弹窗：{title}",
+      "deleteAriaLabel": "删除弹窗：{title}",
+      "empty": "暂无弹窗，请在上方创建第一个。",
+      "confirmDelete": "确定要删除此弹窗吗？",
+      "errors": {
+        "load": "加载弹窗失败",
+        "create": "创建弹窗失败",
+        "update": "更新弹窗失败",
+        "delete": "删除弹窗失败"
+      }
+    }
+  }
+}

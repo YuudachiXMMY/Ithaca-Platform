@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { TEAM_MEMBERS } from "@/types";
 import { HeroSection } from "./sections/HeroSection";
 import { MissionGrid } from "./sections/MissionGrid";
@@ -10,16 +10,17 @@ import { Highlights } from "./sections/Highlights";
 import { TeamGrid } from "./sections/TeamGrid";
 import { ConnectCTA } from "./sections/ConnectCTA";
 
-export const metadata: Metadata = {
-  title: "About Us | Ithaca Family Academy",
-  description:
-    "Learn about Ithaca Family Academy, our mission, teaching philosophy, team, and how we empower youth to explore the future.",
-  openGraph: {
-    title: "About Us | Ithaca Family Academy",
-    description:
-      "Learn about Ithaca Family Academy, our mission, teaching philosophy, team, and how we empower youth to explore the future.",
-  },
-};
+export async function generateMetadata() {
+  const t = await getTranslations("metadata.aboutUs");
+  return {
+    title: t("title"),
+    description: t("description"),
+    openGraph: {
+      title: t("title"),
+      description: t("description"),
+    },
+  };
+}
 
 export default function AboutUsPage() {
   return (

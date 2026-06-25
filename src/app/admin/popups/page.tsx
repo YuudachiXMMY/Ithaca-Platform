@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import {
   Plus,
   Pencil,
@@ -39,6 +40,7 @@ const popupSchema = z.object({
 type PopupFormData = z.infer<typeof popupSchema>;
 
 export default function AdminPopupsPage() {
+  const t = useTranslations("admin.popups");
   const [popups, setPopups] = useState<Popup[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,17 +70,17 @@ export default function AdminPopupsPage() {
       const data = await res.json();
 
       if (!data.success) {
-        setError(data.error ?? "Failed to load popups");
+        setError(data.error ?? t("errors.load"));
         return;
       }
 
       setPopups(data.data);
     } catch {
-      setError("Failed to load popups");
+      setError(t("errors.load"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchPopups();
@@ -150,7 +152,7 @@ export default function AdminPopupsPage() {
         const data = await res.json();
 
         if (!data.success) {
-          setError(data.error ?? "Failed to update popup");
+          setError(data.error ?? t("errors.update"));
           return;
         }
       } else {
@@ -163,7 +165,7 @@ export default function AdminPopupsPage() {
         const data = await res.json();
 
         if (!data.success) {
-          setError(data.error ?? "Failed to create popup");
+          setError(data.error ?? t("errors.create"));
           return;
         }
       }
@@ -171,14 +173,12 @@ export default function AdminPopupsPage() {
       closeForm();
       await fetchPopups();
     } catch {
-      setError(
-        editingPopup ? "Failed to update popup" : "Failed to create popup",
-      );
+      setError(editingPopup ? t("errors.update") : t("errors.create"));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this popup?")) {
+    if (!window.confirm(t("confirmDelete"))) {
       return;
     }
 
@@ -195,13 +195,13 @@ export default function AdminPopupsPage() {
       const data = await res.json();
 
       if (!data.success) {
-        setError(data.error ?? "Failed to delete popup");
+        setError(data.error ?? t("errors.delete"));
         return;
       }
 
       await fetchPopups();
     } catch {
-      setError("Failed to delete popup");
+      setError(t("errors.delete"));
     } finally {
       setDeletingId(null);
     }
@@ -210,7 +210,7 @@ export default function AdminPopupsPage() {
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[#f7f7f7]">Pop-ups</h1>
+        <h1 className="text-2xl font-bold text-[#f7f7f7]">{t("title")}</h1>
         <button
           onClick={showForm ? closeForm : openCreateForm}
           className="flex items-center gap-2 rounded-lg bg-[#ccdef0] px-4 py-2 text-sm font-semibold text-[#161616] transition-colors hover:bg-[#b8d0e8]"
@@ -218,12 +218,12 @@ export default function AdminPopupsPage() {
           {showForm ? (
             <>
               <X className="h-4 w-4" />
-              <span>Cancel</span>
+              <span>{t("cancel")}</span>
             </>
           ) : (
             <>
               <Plus className="h-4 w-4" />
-              <span>New Popup</span>
+              <span>{t("newPopup")}</span>
             </>
           )}
         </button>
@@ -239,7 +239,7 @@ export default function AdminPopupsPage() {
       {showForm && (
         <div className="mb-8 rounded-xl border border-[#2a2a2a] bg-[#1e1e1e] p-6">
           <h2 className="mb-4 text-lg font-semibold text-[#f7f7f7]">
-            {editingPopup ? "Edit Popup" : "Create New Popup"}
+            {editingPopup ? t("form.editTitle") : t("form.createTitle")}
           </h2>
 
           <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-4">
@@ -249,13 +249,13 @@ export default function AdminPopupsPage() {
                   htmlFor="title"
                   className="mb-1.5 block text-sm font-medium text-[#ccc]"
                 >
-                  Title
+                  {t("form.title")}
                 </label>
                 <input
                   {...register("title")}
                   id="title"
                   type="text"
-                  placeholder="Popup title"
+                  placeholder={t("form.titlePlaceholder")}
                   className="w-full rounded-lg border border-[#2a2a2a] bg-[#161616] px-4 py-2.5 text-sm text-[#f7f7f7] placeholder-[#555] transition-colors focus:border-[#ccdef0] focus:outline-none"
                 />
                 {errors.title && (
@@ -272,7 +272,7 @@ export default function AdminPopupsPage() {
                     type="checkbox"
                     className="h-4 w-4 rounded border-[#2a2a2a] bg-[#161616] accent-[#ccdef0]"
                   />
-                  Active
+                  {t("form.active")}
                 </label>
               </div>
             </div>
@@ -282,13 +282,13 @@ export default function AdminPopupsPage() {
                 htmlFor="content"
                 className="mb-1.5 block text-sm font-medium text-[#ccc]"
               >
-                Content
+                {t("form.content")}
               </label>
               <textarea
                 {...register("content")}
                 id="content"
                 rows={4}
-                placeholder="Popup content (supports HTML)"
+                placeholder={t("form.contentPlaceholder")}
                 className="w-full rounded-lg border border-[#2a2a2a] bg-[#161616] px-4 py-2.5 text-sm text-[#f7f7f7] placeholder-[#555] transition-colors focus:border-[#ccdef0] focus:outline-none"
               />
               {errors.content && (
@@ -304,13 +304,13 @@ export default function AdminPopupsPage() {
                   htmlFor="buttonText"
                   className="mb-1.5 block text-sm font-medium text-[#ccc]"
                 >
-                  Button Text (optional)
+                  {t("form.buttonText")}
                 </label>
                 <input
                   {...register("buttonText")}
                   id="buttonText"
                   type="text"
-                  placeholder="Learn More"
+                  placeholder={t("form.buttonTextPlaceholder")}
                   className="w-full rounded-lg border border-[#2a2a2a] bg-[#161616] px-4 py-2.5 text-sm text-[#f7f7f7] placeholder-[#555] transition-colors focus:border-[#ccdef0] focus:outline-none"
                 />
               </div>
@@ -320,13 +320,13 @@ export default function AdminPopupsPage() {
                   htmlFor="buttonLink"
                   className="mb-1.5 block text-sm font-medium text-[#ccc]"
                 >
-                  Button Link (optional)
+                  {t("form.buttonLink")}
                 </label>
                 <input
                   {...register("buttonLink")}
                   id="buttonLink"
                   type="text"
-                  placeholder="https://example.com"
+                  placeholder={t("form.buttonLinkPlaceholder")}
                   className="w-full rounded-lg border border-[#2a2a2a] bg-[#161616] px-4 py-2.5 text-sm text-[#f7f7f7] placeholder-[#555] transition-colors focus:border-[#ccdef0] focus:outline-none"
                 />
               </div>
@@ -338,7 +338,7 @@ export default function AdminPopupsPage() {
                   htmlFor="startDate"
                   className="mb-1.5 block text-sm font-medium text-[#ccc]"
                 >
-                  Start Date (optional)
+                  {t("form.startDate")}
                 </label>
                 <input
                   {...register("startDate")}
@@ -353,7 +353,7 @@ export default function AdminPopupsPage() {
                   htmlFor="endDate"
                   className="mb-1.5 block text-sm font-medium text-[#ccc]"
                 >
-                  End Date (optional)
+                  {t("form.endDate")}
                 </label>
                 <input
                   {...register("endDate")}
@@ -370,7 +370,7 @@ export default function AdminPopupsPage() {
                 onClick={closeForm}
                 className="rounded-lg border border-[#2a2a2a] px-4 py-2.5 text-sm text-[#ccc] transition-colors hover:bg-[#2a2a2a]"
               >
-                Cancel
+                {t("form.cancelBtn")}
               </button>
               <button
                 type="submit"
@@ -380,7 +380,7 @@ export default function AdminPopupsPage() {
                 {isSubmitting && (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 )}
-                <span>{editingPopup ? "Update" : "Create"}</span>
+                <span>{editingPopup ? t("form.update") : t("form.create")}</span>
               </button>
             </div>
           </form>
@@ -394,26 +394,26 @@ export default function AdminPopupsPage() {
           </div>
         ) : popups.length === 0 ? (
           <div className="px-6 py-16 text-center text-[#888]">
-            No popups yet. Create your first one above.
+            {t("empty")}
           </div>
         ) : (
           <table className="w-full" role="table">
             <thead>
               <tr className="border-b border-[#2a2a2a] text-left">
                 <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#888]">
-                  Title
+                  {t("table.title")}
                 </th>
                 <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#888]">
-                  Status
+                  {t("table.status")}
                 </th>
                 <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#888]">
-                  Date Range
+                  {t("table.dateRange")}
                 </th>
                 <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#888]">
-                  Created
+                  {t("table.created")}
                 </th>
                 <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#888]">
-                  Actions
+                  {t("table.actions")}
                 </th>
               </tr>
             </thead>
@@ -431,13 +431,13 @@ export default function AdminPopupsPage() {
                           : "bg-gray-500/10 text-gray-400"
                       }`}
                     >
-                      {popup.isActive ? "Active" : "Inactive"}
+                      {popup.isActive ? t("statusActive") : t("statusInactive")}
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-[#888]">
                     {popup.startDate || popup.endDate
                       ? `${popup.startDate ? new Date(popup.startDate).toLocaleDateString() : "..."} - ${popup.endDate ? new Date(popup.endDate).toLocaleDateString() : "..."}`
-                      : "Always"}
+                      : t("always")}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-[#888]">
                     {new Date(popup.createdAt).toLocaleDateString()}
@@ -447,7 +447,7 @@ export default function AdminPopupsPage() {
                       <button
                         onClick={() => openEditForm(popup)}
                         className="text-[#888] transition-colors hover:text-[#ccdef0]"
-                        aria-label={`Edit popup: ${popup.title}`}
+                        aria-label={t("editAriaLabel", { title: popup.title })}
                       >
                         <Pencil className="h-4 w-4" />
                       </button>
@@ -455,7 +455,7 @@ export default function AdminPopupsPage() {
                         onClick={() => handleDelete(popup.id)}
                         disabled={deletingId === popup.id}
                         className="text-[#888] transition-colors hover:text-red-400 disabled:opacity-50"
-                        aria-label={`Delete popup: ${popup.title}`}
+                        aria-label={t("deleteAriaLabel", { title: popup.title })}
                       >
                         {deletingId === popup.id ? (
                           <Loader2 className="h-4 w-4 animate-spin" />

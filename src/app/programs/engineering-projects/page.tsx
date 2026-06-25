@@ -1,10 +1,13 @@
+import { getTranslations } from "next-intl/server";
 import { PlaceholderProgram } from "@/components/programs/PlaceholderProgram";
 
-export const metadata = {
-  title: "Engineering Projects | Ithaca Family Academy",
-  description:
-    "Real-world engineering projects covering robotics, IoT, and sustainable technology solutions.",
-};
+export async function generateMetadata() {
+  const t = await getTranslations("metadata.engineeringProjects");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 export default function EngineeringProjectsPage() {
   return (

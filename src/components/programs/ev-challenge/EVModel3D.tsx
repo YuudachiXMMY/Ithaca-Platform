@@ -7,6 +7,7 @@ import * as THREE from "three";
 import { useReducedMotion } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useTranslations } from "next-intl";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,7 +20,7 @@ const ACCENT_DIM = "#4a6a88";
 const ACCENT_GLOW = "#e0eeff";
 
 /* ------------------------------------------------------------------ */
-/* Track data                                                          */
+/* Track tags (static — not translated)                               */
 /* ------------------------------------------------------------------ */
 
 const ENG_TAGS = ["CAD Design", "Chassis Build", "Electrical Systems", "Testing"];
@@ -483,6 +484,7 @@ const SPECS = [
 
 export default function EVModel3DSection() {
   const reduce = useReducedMotion() ?? false;
+  const t = useTranslations("programs.evChallenge.model3d");
 
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -649,21 +651,20 @@ export default function EVModel3DSection() {
           <div className="relative z-10 pointer-events-none flex flex-col justify-between px-6 md:px-12 lg:px-[8vw] pt-[calc(var(--nav-h)_+_1rem)] pb-8 md:pb-12 min-h-[calc(80dvh_-_var(--nav-h))]">
             <div>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tighter">
-                The Machine
+                {t("machineName")}
               </h2>
               <p className="text-foreground/40 text-sm mt-2 max-w-[30ch]">
-                Custom-built electric trike. Aluminum tube frame. Designed and
-                assembled by students.
+                {t("machineDesc")}
               </p>
             </div>
             <div className="flex flex-wrap gap-x-8 gap-y-2">
-              {SPECS.map((s) => (
-                <div key={s.label}>
+              {(["drivetrain", "layout", "frame", "builtBy"] as const).map((key) => (
+                <div key={key}>
                   <span className="text-[10px] text-foreground/30 uppercase tracking-wider block">
-                    {s.label}
+                    {t(`specs.${key}`)}
                   </span>
                   <span className="font-mono text-xs text-foreground/60">
-                    {s.value}
+                    {t(`specs.${key}Value`)}
                   </span>
                 </div>
               ))}
@@ -671,29 +672,27 @@ export default function EVModel3DSection() {
           </div>
           <div className="absolute bottom-6 right-6 md:right-12 lg:right-[8vw] z-10">
             <p className="text-[10px] text-foreground/20 uppercase tracking-wider">
-              Drag to rotate
+              {t("dragToRotate")}
             </p>
           </div>
         </div>
 
         <div className="relative overflow-hidden max-h-[calc(100dvh_-_var(--nav-h))]">
           <h2 className="text-center text-2xl md:text-3xl lg:text-4xl font-bold text-foreground tracking-tighter pt-10 pb-8 px-6">
-            Two Tracks, One Vehicle
+            {t("twoTracksTitle")}
           </h2>
           <div className="flex flex-col lg:flex-row">
             <div className="relative flex-1 overflow-hidden min-h-[220px] lg:min-h-[320px]">
               <div className="absolute inset-0 dissolve-panel-eng" />
               <div className="relative z-10 px-6 md:px-12 lg:pl-[8vw] lg:pr-20 py-8 lg:py-16">
                 <span className="font-mono text-[10px] text-accent/30 uppercase tracking-[0.25em] mb-3 block">
-                  Track A
+                  {t("trackA")}
                 </span>
                 <h3 className="text-lg md:text-xl font-bold text-foreground tracking-tight mb-2">
-                  Engineering
+                  {t("engineering.title")}
                 </h3>
                 <p className="text-sm text-foreground/50 leading-relaxed mb-4 max-w-[40ch]">
-                  Design, build, and test a functioning electric vehicle. CAD
-                  modeling, chassis fabrication, electrical wiring, battery
-                  systems, and iterative performance testing.
+                  {t("engineering.description")}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {ENG_TAGS.map((tag) => (
@@ -712,15 +711,13 @@ export default function EVModel3DSection() {
               <div className="relative z-10 px-6 md:px-12 lg:pr-[8vw] lg:pl-20 py-8 lg:py-16 lg:flex lg:flex-col lg:items-end">
                 <div className="lg:max-w-[400px]">
                   <span className="font-mono text-[10px] text-accent/30 uppercase tracking-[0.25em] mb-3 block">
-                    Track B
+                    {t("trackB")}
                   </span>
                   <h3 className="text-lg md:text-xl font-bold text-foreground tracking-tight mb-2">
-                    Business
+                    {t("business.title")}
                   </h3>
                   <p className="text-sm text-foreground/50 leading-relaxed mb-4 max-w-[40ch]">
-                    Run the team as a real operation. Sponsorship acquisition,
-                    budget management, logistics coordination, and
-                    organizational skills that make a racing team function.
+                    {t("business.description")}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {BIZ_TAGS.map((tag) => (
@@ -768,22 +765,21 @@ export default function EVModel3DSection() {
       <div className="absolute inset-x-0 top-[var(--nav-h)] bottom-0 z-10 pointer-events-none flex flex-col justify-between px-6 md:px-12 lg:px-[8vw] py-4 md:py-8">
         <div ref={machineHeadRef}>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tighter">
-            The Machine
+            {t("machineName")}
           </h2>
           <p className="text-foreground/40 text-sm mt-2 max-w-[30ch]">
-            Custom-built electric trike. Aluminum tube frame. Designed and
-            assembled by students.
+            {t("machineDesc")}
           </p>
         </div>
 
         <div ref={machineSpecRef} className="flex flex-wrap gap-x-8 gap-y-2">
-          {SPECS.map((s) => (
-            <div key={s.label}>
+          {(["drivetrain", "layout", "frame", "builtBy"] as const).map((key) => (
+            <div key={key}>
               <span className="text-[10px] text-foreground/30 uppercase tracking-wider block">
-                {s.label}
+                {t(`specs.${key}`)}
               </span>
               <span className="font-mono text-xs text-foreground/60">
-                {s.value}
+                {t(`specs.${key}Value`)}
               </span>
             </div>
           ))}
@@ -796,7 +792,7 @@ export default function EVModel3DSection() {
         className="absolute bottom-6 right-6 md:right-12 lg:right-[8vw] z-10"
       >
         <p className="text-[10px] text-foreground/20 uppercase tracking-wider">
-          Drag to rotate
+          {t("dragToRotate")}
         </p>
       </div>
 
@@ -812,7 +808,7 @@ export default function EVModel3DSection() {
           className="absolute top-20 lg:top-28 left-0 right-0 z-30 text-center px-6"
         >
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground tracking-tighter">
-            Two Tracks, One Vehicle
+            {t("twoTracksTitle")}
           </h2>
         </div>
 
@@ -826,15 +822,13 @@ export default function EVModel3DSection() {
             <div className="absolute inset-0 dissolve-panel-eng" />
             <div className="relative z-10 h-full flex flex-col justify-center px-6 md:px-12 lg:pl-[8vw] lg:pr-28 py-6 pt-28 md:pt-36 lg:py-0 lg:pt-[max(10rem,12vh)]">
               <span className="font-mono text-[10px] text-accent/30 uppercase tracking-[0.25em] mb-3">
-                Track A
+                {t("trackA")}
               </span>
               <h3 className="text-lg md:text-2xl lg:text-3xl font-bold text-foreground tracking-tight mb-1 md:mb-2">
-                Engineering
+                {t("engineering.title")}
               </h3>
               <p className="text-xs md:text-sm text-foreground/50 leading-relaxed mb-3 md:mb-5 max-w-[40ch]">
-                Design, build, and test a functioning electric vehicle. CAD
-                modeling, chassis fabrication, electrical wiring, battery
-                systems, and iterative performance testing.
+                {t("engineering.description")}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {ENG_TAGS.map((tag) => (
@@ -858,15 +852,13 @@ export default function EVModel3DSection() {
             <div className="relative z-10 h-full flex flex-col lg:items-end px-6 md:px-12 lg:pr-[8vw] lg:pl-28 py-6 lg:py-0 lg:justify-end lg:pb-[12vh]">
               <div className="lg:max-w-[400px]">
                 <span className="font-mono text-[10px] text-accent/30 uppercase tracking-[0.25em] mb-2 md:mb-3 block">
-                  Track B
+                  {t("trackB")}
                 </span>
                 <h3 className="text-lg md:text-2xl lg:text-3xl font-bold text-foreground tracking-tight mb-1 md:mb-2">
-                  Business
+                  {t("business.title")}
                 </h3>
                 <p className="text-xs md:text-sm text-foreground/50 leading-relaxed mb-3 md:mb-5 max-w-[40ch]">
-                  Run the team as a real operation. Sponsorship acquisition,
-                  budget management, logistics coordination, and the
-                  organizational skills that make a racing team function.
+                  {t("business.description")}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {BIZ_TAGS.map((tag) => (

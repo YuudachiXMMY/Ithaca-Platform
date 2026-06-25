@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "title": "伊萨卡家庭学院",
+    "description": "赋能青少年探索未来，培养 AI 时代所需的核心技能。",
+    "ogTitle": "伊萨卡家庭学院",
+    "ogDescription": "赋能青少年探索未来，培养 AI 时代所需的核心技能。",
+    "aboutUs": {
+      "title": "关于我们 | 伊萨卡家庭学院",
+      "description": "了解伊萨卡家庭学院的使命、教学理念、团队，以及我们如何赋能青少年探索未来。"
+    },
+    "engineeringProjects": {
+      "title": "工程项目 | 伊萨卡家庭学院",
+      "description": "涵盖机器人、物联网和可持续技术解决方案的真实工程项目。"
+    },
+    "ithacaNight": {
+      "title": "伊萨卡之夜 | 伊萨卡家庭学院",
+      "description": "学生展示成果、庆祝成就的社区展示活动。"
+    },
+    "summerWinterCamps": {
+      "title": "寒暑假营 | 伊萨卡家庭学院",
+      "description": "融合科技、创意与户外体验的强化季节营。"
+    }
+  }
+}

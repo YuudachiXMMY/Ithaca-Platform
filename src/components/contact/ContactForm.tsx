@@ -6,20 +6,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod/v4";
 import { motion } from "framer-motion";
 import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 /* ------------------------------------------------------------------ */
 /* Schema                                                             */
 /* ------------------------------------------------------------------ */
 
 const contactSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100, "Name is too long"),
-  email: z.string().email("Please enter a valid email address"),
+  name: z.string().min(1).max(100),
+  email: z.string().email(),
   phone: z
     .string()
-    .max(20, "Phone number is too long")
+    .max(20)
     .optional()
     .or(z.literal("")),
-  message: z.string().max(2000, "Message is too long").optional().or(z.literal("")),
+  message: z.string().max(2000).optional().or(z.literal("")),
   subscribe: z.boolean().optional(),
 });
 
@@ -39,6 +40,7 @@ const fadeUp = {
 /* ------------------------------------------------------------------ */
 
 export function ContactForm() {
+  const t = useTranslations("contact");
   const [submitState, setSubmitState] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
@@ -83,7 +85,7 @@ export function ContactForm() {
     } catch (err) {
       setSubmitState("error");
       setErrorMessage(
-        err instanceof Error ? err.message : "Something went wrong. Please try again."
+        err instanceof Error ? err.message : t("form.genericError")
       );
     }
   };
@@ -100,17 +102,17 @@ export function ContactForm() {
       >
         <CheckCircle className="w-10 h-10 text-green-400 mx-auto mb-3" />
         <h3 className="text-xl font-bold text-foreground mb-2">
-          Message Sent!
+          {t("form.successTitle")}
         </h3>
         <p className="text-foreground/60 text-sm mb-4">
-          Thank you for reaching out. We will get back to you shortly.
+          {t("form.successMessage")}
         </p>
         <button
           type="button"
           onClick={() => setSubmitState("idle")}
           className="text-accent hover:text-accent-hover transition-colors text-sm font-medium"
         >
-          Send another message
+          {t("form.sendAnother")}
         </button>
       </motion.div>
     );
@@ -143,18 +145,22 @@ export function ContactForm() {
             htmlFor="contact-name"
             className="block text-xs font-medium text-foreground/70 mb-1.5"
           >
-            Name <span className="text-red-400">*</span>
+            {t("form.nameLabel")} <span className="text-red-400">*</span>
           </label>
           <input
             id="contact-name"
             type="text"
             autoComplete="name"
             className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder-foreground/25 focus:outline-none focus:border-accent transition-colors"
-            placeholder="Your name"
+            placeholder={t("form.namePlaceholder")}
             {...register("name")}
           />
           {errors.name && (
-            <p className="text-red-400 text-xs mt-1">{errors.name.message}</p>
+            <p className="text-red-400 text-xs mt-1">
+              {errors.name.message
+                ? t("form.errors.nameTooLong")
+                : t("form.errors.nameRequired")}
+            </p>
           )}
         </div>
 
@@ -163,18 +169,20 @@ export function ContactForm() {
             htmlFor="contact-email"
             className="block text-xs font-medium text-foreground/70 mb-1.5"
           >
-            Email <span className="text-red-400">*</span>
+            {t("form.emailLabel")} <span className="text-red-400">*</span>
           </label>
           <input
             id="contact-email"
             type="email"
             autoComplete="email"
             className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder-foreground/25 focus:outline-none focus:border-accent transition-colors"
-            placeholder="you@example.com"
+            placeholder={t("form.emailPlaceholder")}
             {...register("email")}
           />
           {errors.email && (
-            <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>
+            <p className="text-red-400 text-xs mt-1">
+              {t("form.errors.emailInvalid")}
+            </p>
           )}
         </div>
       </div>
@@ -185,18 +193,20 @@ export function ContactForm() {
           htmlFor="contact-phone"
           className="block text-xs font-medium text-foreground/70 mb-1.5"
         >
-          Phone
+          {t("form.phoneLabel")}
         </label>
         <input
           id="contact-phone"
           type="tel"
           autoComplete="tel"
           className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder-foreground/25 focus:outline-none focus:border-accent transition-colors font-mono"
-          placeholder="+1 (___) ___-____"
+          placeholder={t("form.phonePlaceholder")}
           {...register("phone")}
         />
         {errors.phone && (
-          <p className="text-red-400 text-xs mt-1">{errors.phone.message}</p>
+          <p className="text-red-400 text-xs mt-1">
+            {t("form.errors.phoneTooLong")}
+          </p>
         )}
       </div>
 
@@ -206,18 +216,18 @@ export function ContactForm() {
           htmlFor="contact-message"
           className="block text-xs font-medium text-foreground/70 mb-1.5"
         >
-          Message
+          {t("form.messageLabel")}
         </label>
         <textarea
           id="contact-message"
           rows={4}
           className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder-foreground/25 focus:outline-none focus:border-accent transition-colors resize-y"
-          placeholder="How can we help you?"
+          placeholder={t("form.messagePlaceholder")}
           {...register("message")}
         />
         {errors.message && (
           <p className="text-red-400 text-xs mt-1">
-            {errors.message.message}
+            {t("form.errors.messageTooLong")}
           </p>
         )}
       </div>
@@ -231,7 +241,7 @@ export function ContactForm() {
             {...register("subscribe")}
           />
           <span className="text-xs text-foreground/55">
-            Subscribe to updates
+            {t("form.subscribeLabel")}
           </span>
         </label>
 
@@ -243,12 +253,12 @@ export function ContactForm() {
           {submitState === "submitting" ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Sending...
+              {t("form.submittingButton")}
             </>
           ) : (
             <>
               <Send className="w-4 h-4" />
-              Send
+              {t("form.submitButton")}
             </>
           )}
         </button>

@@ -11,25 +11,19 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: "Home", href: "/" },
-  { label: "About Us", href: "/about-us" },
+  { label: "home", href: "/" },
+  { label: "aboutUs", href: "/about-us" },
   {
-    label: "Programs",
+    label: "programs",
     href: "/programs",
     children: [
-      { label: "EV Team", href: "/programs/ev-challenge" },
-      {
-        label: "AI Entrepreneurship Camp",
-        href: "/programs/ai-entrepreneurship-camp",
-      },
-      {
-        label: "Elite Interviews",
-        href: "/programs/elite-interview",
-      },
-      { label: "Other Programs", href: "/programs" },
+      { label: "evTeam", href: "/programs/ev-challenge" },
+      { label: "aiEntrepreneurshipCamp", href: "/programs/ai-entrepreneurship-camp" },
+      { label: "eliteInterviews", href: "/programs/elite-interview" },
+      { label: "otherPrograms", href: "/programs" },
     ],
   },
-  { label: "Contact Us", href: "/contact-us" },
+  { label: "contactUs", href: "/contact-us" },
 ];
 
 export interface TeamMember {
@@ -42,28 +36,26 @@ export interface TeamMember {
 export const TEAM_MEMBERS: TeamMember[] = [
   {
     name: "Mr. Joshua Wang",
-    title: "Founder & Principal",
-    description:
-      "Mr. Joshua Wang was an editorial writer of leading business media, adjunct professor at universities.",
+    title: "team.joshuaWang.title",
+    description: "team.joshuaWang.description",
     image: "/media/images/team/joshua-wang.jpg",
   },
   {
     name: "Mr. Jadyn Wu",
-    title: "Dean of Education & Technology",
-    description: "Focusing on AI and Engineering Education for Youth",
+    title: "team.jadynWu.title",
+    description: "team.jadynWu.description",
     image: "/media/images/team/jadyn-wu.png",
   },
   {
     name: "Ms. Kristen Perry",
-    title: "Mentor of Business Module",
-    description:
-      "Ms. Kristen Perry is a founder, educator, and investor who focuses on supporting entrepreneurs looking to tackle complex global challenges.",
+    title: "team.kristenPerry.title",
+    description: "team.kristenPerry.description",
     image: "/media/images/team/kristen-perry.png",
   },
   {
     name: "Mr. Grant Bourne",
-    title: "EV Program Lead & Coach",
-    description: "2025 Pirelli GT4 Champion",
+    title: "team.grantBourne.title",
+    description: "team.grantBourne.description",
     image: "/media/images/team/grant-bourne.png",
   },
 ];

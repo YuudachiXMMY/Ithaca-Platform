@@ -1,44 +1,19 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
-const PATHWAY_STEPS = [
-  "Maker",
-  "Rocket Lab",
-  "Engineering Systems",
-  "Drone Lab",
-  "EV Team / AI Camp",
-] as const;
-
-const COMPETENCIES = [
-  {
-    letter: "D",
-    name: "Design & Principles",
-    description: "Creative problem-solving, system design, and design thinking.",
-  },
-  {
-    letter: "E",
-    name: "Electrical Engineering",
-    description: "Circuit design, electronics, and hardware prototyping.",
-  },
-  {
-    letter: "C",
-    name: "Computer Programming",
-    description: "Software development, algorithms, and computational thinking.",
-  },
-  {
-    letter: "A",
-    name: "Application of Math & Physics",
-    description: "Applied reasoning with real-world math and physics.",
-  },
-  {
-    letter: "B",
-    name: "Business & Communication",
-    description: "Collaboration, pitching, and professional communication.",
-  },
-] as const;
+const COMPETENCY_LETTERS = ["d", "e", "c", "a", "b"] as const;
 
 export function DecabFramework() {
+  const t = useTranslations("about");
+
+  const competencies = COMPETENCY_LETTERS.map((letter) => ({
+    letter: letter.toUpperCase(),
+    name: t(`decab.competencies.${letter}.name`),
+    description: t(`decab.competencies.${letter}.description`),
+  }));
+
   return (
     <section
       className="bg-[#0c0e12] py-20 lg:py-28"
@@ -55,17 +30,15 @@ export function DecabFramework() {
             id="decab-heading"
             className="text-2xl md:text-4xl font-bold text-white tracking-tight leading-tight"
           >
-            DECAB Competency Map
+            {t("decab.heading")}
           </h2>
           <p className="text-base text-gray-400 mt-3 max-w-xl leading-relaxed">
-            Our framework tracks student growth across five dimensions, ensuring
-            balanced development in technical depth, applied reasoning, and
-            real-world execution.
+            {t("decab.subtitle")}
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mt-12">
-          {COMPETENCIES.map((comp, i) => (
+          {competencies.map((comp, i) => (
             <motion.div
               key={comp.letter}
               initial={{ opacity: 0, y: 14 }}
