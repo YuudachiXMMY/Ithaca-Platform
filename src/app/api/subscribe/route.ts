@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod/v4";
 import { prisma } from "@/lib/prisma";
-import { resend } from "@/lib/resend";
+import { sendMail } from "@/lib/mail";
 import { assertCsrf } from "@/lib/csrf";
 import { rateLimit } from "@/lib/rate-limit";
 import { escapeHtml } from "@/lib/utils";
@@ -62,8 +62,7 @@ export async function POST(
       });
     }
 
-    await resend?.emails.send({
-      from: "Ithaca Family Academy <noreply@ithacateens.com>",
+    await sendMail({
       to: email,
       subject: "Welcome to Ithaca Family Academy!",
       html: `
