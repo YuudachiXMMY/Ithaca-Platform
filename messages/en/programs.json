@@ -2,31 +2,38 @@
   "programs": {
     "index": {
       "title": "Our Programs",
-      "subtitle": "Empowering youth to explore the future through hands-on, project-based learning experiences.",
+      "subtitle": "Hands-on learning in AI, engineering, and entrepreneurship for the next generation.",
       "learnMore": "Learn More",
+      "explore": "Explore Program",
       "cards": {
         "aiCamp": {
           "title": "AI Entrepreneurship Camp",
+          "tag": "AI & Business",
           "description": "A 13-week program where students build AI-powered startups, develop MVPs, and pitch to real investors."
         },
         "evTeam": {
           "title": "EV Team",
+          "tag": "Engineering",
           "description": "Hands-on electric vehicle engineering challenge pushing students to design, build, and race."
-        },
-        "engineering": {
-          "title": "Engineering Projects",
-          "description": "Real-world engineering projects covering robotics, IoT, and sustainable technology solutions."
         },
         "eliteInterview": {
           "title": "Elite Interviews",
-          "description": "A research and documentary program where students investigate real-world issues through expert interviews, producing portfolio-ready reports and published documentaries."
+          "tag": "Research",
+          "description": "Investigate real-world issues through expert interviews, producing portfolio-ready reports and published documentaries."
+        },
+        "engineering": {
+          "title": "Engineering Projects",
+          "tag": "STEM",
+          "description": "Real-world engineering projects covering robotics, IoT, and sustainable technology solutions."
         },
         "summerWinter": {
           "title": "Summer & Winter Camps",
+          "tag": "Seasonal",
           "description": "Intensive seasonal camps blending technology, creativity, and outdoor experiences."
         },
         "ithacaNight": {
           "title": "Ithaca Night",
+          "tag": "Community",
           "description": "Community showcase events where students present their work and celebrate achievements."
         }
       }

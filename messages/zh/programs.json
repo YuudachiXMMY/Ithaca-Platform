@@ -2,31 +2,38 @@
   "programs": {
     "index": {
       "title": "我们的项目",
-      "subtitle": "通过动手实践、项目导向的学习体验，赋能青少年探索未来。",
+      "subtitle": "AI、工程与创业领域的实践学习，为下一代赋能。",
       "learnMore": "了解更多",
+      "explore": "探索项目",
       "cards": {
         "aiCamp": {
           "title": "AI 创业营",
+          "tag": "AI 与商业",
           "description": "为期 13 周的项目，学生打造 AI 驱动的初创公司，开发 MVP 并向真实投资人路演。"
         },
         "evTeam": {
           "title": "EV 车队",
+          "tag": "工程",
           "description": "动手实践的电动汽车工程挑战，推动学生完成设计、制造与竞速。"
-        },
-        "engineering": {
-          "title": "工程项目",
-          "description": "涵盖机器人、物联网和可持续技术解决方案的真实世界工程项目。"
         },
         "eliteInterview": {
           "title": "精英采访",
-          "description": "一个研究与纪录片项目，学生通过专家访谈调查现实问题，制作可入作品集的报告和已发布的纪录片。"
+          "tag": "研究",
+          "description": "通过专家访谈调查现实问题，制作可入作品集的报告和已发布的纪录片。"
+        },
+        "engineering": {
+          "title": "工程项目",
+          "tag": "STEM",
+          "description": "涵盖机器人、物联网和可持续技术解决方案的真实世界工程项目。"
         },
         "summerWinter": {
           "title": "暑期与冬令营",
+          "tag": "季节性",
           "description": "融合科技、创意与户外体验的强化季节性营地。"
         },
         "ithacaNight": {
           "title": "伊萨卡之夜",
+          "tag": "社区",
           "description": "社区展示活动，学生展示成果并庆祝成就。"
         }
       }
