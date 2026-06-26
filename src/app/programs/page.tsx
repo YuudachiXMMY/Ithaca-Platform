@@ -33,7 +33,7 @@ const PROGRAMS: readonly ProgramCard[] = [
     descriptionKey: "cards.evTeam.description",
     tagKey: "cards.evTeam.tag",
     href: "/programs/ev-challenge",
-    image: "/media/images/programs/ev-challenge/EV26-5.jpg",
+    image: "/media/images/programs/ev-challenge/EV26-5.JPG",
     imageAlt: "EV Challenge electric vehicle",
     span: "featured",
   },
