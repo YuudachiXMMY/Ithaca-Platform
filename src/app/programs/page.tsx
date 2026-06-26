@@ -28,23 +28,23 @@ interface ProgramCard {
 
 const PROGRAMS: readonly ProgramCard[] = [
   {
-    id: "aiCamp",
-    titleKey: "cards.aiCamp.title",
-    descriptionKey: "cards.aiCamp.description",
-    tagKey: "cards.aiCamp.tag",
-    href: "/programs/ai-entrepreneurship-camp",
-    image: "/media/images/programs/ai-camp/ai-camp-hero.png",
-    imageAlt: "Students at AI Entrepreneurship Camp",
-    span: "featured",
-  },
-  {
     id: "evTeam",
     titleKey: "cards.evTeam.title",
     descriptionKey: "cards.evTeam.description",
     tagKey: "cards.evTeam.tag",
     href: "/programs/ev-challenge",
-    image: "/media/images/programs/ev-challenge/EV25-1.png",
+    image: "/media/images/programs/ev-challenge/EV26-5.jpg",
     imageAlt: "EV Challenge electric vehicle",
+    span: "featured",
+  },
+  {
+    id: "aiCamp",
+    titleKey: "cards.aiCamp.title",
+    descriptionKey: "cards.aiCamp.description",
+    tagKey: "cards.aiCamp.tag",
+    href: "/programs/ai-entrepreneurship-camp",
+    image: "/media/images/programs/ai-entrepreneurship/AI-Entrep_81.jpg",
+    imageAlt: "Students at AI Entrepreneurship Camp",
     span: "medium",
   },
   {
@@ -53,7 +53,7 @@ const PROGRAMS: readonly ProgramCard[] = [
     descriptionKey: "cards.eliteInterview.description",
     tagKey: "cards.eliteInterview.tag",
     href: "/programs/elite-interview",
-    image: "/media/images/programs/ai-entrepreneurship/AI-Entrep_87.jpg",
+    image: "/media/images/programs/ai-interview/25_Mr. Carmi Levy.png",
     imageAlt: "Elite Interview session",
     span: "medium",
   },
@@ -99,15 +99,15 @@ const CARD_GRADIENTS: Record<string, string> = {
 /*
  * Bento layout (lg, 3-col × 2-row):
  * ┌──────────────────┬──────────┐
- * │  AI Camp (2c)    │ EV Team  │   row 1
+ * │  EV Team (2c)    │ AI Camp  │   row 1
  * ├─────────┬────────┼──────────┤
  * │  Elite  │  Eng.  │ Summer / │   row 2
  * │         │        │ Ithaca   │   (stacked pair)
  * └─────────┴────────┴──────────┘
  */
 const GRID_CLASSES: Record<string, string> = {
-  aiCamp: "lg:col-span-2",
-  evTeam: "",
+  evTeam: "lg:col-span-2",
+  aiCamp: "",
   eliteInterview: "",
   engineering: "",
   summerWinter: "",
@@ -121,17 +121,19 @@ const GRID_CLASSES: Record<string, string> = {
 function ProgramCard({
   program,
   t,
+  stacked = false,
 }: {
   readonly program: ProgramCard;
   readonly t: ReturnType<typeof useTranslations>;
+  readonly stacked?: boolean;
 }) {
   const isFeatured = program.span === "featured";
   const hasImage = Boolean(program.image);
-  const gridClass = GRID_CLASSES[program.id] ?? "";
+  const gridClass = stacked ? "" : (GRID_CLASSES[program.id] ?? "");
   const gradientClass = CARD_GRADIENTS[program.id] ?? "";
 
   return (
-    <div className={`bento-card ${gridClass}`}>
+    <div className={stacked ? "flex-1 min-h-0" : `bento-card ${gridClass}`}>
       <Link
         href={program.href}
         className="group flex flex-col h-full overflow-hidden rounded-2xl border border-border bg-card-bg transition-colors duration-300 hover:border-accent/40"
@@ -139,8 +141,8 @@ function ProgramCard({
         {/* Image area (pure visual, no text overlay) */}
         <div
           className={`relative overflow-hidden shrink-0
-            ${hasImage ? "h-[240px] md:h-[300px]" : "h-[180px] md:h-[220px]"}
-            ${isFeatured ? "lg:h-[360px]" : ""}
+            ${stacked ? "h-[100px] md:h-[120px]" : hasImage ? "h-[240px] md:h-[300px]" : "h-[180px] md:h-[220px]"}
+            ${isFeatured && !stacked ? "lg:h-[360px]" : ""}
             ${!hasImage ? gradientClass : ""}`}
         >
           {hasImage && (
@@ -172,24 +174,24 @@ function ProgramCard({
         </div>
 
         {/* Info area below image: title, tag, description, CTA */}
-        <div className="flex flex-col grow p-5 md:p-6">
+        <div className={`flex flex-col grow ${stacked ? "p-4" : "p-5 md:p-6"}`}>
           <h2
-            className={`font-bold text-foreground leading-tight tracking-tight mb-3
-              ${isFeatured ? "text-xl md:text-2xl" : "text-lg md:text-xl"}`}
+            className={`font-bold text-foreground leading-tight tracking-tight
+              ${stacked ? "text-sm md:text-base mb-2" : isFeatured ? "text-xl md:text-2xl mb-3" : "text-lg md:text-xl mb-3"}`}
           >
             {t(program.titleKey)}
           </h2>
 
-          <span className="mb-3 inline-block w-fit rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium tracking-wide text-accent">
+          <span className={`inline-block w-fit rounded-full border border-accent/30 bg-accent/10 px-3 py-1 font-medium tracking-wide text-accent ${stacked ? "text-[11px] mb-2" : "text-xs mb-3"}`}>
             {t(program.tagKey)}
           </span>
 
-          <p className="text-foreground/55 text-sm leading-relaxed mb-4 grow">
+          <p className={`text-foreground/55 leading-relaxed grow ${stacked ? "text-xs line-clamp-2 mb-3" : "text-sm mb-4"}`}>
             {t(program.descriptionKey)}
           </p>
 
-          <span className="inline-flex items-center gap-2 text-accent text-sm font-medium group-hover:gap-3 transition-all duration-300">
-            {isFeatured ? t("explore") : t("learnMore")}
+          <span className={`inline-flex items-center gap-2 text-accent font-medium group-hover:gap-3 transition-all duration-300 ${stacked ? "text-xs" : "text-sm"}`}>
+            {isFeatured && !stacked ? t("explore") : t("learnMore")}
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
           </span>
         </div>
@@ -276,9 +278,16 @@ export default function ProgramsPage() {
           ref={gridRef}
           className="max-w-7xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 auto-rows-[minmax(260px,auto)]"
         >
-          {PROGRAMS.map((program) => (
+          {PROGRAMS.slice(0, 4).map((program) => (
             <ProgramCard key={program.id} program={program} t={t} />
           ))}
+
+          {/* Stacked pair: Summer/Winter + Ithaca Night */}
+          <div className="bento-card flex flex-col gap-4 md:gap-5">
+            {PROGRAMS.slice(4).map((program) => (
+              <ProgramCard key={program.id} program={program} t={t} stacked />
+            ))}
+          </div>
         </div>
       </section>
     </div>
