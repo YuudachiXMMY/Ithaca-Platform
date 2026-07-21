@@ -17,9 +17,9 @@
           "description": "动手实践的电动汽车工程挑战，推动学生完成设计、制造与竞速。"
         },
         "eliteInterview": {
-          "title": "精英采访",
+          "title": "菁英访谈",
           "tag": "研究",
-          "description": "通过专家访谈调查现实问题，制作可入作品集的报告和已发布的纪录片。"
+          "description": "拓宽视野的对话。连接学生与塑造未来的人们。"
         },
         "engineering": {
           "title": "工程项目",
@@ -348,13 +348,13 @@
     },
     "eliteInterview": {
       "meta": {
-        "title": "精英采访 | 伊萨卡家庭学院",
+        "title": "菁英访谈 | 伊萨卡家庭学院",
         "description": "为期 10 周的研究与纪录片项目，学生通过访谈学术界、行业和政策领域专家，调查 AI 与加拿大的未来。"
       },
       "hero": {
-        "title": "精英采访",
-        "subtitle": "AI 与加拿大的未来",
-        "description": "十周田野调查。五个研究视角。一部纪录片。",
+        "title": "菁英访谈",
+        "subtitle": "拓宽视野的对话。",
+        "description": "连接学生与塑造未来的人们。十周田野调查。五个研究视角。一部纪录片。",
         "pills": {
           "fall": "2026 年秋季",
           "grades": "9-12 年级",
@@ -504,7 +504,7 @@
         "contactEmail": "joshua.wang@ithacafo.com",
         "items": {
           "whatIsProgram": {
-            "question": "精英采访项目是什么？",
+            "question": "菁英访谈项目是什么？",
             "answer": "这是一个研究与纪录片项目，学生通过对学术界、行业和政策领域专家进行真实采访，调查一个重大社会问题。每位学生认领一条研究轨道，并为团队纪录片做出贡献。"
           },
           "experience": {
