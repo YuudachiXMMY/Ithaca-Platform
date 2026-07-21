@@ -52,9 +52,9 @@ const PROGRAMS: readonly ProgramCard[] = [
     titleKey: "cards.eliteInterview.title",
     descriptionKey: "cards.eliteInterview.description",
     tagKey: "cards.eliteInterview.tag",
-    href: "/programs/elite-interview",
+    href: "/programs/ithaca-dialogues",
     image: "/media/images/programs/ai-interview/25_Mr. Carmi Levy.png",
-    imageAlt: "Elite Interview session",
+    imageAlt: "Ithaca Dialogues session",
     span: "medium",
   },
   {

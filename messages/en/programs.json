@@ -17,9 +17,9 @@
           "description": "Hands-on electric vehicle engineering challenge pushing students to design, build, and race."
         },
         "eliteInterview": {
-          "title": "Elite Interviews",
+          "title": "Ithaca Dialogues",
           "tag": "Research",
-          "description": "Investigate real-world issues through expert interviews, producing portfolio-ready reports and published documentaries."
+          "description": "Conversations that broaden horizons. Connecting students with people shaping the future."
         },
         "engineering": {
           "title": "Engineering Projects",
@@ -348,13 +348,13 @@
     },
     "eliteInterview": {
       "meta": {
-        "title": "Elite Interviews | Ithaca Family Academy",
+        "title": "Ithaca Dialogues | Ithaca Family Academy",
         "description": "A 10-week research and documentary program where students investigate AI and Canada's future through interviews with experts in academia, industry, and policy."
       },
       "hero": {
-        "title": "Elite Interviews",
-        "subtitle": "AI and Canada's Future",
-        "description": "Ten weeks of fieldwork. Five research angles. One documentary.",
+        "title": "Ithaca Dialogues",
+        "subtitle": "Conversations that broaden horizons.",
+        "description": "Connecting students with people shaping the future. Ten weeks of fieldwork. Five research angles. One documentary.",
         "pills": {
           "fall": "Fall 2026",
           "grades": "G9-G12",
@@ -504,7 +504,7 @@
         "contactEmail": "joshua.wang@ithacafo.com",
         "items": {
           "whatIsProgram": {
-            "question": "What is the Elite Interviews program?",
+            "question": "What is the Ithaca Dialogues program?",
             "answer": "A research and documentary program where students investigate a major societal question through real interviews with experts in academia, industry, and policy. Each student claims one research track and contributes to a team documentary."
           },
           "experience": {

@@ -36,7 +36,7 @@ const PROGRAMS: readonly Program[] = [
   {
     titleKey: "programs.elite.title",
     descriptionKey: "programs.elite.description",
-    href: "/programs/elite-interviews",
+    href: "/programs/ithaca-dialogues",
     image: "/media/images/programs/ai-interview/25_Mr. Carmi Levy.png",
     altKey: "programs.elite.alt",
   },

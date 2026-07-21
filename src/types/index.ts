@@ -19,7 +19,7 @@ export const NAV_ITEMS: NavItem[] = [
     children: [
       { label: "evTeam", href: "/programs/ev-challenge" },
       { label: "aiEntrepreneurshipCamp", href: "/programs/ai-entrepreneurship-camp" },
-      { label: "eliteInterviews", href: "/programs/elite-interview" },
+      { label: "eliteInterviews", href: "/programs/ithaca-dialogues" },
       { label: "otherPrograms", href: "/programs" },
     ],
   },
