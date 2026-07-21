@@ -194,7 +194,8 @@ export function HeroSection() {
             muted
             loop
             playsInline
-            preload="auto"
+            preload="metadata"
+            poster="/media/videos/hero-poster.jpg"
             aria-hidden="true"
           >
             <source src="/media/videos/hero-video.mp4" type="video/mp4" />

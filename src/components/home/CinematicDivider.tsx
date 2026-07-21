@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useLayoutEffect } from "react";
+import { useRef, useState, useEffect, useLayoutEffect } from "react";
 import { useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
 
@@ -24,7 +24,24 @@ export function CinematicDivider() {
   const titleRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const gsapCtxRef = useRef<{ revert: () => void } | null>(null);
+  const [videoReady, setVideoReady] = useState(false);
   const t = useTranslations("home");
+
+  // Lazy-load video when section approaches viewport
+  useEffect(() => {
+    if (reduce || !sectionRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVideoReady(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, [reduce]);
 
   useLayoutEffect(() => {
     return () => {
@@ -160,17 +177,21 @@ export function CinematicDivider() {
       className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#0a0c10]"
       aria-hidden="true"
     >
-      {/* Full-bleed video background */}
+      {/* Full-bleed video background - lazy-loaded on scroll */}
       <div ref={videoWrapRef} className="absolute inset-[-10%]">
-        <video
-          src="/media/videos/dr-moridi-ai-talk.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          aria-hidden="true"
-          className="h-full w-full object-cover"
-        />
+        {videoReady && (
+          <video
+            src="/media/videos/dr-moridi-ai-talk.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster="/media/videos/dr-moridi-poster.jpg"
+            aria-hidden="true"
+            className="h-full w-full object-cover"
+          />
+        )}
       </div>
 
       {/* Dark overlay - animated by GSAP to reveal/conceal the video */}
