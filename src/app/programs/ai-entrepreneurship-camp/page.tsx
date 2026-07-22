@@ -128,7 +128,6 @@ export default function AIEntrepreneurshipCampPage() {
               alt="Student presenting their startup pitch"
               fill
               className="object-cover"
-              priority
               sizes="25vw"
             placeholder="blur"
             blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AI-Entrep_70.jpg")}
@@ -154,7 +153,6 @@ export default function AIEntrepreneurshipCampPage() {
             alt="AI Entrepreneurship Camp"
             fill
             className="object-cover"
-            priority
             sizes="100vw"
           placeholder="blur"
           blurDataURL={getBlurDataURL("/media/images/programs/ai-camp/ai-camp-hero.png")}
@@ -396,7 +394,7 @@ export default function AIEntrepreneurshipCampPage() {
               alt="Ithaca teaching team with students"
               fill
               className="object-cover"
-              sizes="100vw"
+              sizes="(max-width: 1024px) 100vw, 80vw"
             placeholder="blur"
             blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AI-Entrep_93s.jpg")}
             />
@@ -464,7 +462,7 @@ export default function AIEntrepreneurshipCampPage() {
           alt="AI Entrepreneurship Camp community"
           fill
           className="object-cover"
-          sizes="100vw"
+          sizes="(max-width: 1024px) 100vw, 80vw"
         placeholder="blur"
         blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AI-Entrep_70.jpg")}
         />

@@ -33,7 +33,7 @@ const thresholdIdx = args.indexOf("--threshold");
 
 const MAX_WIDTH = maxWidthIdx !== -1 ? Number(args[maxWidthIdx + 1]) : 1920;
 const QUALITY = qualityIdx !== -1 ? Number(args[qualityIdx + 1]) : 80;
-const SIZE_THRESHOLD = thresholdIdx !== -1 ? Number(args[thresholdIdx + 1]) : 500_000; // 500KB
+const SIZE_THRESHOLD = thresholdIdx !== -1 ? Number(args[thresholdIdx + 1]) : 150_000; // 150KB
 
 // ── Helpers ───────────────────────────────────────────────
 
