@@ -1,13 +1,13 @@
 # ── IthacaFA Web — Multi-stage Build ────────────
 # Next.js 16 standalone output with Prisma
 
-# Stage 1: Install dependencies
+# Stage 1: Install ALL dependencies (including devDependencies for build)
 FROM node:20-alpine AS deps
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
 COPY prisma/schema.prisma prisma/schema.prisma
-RUN npm ci --omit=dev
+RUN npm ci
 
 # Stage 2: Build application
 FROM node:20-alpine AS build
