@@ -6,6 +6,7 @@ FROM node:20-alpine AS deps
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
+COPY prisma/schema.prisma prisma/schema.prisma
 RUN npm ci --omit=dev
 
 # Stage 2: Build application
