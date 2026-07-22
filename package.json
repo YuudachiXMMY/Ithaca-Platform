@@ -18,7 +18,17 @@
     "db:seed": "npx tsx prisma/seed.ts",
     "db:studio": "prisma studio",
     "prisma:seed": "npx tsx prisma/seed.ts",
-    "i18n:check": "npx tsx scripts/check-i18n.ts"
+    "i18n:check": "npx tsx scripts/check-i18n.ts",
+    "prod": "./scripts/prod.sh",
+    "prod:deploy": "./scripts/prod.sh deploy",
+    "prod:logs": "./scripts/prod.sh logs",
+    "prod:logs:follow": "./scripts/prod.sh logs -f",
+    "prod:status": "./scripts/prod.sh status",
+    "prod:backup": "./scripts/prod.sh backup",
+    "prod:rollback": "./scripts/prod.sh rollback",
+    "build:test": "./scripts/build-test.sh",
+    "build:test:run": "./scripts/build-test.sh --run",
+    "build:test:clean": "./scripts/build-test.sh --clean"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
