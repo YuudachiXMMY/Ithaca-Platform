@@ -198,7 +198,7 @@ export function HeroSection() {
             poster="/media/videos/hero-poster.jpg"
             aria-hidden="true"
           >
-            <source src="/media/videos/hero-video.mp4" type="video/mp4" />
+            <source src="/media/videos/hero-video-compressed.mp4" type="video/mp4" />
           </video>
         </div>
 

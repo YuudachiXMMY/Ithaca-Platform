@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { BLUR_DATA_URL } from "@/lib/utils";
+import { getBlurDataURL } from "@/lib/blur-data";
 
 const FEATURED_IMAGES = [
   "/media/images/programs/ai-entrepreneurship/AI-Entrep_03.jpg",
@@ -71,7 +71,7 @@ export function Outcomes() {
                   className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                   sizes="(max-width: 768px) 100vw, 50vw"
                   placeholder="blur"
-                  blurDataURL={BLUR_DATA_URL}
+                  blurDataURL={getBlurDataURL(outcome.image)}
                 />
                 {/* Gradient overlay for text legibility */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />

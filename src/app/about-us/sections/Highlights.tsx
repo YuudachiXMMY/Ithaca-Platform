@@ -4,7 +4,7 @@ import { useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { BLUR_DATA_URL } from "@/lib/utils";
+import { getBlurDataURL } from "@/lib/blur-data";
 
 const HIGHLIGHT_VIDEO_SRCS = [
   "https://player.vimeo.com/video/1117749184?badge=0&byline=0&h=c1bb956d04&portrait=0&title=0&autoplay=0&loop=0&muted=0&controls=1",
@@ -166,7 +166,7 @@ export function Highlights() {
                     className="object-cover"
                     sizes="(max-width: 768px) 260px, 380px"
                     placeholder="blur"
-                    blurDataURL={BLUR_DATA_URL}
+                    blurDataURL={getBlurDataURL(src)}
                   />
                 </div>
               ))}

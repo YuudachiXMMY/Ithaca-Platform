@@ -6,7 +6,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { BLUR_DATA_URL } from "@/lib/utils";
+import { getBlurDataURL } from "@/lib/blur-data";
 
 /* ------------------------------------------------------------------ */
 /* Sub-components                                                     */
@@ -119,7 +119,7 @@ export default function AIEntrepreneurshipCampPage() {
               priority
               sizes="25vw"
             placeholder="blur"
-            blurDataURL={BLUR_DATA_URL}
+            blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AIEC2026/OTLFInnovationDay-2026-Presentations-188.jpg")}
             />
           </div>
           <div className="relative rounded-xl overflow-hidden">
@@ -131,7 +131,7 @@ export default function AIEntrepreneurshipCampPage() {
               priority
               sizes="25vw"
             placeholder="blur"
-            blurDataURL={BLUR_DATA_URL}
+            blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AI-Entrep_70.jpg")}
             />
           </div>
           <div className="relative rounded-xl overflow-hidden">
@@ -142,7 +142,7 @@ export default function AIEntrepreneurshipCampPage() {
               className="object-cover"
               sizes="25vw"
             placeholder="blur"
-            blurDataURL={BLUR_DATA_URL}
+            blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AIEC2026/OTLFInnovationDay-2026-Presentations-179.jpg")}
             />
           </div>
         </div>
@@ -157,7 +157,7 @@ export default function AIEntrepreneurshipCampPage() {
             priority
             sizes="100vw"
           placeholder="blur"
-          blurDataURL={BLUR_DATA_URL}
+          blurDataURL={getBlurDataURL("/media/images/programs/ai-camp/ai-camp-hero.png")}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
         </div>
@@ -187,7 +187,7 @@ export default function AIEntrepreneurshipCampPage() {
                 className="object-cover"
                 sizes="(max-width: 768px) 50vw, 66vw"
               placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
+              blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AI-Entrep_05.jpg")}
               />
             </div>
             <div className="relative h-[180px] md:h-[280px] rounded-xl overflow-hidden">
@@ -198,7 +198,7 @@ export default function AIEntrepreneurshipCampPage() {
                 className="object-cover"
                 sizes="(max-width: 768px) 50vw, 33vw"
               placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
+              blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AIEC2026/AIEC2026-clossette_2s.png")}
               />
             </div>
             <div className="relative h-[180px] md:h-[280px] rounded-xl overflow-hidden">
@@ -209,7 +209,7 @@ export default function AIEntrepreneurshipCampPage() {
                 className="object-cover"
                 sizes="(max-width: 768px) 50vw, 33vw"
               placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
+              blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AI-Entrep_65.jpg")}
               />
             </div>
             <div className="relative h-[180px] md:h-[280px] md:col-span-2 rounded-xl overflow-hidden">
@@ -220,7 +220,7 @@ export default function AIEntrepreneurshipCampPage() {
                 className="object-cover"
                 sizes="(max-width: 768px) 50vw, 66vw"
               placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
+              blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AI-Entrep_79.jpg")}
               />
             </div>
           </div>
@@ -239,7 +239,7 @@ export default function AIEntrepreneurshipCampPage() {
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 40vw"
               placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
+              blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AI-Entrep_12.jpg")}
               />
             </div>
 
@@ -330,7 +330,7 @@ export default function AIEntrepreneurshipCampPage() {
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
               placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
+              blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AI-Entrep_50.jpg")}
               />
             </div>
             <div className="relative h-[220px] md:h-[300px] rounded-xl overflow-hidden">
@@ -341,7 +341,7 @@ export default function AIEntrepreneurshipCampPage() {
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
               placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
+              blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AIEC2026/OTLFInnovationDay-2026-Presentations-164.jpg")}
               />
             </div>
           </div>
@@ -376,7 +376,7 @@ export default function AIEntrepreneurshipCampPage() {
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 40vw"
               placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
+              blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AI-Entrep_89.jpg")}
               />
             </div>
           </div>
@@ -398,7 +398,7 @@ export default function AIEntrepreneurshipCampPage() {
               className="object-cover"
               sizes="100vw"
             placeholder="blur"
-            blurDataURL={BLUR_DATA_URL}
+            blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AI-Entrep_93s.jpg")}
             />
           </div>
 
@@ -466,7 +466,7 @@ export default function AIEntrepreneurshipCampPage() {
           className="object-cover"
           sizes="100vw"
         placeholder="blur"
-        blurDataURL={BLUR_DATA_URL}
+        blurDataURL={getBlurDataURL("/media/images/programs/ai-entrepreneurship/AI-Entrep_70.jpg")}
         />
         <div className="absolute inset-0 bg-background/80" />
         <div className="relative z-10 text-center px-6">

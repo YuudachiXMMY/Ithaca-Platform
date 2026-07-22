@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { BLUR_DATA_URL } from "@/lib/utils";
+import { getBlurDataURL } from "@/lib/blur-data";
 
 export function HeroSection() {
   const t = useTranslations("about");
@@ -29,7 +29,7 @@ export function HeroSection() {
           className="object-cover"
           sizes="100vw"
           placeholder="blur"
-          blurDataURL={BLUR_DATA_URL}
+          blurDataURL={getBlurDataURL("/media/images/site/about-hero.jpg")}
         />
       </div>
 
