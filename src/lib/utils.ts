@@ -6,8 +6,8 @@ export function cn(...inputs: ClassValue[]) {
 
 /**
  * Tiny 1×1 dark placeholder matching the site background (#111318).
- * Used as blurDataURL for Next.js Image components to show a dark
- * shimmer instead of blank space while images load.
+ * Used as fallback by getBlurDataURL() when no per-image blur data exists.
+ * For image components, prefer getBlurDataURL(imagePath) from "@/lib/blur-data".
  */
 export const BLUR_DATA_URL =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNMSfn/HwAFWgJ2pUb3OAAAAABJRU5ErkJggg==";

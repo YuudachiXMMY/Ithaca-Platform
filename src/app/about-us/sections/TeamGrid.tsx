@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { BLUR_DATA_URL } from "@/lib/utils";
+import { getBlurDataURL } from "@/lib/blur-data";
 import type { TeamMember } from "@/types";
 
 interface TeamGridProps {
@@ -56,7 +56,7 @@ export function TeamGrid({ members }: TeamGridProps) {
                     className="object-cover"
                     sizes="(max-width: 640px) 50vw, 25vw"
                     placeholder="blur"
-                    blurDataURL={BLUR_DATA_URL}
+                    blurDataURL={getBlurDataURL(member.image)}
                   />
                 )}
               </div>

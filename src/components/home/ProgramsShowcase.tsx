@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { BLUR_DATA_URL } from "@/lib/utils";
+import { getBlurDataURL } from "@/lib/blur-data";
 
 /* ------------------------------------------------------------------ */
 /*  Program data with images                                          */
@@ -153,7 +153,7 @@ function BentoCell({
         sizes={large ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 100vw, 34vw"}
         className="object-cover transition-transform duration-500 group-hover:scale-105"
         placeholder="blur"
-        blurDataURL={BLUR_DATA_URL}
+        blurDataURL={getBlurDataURL(program.image)}
       />
 
       {/* Dark gradient overlay for text readability */}

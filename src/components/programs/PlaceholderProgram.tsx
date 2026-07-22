@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { BLUR_DATA_URL } from "@/lib/utils";
+import { getBlurDataURL } from "@/lib/blur-data";
 
 interface PlaceholderProgramProps {
   readonly heroImage: string;
@@ -35,7 +35,7 @@ export function PlaceholderProgram({
           priority
           sizes="100vw"
           placeholder="blur"
-          blurDataURL={BLUR_DATA_URL}
+          blurDataURL={getBlurDataURL(heroImage)}
         />
         <div className="absolute inset-0 bg-black/60" />
         <motion.div
