@@ -19,6 +19,8 @@
     "db:studio": "prisma studio",
     "prisma:seed": "npx tsx prisma/seed.ts",
     "i18n:check": "npx tsx scripts/check-i18n.ts",
+    "images:check": "npx tsx scripts/optimize-images.ts",
+    "images:optimize": "npx tsx scripts/optimize-images.ts --apply",
     "prod": "./scripts/prod.sh",
     "prod:deploy": "./scripts/prod.sh deploy",
     "prod:logs": "./scripts/prod.sh logs",
@@ -66,8 +68,10 @@
     "@types/nodemailer": "^8.0.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/sharp": "^0.31.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "sharp": "^0.35.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

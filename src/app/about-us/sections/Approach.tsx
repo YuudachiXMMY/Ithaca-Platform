@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { BLUR_DATA_URL } from "@/lib/utils";
 
 export function Approach() {
   const t = useTranslations("about");
@@ -27,6 +28,8 @@ export function Approach() {
               fill
               className="object-cover"
               sizes="100vw"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
             />
           </div>
         </motion.div>
@@ -61,6 +64,8 @@ export function Approach() {
               fill
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 60vw"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
             />
           </div>
           <div>

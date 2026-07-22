@@ -7,6 +7,7 @@ import { useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { BLUR_DATA_URL } from "@/lib/utils";
 import WorkshopToRolesTransition from "@/components/programs/ev-challenge/WorkshopToRolesTransition";
 
 const EVModel3DSection = dynamic(
@@ -120,6 +121,8 @@ export default function EVChallengePage() {
             className="object-cover scale-[1.15] origin-center"
             priority
             sizes="100vw"
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
           />
         </motion.div>
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
@@ -208,6 +211,8 @@ export default function EVChallengePage() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
+                placeholder="blur"
+                blurDataURL={BLUR_DATA_URL}
               />
             </motion.div>
           </div>
@@ -248,6 +253,8 @@ export default function EVChallengePage() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 60vw"
+                placeholder="blur"
+                blurDataURL={BLUR_DATA_URL}
               />
             </div>
           </div>
@@ -300,6 +307,8 @@ export default function EVChallengePage() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 40vw"
+                placeholder="blur"
+                blurDataURL={BLUR_DATA_URL}
               />
             </motion.div>
           </div>
@@ -314,6 +323,8 @@ export default function EVChallengePage() {
           fill
           className="object-cover"
           sizes="100vw"
+          placeholder="blur"
+          blurDataURL={BLUR_DATA_URL}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/40 md:bg-gradient-to-r md:from-background md:via-background/80 md:to-transparent" />
         <div className="relative z-10 px-6 md:px-12 lg:px-[8vw] py-24">
@@ -476,6 +487,8 @@ export default function EVChallengePage() {
                   fill
                   className="object-cover"
                   sizes="35vw"
+                  placeholder="blur"
+                  blurDataURL={BLUR_DATA_URL}
                 />
               </div>
             </div>

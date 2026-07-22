@@ -8,6 +8,7 @@ import { ArrowRight } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useTranslations } from "next-intl";
+import { BLUR_DATA_URL } from "@/lib/utils";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -156,6 +157,8 @@ function ProgramCard({
                   ? "(max-width: 768px) 100vw, 66vw"
                   : "(max-width: 768px) 100vw, 33vw"
               }
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
             />
           )}
 

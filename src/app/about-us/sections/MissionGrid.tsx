@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { BLUR_DATA_URL } from "@/lib/utils";
 
 const MISSION_IMAGES = [
   "/media/images/pillars/pillar-pbl.jpg",
@@ -89,6 +90,8 @@ export function MissionGrid() {
                     fill
                     className="object-cover"
                     sizes="(max-width: 1024px) 100vw, 50vw"
+                    placeholder="blur"
+                    blurDataURL={BLUR_DATA_URL}
                   />
                 </div>
 

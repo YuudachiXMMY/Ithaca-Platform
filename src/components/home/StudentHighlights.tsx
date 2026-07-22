@@ -4,6 +4,7 @@ import { useRef, useEffect, useLayoutEffect } from "react";
 import Image from "next/image";
 import { useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { BLUR_DATA_URL } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
 /*  Highlight data                                                    */
@@ -120,6 +121,8 @@ function HighlightCell({
         fill
         sizes="(min-width: 768px) 520px, 50vw"
         className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+        placeholder="blur"
+        blurDataURL={BLUR_DATA_URL}
       />
 
       {/* Gradient scrim */}

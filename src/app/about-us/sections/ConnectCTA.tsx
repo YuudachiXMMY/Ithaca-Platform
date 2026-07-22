@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { BLUR_DATA_URL } from "@/lib/utils";
 import { NewsletterForm } from "@/components/shared/NewsletterForm";
 import { FadeIn } from "@/components/animations/FadeIn";
 
@@ -21,6 +22,8 @@ export function ConnectCTA() {
               fill
               className="object-cover"
               sizes="100vw"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
             />
             <div className="absolute inset-0 bg-black/40" />
             <div className="absolute inset-0 flex items-end p-4 md:p-6">

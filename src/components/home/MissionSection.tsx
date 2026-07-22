@@ -4,6 +4,7 @@ import { useRef, useEffect, useLayoutEffect } from "react";
 import Image from "next/image";
 import { useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { BLUR_DATA_URL } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
 /*  Pillar data                                                       */
@@ -131,6 +132,8 @@ export function MissionSection() {
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
+                  placeholder="blur"
+                  blurDataURL={BLUR_DATA_URL}
                   {...(i === 0 ? { priority: true } : {})}
                 />
               </div>

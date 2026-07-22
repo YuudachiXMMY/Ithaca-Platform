@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { BLUR_DATA_URL } from "@/lib/utils";
 
 export async function generateMetadata() {
   const t = await getTranslations("programs.eliteInterview.meta");
@@ -81,6 +82,8 @@ export default async function EliteInterviewPage() {
             className="object-cover"
             priority
             sizes="58vw"
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
           />
         </div>
 
@@ -93,6 +96,8 @@ export default async function EliteInterviewPage() {
             className="object-cover"
             priority
             sizes="100vw"
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
         </div>
@@ -193,6 +198,8 @@ export default async function EliteInterviewPage() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 40vw"
+                placeholder="blur"
+                blurDataURL={BLUR_DATA_URL}
               />
             </div>
           </div>
@@ -213,6 +220,8 @@ export default async function EliteInterviewPage() {
               fill
               className="object-cover"
               sizes="100vw"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
             />
           </div>
 
@@ -378,6 +387,8 @@ export default async function EliteInterviewPage() {
           fill
           className="object-cover"
           sizes="100vw"
+          placeholder="blur"
+          blurDataURL={BLUR_DATA_URL}
         />
         <div className="absolute inset-0 bg-background/80" />
         <div className="relative z-10 text-center px-6">

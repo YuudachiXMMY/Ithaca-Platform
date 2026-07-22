@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "framer-motion";
 import { Compass, Wrench, Gauge, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { BLUR_DATA_URL } from "@/lib/utils";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -242,6 +243,8 @@ export default function WorkshopToRolesTransition() {
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 50vw, 33vw"
+                    placeholder="blur"
+                    blurDataURL={BLUR_DATA_URL}
                   />
                 </div>
               ))}
