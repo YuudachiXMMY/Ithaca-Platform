@@ -27,7 +27,7 @@ export function Approach() {
               alt={t("approach.howWeTeach.imageAlt")}
               fill
               className="object-cover"
-              sizes="100vw"
+              sizes="(max-width: 1024px) 100vw, 80vw"
               placeholder="blur"
               blurDataURL={getBlurDataURL("/media/images/programs/ai-camp/ai-camp-HB8A5242.jpg")}
             />

@@ -322,7 +322,7 @@ export default function EVChallengePage() {
           alt="Ithaca EV driver celebrating during the race at Waterloo"
           fill
           className="object-cover"
-          sizes="100vw"
+          sizes="(max-width: 1024px) 100vw, 80vw"
           placeholder="blur"
           blurDataURL={getBlurDataURL("/media/images/programs/ev-challenge/EV26-2.JPG")}
         />

@@ -30,7 +30,8 @@
     "prod:rollback": "./scripts/prod.sh rollback",
     "build:test": "./scripts/build-test.sh",
     "build:test:run": "./scripts/build-test.sh --run",
-    "build:test:clean": "./scripts/build-test.sh --clean"
+    "build:test:clean": "./scripts/build-test.sh --clean",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"

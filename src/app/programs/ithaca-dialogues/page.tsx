@@ -94,7 +94,6 @@ export default async function EliteInterviewPage() {
             alt="Students in professional attire discussing research topics"
             fill
             className="object-cover"
-            priority
             sizes="100vw"
             placeholder="blur"
             blurDataURL={getBlurDataURL("/media/images/site/about-hero.jpg")}
@@ -219,7 +218,7 @@ export default async function EliteInterviewPage() {
               alt="Students presenting research findings to an audience"
               fill
               className="object-cover"
-              sizes="100vw"
+              sizes="(max-width: 1024px) 100vw, 80vw"
               placeholder="blur"
               blurDataURL={getBlurDataURL("/media/images/programs/ai-camp/ai-camp-HB8A5242.jpg")}
             />
@@ -386,7 +385,7 @@ export default async function EliteInterviewPage() {
           alt="Student delivering a professional presentation"
           fill
           className="object-cover"
-          sizes="100vw"
+          sizes="(max-width: 1024px) 100vw, 80vw"
           placeholder="blur"
           blurDataURL={getBlurDataURL("/media/images/programs/ai-camp/ai-camp-HB8A5465.jpg")}
         />
