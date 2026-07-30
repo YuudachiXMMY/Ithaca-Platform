@@ -11,7 +11,9 @@
  *   1. Scans public/media/images for JPG/PNG files above a size threshold
  *   2. Resizes to max-width (preserving aspect ratio) and re-encodes as
  *      progressive JPEG at the specified quality
- *   3. Overwrites the original file in-place (make sure to commit first!)
+ *   3. Overwrites the original file in-place, archiving the untouched master to
+ *      .archive/media-originals/images/ on first run (re-runs read that master,
+ *      so re-encoding never compounds loss). ICC color profile is preserved.
  *   4. Generates a tiny 16px-wide blur placeholder (base64) for each image
  *      and writes it to public/media/images/_blurData.json
  */
@@ -23,6 +25,9 @@ import * as path from "path";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const IMAGES_DIR = path.join(ROOT, "public", "media", "images");
 const BLUR_OUTPUT = path.join(IMAGES_DIR, "_blurData.json");
+// Pre-optimization masters live here (gitignored). The optimizer reads its
+// source from the archived master when present, so re-runs never compound loss.
+const ARCHIVE_ROOT = path.join(ROOT, ".archive", "media-originals", "images");
 
 // ── CLI args ──────────────────────────────────────────────
 const args = process.argv.slice(2);
@@ -114,10 +119,16 @@ async function main() {
 
     if (applyMode) {
       try {
-        const metadata = await sharp(file).metadata();
+        // Archive is the source of truth: on re-run, read the untouched master
+        // so a re-encode starts from the original, not an already-compressed file.
+        const archivePath = path.join(ARCHIVE_ROOT, path.relative(IMAGES_DIR, file));
+        const source = fs.existsSync(archivePath) ? archivePath : file;
+
+        const metadata = await sharp(source).metadata();
         const needsResize = (metadata.width ?? 0) > MAX_WIDTH;
 
-        let pipeline = sharp(file).rotate(); // auto-rotate based on EXIF
+        // .rotate() bakes EXIF orientation; .keepIccProfile() preserves color while dropping bulky EXIF.
+        let pipeline = sharp(source).rotate().keepIccProfile();
 
         if (needsResize) {
           pipeline = pipeline.resize(MAX_WIDTH, undefined, {
@@ -130,7 +141,8 @@ async function main() {
         const tmpPath = file + ".tmp";
 
         if (ext === ".png") {
-          await pipeline.png({ quality: QUALITY, progressive: true }).toFile(tmpPath);
+          // truecolor, lossless — no palette/quality quantization (avoids banding)
+          await pipeline.png({ compressionLevel: 9 }).toFile(tmpPath);
         } else {
           await pipeline.jpeg({ quality: QUALITY, progressive: true, mozjpeg: true }).toFile(tmpPath);
         }
@@ -139,6 +151,11 @@ async function main() {
         totalAfter += newSize;
 
         if (newSize < size) {
+          // First optimization only: preserve the master, never overwrite it on re-runs.
+          if (!fs.existsSync(archivePath)) {
+            fs.mkdirSync(path.dirname(archivePath), { recursive: true });
+            fs.copyFileSync(file, archivePath);
+          }
           fs.renameSync(tmpPath, file);
           const saved = ((1 - newSize / size) * 100).toFixed(1);
           console.log(`  ✅ ${relative}  ${formatBytes(size)} → ${formatBytes(newSize)}  (-${saved}%)`);
