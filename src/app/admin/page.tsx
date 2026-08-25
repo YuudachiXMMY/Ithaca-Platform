@@ -26,15 +26,18 @@ export default function AdminDashboardPage() {
 
   const fetchStats = useCallback(async () => {
     try {
-      const [subscribersRes, campaignsRes, popupsRes] = await Promise.all([
-        fetch("/api/admin/subscribers?page=1&limit=1"),
-        fetch("/api/admin/emails"),
-        fetch("/api/admin/popups"),
-      ]);
+      const [subscribersRes, campaignsRes, popupsRes, contactsRes] =
+        await Promise.all([
+          fetch("/api/admin/subscribers?page=1&limit=1"),
+          fetch("/api/admin/emails"),
+          fetch("/api/admin/popups"),
+          fetch("/api/admin/contacts"),
+        ]);
 
       const subscribersData = await subscribersRes.json();
       const campaignsData = await campaignsRes.json();
       const popupsData = await popupsRes.json();
+      const contactsData = await contactsRes.json();
 
       const totalSubscribers =
         subscribersData.data?.pagination?.total ?? 0;
@@ -51,7 +54,7 @@ export default function AdminDashboardPage() {
 
       setStats({
         totalSubscribers,
-        totalContacts: 0,
+        totalContacts: contactsData.data?.total ?? 0,
         campaignsSent,
         activePopups,
       });

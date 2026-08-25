@@ -6,6 +6,7 @@
 
 | Date       | Action  | Notes                                      |
 |------------|---------|---------------------------------------------|
+| 2026-08-25 | Updated | Phase 0 bugfixes + dependency patches: PopupBanner `buttonLink` fix, dashboard real contact count (`/api/admin/contacts`), GA now injected via `NEXT_PUBLIC_GA_TRACKING_ID` build-arg, Upstash rate-limit per-config keyed cache, `middleware.ts` renamed to `proxy.ts` (Next 16 convention) with fail-closed `getToken`, new `/privacy` + `/terms` legal pages (`legal` namespace), deps upgraded (next 16.3.x, next-auth 4.24.15, nodemailer 7.x) and `@auth/prisma-adapter` removed. |
 | 2026-06-25 | Updated | Incremental rescan: confirmed about-us cleanup (13 legacy section files removed, 9 active remain), verified all modules unchanged, updated index.json inactive refs, scripts module now 2 files (dev.sh + check-i18n.ts). |
 | 2026-06-25 | Updated | Full rescan: i18n docs, font/color corrections, new components (CinematicDivider, ImpactStats, EVModel3D, LanguageSwitcher), about-us redesign (9 active sections, 13 legacy removed), elite-interview route, 404 page, GSAP/Three.js deps, module docs updated. |
 | 2026-06-14 | Updated | Full deep scan; added module-level CLAUDE.md files, updated index.json. |
@@ -164,8 +165,11 @@ npm run dev                                       # http://localhost:3000
 | `ADMIN_EMAIL`      | Seed     | Admin email for `prisma/seed.ts`         |
 | `ADMIN_PASSWORD`   | Seed     | Admin password for `prisma/seed.ts`      |
 
-**Note:** Google Analytics tracking ID (`G-675W5PPJEJ`) is hardcoded in `src/app/layout.tsx`,
-not configured via environment variable.
+**Note:** Google Analytics tracking ID is injected at build time via the
+`NEXT_PUBLIC_GA_TRACKING_ID` environment variable (read in `src/app/layout.tsx`).
+In Docker/CI it is supplied as a build-arg (`Dockerfile` + `.github/workflows/deploy.yml`),
+defaulting to `G-675W5PPJEJ`. NEXT_PUBLIC_* values are inlined at build time, so the
+variable must be present before `npm run build`.
 
 ### Docker
 

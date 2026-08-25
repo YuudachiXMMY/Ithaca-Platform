@@ -81,39 +81,52 @@ export interface RateLimitOptions {
 // ---------------------------------------------------------------------------
 
 type UpstashRatelimit = import("@upstash/ratelimit").Ratelimit;
+type UpstashRedis = import("@upstash/redis").Redis;
 
-let upstashRatelimit: UpstashRatelimit | null = null;
-let upstashInitialised = false;
+let redisClient: UpstashRedis | null = null;
+let redisInitAttempted = false;
+// Cache one Ratelimit per distinct (maxRequests, windowMs) config so that
+// e.g. subscribe (10/60s) and contact (5/60s) do NOT share a single instance.
+const ratelimitCache = new Map<string, UpstashRatelimit>();
 
 async function getUpstashRatelimit(
   maxRequests: number,
   windowMs: number,
 ): Promise<UpstashRatelimit | null> {
-  if (upstashInitialised) return upstashRatelimit;
-  upstashInitialised = true;
+  const cacheKey = `${maxRequests}:${windowMs}`;
+  const cached = ratelimitCache.get(cacheKey);
+  if (cached) return cached;
 
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) return null;
+  if (!redisInitAttempted) {
+    redisInitAttempted = true;
+    const url = process.env.UPSTASH_REDIS_REST_URL;
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+    if (url && token) {
+      try {
+        const { Redis } = await import("@upstash/redis");
+        redisClient = new Redis({ url, token });
+      } catch (err) {
+        console.warn("[rate-limit] Upstash init failed, falling back to memory:", err);
+        redisClient = null;
+      }
+    }
+  }
+  if (!redisClient) return null;
 
   try {
-    const { Redis } = await import("@upstash/redis");
     const { Ratelimit } = await import("@upstash/ratelimit");
-
-    const redis = new Redis({ url, token });
     const windowSeconds = Math.ceil(windowMs / 1000);
-
-    upstashRatelimit = new Ratelimit({
-      redis,
+    const rl = new Ratelimit({
+      redis: redisClient,
       limiter: Ratelimit.slidingWindow(maxRequests, `${windowSeconds} s`),
       analytics: false,
     });
+    ratelimitCache.set(cacheKey, rl);
+    return rl;
   } catch (err) {
-    console.warn("[rate-limit] Upstash init failed, falling back to memory:", err);
-    upstashRatelimit = null;
+    console.warn("[rate-limit] Upstash ratelimit build failed, falling back to memory:", err);
+    return null;
   }
-
-  return upstashRatelimit;
 }
 
 // ---------------------------------------------------------------------------
