@@ -177,7 +177,7 @@ The **minimum to validate the hypothesis** is the **public marketing site** rebu
 | # | Phase | Description | Status | Parallel | Depends | PRP Plan |
 |---|-------|-------------|--------|----------|---------|----------|
 | 0 | Foundation & scaffolding | SvelteKit 2 + adapter-node + Docker + Prisma wired; Tailwind v4 tokens ported; Paraglide `/zh` routing skeleton; shared layout (Header/Footer); Cloudflare in front; **baseline metrics captured** | in-progress | - | - | [plan](../plans/phase-0-foundation-scaffolding-sveltekit.plan.md) |
-| 1 | Public site + media pipeline | Port all 12 public routes (content/images) as Svelte; enhanced-img AVIF/WebP; adaptive video; gated CJK fonts; prerender + edge cache | pending | with 3 | 0 | - |
+| 1 | Public site + media pipeline | Port all 12 public routes (content/images) as Svelte; enhanced-img AVIF/WebP; adaptive video; gated CJK fonts; prerender + edge cache | in-progress | with 3 | 0 | [plan](../plans/phase-1-public-site-media-pipeline-sveltekit.plan.md) |
 | 2 | Animation & 3D layer | Svelte transitions + `inview` + CSS scroll-timeline for sections; Threlte EV scene (lazy, on-demand); lazy GSAP where needed; reduced-motion | pending | - | 1 | - |
 | 3 | Admin CMS + auth + API | Better Auth (bcrypt reuse + data-migration); port admin panel; API routes → `+server.ts` (subscribe/contact/admin CRUD/emails); nodemailer + rate-limit + Zod | pending | with 1 | 0 | - |
 | 4 | Interaction & perf hardening | Loading skeletons/transitions; cached popup (SWR); SSR-seeded CSRF; focus-trap/Escape; global reduced-motion; SEO parity (metadata, sitemap, hreflang, GA); Lighthouse/CWV validation vs targets | pending | - | 2, 3 | - |
