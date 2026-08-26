@@ -1,0 +1,23 @@
+# Development-only: PostgreSQL database
+# Next.js runs natively on host for hot reload
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: ithacafa-dev-db
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: ithacafa
+      POSTGRES_USER: ithacafa
+      POSTGRES_PASSWORD: ithacafa_dev_2026
+    volumes:
+      - ithacafa-dev-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ithacafa -d ithacafa']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  ithacafa-dev-data:

@@ -187,6 +187,7 @@ The **minimum to validate the hypothesis** is the **public marketing site** rebu
 
 **Phase 0: Foundation & scaffolding**
 - **Status**: in-progress — plan: `.claude/PRPs/plans/phase-0-foundation-scaffolding-sveltekit.plan.md`
+- **Implementation (2026-08-26)**: Code/Docker/Prisma/i18n/prerender **validated** (project under `sveltekit/`; `svelte-check`+lint+build green; `docker build`+containerized self-migrate+serve verified; `/`+`/zh` prerender with correct `<html lang>`; 0 Noto bytes on `/`). **Pending (infra, not code):** apply Cloudflare cache rules (see `sveltekit/docs/DEPLOYMENT.md`) and capture live-prod baselines (see `.claude/PRPs/baselines/README.md`). Report: `.claude/PRPs/reports/phase-0-foundation-scaffolding-sveltekit-report.md`.
 - **Goal**: A deployable SvelteKit shell with the correct rendering/i18n/hosting spine and a measured baseline.
 - **Scope**: Project init; adapter-node Docker parity with current multi-stage build; Prisma singleton + `migrate deploy` entrypoint; Paraglide configured (en/`/zh`, `reroute`+`handle`); Tailwind v4 theme/tokens + globals (grain overlay, palette) ported; Header/Footer shell; Cloudflare zone + cache rules (public vs admin/API); **capture current-prod Lighthouse/CWV/bundle baselines**.
 - **Success signal**: A prerendered "hello" content route serves from the edge (`Cf-Cache-Status: HIT`); `/zh` variant prerenders; admin/API paths bypass cache; baseline numbers recorded.
