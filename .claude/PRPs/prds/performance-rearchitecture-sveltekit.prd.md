@@ -176,7 +176,7 @@ The **minimum to validate the hypothesis** is the **public marketing site** rebu
 
 | # | Phase | Description | Status | Parallel | Depends | PRP Plan |
 |---|-------|-------------|--------|----------|---------|----------|
-| 0 | Foundation & scaffolding | SvelteKit 2 + adapter-node + Docker + Prisma wired; Tailwind v4 tokens ported; Paraglide `/zh` routing skeleton; shared layout (Header/Footer); Cloudflare in front; **baseline metrics captured** | pending | - | - | - |
+| 0 | Foundation & scaffolding | SvelteKit 2 + adapter-node + Docker + Prisma wired; Tailwind v4 tokens ported; Paraglide `/zh` routing skeleton; shared layout (Header/Footer); Cloudflare in front; **baseline metrics captured** | in-progress | - | - | [plan](../plans/phase-0-foundation-scaffolding-sveltekit.plan.md) |
 | 1 | Public site + media pipeline | Port all 12 public routes (content/images) as Svelte; enhanced-img AVIF/WebP; adaptive video; gated CJK fonts; prerender + edge cache | pending | with 3 | 0 | - |
 | 2 | Animation & 3D layer | Svelte transitions + `inview` + CSS scroll-timeline for sections; Threlte EV scene (lazy, on-demand); lazy GSAP where needed; reduced-motion | pending | - | 1 | - |
 | 3 | Admin CMS + auth + API | Better Auth (bcrypt reuse + data-migration); port admin panel; API routes → `+server.ts` (subscribe/contact/admin CRUD/emails); nodemailer + rate-limit + Zod | pending | with 1 | 0 | - |
@@ -186,6 +186,7 @@ The **minimum to validate the hypothesis** is the **public marketing site** rebu
 ### Phase Details
 
 **Phase 0: Foundation & scaffolding**
+- **Status**: in-progress — plan: `.claude/PRPs/plans/phase-0-foundation-scaffolding-sveltekit.plan.md`
 - **Goal**: A deployable SvelteKit shell with the correct rendering/i18n/hosting spine and a measured baseline.
 - **Scope**: Project init; adapter-node Docker parity with current multi-stage build; Prisma singleton + `migrate deploy` entrypoint; Paraglide configured (en/`/zh`, `reroute`+`handle`); Tailwind v4 theme/tokens + globals (grain overlay, palette) ported; Header/Footer shell; Cloudflare zone + cache rules (public vs admin/API); **capture current-prod Lighthouse/CWV/bundle baselines**.
 - **Success signal**: A prerendered "hello" content route serves from the edge (`Cf-Cache-Status: HIT`); `/zh` variant prerenders; admin/API paths bypass cache; baseline numbers recorded.
