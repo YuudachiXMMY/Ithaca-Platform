@@ -10,7 +10,7 @@ interface PopupData {
   title: string;
   content: string;
   buttonText?: string;
-  buttonHref?: string;
+  buttonLink?: string;
 }
 
 const STORAGE_KEY = "ithaca-popup-dismissed";
@@ -126,10 +126,10 @@ export function PopupBanner() {
 
             {popup.buttonText && (
               <div className="mt-6">
-                {popup.buttonHref ? (
+                {popup.buttonLink ? (
                   <Button
                     as="link"
-                    href={popup.buttonHref}
+                    href={popup.buttonLink}
                     size="md"
                     onClick={dismiss}
                   >

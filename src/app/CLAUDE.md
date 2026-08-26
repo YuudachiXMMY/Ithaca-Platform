@@ -6,6 +6,7 @@
 
 | Date       | Action  | Notes                         |
 |------------|---------|-------------------------------|
+| 2026-08-25 | Updated | Phase 0: `middleware.ts` renamed to `proxy.ts` (Next 16 Proxy convention) with fail-closed `getToken`; new `/api/admin/contacts` count endpoint wired into dashboard; new `/privacy` + `/terms` server pages (`legal` namespace). |
 | 2026-06-25 | Updated | Incremental rescan: confirmed 13 inactive about-us section files fully removed; 9 active sections remain. No other file changes detected. |
 | 2026-06-25 | Updated | Full rescan: i18n integration details, about-us redesign (9 active + 13 inactive sections), elite-interview route, ai-pioneers-interview redirect, 404 page, font/color corrections, GSAP/Three.js deps, homepage sections (ImpactStats, CinematicDivider). |
 | 2026-06-25 | Updated | Removed 13 inactive about-us legacy section files; about-us now has 9 active sections. |
@@ -29,7 +30,7 @@ This directory is the Next.js App Router entry point. It contains:
 | `page.tsx` | Homepage: assembles HeroSection, MissionSection, ProgramsShowcase, ImpactStats, CinematicDivider, FeaturedSection, StudentHighlights, ContactSection |
 | `not-found.tsx` | Custom 404 page with accent-colored "Back to home" link |
 | `globals.css` | CSS variables (`#111318` bg, `#f0f1f3` fg, `#ccdef0` accent), Tailwind v4 import, grain texture overlay, skip-to-content, EV Challenge glassmorphism panels |
-| `../middleware.ts` | Intercepts `/admin/*` requests; redirects unauthenticated users to `/admin/login` |
+| `../proxy.ts` | Intercepts `/admin/*` requests; redirects unauthenticated users to `/admin/login` (Next 16 Proxy convention; formerly `middleware.ts`). Wraps `getToken` in try/catch for fail-closed handling of malformed Bearer headers. |
 
 ## Public Pages
 
@@ -212,5 +213,5 @@ src/app/
       emails/send/route.ts
       popups/route.ts
       popups/active/route.ts
-src/middleware.ts                      # Auth middleware
+src/proxy.ts                           # Auth proxy (Next 16; formerly middleware.ts)
 ```

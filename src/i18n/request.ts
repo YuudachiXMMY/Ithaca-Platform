@@ -29,6 +29,7 @@ export default getRequestConfig(async () => {
     import(`../../messages/${locale}/contact.json`),
     import(`../../messages/${locale}/admin.json`),
     import(`../../messages/${locale}/metadata.json`),
+    import(`../../messages/${locale}/legal.json`),
   ]);
 
   const messages = Object.assign({}, ...modules.map((m) => m.default));
