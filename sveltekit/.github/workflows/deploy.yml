@@ -1,0 +1,59 @@
+# ── Build & Push the SvelteKit image to GHCR on the `prod` branch ──────────
+# Mirrors the Next.js app's workflow (renamed GA build-arg key -> PUBLIC_GA_TRACKING_ID).
+#
+# NOTE: GitHub only runs workflows from the REPOSITORY-ROOT `.github/workflows/`. To
+# activate this while the SvelteKit project lives in the `sveltekit/` subdir, either
+# (a) move this file to the repo root and set `context: ./sveltekit` +
+#     `file: ./sveltekit/Dockerfile`, or
+# (b) extract the SvelteKit project to its own repository (context stays `.`).
+name: Build & Deploy (SvelteKit)
+
+on:
+  push:
+    branches: [prod]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}-kit
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=
+            type=raw,value=latest
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          build-args: |
+            PUBLIC_GA_TRACKING_ID=${{ vars.PUBLIC_GA_TRACKING_ID || 'G-675W5PPJEJ' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
