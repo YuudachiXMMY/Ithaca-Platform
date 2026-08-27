@@ -1,5 +1,8 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
+	import { onMount } from 'svelte';
+	import { prefersReducedMotion } from 'svelte/motion';
+	import { loadGsap } from '$lib/motion/gsap';
 	import type { Picture } from 'vite-imagetools';
 	import img189 from '$lib/assets/highlights/wechat-img-189.jpg?enhanced';
 	import ev5 from '$lib/assets/programs/ev-challenge/EV25-5s.png?enhanced';
@@ -8,9 +11,10 @@
 	import img197 from '$lib/assets/highlights/wechat-img-197.jpg?enhanced';
 	import appImg from '$lib/assets/programs/app.png?enhanced';
 
-	// Static port: on md+ the Next component runs a GSAP horizontal-scroll pin. Its
-	// reduced-motion branch (reduce=true) drops the pin and makes the track a plain
-	// overflow-x-auto strip — that is the Phase 1 form ported here. Mobile stays a 2-col grid.
+	// Tier-2 GSAP horizontal-scroll pin on md+ (StudentHighlights.tsx:203-247), layered on
+	// top of the static overflow-x-auto strip below. Under `prefersReducedMotion.current` OR
+	// viewport < 768px we early-return from onMount → the wrapper stays `overflow-x-auto`
+	// (the Phase-1 native-scroll form) and the mobile 2-col grid is untouched.
 	interface Highlight {
 		img: Picture;
 		title: () => string;
@@ -75,6 +79,50 @@
 		{ type: 'hero', index: 3, width: 440 },
 		{ type: 'stack', indices: [4, 5], width: 380, split: ['58%', '42%'] }
 	];
+
+	// Desktop horizontal-pin refs. `animate` flips the wrapper overflow (auto → hidden)
+	// only once GSAP has actually taken over, so SSR/reduced/mobile keep native scroll.
+	let wrapEl: HTMLDivElement | undefined = $state();
+	let trackEl: HTMLDivElement | undefined = $state();
+	let progressEl: HTMLDivElement | undefined = $state();
+	let animate = $state(false);
+
+	onMount(() => {
+		// Reduced motion OR mobile → keep the static overflow-x-auto strip (Phase-1 form).
+		if (prefersReducedMotion.current || window.innerWidth < 768) return;
+
+		let cancelled = false;
+		let ctx: { revert: () => void } | undefined;
+
+		loadGsap().then(({ gsap }) => {
+			if (cancelled || !wrapEl || !trackEl) return;
+			animate = true;
+
+			ctx = gsap.context(() => {
+				const distance = trackEl!.scrollWidth - window.innerWidth;
+
+				const tl = gsap.timeline({
+					scrollTrigger: {
+						trigger: wrapEl,
+						start: 'top top',
+						end: () => `+=${distance}`,
+						pin: true,
+						scrub: 1,
+						invalidateOnRefresh: true
+					}
+				});
+
+				// Pan the mosaic track left by its overflow width; fill the progress bar in sync.
+				tl.to(trackEl!, { x: -distance, ease: 'none' }, 0);
+				tl.to(progressEl!, { scaleX: 1, ease: 'none' }, 0);
+			}, wrapEl);
+		});
+
+		return () => {
+			cancelled = true;
+			ctx?.revert();
+		};
+	});
 </script>
 
 {#snippet cell(highlight: Highlight, index: number, showDescription: boolean)}
@@ -131,9 +179,12 @@
 		</div>
 	</div>
 
-	<!-- Desktop: data-strip + horizontal mosaic (md+), static overflow-x-auto form -->
+	<!-- Desktop: data-strip + horizontal mosaic (md+); overflow-x-auto until GSAP pins -->
 	<div class="hidden md:block">
-		<div class="relative overflow-x-auto bg-[#0e1015]">
+		<div
+			bind:this={wrapEl}
+			class="relative bg-[#0e1015] {animate ? 'overflow-hidden' : 'overflow-x-auto'}"
+		>
 			<div class="flex h-[100dvh] flex-col pt-18">
 				<!-- Compact data-strip header -->
 				<div class="shrink-0 px-5 sm:px-8 md:px-[6vw]">
@@ -156,7 +207,10 @@
 				</div>
 
 				<!-- Horizontal mosaic track -->
-				<div class="flex flex-1 items-stretch gap-[2px] px-5 pb-2 sm:px-8 md:px-[6vw]">
+				<div
+					bind:this={trackEl}
+					class="flex flex-1 items-stretch gap-[2px] px-5 pb-2 sm:px-8 md:px-[6vw]"
+				>
 					{#each COLUMNS as col, ci (ci)}
 						{#if col.type === 'hero'}
 							<div class="relative shrink-0" style="width: {col.width}px">
@@ -185,9 +239,9 @@
 				</div>
 			</div>
 
-			<!-- Thin progress indicator (static) -->
+			<!-- Thin progress indicator (GSAP fills scaleX 0 → 1 while pinned) -->
 			<div class="absolute inset-x-0 bottom-0 h-[2px] bg-white/[0.04]">
-				<div class="h-full w-full origin-left scale-x-0 bg-accent/40"></div>
+				<div bind:this={progressEl} class="h-full w-full origin-left scale-x-0 bg-accent/40"></div>
 			</div>
 		</div>
 	</div>

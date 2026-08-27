@@ -6,6 +6,9 @@ import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+	// three (and three/addons/*) touch browser globals and ship ESM that must be
+	// bundled for SSR/prerender rather than externalized as a bare Node require.
+	ssr: { noExternal: ['three'] },
 	plugins: [
 		tailwindcss(),
 		// strategy + urlPatterns live HERE (the Vite plugin), not in settings.json.

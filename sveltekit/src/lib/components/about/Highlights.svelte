@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
+	import { prefersReducedMotion } from 'svelte/motion';
 	import community0 from '$lib/assets/highlights/screenshot-2025-09-15.png?enhanced';
 	import community1 from '$lib/assets/highlights/screenshot-2025-09-16.png?enhanced';
 	import community2 from '$lib/assets/highlights/wechat-img-187.jpg?enhanced';
@@ -58,7 +59,10 @@
 		const children = container.children;
 		if (index < 0 || index >= children.length) return;
 		const child = children[index] as HTMLElement;
-		container.scrollTo({ left: child.offsetLeft, behavior: 'smooth' });
+		container.scrollTo({
+			left: child.offsetLeft,
+			behavior: prefersReducedMotion.current ? 'auto' : 'smooth'
+		});
 		activeIndex = index;
 	}
 </script>

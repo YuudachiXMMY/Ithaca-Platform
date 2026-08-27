@@ -172,3 +172,103 @@ html {
 ::-webkit-scrollbar-thumb:hover {
 	background: var(--accent);
 }
+
+/* ==========================================================================
+   Phase 2 — Animation & 3D layer
+   ========================================================================== */
+
+/* Global reduced-motion guard. Neutralizes smooth scroll + every CSS
+   animation/transition so the site collapses to its static Phase-1 look for
+   users who ask for less motion. JS tiers branch on `prefersReducedMotion`
+   separately; this covers pure-CSS motion (orbital rings, scroll-timelines). */
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.001ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.001ms !important;
+		scroll-behavior: auto !important;
+	}
+}
+
+/* EV Challenge: ambient section backgrounds (deferred from Phase 1).
+   Referenced by routes/programs/ev-challenge/+page.svelte (sections at
+   219/437/548/628). Radial-gradient ambience keyed to the .ev-roles-bg
+   accent palette (rgba(204, 222, 240, …) glow over the dark base). */
+.ev-ambient-a {
+	background:
+		radial-gradient(ellipse 700px 500px at 20% 15%, rgba(204, 222, 240, 0.12) 0%, transparent 60%),
+		radial-gradient(ellipse 600px 500px at 90% 85%, rgba(160, 190, 220, 0.08) 0%, transparent 60%),
+		radial-gradient(ellipse at 50% 50%, rgba(19, 22, 30, 1) 0%, rgba(14, 16, 22, 1) 100%);
+}
+
+.ev-ambient-b {
+	background:
+		radial-gradient(ellipse 750px 550px at 85% 20%, rgba(204, 222, 240, 0.13) 0%, transparent 62%),
+		radial-gradient(ellipse 600px 480px at 12% 78%, rgba(160, 190, 220, 0.09) 0%, transparent 60%),
+		radial-gradient(ellipse at 50% 50%, rgba(20, 24, 32, 1) 0%, rgba(13, 15, 21, 1) 100%);
+}
+
+.ev-ambient-c {
+	background:
+		radial-gradient(ellipse 900px 650px at 50% 25%, rgba(204, 222, 240, 0.14) 0%, transparent 65%),
+		radial-gradient(ellipse 620px 520px at 50% 90%, rgba(160, 190, 220, 0.08) 0%, transparent 58%),
+		radial-gradient(ellipse at 50% 50%, rgba(20, 24, 32, 1) 0%, rgba(14, 16, 22, 1) 100%);
+}
+
+.ev-ambient-close {
+	background:
+		radial-gradient(ellipse 800px 400px at 50% 100%, rgba(204, 222, 240, 0.08) 0%, transparent 60%),
+		radial-gradient(ellipse at 50% 50%, rgba(17, 19, 24, 1) 0%, rgba(13, 15, 20, 1) 100%);
+}
+
+/* --------------------------------------------------------------------------
+   Shared keyframes referenced by the component stage.
+   -------------------------------------------------------------------------- */
+
+/* Tier 1 — MissionSection sticky-stack scrub (@supports animation-timeline).
+   The component authors the RESTING state as the finished/visible look and
+   applies this keyframe ONLY inside an @supports block with fill-mode:both,
+   so Firefox (no animation-timeline) keeps a clean sticky stack. */
+@keyframes mission-recede {
+	to {
+		scale: 0.92;
+		opacity: 0.4;
+	}
+}
+
+/* Tier 0 — ContactSection OrbitalField (pure-CSS infinite loops). */
+@keyframes ring-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes breathing-glow {
+	0%,
+	100% {
+		opacity: 0.04;
+	}
+	50% {
+		opacity: 0.12;
+	}
+}
+
+@keyframes particle-drift {
+	0% {
+		transform: translateY(0);
+		opacity: 0;
+	}
+	20%,
+	80% {
+		opacity: 0.6;
+	}
+	100% {
+		transform: translateY(-40px);
+		opacity: 0;
+	}
+}

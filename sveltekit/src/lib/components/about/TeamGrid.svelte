@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
+	import Reveal from '$lib/components/shared/Reveal.svelte';
 	import { TEAM_MEMBERS } from '$lib/data/team';
 	import joshuaWang from '$lib/assets/team/joshua-wang.jpg?enhanced';
 	import jadynWu from '$lib/assets/team/jadyn-wu.png?enhanced';
@@ -31,35 +32,39 @@
 
 <section class="bg-[#0c0e12] py-12 lg:py-16" aria-labelledby="team-heading">
 	<div class="mx-auto max-w-[1400px] px-4 lg:px-6">
-		<div>
-			<h2 id="team-heading" class="text-2xl font-bold tracking-tight text-white md:text-4xl">
-				{m.about_team_heading()}
-			</h2>
-			<p class="mt-2 max-w-md text-base leading-relaxed text-gray-400">
-				{m.about_team_subtitle()}
-			</p>
-		</div>
+		<Reveal y={20} duration={500}>
+			<div>
+				<h2 id="team-heading" class="text-2xl font-bold tracking-tight text-white md:text-4xl">
+					{m.about_team_heading()}
+				</h2>
+				<p class="mt-2 max-w-md text-base leading-relaxed text-gray-400">
+					{m.about_team_subtitle()}
+				</p>
+			</div>
+		</Reveal>
 
 		<!-- Compact 4-column grid - all equal for density -->
 		<div class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-			{#each TEAM_MEMBERS as member (member.name)}
-				<div>
-					<div class="relative aspect-[3/4] overflow-hidden rounded-lg bg-[#111318]">
-						{#if TEAM_IMAGE[member.name]}
-							<enhanced:img
-								src={TEAM_IMAGE[member.name]}
-								alt={member.name}
-								sizes="(max-width: 640px) 50vw, 25vw"
-								class="absolute inset-0 h-full w-full object-cover"
-							/>
-						{/if}
+			{#each TEAM_MEMBERS as member, i (member.name)}
+				<Reveal y={20} duration={400} delay={i * 50}>
+					<div>
+						<div class="relative aspect-[3/4] overflow-hidden rounded-lg bg-[#111318]">
+							{#if TEAM_IMAGE[member.name]}
+								<enhanced:img
+									src={TEAM_IMAGE[member.name]}
+									alt={member.name}
+									sizes="(max-width: 640px) 50vw, 25vw"
+									class="absolute inset-0 h-full w-full object-cover"
+								/>
+							{/if}
+						</div>
+						<h4 class="mt-3 text-sm font-bold text-white">{member.name}</h4>
+						<p class="text-xs font-medium text-[#ccdef0]/70">{teamMsg(member.title)}</p>
+						<p class="mt-1 text-xs leading-relaxed text-gray-400">
+							{teamMsg(member.description)}
+						</p>
 					</div>
-					<h4 class="mt-3 text-sm font-bold text-white">{member.name}</h4>
-					<p class="text-xs font-medium text-[#ccdef0]/70">{teamMsg(member.title)}</p>
-					<p class="mt-1 text-xs leading-relaxed text-gray-400">
-						{teamMsg(member.description)}
-					</p>
-				</div>
+				</Reveal>
 			{/each}
 		</div>
 	</div>

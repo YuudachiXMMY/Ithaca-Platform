@@ -31,7 +31,7 @@
 <section aria-label="Our Mission">
 	<div class="relative">
 		{#each PILLARS as pillar, i (i)}
-			<div class="top-0 bg-[#111318] md:sticky md:min-h-[100dvh]">
+			<div class="mission-card top-0 bg-[#111318] md:sticky md:min-h-[100dvh]">
 				<div class="mx-auto grid max-w-[1400px] items-center md:min-h-[100dvh] md:grid-cols-2">
 					<!-- Image -->
 					<div
@@ -65,3 +65,25 @@
 		{/each}
 	</div>
 </section>
+
+<style>
+	/* Tier 1 — CSS scroll-timeline scrub. RESTING state (below) is the
+	   finished/visible look: full scale + opacity. The recede is applied ONLY
+	   inside @supports (animation-timeline: view()) so Firefox stable (no
+	   animation-timeline) keeps a clean sticky stack, and the global
+	   prefers-reduced-motion block in app.css neutralizes it. The last card
+	   never recedes (nothing scrolls over it) — mirrors the GSAP guard that
+	   skipped cards[length-1]. */
+	.mission-card {
+		scale: 1;
+		opacity: 1;
+	}
+
+	@supports (animation-timeline: view()) {
+		.mission-card:not(:last-child) {
+			animation: mission-recede linear both;
+			animation-timeline: view();
+			animation-range: cover 0% cover 100%;
+		}
+	}
+</style>
