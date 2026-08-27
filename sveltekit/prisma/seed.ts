@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { randomUUID } from 'node:crypto';
 import { hash } from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -13,20 +14,36 @@ async function main() {
 		);
 	}
 
+	// bcrypt cost 12 — the algorithm Better Auth's password.verify uses (see $lib/server/auth).
 	const passwordHash = await hash(password, 12);
 
-	const adminUser = await prisma.adminUser.upsert({
+	// Direct insert of a Better Auth User + credential Account. This bypasses the sign-up route
+	// (which disableSignUp:true blocks), so it works regardless of that setting. Idempotent.
+	const user = await prisma.user.upsert({
 		where: { email },
-		update: { passwordHash },
-		create: {
-			email,
-			passwordHash,
-			name: 'Admin',
-			role: 'admin'
-		}
+		update: { emailVerified: true },
+		create: { id: randomUUID(), email, name: 'Admin', emailVerified: true }
 	});
 
-	process.stdout.write(`Admin user seeded: ${adminUser.email} (${adminUser.id})\n`);
+	const existing = await prisma.account.findFirst({
+		where: { userId: user.id, providerId: 'credential' }
+	});
+	if (existing) {
+		await prisma.account.update({ where: { id: existing.id }, data: { password: passwordHash } });
+	} else {
+		await prisma.account.create({
+			data: {
+				id: randomUUID(),
+				issuer: 'local:credential', // Better Auth 1.7 scopes account identity by issuer
+				accountId: user.id, // credential accounts: accountId === userId
+				providerId: 'credential',
+				userId: user.id,
+				password: passwordHash
+			}
+		});
+	}
+
+	process.stdout.write(`Admin user seeded: ${user.email} (${user.id})\n`);
 }
 
 main()

@@ -10,10 +10,16 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
+	import PopupBanner from '$lib/components/PopupBanner.svelte';
 	import * as m from '$lib/paraglide/messages';
 	import { getLocale } from '$lib/paraglide/runtime';
+	import { page } from '$app/state';
 
 	let { children } = $props();
+
+	// Admin routes render their own chrome (sidebar in the (protected) layout, or the
+	// full-screen login form); skip the public Header/Footer/PopupBanner for them.
+	const isAdmin = $derived(page.url.pathname.startsWith('/admin'));
 </script>
 
 <svelte:head>
@@ -25,9 +31,14 @@
 	{/if}
 </svelte:head>
 
-<a href="#main-content" class="skip-to-content">{m.common_skipToContent()}</a>
-<Header />
-<main id="main-content" class="flex-1">
+{#if isAdmin}
 	{@render children()}
-</main>
-<Footer />
+{:else}
+	<a href="#main-content" class="skip-to-content">{m.common_skipToContent()}</a>
+	<Header />
+	<main id="main-content" class="flex-1">
+		{@render children()}
+	</main>
+	<Footer />
+	<PopupBanner />
+{/if}

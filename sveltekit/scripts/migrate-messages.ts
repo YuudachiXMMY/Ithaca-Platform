@@ -7,8 +7,8 @@
  * JSON root key of each file (nav.json = { nav: { home } }), so nav.home -> nav_home
  * (do NOT prepend the filename again). Arrays -> indexed keys (body[0] -> body_0).
  *
- * The `admin` namespace is intentionally excluded (Phase 3). Existing Phase-0 keys not
- * present in the source (e.g. page_hello_*, common_skipToContent) are preserved. Source
+ * All namespaces are included (the `admin` namespace was added in Phase 3). Existing keys
+ * not present in the source (e.g. page_hello_*, common_skipToContent) are preserved. Source
  * values win on conflict.
  *
  * Run: npx tsx scripts/migrate-messages.ts
@@ -19,7 +19,7 @@ import { join } from 'node:path';
 const SRC_DIR = join('..', 'messages'); // Next app catalogs (../messages/{en,zh})
 const OUT_DIR = 'messages'; // Paraglide flat files (./messages/{en,zh}.json)
 const LOCALES = ['en', 'zh'] as const;
-const EXCLUDE = new Set(['admin.json']); // Phase 3
+const EXCLUDE = new Set<string>(); // (admin namespace added in Phase 3)
 
 type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
 

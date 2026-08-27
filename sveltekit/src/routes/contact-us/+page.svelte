@@ -43,6 +43,41 @@
 		}
 	] as const;
 
+	// Contact form (Phase 3): posts to /api/contact (Zod-validated, rate-limited server-side).
+	let cf = $state({ name: '', email: '', phone: '', message: '', subscribe: true });
+	let cfStatus = $state<'idle' | 'submitting' | 'success' | 'error'>('idle');
+	let cfMessage = $state('');
+
+	async function submitContact(e: SubmitEvent) {
+		e.preventDefault();
+		cfMessage = '';
+		if (!cf.name.trim() || !cf.email.trim()) {
+			cfStatus = 'error';
+			cfMessage = 'Please fill in your name and email.';
+			return;
+		}
+		cfStatus = 'submitting';
+		try {
+			const res = await fetch('/api/contact', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(cf)
+			});
+			const data = await res.json();
+			if (!data.success) {
+				cfStatus = 'error';
+				cfMessage = data.error ?? 'Something went wrong. Please try again.';
+				return;
+			}
+			cfStatus = 'success';
+			cfMessage = "Thanks — we'll be in touch soon.";
+			cf = { name: '', email: '', phone: '', message: '', subscribe: true };
+		} catch {
+			cfStatus = 'error';
+			cfMessage = 'Something went wrong. Please try again.';
+		}
+	}
+
 	// LazyMap: IntersectionObserver-gated Google Maps iframe (mirror LAZY_VIDEO_INTERSECTION).
 	let mapContainer = $state<HTMLDivElement | null>(null);
 	let mapVisible = $state(false);
@@ -147,9 +182,8 @@
 				</h2>
 				<form
 					class="flex flex-col gap-4"
-					onsubmit={(e) => e.preventDefault()}
-					aria-label="Contact form (coming soon)"
-					novalidate
+					onsubmit={submitContact}
+					aria-label={m.contact_page_sendMessage()}
 				>
 					<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 						<div>
@@ -160,7 +194,7 @@
 								id="contact-name"
 								type="text"
 								autocomplete="name"
-								disabled
+								bind:value={cf.name}
 								placeholder={m.contact_form_namePlaceholder()}
 								class="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder-foreground/25 transition-colors focus:border-accent focus:outline-none"
 							/>
@@ -177,7 +211,7 @@
 								id="contact-email"
 								type="email"
 								autocomplete="email"
-								disabled
+								bind:value={cf.email}
 								placeholder={m.contact_form_emailPlaceholder()}
 								class="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder-foreground/25 transition-colors focus:border-accent focus:outline-none"
 							/>
@@ -192,7 +226,7 @@
 							id="contact-phone"
 							type="tel"
 							autocomplete="tel"
-							disabled
+							bind:value={cf.phone}
 							placeholder={m.contact_form_phonePlaceholder()}
 							class="w-full rounded-lg border border-border bg-background px-3 py-2.5 font-mono text-sm text-foreground placeholder-foreground/25 transition-colors focus:border-accent focus:outline-none"
 						/>
@@ -208,7 +242,7 @@
 						<textarea
 							id="contact-message"
 							rows="4"
-							disabled
+							bind:value={cf.message}
 							placeholder={m.contact_form_messagePlaceholder()}
 							class="w-full resize-y rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder-foreground/25 transition-colors focus:border-accent focus:outline-none"
 						></textarea>
@@ -218,8 +252,7 @@
 						<label class="flex cursor-pointer items-center gap-2 select-none">
 							<input
 								type="checkbox"
-								disabled
-								checked
+								bind:checked={cf.subscribe}
 								class="h-3.5 w-3.5 rounded border-border bg-background text-accent focus:ring-accent focus:ring-offset-0"
 							/>
 							<span class="text-xs text-foreground/55">{m.contact_form_subscribeLabel()}</span>
@@ -227,12 +260,18 @@
 
 						<button
 							type="submit"
-							disabled
-							class="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-foreground-dark opacity-60"
+							disabled={cfStatus === 'submitting'}
+							class="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-foreground-dark disabled:opacity-60"
 						>
 							{m.contact_form_submitButton()}
 						</button>
 					</div>
+
+					{#if cfMessage}
+						<p class="text-sm {cfStatus === 'success' ? 'text-green-400' : 'text-red-400'}">
+							{cfMessage}
+						</p>
+					{/if}
 				</form>
 			</div>
 
