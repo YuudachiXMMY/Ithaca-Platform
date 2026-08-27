@@ -181,7 +181,7 @@ The **minimum to validate the hypothesis** is the **public marketing site** rebu
 | 2 | Animation & 3D layer | Svelte transitions + `inview` + CSS scroll-timeline for sections; Threlte EV scene (lazy, on-demand); lazy GSAP where needed; reduced-motion | complete | - | 1 | [plan](../plans/completed/phase-2-animation-3d-layer-sveltekit.plan.md) |
 | 3 | Admin CMS + auth + API | Better Auth (bcrypt reuse + data-migration); port admin panel; API routes → `+server.ts` (subscribe/contact/admin CRUD/emails); nodemailer + rate-limit + Zod | complete | with 1 | 0 | [plan](../plans/completed/phase-3-admin-cms-auth-api-sveltekit.plan.md) |
 | 4 | Interaction & perf hardening | Loading skeletons/transitions; cached popup (SWR); SSR-seeded CSRF; focus-trap/Escape; global reduced-motion; SEO parity (metadata, sitemap, hreflang, GA); Lighthouse/CWV validation vs targets | complete | - | 2, 3 | [plan](../plans/completed/phase-4-interaction-perf-hardening-sveltekit.plan.md) |
-| 5 | Cutover & decommission | DNS/edge cutover, 301s if any path changed, monitor, retire Next.js app + old AdminUser table | pending | - | 4 | - |
+| 5 | Cutover & decommission | DNS/edge cutover, 301s if any path changed, monitor, retire Next.js app + old AdminUser table | in-progress | - | 4 | [plan](../plans/phase-5-cutover-decommission-sveltekit.plan.md) |
 
 ### Phase Details
 
@@ -221,6 +221,7 @@ The **minimum to validate the hypothesis** is the **public marketing site** rebu
 - **Success signal**: All success-metric targets met on staging; a11y checks pass; no CSRF preflight; popup off the critical path.
 
 **Phase 5: Cutover & decommission**
+- **Status**: in-progress — plan: `.claude/PRPs/plans/phase-5-cutover-decommission-sveltekit.plan.md`. Predominantly an ops/infra/data cutover runbook (small code surface: CI-workflow promotion, a backfill-as-SQL migration, the `admin_users` DROP migration, decommission cleanup). Load-bearing ordering: expand (Better Auth tables — done) → backfill admins → **verify prod login** → contract (DROP `admin_users`) → retire Next.js. Baselines (Open Q#1) + Cloudflare zone/rules (Open Q#2) are prerequisites.
 - **Goal**: Production cutover with SEO continuity, retire the old stack.
 - **Scope**: DNS/edge cutover; 301s for any changed paths (English unchanged → mainly add `/zh` + hreflang); post-cutover monitoring; retire Next.js app and old `AdminUser` table once confirmed.
 - **Success signal**: Production serving from SvelteKit; search rankings stable; old stack decommissioned.
