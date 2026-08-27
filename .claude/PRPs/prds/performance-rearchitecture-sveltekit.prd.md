@@ -179,7 +179,7 @@ The **minimum to validate the hypothesis** is the **public marketing site** rebu
 | 0 | Foundation & scaffolding | SvelteKit 2 + adapter-node + Docker + Prisma wired; Tailwind v4 tokens ported; Paraglide `/zh` routing skeleton; shared layout (Header/Footer); Cloudflare in front; **baseline metrics captured** | in-progress | - | - | [plan](../plans/phase-0-foundation-scaffolding-sveltekit.plan.md) |
 | 1 | Public site + media pipeline | Port all 12 public routes (content/images) as Svelte; enhanced-img AVIF/WebP; adaptive video; gated CJK fonts; prerender + edge cache | in-progress | with 3 | 0 | [plan](../plans/phase-1-public-site-media-pipeline-sveltekit.plan.md) |
 | 2 | Animation & 3D layer | Svelte transitions + `inview` + CSS scroll-timeline for sections; Threlte EV scene (lazy, on-demand); lazy GSAP where needed; reduced-motion | complete | - | 1 | [plan](../plans/completed/phase-2-animation-3d-layer-sveltekit.plan.md) |
-| 3 | Admin CMS + auth + API | Better Auth (bcrypt reuse + data-migration); port admin panel; API routes → `+server.ts` (subscribe/contact/admin CRUD/emails); nodemailer + rate-limit + Zod | pending | with 1 | 0 | - |
+| 3 | Admin CMS + auth + API | Better Auth (bcrypt reuse + data-migration); port admin panel; API routes → `+server.ts` (subscribe/contact/admin CRUD/emails); nodemailer + rate-limit + Zod | in-progress | with 1 | 0 | [plan](../plans/phase-3-admin-cms-auth-api-sveltekit.plan.md) |
 | 4 | Interaction & perf hardening | Loading skeletons/transitions; cached popup (SWR); SSR-seeded CSRF; focus-trap/Escape; global reduced-motion; SEO parity (metadata, sitemap, hreflang, GA); Lighthouse/CWV validation vs targets | pending | - | 2, 3 | - |
 | 5 | Cutover & decommission | DNS/edge cutover, 301s if any path changed, monitor, retire Next.js app + old AdminUser table | pending | - | 4 | - |
 
@@ -207,6 +207,7 @@ The **minimum to validate the hypothesis** is the **public marketing site** rebu
 - **Success signal**: 60fps scrub on mid-range mobile (no long tasks >50ms during scroll); framer-motion removed from deps; 3D route lazy + on-demand; reduced-motion parity.
 
 **Phase 3: Admin CMS + auth + API** _(parallel with Phase 1)_
+- **Status**: in-progress — plan: `.claude/PRPs/plans/phase-3-admin-cms-auth-api-sveltekit.plan.md` (auth locked to **Better Auth** per Decisions Log — supersedes the Phase-0 `getAdminToken` stateless-JWT stub, since revocable sessions require DB-backed sessions).
 - **Goal**: Admin + public API at functional parity, with revocable sessions.
 - **Scope**: Better Auth setup + Prisma schema gen + admin data-migration (no password reset); `hooks.server.ts` session guard; port `/admin/*` pages; API routes → `+server.ts` (subscribe, contact, admin subscribers/emails/emails-send/popups CRUD, popups/active); nodemailer batch send; rate-limit + Zod; drop `@auth/prisma-adapter`.
 - **Success signal**: Existing admin logs in with same password; all admin CRUD + email campaigns + public forms work; sessions revocable; rate-limit uses real client IP behind Cloudflare.
