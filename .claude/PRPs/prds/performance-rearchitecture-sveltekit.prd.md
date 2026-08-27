@@ -178,7 +178,7 @@ The **minimum to validate the hypothesis** is the **public marketing site** rebu
 |---|-------|-------------|--------|----------|---------|----------|
 | 0 | Foundation & scaffolding | SvelteKit 2 + adapter-node + Docker + Prisma wired; Tailwind v4 tokens ported; Paraglide `/zh` routing skeleton; shared layout (Header/Footer); Cloudflare in front; **baseline metrics captured** | in-progress | - | - | [plan](../plans/phase-0-foundation-scaffolding-sveltekit.plan.md) |
 | 1 | Public site + media pipeline | Port all 12 public routes (content/images) as Svelte; enhanced-img AVIF/WebP; adaptive video; gated CJK fonts; prerender + edge cache | in-progress | with 3 | 0 | [plan](../plans/phase-1-public-site-media-pipeline-sveltekit.plan.md) |
-| 2 | Animation & 3D layer | Svelte transitions + `inview` + CSS scroll-timeline for sections; Threlte EV scene (lazy, on-demand); lazy GSAP where needed; reduced-motion | pending | - | 1 | - |
+| 2 | Animation & 3D layer | Svelte transitions + `inview` + CSS scroll-timeline for sections; Threlte EV scene (lazy, on-demand); lazy GSAP where needed; reduced-motion | in-progress | - | 1 | [plan](../plans/phase-2-animation-3d-layer-sveltekit.plan.md) |
 | 3 | Admin CMS + auth + API | Better Auth (bcrypt reuse + data-migration); port admin panel; API routes → `+server.ts` (subscribe/contact/admin CRUD/emails); nodemailer + rate-limit + Zod | pending | with 1 | 0 | - |
 | 4 | Interaction & perf hardening | Loading skeletons/transitions; cached popup (SWR); SSR-seeded CSRF; focus-trap/Escape; global reduced-motion; SEO parity (metadata, sitemap, hreflang, GA); Lighthouse/CWV validation vs targets | pending | - | 2, 3 | - |
 | 5 | Cutover & decommission | DNS/edge cutover, 301s if any path changed, monitor, retire Next.js app + old AdminUser table | pending | - | 4 | - |
@@ -200,6 +200,7 @@ The **minimum to validate the hypothesis** is the **public marketing site** rebu
 - **Success signal**: Content pages prerender + edge-cache; homepage mobile media <1MB; English pages ship 0 CJK bytes; visual parity with current site.
 
 **Phase 2: Animation & 3D layer** _(depends on 1)_
+- **Status**: in-progress — plan: `.claude/PRPs/plans/phase-2-animation-3d-layer-sveltekit.plan.md`. Three-tier motion system (Tier 0 Svelte transitions/motion + `use:inview`; Tier 1 CSS `animation-timeline`; Tier 2 lazy GSAP for scrub-inertia) + Threlte EV trike (procedural fat-lines, on-demand, client-only). All engines dynamic-imported (0 eager bytes on content pages); every tier falls back to the Phase-1 static branch via built-in `prefersReducedMotion`.
 - **Goal**: Cinematic feel restored with a compiled-away runtime and on-demand 3D.
 - **Scope**: Replace all framer-motion with Svelte transitions/motion + `inview`; rebuild scrubbed/pinned sections (CinematicDivider, ImpactStats, WorkshopToRoles) with CSS scroll-timeline (or lazy GSAP where inertia is required); port EVModel3D → Threlte `<EVScene>` (lazy, `ssr=false`, on-demand, fat-line rewrite); port every `useReducedMotion` static fallback.
 - **Success signal**: 60fps scrub on mid-range mobile (no long tasks >50ms during scroll); framer-motion removed from deps; 3D route lazy + on-demand; reduced-motion parity.
