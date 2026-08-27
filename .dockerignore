@@ -1,6 +1,11 @@
 node_modules
-.next
+.svelte-kit
+build
 .git
-.env*
-*.md
-.playwright-mcp
+.gitignore
+.env
+.env.*
+!.env.example
+.DS_Store
+npm-debug.log*
+src/lib/paraglide
