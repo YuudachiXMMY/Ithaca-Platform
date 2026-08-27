@@ -1,11 +1,11 @@
 # ── Build & Push the SvelteKit image to GHCR on the `prod` branch ──────────
-# Mirrors the Next.js app's workflow (renamed GA build-arg key -> PUBLIC_GA_TRACKING_ID).
-#
-# NOTE: GitHub only runs workflows from the REPOSITORY-ROOT `.github/workflows/`. To
-# activate this while the SvelteKit project lives in the `sveltekit/` subdir, either
-# (a) move this file to the repo root and set `context: ./sveltekit` +
-#     `file: ./sveltekit/Dockerfile`, or
-# (b) extract the SvelteKit project to its own repository (context stays `.`).
+# Promoted to the REPOSITORY ROOT in Phase 5 (cutover): GitHub Actions only runs
+# workflows from the root `.github/workflows/`, so the previous copy under
+# `sveltekit/.github/workflows/deploy.yml` never executed. This builds the SvelteKit
+# app in `sveltekit/` (adapter-node, self-migrating on start) and publishes
+# `ghcr.io/<repo>-kit`. It runs ALONGSIDE the legacy Next.js `deploy.yml` (which
+# builds `ghcr.io/<repo>:latest`) during the blue-green cutover window; delete the
+# legacy workflow at decommission (Phase 5, Task 12).
 name: Build & Deploy (SvelteKit)
 
 on:
@@ -46,13 +46,19 @@ jobs:
             type=sha,prefix=
             type=raw,value=latest
 
+      # PUBLIC_* are inlined into the client bundle at BUILD time (Vite), so they must be
+      # passed as build-args here — a runtime-only value would be `undefined` in the browser.
+      # PUBLIC_SITE_URL bakes every canonical/OG/hreflang/sitemap URL: keep it the real prod
+      # origin (a staging value would point all SEO URLs at the wrong host).
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./sveltekit
+          file: ./sveltekit/Dockerfile
           push: true
           build-args: |
             PUBLIC_GA_TRACKING_ID=${{ vars.PUBLIC_GA_TRACKING_ID || 'G-675W5PPJEJ' }}
+            PUBLIC_SITE_URL=${{ vars.PUBLIC_SITE_URL || 'https://ithacateens.com' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
