@@ -1,23 +1,20 @@
 <script lang="ts">
-	import { ArrowRight, ChevronDown, Compass, Wrench, Gauge, Users } from 'lucide-svelte';
+	import { onMount } from 'svelte';
+	import { ArrowRight, ChevronDown } from 'lucide-svelte';
+	import { prefersReducedMotion } from 'svelte/motion';
 	import { localizeHref } from '$lib/paraglide/runtime';
+	import { loadGsap } from '$lib/motion/gsap';
 	import * as m from '$lib/paraglide/messages';
+
+	import EVModel3DSection from '$lib/components/programs/ev-challenge/EVModel3DSection.svelte';
+	import WorkshopToRoles from '$lib/components/programs/ev-challenge/WorkshopToRoles.svelte';
 
 	import heroImg from '$lib/assets/programs/ev-challenge/EV26-1.JPG?enhanced';
 	import missionImg from '$lib/assets/programs/ev-challenge/EV25-12.jpg?enhanced';
-	import machineImg from '$lib/assets/programs/ev-challenge/EV26-6.JPG?enhanced';
 	import detailsImg from '$lib/assets/programs/ev-challenge/EV25-10.s.png?enhanced';
 	import gainsImg from '$lib/assets/programs/ev-challenge/EV25-8.jpg?enhanced';
 	import competitionImg from '$lib/assets/programs/ev-challenge/EV26-2.JPG?enhanced';
 	import ctaImg from '$lib/assets/programs/ev-challenge/EV26-5.JPG?enhanced';
-
-	// Workshop-to-roles photo grid (static branch of WorkshopToRolesTransition).
-	import wtr0 from '$lib/assets/programs/ev-challenge/EV26-3.JPG?enhanced';
-	import wtr1 from '$lib/assets/programs/ev-challenge/EV25-2.png?enhanced';
-	import wtr2 from '$lib/assets/programs/ev-challenge/EV25-5.jpg?enhanced';
-	import wtr3 from '$lib/assets/programs/ev-challenge/EV25-6.jpg?enhanced';
-	import wtr4 from '$lib/assets/programs/ev-challenge/EV25-9.jpg?enhanced';
-	import wtr5 from '$lib/assets/programs/ev-challenge/EV26-4.JPG?enhanced';
 
 	const STATS = [
 		{ label: m.programs_evChallenge_stats_season, value: '03' },
@@ -25,67 +22,6 @@
 		{ label: m.programs_evChallenge_stats_duration, value: '9 mo' },
 		{ label: m.programs_evChallenge_stats_cadence, value: 'Bi-weekly Sat' },
 		{ label: m.programs_evChallenge_stats_window, value: 'Sep 2026 - May 2027' }
-	];
-
-	// Spec strip + track tags are static (not translated) in the Next source.
-	const SPECS = [
-		{
-			label: m.programs_evChallenge_model3d_specs_drivetrain,
-			value: m.programs_evChallenge_model3d_specs_drivetrainValue
-		},
-		{
-			label: m.programs_evChallenge_model3d_specs_layout,
-			value: m.programs_evChallenge_model3d_specs_layoutValue
-		},
-		{
-			label: m.programs_evChallenge_model3d_specs_frame,
-			value: m.programs_evChallenge_model3d_specs_frameValue
-		},
-		{
-			label: m.programs_evChallenge_model3d_specs_builtBy,
-			value: m.programs_evChallenge_model3d_specs_builtByValue
-		}
-	];
-	const ENG_TAGS = ['CAD Design', 'Chassis Build', 'Electrical Systems', 'Testing'];
-	const BIZ_TAGS = ['Sponsorship', 'Budget', 'Logistics', 'Team Mgmt'];
-
-	const WTR_PHOTOS = [
-		{
-			src: wtr0,
-			alt: 'Completed EV with solar panel in the pit area at Waterloo',
-			span: 'md:col-span-2 md:row-span-2'
-		},
-		{ src: wtr1, alt: 'Students welding components in the fabrication shop', span: '' },
-		{ src: wtr2, alt: 'Two students assembling the EV chassis frame', span: '' },
-		{ src: wtr3, alt: 'Students working on the EV body shell in the garage', span: '' },
-		{ src: wtr4, alt: 'Team collaborating on body shell modifications', span: '' },
-		{ src: wtr5, alt: 'Ithaca EV team members with their vehicle at competition', span: '' }
-	];
-
-	// DOM order in the static branch: left col [design, racing], right col [assembly, operations].
-	const ROLES_LEFT = [
-		{
-			icon: Compass,
-			title: m.programs_evChallenge_workshopToRoles_roles_design_title,
-			description: m.programs_evChallenge_workshopToRoles_roles_design_description
-		},
-		{
-			icon: Gauge,
-			title: m.programs_evChallenge_workshopToRoles_roles_racing_title,
-			description: m.programs_evChallenge_workshopToRoles_roles_racing_description
-		}
-	];
-	const ROLES_RIGHT = [
-		{
-			icon: Wrench,
-			title: m.programs_evChallenge_workshopToRoles_roles_assembly_title,
-			description: m.programs_evChallenge_workshopToRoles_roles_assembly_description
-		},
-		{
-			icon: Users,
-			title: m.programs_evChallenge_workshopToRoles_roles_operations_title,
-			description: m.programs_evChallenge_workshopToRoles_roles_operations_description
-		}
 	];
 
 	const DETAILS = [
@@ -161,6 +97,44 @@
 
 	// Secondary past-season clips (portrait Vimeo embeds), verbatim ids from Next.
 	const CLIP_IDS = ['1202133768', '1202133767', '1202133769'];
+
+	// Hero parallax (Tier 2): the race photo drifts vertically as the hero scrolls
+	// out. The base `scale-[1.15]` (kept as the reduced-motion static state) gives
+	// the overflow room to translate without exposing an edge. Motion is additive —
+	// under reduced motion we early-return and the static scaled poster remains.
+	let heroSectionEl: HTMLElement | undefined = $state();
+	let heroImgEl: HTMLElement | undefined = $state();
+
+	onMount(() => {
+		if (prefersReducedMotion.current || !heroSectionEl || !heroImgEl) return;
+
+		let cancelled = false;
+		let ctx: { revert: () => void } | undefined;
+
+		loadGsap().then(({ gsap }) => {
+			if (cancelled || !heroSectionEl) return;
+			ctx = gsap.context(() => {
+				// Bump scale to 1.25 (from the static 1.15) for parallax headroom, then
+				// drift the photo down as the hero scrolls out (10% < 12.5% overflow).
+				gsap.set(heroImgEl!, { scale: 1.25 });
+				gsap.to(heroImgEl!, {
+					yPercent: 10,
+					ease: 'none',
+					scrollTrigger: {
+						trigger: heroSectionEl,
+						start: 'top top',
+						end: 'bottom top',
+						scrub: true
+					}
+				});
+			}, heroSectionEl);
+		});
+
+		return () => {
+			cancelled = true;
+			ctx?.revert();
+		};
+	});
 </script>
 
 <svelte:head>
@@ -171,14 +145,17 @@
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
 <div class="min-h-screen bg-background">
-	<!-- 1. Hero: Full-bleed race photo with overlay (parallax → static; Phase 2) -->
-	<section class="relative flex min-h-[85dvh] items-end overflow-hidden">
-		<div class="absolute inset-0">
+	<!-- 1. Hero: Full-bleed race photo with overlay (GSAP parallax; reduce = static) -->
+	<section bind:this={heroSectionEl} class="relative flex min-h-[85dvh] items-end overflow-hidden">
+		<div
+			bind:this={heroImgEl}
+			class="absolute inset-0 origin-center scale-[1.15] will-change-transform"
+		>
 			<enhanced:img
 				src={heroImg}
 				alt="Ithaca EV team racing at the Waterloo EV Challenge"
 				sizes="100vw"
-				class="absolute inset-0 h-full w-full origin-center scale-[1.15] object-cover"
+				class="absolute inset-0 h-full w-full object-cover"
 			/>
 		</div>
 		<div
@@ -249,189 +226,11 @@
 		</div>
 	</section>
 
-	<!-- 3. The Machine + Two Tracks — STATIC PLACEHOLDER for the R3F/GSAP scene -->
-	<!-- Phase 2: Threlte EVScene + GSAP scrub -->
-	<section
-		class="border-t border-border bg-background"
-		aria-label="The Ithaca EV trike and program tracks"
-	>
-		<!-- "The Machine": poster stands in for the interactive 3D wireframe canvas -->
-		<div class="relative min-h-[calc(80dvh_-_var(--nav-h))] overflow-hidden">
-			<enhanced:img
-				src={machineImg}
-				alt="The custom-built Ithaca EV trike"
-				sizes="100vw"
-				class="absolute inset-0 h-full w-full object-cover opacity-40"
-			/>
-			<div
-				class="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30"
-			></div>
-			<div
-				class="relative z-10 flex min-h-[calc(80dvh_-_var(--nav-h))] flex-col justify-between px-6 pt-[calc(var(--nav-h)_+_1rem)] pb-8 md:px-12 md:pb-12 lg:px-[8vw]"
-			>
-				<div>
-					<h2 class="text-3xl font-bold tracking-tighter text-foreground md:text-4xl lg:text-5xl">
-						{m.programs_evChallenge_model3d_machineName()}
-					</h2>
-					<p class="mt-2 max-w-[30ch] text-sm text-foreground/40">
-						{m.programs_evChallenge_model3d_machineDesc()}
-					</p>
-				</div>
-				<div class="flex flex-wrap gap-x-8 gap-y-2">
-					{#each SPECS as spec, i (i)}
-						<div>
-							<span class="block text-[10px] tracking-wider text-foreground/30 uppercase"
-								>{spec.label()}</span
-							>
-							<span class="font-mono text-xs text-foreground/60">{spec.value()}</span>
-						</div>
-					{/each}
-				</div>
-			</div>
-		</div>
+	<!-- 3. The Machine + Two Tracks — Threlte 3D trike + GSAP 400% pin (reduce = static) -->
+	<EVModel3DSection />
 
-		<!-- "Two Tracks, One Vehicle": glassmorphism split using .dissolve-panel-* -->
-		<div class="relative overflow-hidden">
-			<h2
-				class="px-6 pt-10 pb-8 text-center text-2xl font-bold tracking-tighter text-foreground md:text-3xl lg:text-4xl"
-			>
-				{m.programs_evChallenge_model3d_twoTracksTitle()}
-			</h2>
-			<div class="flex flex-col lg:flex-row">
-				<div class="relative min-h-[220px] flex-1 overflow-hidden lg:min-h-[320px]">
-					<div class="dissolve-panel-eng absolute inset-0"></div>
-					<div class="relative z-10 px-6 py-8 md:px-12 lg:py-16 lg:pr-20 lg:pl-[8vw]">
-						<span
-							class="mb-3 block font-mono text-[10px] tracking-[0.25em] text-accent/30 uppercase"
-						>
-							{m.programs_evChallenge_model3d_trackA()}
-						</span>
-						<h3 class="mb-2 text-lg font-bold tracking-tight text-foreground md:text-xl">
-							{m.programs_evChallenge_model3d_engineering_title()}
-						</h3>
-						<p class="mb-4 max-w-[40ch] text-sm leading-relaxed text-foreground/50">
-							{m.programs_evChallenge_model3d_engineering_description()}
-						</p>
-						<div class="flex flex-wrap gap-1.5">
-							{#each ENG_TAGS as tag, i (i)}
-								<span
-									class="rounded-full border border-accent/10 bg-accent/8 px-2.5 py-1 text-[11px] text-accent/60"
-								>
-									{tag}
-								</span>
-							{/each}
-						</div>
-					</div>
-				</div>
-				<div class="relative min-h-[220px] flex-1 overflow-hidden lg:min-h-[320px]">
-					<div class="dissolve-panel-biz absolute inset-0"></div>
-					<div
-						class="relative z-10 px-6 py-8 md:px-12 lg:flex lg:flex-col lg:items-end lg:py-16 lg:pr-[8vw] lg:pl-20"
-					>
-						<div class="lg:max-w-[400px]">
-							<span
-								class="mb-3 block font-mono text-[10px] tracking-[0.25em] text-accent/30 uppercase"
-							>
-								{m.programs_evChallenge_model3d_trackB()}
-							</span>
-							<h3 class="mb-2 text-lg font-bold tracking-tight text-foreground md:text-xl">
-								{m.programs_evChallenge_model3d_business_title()}
-							</h3>
-							<p class="mb-4 max-w-[40ch] text-sm leading-relaxed text-foreground/50">
-								{m.programs_evChallenge_model3d_business_description()}
-							</p>
-							<div class="flex flex-wrap gap-1.5">
-								{#each BIZ_TAGS as tag, i (i)}
-									<span
-										class="rounded-full border border-accent/10 bg-accent/8 px-2.5 py-1 text-[11px] text-accent/60"
-									>
-										{tag}
-									</span>
-								{/each}
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
-
-	<!-- 4. Workshop → Team Roles — STATIC (GSAP scatter/swoop deferred) -->
-	<!-- Phase 2: Threlte EVScene + GSAP scrub -->
-	<section class="py-20 md:py-32">
-		<div class="px-6 md:px-12 lg:px-[8vw]">
-			<h2 class="mb-8 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-				{m.programs_evChallenge_workshopToRoles_workshopTitle()}
-			</h2>
-			<div
-				class="grid auto-rows-[160px] grid-cols-2 gap-2 md:auto-rows-[200px] md:grid-cols-3 lg:auto-rows-[240px]"
-			>
-				{#each WTR_PHOTOS as photo, i (i)}
-					<div class="relative overflow-hidden rounded-sm {photo.span}">
-						<enhanced:img
-							src={photo.src}
-							alt={photo.alt}
-							sizes="(max-width: 768px) 50vw, 33vw"
-							class="absolute inset-0 h-full w-full object-cover"
-						/>
-					</div>
-				{/each}
-			</div>
-		</div>
-	</section>
-
-	<section class="relative overflow-hidden border-t border-border py-24 md:py-40">
-		<div class="ev-roles-bg pointer-events-none absolute inset-0"></div>
-		<div class="ev-roles-grid pointer-events-none absolute inset-0"></div>
-
-		<div class="relative px-6 md:px-12 lg:px-[8vw]">
-			<h2
-				class="mb-16 text-3xl font-bold tracking-tighter text-foreground md:mb-24 md:text-4xl lg:text-5xl"
-			>
-				{m.programs_evChallenge_workshopToRoles_rolesTitle()}
-			</h2>
-			<div class="grid grid-cols-1 gap-6 md:grid-cols-[7fr_5fr] md:gap-10 lg:gap-14">
-				<div class="flex flex-col gap-6 md:gap-10">
-					{#each ROLES_LEFT as role, i (i)}
-						{@const Icon = role.icon}
-						<div
-							class="group cursor-default rounded-sm border border-border p-8 transition-colors hover:border-accent/40 hover:bg-foreground/[0.02] lg:p-10"
-						>
-							<Icon
-								class="mb-6 h-8 w-8 text-accent/50 transition-colors group-hover:text-accent lg:h-10 lg:w-10"
-								strokeWidth={1.5}
-							/>
-							<h3 class="mb-3 text-base font-semibold text-foreground lg:text-lg">
-								{role.title()}
-							</h3>
-							<p class="max-w-[36ch] text-sm leading-relaxed text-foreground/50">
-								{role.description()}
-							</p>
-						</div>
-					{/each}
-				</div>
-				<div class="flex flex-col gap-6 md:mt-16 md:gap-10">
-					{#each ROLES_RIGHT as role, i (i)}
-						{@const Icon = role.icon}
-						<div
-							class="group cursor-default rounded-sm border border-border p-8 transition-colors hover:border-accent/40 hover:bg-foreground/[0.02] lg:p-10"
-						>
-							<Icon
-								class="mb-6 h-8 w-8 text-accent/50 transition-colors group-hover:text-accent lg:h-10 lg:w-10"
-								strokeWidth={1.5}
-							/>
-							<h3 class="mb-3 text-base font-semibold text-foreground lg:text-lg">
-								{role.title()}
-							</h3>
-							<p class="max-w-[36ch] text-sm leading-relaxed text-foreground/50">
-								{role.description()}
-							</p>
-						</div>
-					{/each}
-				</div>
-			</div>
-		</div>
-	</section>
+	<!-- 4. Workshop → Team Roles — GSAP scrub:2.5 scatter/swoop (reduce = static grid) -->
+	<WorkshopToRoles />
 
 	<!-- 6. Program Details -->
 	<section class="ev-ambient-b border-t border-border py-24 md:py-32">
