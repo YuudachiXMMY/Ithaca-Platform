@@ -1,37 +1,39 @@
 export interface TeamMember {
 	name: string;
-	/** Message key (resolved once the `team.*` catalog lands in Phase 1). */
+	/** Flat Paraglide message key (e.g. `common_team_joshuaWang_title`), resolved in-component. */
 	title: string;
-	/** Message key (resolved once the `team.*` catalog lands in Phase 1). */
+	/** Flat Paraglide message key (e.g. `common_team_joshuaWang_description`), resolved in-component. */
 	description: string;
 	image?: string;
 }
 
-// Ported verbatim from the Next app's src/types/index.ts (key-as-data). Not rendered
-// in Phase 0 (no About page yet); carried forward so Phase 1 can resolve titles via m.*.
+// Ported from the Next app's src/types/index.ts (key-as-data). title/description are flat
+// message keys from the migrated `common` namespace, resolved via a STATIC_MESSAGE_MAP in
+// TeamGrid.svelte. `image` is the original /media path; TeamGrid re-homes it to a `$lib/assets`
+// enhanced-img import keyed by `name`.
 export const TEAM_MEMBERS: TeamMember[] = [
 	{
 		name: 'Mr. Joshua Wang',
-		title: 'team.joshuaWang.title',
-		description: 'team.joshuaWang.description',
+		title: 'common_team_joshuaWang_title',
+		description: 'common_team_joshuaWang_description',
 		image: '/media/images/team/joshua-wang.jpg'
 	},
 	{
 		name: 'Mr. Jadyn Wu',
-		title: 'team.jadynWu.title',
-		description: 'team.jadynWu.description',
+		title: 'common_team_jadynWu_title',
+		description: 'common_team_jadynWu_description',
 		image: '/media/images/team/jadyn-wu.png'
 	},
 	{
 		name: 'Ms. Kristen Perry',
-		title: 'team.kristenPerry.title',
-		description: 'team.kristenPerry.description',
+		title: 'common_team_kristenPerry_title',
+		description: 'common_team_kristenPerry_description',
 		image: '/media/images/team/kristen-perry.png'
 	},
 	{
 		name: 'Mr. Grant Bourne',
-		title: 'team.grantBourne.title',
-		description: 'team.grantBourne.description',
+		title: 'common_team_grantBourne_title',
+		description: 'common_team_grantBourne_description',
 		image: '/media/images/team/grant-bourne.png'
 	}
 ];

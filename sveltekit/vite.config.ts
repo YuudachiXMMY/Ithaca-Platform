@@ -1,6 +1,7 @@
 import tailwindcss from '@tailwindcss/vite';
 import adapter from '@sveltejs/adapter-node';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { enhancedImages } from '@sveltejs/enhanced-img';
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import { defineConfig } from 'vite';
 
@@ -38,6 +39,8 @@ export default defineConfig({
 				}
 			]
 		}),
+		// enhanced-img MUST come before the SvelteKit plugin or <enhanced:img> won't transform.
+		enhancedImages(),
 		sveltekit({
 			compilerOptions: {
 				// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
@@ -49,11 +52,10 @@ export default defineConfig({
 			// when POST form actions land (e.g. trustedOrigins: ['https://staging.ithacateens.com']).
 			csrf: { trustedOrigins: [] },
 			prerender: {
-				// crawl:false => only the explicit entries are prerendered (Phase 0 has no real
-				// child pages yet; Header links to future routes must not fail the build). Phase 1
-				// re-enables crawl or lists each real page (+ its /zh variant) explicitly.
+				// Phase 1: crawl on — auto-discovers every real content route (+ /zh) from links.
+				// entries kept as a safety net for pages not reachable by a static link.
 				entries: ['*', '/zh'],
-				crawl: false
+				crawl: true
 			}
 		})
 	]

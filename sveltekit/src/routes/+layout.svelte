@@ -11,12 +11,18 @@
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import * as m from '$lib/paraglide/messages';
+	import { getLocale } from '$lib/paraglide/runtime';
 
 	let { children } = $props();
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<!-- CJK font gating: Noto Sans SC subsets load ONLY on Chinese pages, so
+	     English pages ship 0 CJK font bytes. unicode-range keeps fetches on-demand. -->
+	{#if getLocale() === 'zh'}
+		<link rel="stylesheet" href="/fonts/noto-sans-sc.css" />
+	{/if}
 </svelte:head>
 
 <a href="#main-content" class="skip-to-content">{m.common_skipToContent()}</a>
