@@ -63,12 +63,12 @@ These extend Rules A/B above for the production cutover. Sources: Cloudflare Cac
 [dynamic redirects](https://developers.cloudflare.com/rules/url-forwarding/single-redirects/settings/).
 
 **Rule ordering:** Rule B (Bypass) must be placed **after** Rule A — for conflicting cache
-eligibility, *the last matching rule wins*. Keeping Bypass last is a standing security guard for
+eligibility, _the last matching rule wins_. Keeping Bypass last is a standing security guard for
 `/admin` + `/api` even if Rule A is later loosened.
 
 **Edge TTL + stale-while-revalidate (emulated ISR — adapter-node has no native ISR):** have
 content responses emit `Cache-Control: public, max-age=60, stale-while-revalidate=60` and set the
-Rule A Edge TTL to *respect origin*. Cloudflare's revalidation is async — it serves stale
+Rule A Edge TTL to _respect origin_. Cloudflare's revalidation is async — it serves stale
 (`Cf-Cache-Status: UPDATING`) and refreshes in the background, so no visitor blocks on origin.
 Set **Browser TTL** small (or 0) so clients revalidate while the edge absorbs load.
 ⚠ **Do NOT use `s-maxage` / `must-revalidate` / `no-cache`** — RFC 9111 makes them forbid serving
@@ -77,7 +77,7 @@ stale, forcing blocking `EXPIRED`/`REVALIDATED` instead of `UPDATING`. Use `max-
 
 **SvelteKit soft-nav `__data.json` (critical for edge page-switch):** client navigations fetch
 `/<path>/__data.json?x-sveltekit-invalidated=<bitmask>`. The default Standard cache key includes
-the full query string, so the varying bitmask *busts* the cache and soft-nav misses the edge. Add
+the full query string, so the varying bitmask _busts_ the cache and soft-nav misses the edge. Add
 a dedicated Cache Rule:
 
 - Match: `ends_with(http.request.uri.path, "/__data.json")`

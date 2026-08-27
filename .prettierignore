@@ -16,3 +16,6 @@ prisma/migrations/
 
 # Paraglide compile cache
 project.inlang/cache/
+
+# Agent / planning scratch (not shippable source)
+.claude/

@@ -14,6 +14,7 @@ expand (Better Auth tables — already applied)
       → contract (DROP admin_users)                                 ← SEPARATE, LATER migration
         → decommission Next.js app
 ```
+
 Prisma has **no down-migration**: a dropped table only comes back from a DB restore. The verify
 gate sits between the two destroy-able steps.
 
@@ -37,13 +38,10 @@ The `DROP admin_users` migration and the Next.js deletion are **intentionally NO
       canonical domain + a `staging.<domain>` record for green.
 - [ ] **Baselines captured** from the LIVE Next.js prod, BEFORE the flip (Open Q#1) —
       fill `.claude/PRPs/baselines/README.md`. Once traffic moves, the source is gone.
-- [ ] **Prod env/secrets** set in the `IthacaServer` compose:
-      - Runtime: `ORIGIN=https://<canonical>`, `BETTER_AUTH_SECRET` (real), `BETTER_AUTH_URL`,
-        `DATABASE_URL`, `SMTP_*` (optional). Trust headers (`ADDRESS_HEADER=cf-connecting-ip`,
-        `PROTOCOL_HEADER`, `HOST_HEADER`) are baked in the Dockerfile — only `ORIGIN` is required.
-      - Build-time (baked into the `-kit` image): `PUBLIC_SITE_URL`, `PUBLIC_GA_TRACKING_ID`.
-      - ⚠ `PUBLIC_SITE_URL` bakes at build — a staging value makes every canonical/hreflang/
-        sitemap/OG URL point at the wrong host. Build the prod image with the prod value.
+- [ ] **Prod env/secrets** set in the `IthacaServer` compose: - Runtime: `ORIGIN=https://<canonical>`, `BETTER_AUTH_SECRET` (real), `BETTER_AUTH_URL`,
+      `DATABASE_URL`, `SMTP_*` (optional). Trust headers (`ADDRESS_HEADER=cf-connecting-ip`,
+      `PROTOCOL_HEADER`, `HOST_HEADER`) are baked in the Dockerfile — only `ORIGIN` is required. - Build-time (baked into the `-kit` image): `PUBLIC_SITE_URL`, `PUBLIC_GA_TRACKING_ID`. - ⚠ `PUBLIC_SITE_URL` bakes at build — a staging value makes every canonical/hreflang/
+      sitemap/OG URL point at the wrong host. Build the prod image with the prod value.
 
 ## 2. Build & stage green [OPS]
 
@@ -54,6 +52,7 @@ curl -sI https://staging.<domain>/                          # 200
 curl -sI https://staging.<domain>/zh                        # 200
 curl -sI https://staging.<domain>/admin                     # 303 → /admin/login (guard)
 ```
+
 Run blue (Next.js) and green (SvelteKit) side-by-side on different ports.
 
 ## 3. Apply Cloudflare cache rules [OPS]
@@ -76,6 +75,7 @@ The green container's `prisma migrate deploy` applies `better_auth`, `add_accoun
 # real admin logs into green /admin/login with their ORIGINAL bcrypt password → 200 + session cookie
 # psql: SELECT count(*) FROM "user";  -- >= prod admin count
 ```
+
 ⚠ A failed migration records **P3009** and freezes future deploys — recover with
 `prisma migrate status` + `migrate resolve --applied|--rolled-back`, never blind-retry.
 
@@ -85,6 +85,7 @@ The green container's `prisma migrate deploy` applies `better_auth`, `add_accoun
 # repoint the canonical proxied record's ORIGIN from blue to green (not just the cloud toggle)
 # warm the edge: loop curl over the 24 sitemap URLs (en + /zh) before real traffic
 ```
+
 Keep blue running for rollback. Auto TTL = 300s; local caches may take >5 min.
 
 ## 6. SEO + monitoring [SEO][MON]
@@ -127,5 +128,6 @@ Preserve those — reintroducing a `sveltekit/` prefix would make CI silently bu
 # repoint the Cloudflare record's origin back to blue (Next.js) — seconds-to-minutes
 ./scripts/prod.sh rollback        # restore the previous image/container if needed
 ```
+
 Because the DROP is deferred to §7, `admin_users` still exists → rollback to Next.js is fully
 functional throughout the monitoring window.

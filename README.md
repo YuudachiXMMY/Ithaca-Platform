@@ -29,21 +29,21 @@ The production server (`node build/index.js`, and the Docker image) listens on *
 
 ## Scripts
 
-| Command | Description |
-|---|---|
-| `npm run dev` | Vite dev server (default `http://localhost:5173`) |
-| `npm run build` | Production build (adapter-node → `build/index.js`) |
-| `npm run preview` | Preview the production build |
-| `npm run start` | Run the built server (`node build/index.js`, `:3000`) |
-| `npm run check` | Paraglide compile + `svelte-kit sync` + `svelte-check` |
-| `npm run lint` | ESLint + Prettier check |
-| `npm run format` | Prettier write |
-| `npm run db:migrate` | Prisma migrate (dev) |
-| `npm run db:migrate:deploy` | Apply migrations (production) |
-| `npm run db:migrate:status` | Show migration status |
-| `npm run db:seed` | Seed admin user |
-| `npm run db:studio` | Open Prisma Studio |
-| `npm run prod:deploy` | Deploy to production via `scripts/prod.sh` (SSH `ops` wrapper) |
+| Command                     | Description                                                    |
+| --------------------------- | -------------------------------------------------------------- |
+| `npm run dev`               | Vite dev server (default `http://localhost:5173`)              |
+| `npm run build`             | Production build (adapter-node → `build/index.js`)             |
+| `npm run preview`           | Preview the production build                                   |
+| `npm run start`             | Run the built server (`node build/index.js`, `:3000`)          |
+| `npm run check`             | Paraglide compile + `svelte-kit sync` + `svelte-check`         |
+| `npm run lint`              | ESLint + Prettier check                                        |
+| `npm run format`            | Prettier write                                                 |
+| `npm run db:migrate`        | Prisma migrate (dev)                                           |
+| `npm run db:migrate:deploy` | Apply migrations (production)                                  |
+| `npm run db:migrate:status` | Show migration status                                          |
+| `npm run db:seed`           | Seed admin user                                                |
+| `npm run db:studio`         | Open Prisma Studio                                             |
+| `npm run prod:deploy`       | Deploy to production via `scripts/prod.sh` (SSH `ops` wrapper) |
 
 ## Environment
 

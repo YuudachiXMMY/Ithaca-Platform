@@ -4,11 +4,11 @@
 
 ## Changelog
 
-| Date       | Action  | Notes                                      |
-|------------|---------|---------------------------------------------|
-| 2026-08-27 | Reorg   | **Repo cleanup & reorg**: the legacy Next.js 16 tree was decommissioned and the SvelteKit 2 app promoted from `sveltekit/` to the repository root. Stack is now SvelteKit 2 + Svelte 5 (runes), adapter-node, Better Auth, Paraglide (flat `messages/{en,zh}.json`), Prisma + PostgreSQL, nodemailer, Threlte. CI collapsed to one `deploy.yml` (SvelteKit → `ghcr.io/<repo>-kit`) + `lighthouse.yml`, both at root paths. Docs rewritten for the new stack. |
-| 2026-08-25 | (Next.js) | Historical: Phase 0 bugfixes on the retired Next.js app (kept for provenance). |
-| 2026-04-17 | Created | Initial architecture scan (Next.js era).   |
+| Date       | Action    | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ---------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-08-27 | Reorg     | **Repo cleanup & reorg**: the legacy Next.js 16 tree was decommissioned and the SvelteKit 2 app promoted from `sveltekit/` to the repository root. Stack is now SvelteKit 2 + Svelte 5 (runes), adapter-node, Better Auth, Paraglide (flat `messages/{en,zh}.json`), Prisma + PostgreSQL, nodemailer, Threlte. CI collapsed to one `deploy.yml` (SvelteKit → `ghcr.io/<repo>-kit`) + `lighthouse.yml`, both at root paths. Docs rewritten for the new stack. |
+| 2026-08-25 | (Next.js) | Historical: Phase 0 bugfixes on the retired Next.js app (kept for provenance).                                                                                                                                                                                                                                                                                                                                                                               |
+| 2026-04-17 | Created   | Initial architecture scan (Next.js era).                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 ## Project Vision
 
@@ -91,26 +91,26 @@ graph TD
 
 ## Module Index
 
-| Module Path         | Language     | Purpose                                                        |
-|---------------------|--------------|----------------------------------------------------------------|
-| `src/routes`        | Svelte/TS    | Pages (`+page.svelte`), loaders (`+page.ts`/`+page.server.ts`), API (`+server.ts`) |
-| `src/lib/components` | Svelte      | UI components (about, home, layout, media, programs, shared)    |
-| `src/lib/server`    | TS           | Server-only: `auth.ts` (Better Auth), `prisma.ts`, `mail.ts`, `csrf.ts`, `rate-limit.ts`, `popup-cache.ts` |
-| `src/lib/data`      | TS           | Static content data: `team.ts`, `nav.ts`, `programs.ts`, `contact.ts` |
-| `src/lib/assets`    | Images       | Build-processed images (`@sveltejs/enhanced-img`)              |
-| `src/lib/motion`    | TS           | Animation / transition helpers (GSAP, Svelte transitions)      |
-| `src/lib/paraglide` | TS (gen)     | Paraglide-compiled i18n runtime -- **generated, gitignored**   |
-| `prisma`            | Prisma/TS    | `schema.prisma`, `migrations/`, `seed.ts`, `migrate-admins-to-betterauth.ts` |
-| `messages`          | JSON         | Paraglide message catalogs: `en.json`, `zh.json` (flat)        |
-| `project.inlang`    | JSON         | inlang project settings (`settings.json`)                      |
-| `static`            | Static       | `media/` (images, videos), logo, favicons                      |
-| `scripts`           | Bash/TS      | `prod.sh` (SSH ops), `docker-smoke.sh`, `check-i18n.ts`, `migrate-messages.ts` |
+| Module Path          | Language  | Purpose                                                                                                    |
+| -------------------- | --------- | ---------------------------------------------------------------------------------------------------------- |
+| `src/routes`         | Svelte/TS | Pages (`+page.svelte`), loaders (`+page.ts`/`+page.server.ts`), API (`+server.ts`)                         |
+| `src/lib/components` | Svelte    | UI components (about, home, layout, media, programs, shared)                                               |
+| `src/lib/server`     | TS        | Server-only: `auth.ts` (Better Auth), `prisma.ts`, `mail.ts`, `csrf.ts`, `rate-limit.ts`, `popup-cache.ts` |
+| `src/lib/data`       | TS        | Static content data: `team.ts`, `nav.ts`, `programs.ts`, `contact.ts`                                      |
+| `src/lib/assets`     | Images    | Build-processed images (`@sveltejs/enhanced-img`)                                                          |
+| `src/lib/motion`     | TS        | Animation / transition helpers (GSAP, Svelte transitions)                                                  |
+| `src/lib/paraglide`  | TS (gen)  | Paraglide-compiled i18n runtime -- **generated, gitignored**                                               |
+| `prisma`             | Prisma/TS | `schema.prisma`, `migrations/`, `seed.ts`, `migrate-admins-to-betterauth.ts`                               |
+| `messages`           | JSON      | Paraglide message catalogs: `en.json`, `zh.json` (flat)                                                    |
+| `project.inlang`     | JSON      | inlang project settings (`settings.json`)                                                                  |
+| `static`             | Static    | `media/` (images, videos), logo, favicons                                                                  |
+| `scripts`            | Bash/TS   | `prod.sh` (SSH ops), `docker-smoke.sh`, `check-i18n.ts`, `migrate-messages.ts`                             |
 
 ## Run & Develop
 
 ### Prerequisites
 
-- Node.js 20+  (`.npmrc` sets `engine-strict=true`)
+- Node.js 20+ (`.npmrc` sets `engine-strict=true`)
 - Docker (for local PostgreSQL)
 - npm
 
@@ -129,36 +129,36 @@ The production server (`node build/index.js`, and the Docker image) listens on *
 
 ### Key npm Scripts
 
-| Command                     | Description                                     |
-|-----------------------------|-------------------------------------------------|
-| `npm run dev`               | Vite dev server (default `:5173`)               |
-| `npm run build`             | Production build (adapter-node -> `build/index.js`) |
-| `npm run preview`           | Preview the production build                    |
-| `npm run start`             | Run the built server (`node build/index.js`)    |
+| Command                     | Description                                                 |
+| --------------------------- | ----------------------------------------------------------- |
+| `npm run dev`               | Vite dev server (default `:5173`)                           |
+| `npm run build`             | Production build (adapter-node -> `build/index.js`)         |
+| `npm run preview`           | Preview the production build                                |
+| `npm run start`             | Run the built server (`node build/index.js`)                |
 | `npm run check`             | `paraglide-js compile` + `svelte-kit sync` + `svelte-check` |
-| `npm run lint`              | `eslint .` + `prettier --check .`               |
-| `npm run format`            | `prettier --write .`                            |
-| `npm run db:migrate`        | Prisma migrate (dev)                            |
-| `npm run db:migrate:deploy` | Apply migrations (production)                   |
-| `npm run db:migrate:status` | Show migration status                           |
-| `npm run db:seed`           | Seed admin user (`prisma/seed.ts`)              |
-| `npm run db:studio`         | Open Prisma Studio                              |
-| `npm run prod:deploy`       | Deploy to prod via `scripts/prod.sh` (SSH `ops`)|
+| `npm run lint`              | `eslint .` + `prettier --check .`                           |
+| `npm run format`            | `prettier --write .`                                        |
+| `npm run db:migrate`        | Prisma migrate (dev)                                        |
+| `npm run db:migrate:deploy` | Apply migrations (production)                               |
+| `npm run db:migrate:status` | Show migration status                                       |
+| `npm run db:seed`           | Seed admin user (`prisma/seed.ts`)                          |
+| `npm run db:studio`         | Open Prisma Studio                                          |
+| `npm run prod:deploy`       | Deploy to prod via `scripts/prod.sh` (SSH `ops`)            |
 
 ### Environment Variables
 
-| Variable                                        | Required | Description                              |
-|-------------------------------------------------|----------|------------------------------------------|
-| `DATABASE_URL`                                  | Yes      | PostgreSQL connection string             |
-| `BETTER_AUTH_SECRET`                            | Yes (prod) | Signs Better Auth sessions             |
-| `BETTER_AUTH_URL`                               | Yes      | Canonical public origin for cookies/redirects |
-| `ORIGIN`                                         | Yes (prod) | adapter-node CSRF origin + absolute URLs |
-| `ADDRESS_HEADER` / `PROTOCOL_HEADER` / `HOST_HEADER` | No  | Trust headers behind Cloudflare (baked in Dockerfile) |
-| `PUBLIC_SITE_URL`                               | Build    | Canonical origin for SEO/OG/sitemap -- **inlined at build time** |
-| `PUBLIC_GA_TRACKING_ID`                         | Build    | Google Analytics ID -- **inlined at build time** (default `G-675W5PPJEJ`) |
-| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `SMTP_FROM` | No | nodemailer; unset = sends skipped |
-| `UPSTASH_REDIS_REST_URL` / `_TOKEN`             | No       | Distributed rate limiting; unset = in-memory |
-| `ADMIN_EMAIL` / `ADMIN_PASSWORD`                | Seed     | Used only by `prisma/seed.ts`            |
+| Variable                                                                | Required   | Description                                                               |
+| ----------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------- |
+| `DATABASE_URL`                                                          | Yes        | PostgreSQL connection string                                              |
+| `BETTER_AUTH_SECRET`                                                    | Yes (prod) | Signs Better Auth sessions                                                |
+| `BETTER_AUTH_URL`                                                       | Yes        | Canonical public origin for cookies/redirects                             |
+| `ORIGIN`                                                                | Yes (prod) | adapter-node CSRF origin + absolute URLs                                  |
+| `ADDRESS_HEADER` / `PROTOCOL_HEADER` / `HOST_HEADER`                    | No         | Trust headers behind Cloudflare (baked in Dockerfile)                     |
+| `PUBLIC_SITE_URL`                                                       | Build      | Canonical origin for SEO/OG/sitemap -- **inlined at build time**          |
+| `PUBLIC_GA_TRACKING_ID`                                                 | Build      | Google Analytics ID -- **inlined at build time** (default `G-675W5PPJEJ`) |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `SMTP_FROM` | No         | nodemailer; unset = sends skipped                                         |
+| `UPSTASH_REDIS_REST_URL` / `_TOKEN`                                     | No         | Distributed rate limiting; unset = in-memory                              |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD`                                        | Seed       | Used only by `prisma/seed.ts`                                             |
 
 **Note:** `PUBLIC_*` values are read via `$env/static/public` and inlined by Vite at build
 time, so they must be present **before** `npm run build`. In Docker/CI they are supplied as
