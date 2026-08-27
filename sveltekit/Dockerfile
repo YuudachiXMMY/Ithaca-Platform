@@ -26,6 +26,11 @@ ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholde
 ARG PUBLIC_GA_TRACKING_ID=G-675W5PPJEJ
 ENV PUBLIC_GA_TRACKING_ID=$PUBLIC_GA_TRACKING_ID
 
+# Canonical site origin for SEO (absolute canonical/OG/hreflang URLs + sitemap).
+# Also PUBLIC_* → inlined at build time, so it must be set BEFORE `vite build`.
+ARG PUBLIC_SITE_URL=https://ithacateens.com
+ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
+
 RUN npx prisma generate
 RUN npm run build
 

@@ -2,6 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 import { prisma } from '$lib/server/prisma';
 import type { ApiResponse } from '$lib/types';
+import { invalidatePopupCache } from '$lib/server/popup-cache';
 
 export const prerender = false;
 
@@ -46,6 +47,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			displayRules: data.displayRules
 		}
 	});
+	invalidatePopupCache();
 	return json({ success: true, data: popup } satisfies ApiResponse, { status: 201 });
 };
 
@@ -96,6 +98,7 @@ export const PUT: RequestHandler = async ({ request }) => {
 	if (updateFields.displayRules !== undefined) updateData.displayRules = updateFields.displayRules;
 
 	const popup = await prisma.popup.update({ where: { id }, data: updateData });
+	invalidatePopupCache();
 	return json({ success: true, data: popup } satisfies ApiResponse);
 };
 
@@ -120,5 +123,6 @@ export const DELETE: RequestHandler = async ({ request }) => {
 		});
 	}
 	await prisma.popup.delete({ where: { id } });
+	invalidatePopupCache();
 	return json({ success: true } satisfies ApiResponse);
 };

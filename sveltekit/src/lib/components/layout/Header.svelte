@@ -8,6 +8,7 @@
 	import { localizeHref, deLocalizeUrl } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
+	import { focustrap } from '$lib/actions/focus-trap';
 
 	// Split nav items: left group / center logo / right group.
 	const LEFT_NAV = NAV_ITEMS.filter((item) => item.href !== '/contact-us');
@@ -28,6 +29,15 @@
 
 	let scrolled = $state(false);
 	let mobileOpen = $state(false);
+	// Hamburger toggle element — focus is returned here when the drawer closes via
+	// Escape or the backdrop (the focustrap destroy also restores, but these paths
+	// close the drawer without unmounting via the trap, so restore explicitly).
+	let toggleEl = $state<HTMLButtonElement | null>(null);
+
+	function closeMobile() {
+		mobileOpen = false;
+		toggleEl?.focus();
+	}
 
 	// Motion is additive: reduced-motion collapses transition durations to 0 while
 	// the same markup renders — the panel/accordion still open/close, just instantly.
@@ -91,6 +101,12 @@
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
+
+<svelte:window
+	onkeydown={(e) => {
+		if (mobileOpen && e.key === 'Escape') closeMobile();
+	}}
+/>
 
 <header
 	class={cn(
@@ -220,12 +236,17 @@
 			</div>
 
 			<button
+				bind:this={toggleEl}
 				onclick={() => (mobileOpen = !mobileOpen)}
 				class="rounded-lg p-2 text-white/70 transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none lg:hidden"
 				aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
 				aria-expanded={mobileOpen}
 			>
-				<Menu class="h-5 w-5" />
+				{#if mobileOpen}
+					<X class="h-5 w-5" />
+				{:else}
+					<Menu class="h-5 w-5" />
+				{/if}
 			</button>
 		</div>
 	</div>
@@ -236,12 +257,13 @@
 	<button
 		type="button"
 		class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
-		onclick={() => (mobileOpen = false)}
+		onclick={closeMobile}
 		aria-label="Close navigation"
 		transition:fade={{ duration: 200 }}
 	></button>
 
 	<nav
+		use:focustrap
 		class="fixed top-0 right-0 z-50 flex h-full w-72 flex-col bg-[#0a0c10]/95 shadow-2xl backdrop-blur-xl lg:hidden"
 		aria-label="Mobile navigation"
 		transition:fly={{ x: 288, duration: 300 }}

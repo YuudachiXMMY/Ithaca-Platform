@@ -22,6 +22,10 @@
 	}
 </script>
 
+<svelte:head>
+	<meta name="robots" content="noindex" />
+</svelte:head>
+
 <!-- eslint-disable svelte/no-navigation-without-resolve -- static internal admin routes -->
 <div class="flex min-h-screen bg-[#111318] text-[#f7f7f7]">
 	<aside class="flex w-60 flex-col border-r border-[#2a2a2a] bg-[#1e1e1e] p-4">

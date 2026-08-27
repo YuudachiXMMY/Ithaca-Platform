@@ -1,0 +1,50 @@
+# ── Lighthouse CI — mobile perf gate ────────────
+# Builds the SvelteKit app (adapter-node) and runs `lhci autorun` against the
+# built site, asserting the PRD's headline metrics (Performance ≥ 0.95,
+# LCP < 2.0s, CLS < 0.05). PUBLIC_* env is inlined at build time.
+
+name: Lighthouse CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: sveltekit/package-lock.json
+
+      - name: Install dependencies
+        working-directory: sveltekit
+        run: npm ci
+
+      - name: Build
+        working-directory: sveltekit
+        env:
+          PUBLIC_GA_TRACKING_ID: G-675W5PPJEJ
+          PUBLIC_SITE_URL: https://ithacateens.com
+        run: npm run build
+
+      - name: Install Lighthouse CI
+        run: npm i -g @lhci/cli@0.15.x
+
+      - name: Run Lighthouse CI
+        working-directory: sveltekit
+        run: lhci autorun
+
+      - name: Upload Lighthouse results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-results
+          path: sveltekit/.lighthouseci

@@ -272,3 +272,77 @@ html {
 		opacity: 0;
 	}
 }
+
+/* ==========================================================================
+   Phase 4 — Interaction & perf hardening
+   ========================================================================== */
+
+/* Skeleton placeholder (admin async loads). The <Skeleton> component sizes the
+   block; this owns the shimmer sweep + its reduced-motion neutralization. */
+.skeleton {
+	background: linear-gradient(
+		90deg,
+		var(--card-bg, #1e1e1e) 25%,
+		rgba(255, 255, 255, 0.06) 37%,
+		var(--card-bg, #1e1e1e) 63%
+	);
+	background-size: 400% 100%;
+	animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+	0% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0 50%;
+	}
+}
+
+/* Global top nav-progress bar (root layout, driven by the `navigating` store). */
+.nav-progress {
+	position: fixed;
+	inset: 0 0 auto 0;
+	height: 3px;
+	z-index: 100;
+	background: var(--accent, #ccdef0);
+	transform-origin: left;
+	animation: nav-indeterminate 1.2s ease-in-out infinite;
+}
+
+@keyframes nav-indeterminate {
+	0% {
+		transform: scaleX(0);
+		opacity: 1;
+	}
+	50% {
+		transform: scaleX(0.7);
+		opacity: 1;
+	}
+	100% {
+		transform: scaleX(1);
+		opacity: 0;
+	}
+}
+
+/* Tuned SPA view-transition cross-fade (root). */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 250ms;
+}
+
+/* Reduced-motion: neutralize the Phase-4 motion added above. The Phase-2 global guard
+   (near the top of this file) already zeroes every `*` animation/transition; these extra
+   rules cover the ::view-transition pseudo-elements (untargetable by `*`) and explicitly
+   pin the skeleton/nav-progress shimmer for belt-and-suspenders. */
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none !important;
+	}
+	.skeleton,
+	.nav-progress {
+		animation: none !important;
+	}
+}

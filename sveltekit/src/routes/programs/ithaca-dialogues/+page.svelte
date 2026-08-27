@@ -2,6 +2,7 @@
 	import { ArrowRight, ChevronDown } from 'lucide-svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
+	import Seo from '$lib/components/Seo.svelte';
 
 	import heroImg from '$lib/assets/site/about-hero.jpg?enhanced';
 	import tracksImg from '$lib/assets/pillars/pillar-explore.png?enhanced';
@@ -138,10 +139,10 @@
 	];
 </script>
 
-<svelte:head>
-	<title>{m.programs_eliteInterview_meta_title()}</title>
-	<meta name="description" content={m.programs_eliteInterview_meta_description()} />
-</svelte:head>
+<Seo
+	title={m.programs_eliteInterview_meta_title()}
+	description={m.programs_eliteInterview_meta_description()}
+/>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 

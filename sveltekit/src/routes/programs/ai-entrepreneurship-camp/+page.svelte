@@ -2,6 +2,7 @@
 	import { ArrowRight, ChevronDown } from 'lucide-svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
+	import Seo from '$lib/components/Seo.svelte';
 
 	// Hand-placed mosaics (specific images / alts / spans), so build-time enhanced
 	// imports per image — NOT a folder glob, which would render all ~90 photos.
@@ -99,10 +100,7 @@
 	];
 </script>
 
-<svelte:head>
-	<title>{m.programs_aiCamp_meta_title()}</title>
-	<meta name="description" content={m.programs_aiCamp_meta_description()} />
-</svelte:head>
+<Seo title={m.programs_aiCamp_meta_title()} description={m.programs_aiCamp_meta_description()} />
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 

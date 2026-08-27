@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
+	import Seo from '$lib/components/Seo.svelte';
 	import HeroSection from '$lib/components/about/HeroSection.svelte';
 	import MissionGrid from '$lib/components/about/MissionGrid.svelte';
 	import Approach from '$lib/components/about/Approach.svelte';
@@ -11,10 +12,7 @@
 	import ConnectCTA from '$lib/components/about/ConnectCTA.svelte';
 </script>
 
-<svelte:head>
-	<title>{m.metadata_aboutUs_title()}</title>
-	<meta name="description" content={m.metadata_aboutUs_description()} />
-</svelte:head>
+<Seo title={m.metadata_aboutUs_title()} description={m.metadata_aboutUs_description()} />
 
 <div>
 	<HeroSection />

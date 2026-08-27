@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import type { RequestEvent } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 
@@ -29,4 +30,19 @@ export function validateOrigin(event: RequestEvent): boolean {
 	if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
 	const allowed = allowedHost();
 	return allowed !== null && hostname === allowed;
+}
+
+// Double-submit CSRF check: the `x-csrf-token` header (echoed by client JS) must
+// match the `csrf_token` cookie. A cross-site forged POST omits the same-site
+// cookie, so this fails. timingSafeEqual throws on length mismatch, hence the
+// explicit length pre-check.
+export function verifyCsrfToken(event: RequestEvent): boolean {
+	const header = event.request.headers.get('x-csrf-token');
+	const cookie = event.cookies.get('csrf_token');
+	return (
+		!!header &&
+		!!cookie &&
+		header.length === cookie.length &&
+		crypto.timingSafeEqual(Buffer.from(header), Buffer.from(cookie))
+	);
 }

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Loader2, Trash2, Download } from 'lucide-svelte';
+	import Skeleton from '$lib/components/shared/Skeleton.svelte';
 	import * as m from '$lib/paraglide/messages';
 
 	type Subscriber = {
@@ -108,7 +109,17 @@
 {/if}
 
 {#if loading}
-	<div class="flex items-center gap-2 text-[#888]"><Loader2 class="h-5 w-5 animate-spin" /> …</div>
+	<div class="overflow-hidden rounded-xl border border-[#2a2a2a]">
+		{#each [0, 1, 2, 3, 4, 5] as i (i)}
+			<div class="flex items-center gap-4 border-t border-[#2a2a2a] px-4 py-3.5 first:border-t-0">
+				<Skeleton width="30%" />
+				<Skeleton width="18%" />
+				<Skeleton width="4rem" height="1.25rem" rounded="9999px" />
+				<Skeleton width="5rem" />
+				<div class="ml-auto"><Skeleton width="1rem" height="1rem" rounded="0.25rem" /></div>
+			</div>
+		{/each}
+	</div>
 {:else if subscribers.length === 0}
 	<p class="text-[#888]">{m.admin_subscribers_empty()}</p>
 {:else}

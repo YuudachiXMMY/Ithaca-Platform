@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { z } from 'zod';
 	import { Loader2, Plus, X, Pencil, Trash2 } from 'lucide-svelte';
+	import Skeleton from '$lib/components/shared/Skeleton.svelte';
 	import * as m from '$lib/paraglide/messages';
 
 	type Popup = {
@@ -272,7 +273,18 @@
 {/if}
 
 {#if loading}
-	<div class="flex items-center gap-2 text-[#888]"><Loader2 class="h-5 w-5 animate-spin" /> …</div>
+	<div class="flex flex-col gap-3">
+		{#each [0, 1, 2, 3] as i (i)}
+			<div class="rounded-xl border border-[#2a2a2a] bg-[#1e1e1e] p-4">
+				<Skeleton width="35%" height="1.125rem" />
+				<div class="mt-3 flex gap-4">
+					<Skeleton width="4rem" height="1.25rem" rounded="9999px" />
+					<Skeleton width="7rem" />
+					<Skeleton width="5rem" />
+				</div>
+			</div>
+		{/each}
+	</div>
 {:else if popups.length === 0}
 	<p class="text-[#888]">{m.admin_popups_empty()}</p>
 {:else}

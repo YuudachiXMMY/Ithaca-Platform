@@ -23,7 +23,8 @@
 		"db:seed": "tsx prisma/seed.ts",
 		"db:studio": "prisma studio",
 		"prisma:seed": "tsx prisma/seed.ts",
-		"postinstall": "if [ -f prisma/schema.prisma ]; then prisma generate; fi"
+		"postinstall": "if [ -f prisma/schema.prisma ]; then prisma generate; fi",
+		"lhci": "npx --yes @lhci/cli@0.15.x autorun"
 	},
 	"prisma": {
 		"seed": "tsx prisma/seed.ts"
