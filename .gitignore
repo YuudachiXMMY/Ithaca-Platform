@@ -1,50 +1,36 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+node_modules
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
 /build
 
-# misc
+# OS
 .DS_Store
-*.pem
+Thumbs.db
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
 
-# playwright MCP
-.playwright-mcp/
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
 
-# playwright screenshots (not site assets)
-.playwright-mcp/**/*.png
+# Paraglide (generated i18n runtime)
+/src/lib/paraglide
 
-# env files (can opt-in for committing if needed)
-.env*
+# Paraglide compile cache
+project.inlang/cache/
 
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# archived original media (pre-optimization masters — kept locally only)
+# Pre-optimization media masters — local only, never commit (the sole originals)
 .archive/
+
+# Local agent / tooling scratch (worktrees + code-graph index)
+.claude/worktrees/
+.codegraph/
