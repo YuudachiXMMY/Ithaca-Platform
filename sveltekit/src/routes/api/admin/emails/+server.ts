@@ -20,7 +20,10 @@ export const POST: RequestHandler = async ({ request }) => {
 	const result = createCampaignSchema.safeParse(await request.json().catch(() => null));
 	if (!result.success) {
 		return json(
-			{ success: false, error: result.error.issues[0]?.message ?? 'Invalid input' } satisfies ApiResponse,
+			{
+				success: false,
+				error: result.error.issues[0]?.message ?? 'Invalid input'
+			} satisfies ApiResponse,
 			{ status: 400 }
 		);
 	}

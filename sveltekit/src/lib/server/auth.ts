@@ -34,9 +34,12 @@ export const auth = betterAuth({
 		cookieCache: { enabled: true, maxAge: 5 * 60 } // avoid a DB hit on every request
 	},
 
-	trustedOrigins: [env.BETTER_AUTH_URL, env.ORIGIN, 'http://localhost:5173', 'http://localhost:3000'].filter(
-		(o): o is string => typeof o === 'string' && o.length > 0
-	),
+	trustedOrigins: [
+		env.BETTER_AUTH_URL,
+		env.ORIGIN,
+		'http://localhost:5173',
+		'http://localhost:3000'
+	].filter((o): o is string => typeof o === 'string' && o.length > 0),
 
 	// FOOTGUN: sveltekitCookies MUST be the LAST plugin in this array.
 	plugins: [sveltekitCookies(getRequestEvent)]

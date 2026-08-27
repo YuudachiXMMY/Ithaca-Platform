@@ -17,10 +17,12 @@
 
 	async function signOut() {
 		await authClient.signOut();
+		// eslint-disable-next-line svelte/no-navigation-without-resolve -- static internal admin route
 		await goto('/admin/login');
 	}
 </script>
 
+<!-- eslint-disable svelte/no-navigation-without-resolve -- static internal admin routes -->
 <div class="flex min-h-screen bg-[#111318] text-[#f7f7f7]">
 	<aside class="flex w-60 flex-col border-r border-[#2a2a2a] bg-[#1e1e1e] p-4">
 		<h1 class="mb-6 px-2 text-lg font-bold">{m.admin_sidebar_title()}</h1>

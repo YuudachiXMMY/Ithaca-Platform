@@ -146,7 +146,7 @@
 		/>
 		{#if fieldErrors.subject}<p class="mb-3 text-sm text-red-400">{fieldErrors.subject}</p>{/if}
 
-		<label class="mb-1 mt-3 block text-sm text-[#cccccc]" for="body"
+		<label class="mt-3 mb-1 block text-sm text-[#cccccc]" for="body"
 			>{m.admin_emails_createForm_body()}</label
 		>
 		<textarea
@@ -190,8 +190,9 @@
 					<tr class="border-t border-[#2a2a2a]">
 						<td class="px-4 py-3">{c.subject}</td>
 						<td class="px-4 py-3">
-							<span class="rounded-full px-2 py-0.5 text-xs {STATUS_STYLES[c.status] ?? STATUS_STYLES.draft}"
-								>{c.status}</span
+							<span
+								class="rounded-full px-2 py-0.5 text-xs {STATUS_STYLES[c.status] ??
+									STATUS_STYLES.draft}">{c.status}</span
 							>
 						</td>
 						<td class="px-4 py-3">{c.recipientCount}</td>

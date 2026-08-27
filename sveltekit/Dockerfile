@@ -62,8 +62,14 @@ ENV BODY_SIZE_LIMIT=5M
 ENV ADDRESS_HEADER=cf-connecting-ip
 ENV PROTOCOL_HEADER=x-forwarded-proto
 ENV HOST_HEADER=x-forwarded-host
-# ORIGIN must be supplied at runtime (e.g. https://staging.ithacateens.com) for CSRF +
-# absolute URL generation. Left unset here on purpose.
+# Runtime-supplied env (left unset here on purpose):
+#   ORIGIN               canonical URL — CSRF origin check + absolute URLs (Phase 0)
+#   BETTER_AUTH_SECRET   session signing secret (Phase 3; required in production)
+#   BETTER_AUTH_URL      canonical origin for auth cookies/redirects (Phase 3)
+#   SMTP_* / UPSTASH_*   email + optional distributed rate-limit (Phase 3; optional)
+# One-time at cutover (NOT in this CMD — tsx is a dev dep): after `migrate deploy`, run
+#   `npx tsx prisma/migrate-admins-to-betterauth.ts` once to copy existing bcrypt admin
+#   hashes into Better Auth (User + credential Account) so the same password keeps working.
 
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 sveltekit

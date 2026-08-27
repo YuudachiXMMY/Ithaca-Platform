@@ -33,7 +33,7 @@ const i18n: Handle = ({ event, resolve }) =>
 // /api/admin/* endpoints (401 envelope). Mirrors the Next app's src/proxy.ts guard. The auth
 // catch-all route (/api/auth/[...all]) handles sign-in/out itself — do NOT dispatch here.
 const handleAuth: Handle = async ({ event, resolve }) => {
-	let session: Awaited<ReturnType<typeof auth.api.getSession>> = null;
+	let session: Awaited<ReturnType<typeof auth.api.getSession>>;
 	try {
 		session = await auth.api.getSession({ headers: event.request.headers });
 	} catch {

@@ -26,7 +26,10 @@ export const POST: RequestHandler = async ({ request }) => {
 	const result = createPopupSchema.safeParse(await request.json().catch(() => null));
 	if (!result.success) {
 		return json(
-			{ success: false, error: result.error.issues[0]?.message ?? 'Invalid input' } satisfies ApiResponse,
+			{
+				success: false,
+				error: result.error.issues[0]?.message ?? 'Invalid input'
+			} satisfies ApiResponse,
 			{ status: 400 }
 		);
 	}
@@ -62,7 +65,10 @@ export const PUT: RequestHandler = async ({ request }) => {
 	const result = updatePopupSchema.safeParse(await request.json().catch(() => null));
 	if (!result.success) {
 		return json(
-			{ success: false, error: result.error.issues[0]?.message ?? 'Invalid input' } satisfies ApiResponse,
+			{
+				success: false,
+				error: result.error.issues[0]?.message ?? 'Invalid input'
+			} satisfies ApiResponse,
 			{ status: 400 }
 		);
 	}
@@ -70,7 +76,9 @@ export const PUT: RequestHandler = async ({ request }) => {
 
 	const existing = await prisma.popup.findUnique({ where: { id } });
 	if (!existing) {
-		return json({ success: false, error: 'Popup not found' } satisfies ApiResponse, { status: 404 });
+		return json({ success: false, error: 'Popup not found' } satisfies ApiResponse, {
+			status: 404
+		});
 	}
 
 	// Partial update: only apply fields that were explicitly provided.
@@ -78,7 +86,8 @@ export const PUT: RequestHandler = async ({ request }) => {
 	if (updateFields.title !== undefined) updateData.title = updateFields.title;
 	if (updateFields.content !== undefined) updateData.content = updateFields.content;
 	if (updateFields.buttonText !== undefined) updateData.buttonText = updateFields.buttonText;
-	if (updateFields.buttonLink !== undefined) updateData.buttonLink = updateFields.buttonLink || null;
+	if (updateFields.buttonLink !== undefined)
+		updateData.buttonLink = updateFields.buttonLink || null;
 	if (updateFields.isActive !== undefined) updateData.isActive = updateFields.isActive;
 	if (updateFields.startDate !== undefined)
 		updateData.startDate = updateFields.startDate ? new Date(updateFields.startDate) : null;
@@ -96,14 +105,19 @@ export const DELETE: RequestHandler = async ({ request }) => {
 	const result = deleteSchema.safeParse(await request.json().catch(() => null));
 	if (!result.success) {
 		return json(
-			{ success: false, error: result.error.issues[0]?.message ?? 'Invalid input' } satisfies ApiResponse,
+			{
+				success: false,
+				error: result.error.issues[0]?.message ?? 'Invalid input'
+			} satisfies ApiResponse,
 			{ status: 400 }
 		);
 	}
 	const { id } = result.data;
 	const existing = await prisma.popup.findUnique({ where: { id } });
 	if (!existing) {
-		return json({ success: false, error: 'Popup not found' } satisfies ApiResponse, { status: 404 });
+		return json({ success: false, error: 'Popup not found' } satisfies ApiResponse, {
+			status: 404
+		});
 	}
 	await prisma.popup.delete({ where: { id } });
 	return json({ success: true } satisfies ApiResponse);

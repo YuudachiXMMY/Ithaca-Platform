@@ -116,7 +116,8 @@
 			const data = await res.json();
 			if (!data.success) {
 				error =
-					data.error ?? (editingId ? m.admin_popups_errors_update() : m.admin_popups_errors_create());
+					data.error ??
+					(editingId ? m.admin_popups_errors_update() : m.admin_popups_errors_create());
 				return;
 			}
 			resetForm();
@@ -184,7 +185,9 @@
 			{editingId ? m.admin_popups_form_editTitle() : m.admin_popups_form_createTitle()}
 		</h2>
 
-		<label class="mb-1 block text-sm text-[#cccccc]" for="p-title">{m.admin_popups_form_title()}</label>
+		<label class="mb-1 block text-sm text-[#cccccc]" for="p-title"
+			>{m.admin_popups_form_title()}</label
+		>
 		<input
 			id="p-title"
 			bind:value={title}
@@ -193,7 +196,7 @@
 		/>
 		{#if fieldErrors.title}<p class="mb-2 text-sm text-red-400">{fieldErrors.title}</p>{/if}
 
-		<label class="mb-1 mt-3 block text-sm text-[#cccccc]" for="p-content"
+		<label class="mt-3 mb-1 block text-sm text-[#cccccc]" for="p-content"
 			>{m.admin_popups_form_content()}</label
 		>
 		<textarea
@@ -253,7 +256,8 @@
 		</div>
 
 		<label class="mt-3 flex items-center gap-2 text-sm text-[#cccccc]">
-			<input type="checkbox" bind:checked={isActive} /> {m.admin_popups_form_active()}
+			<input type="checkbox" bind:checked={isActive} />
+			{m.admin_popups_form_active()}
 		</label>
 
 		<button
@@ -292,7 +296,9 @@
 								class="rounded-full px-2 py-0.5 text-xs {p.isActive
 									? 'bg-green-500/15 text-green-300'
 									: 'bg-gray-500/15 text-gray-300'}"
-								>{p.isActive ? m.admin_popups_statusActive() : m.admin_popups_statusInactive()}</span
+								>{p.isActive
+									? m.admin_popups_statusActive()
+									: m.admin_popups_statusInactive()}</span
 							>
 						</td>
 						<td class="px-4 py-3">{dateRange(p)}</td>

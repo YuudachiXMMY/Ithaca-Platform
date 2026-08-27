@@ -32,14 +32,19 @@ export const DELETE: RequestHandler = async ({ request }) => {
 	const result = deleteSchema.safeParse(await request.json().catch(() => null));
 	if (!result.success) {
 		return json(
-			{ success: false, error: result.error.issues[0]?.message ?? 'Invalid input' } satisfies ApiResponse,
+			{
+				success: false,
+				error: result.error.issues[0]?.message ?? 'Invalid input'
+			} satisfies ApiResponse,
 			{ status: 400 }
 		);
 	}
 	const { id } = result.data;
 	const existing = await prisma.subscriber.findUnique({ where: { id } });
 	if (!existing) {
-		return json({ success: false, error: 'Subscriber not found' } satisfies ApiResponse, { status: 404 });
+		return json({ success: false, error: 'Subscriber not found' } satisfies ApiResponse, {
+			status: 404
+		});
 	}
 	await prisma.subscriber.delete({ where: { id } });
 	return json({ success: true } satisfies ApiResponse);

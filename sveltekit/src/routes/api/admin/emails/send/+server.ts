@@ -14,7 +14,10 @@ export const POST: RequestHandler = async ({ request }) => {
 	const result = sendSchema.safeParse(await request.json().catch(() => null));
 	if (!result.success) {
 		return json(
-			{ success: false, error: result.error.issues[0]?.message ?? 'Invalid input' } satisfies ApiResponse,
+			{
+				success: false,
+				error: result.error.issues[0]?.message ?? 'Invalid input'
+			} satisfies ApiResponse,
 			{ status: 400 }
 		);
 	}
@@ -22,7 +25,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	const campaign = await prisma.emailCampaign.findUnique({ where: { id } });
 	if (!campaign) {
-		return json({ success: false, error: 'Campaign not found' } satisfies ApiResponse, { status: 404 });
+		return json({ success: false, error: 'Campaign not found' } satisfies ApiResponse, {
+			status: 404
+		});
 	}
 	if (campaign.status === 'sent') {
 		return json({ success: false, error: 'Campaign has already been sent' } satisfies ApiResponse, {
@@ -38,9 +43,12 @@ export const POST: RequestHandler = async ({ request }) => {
 	});
 	if (subscribers.length === 0) {
 		await prisma.emailCampaign.update({ where: { id }, data: { status: 'failed' } });
-		return json({ success: false, error: 'No active subscribers to send to' } satisfies ApiResponse, {
-			status: 400
-		});
+		return json(
+			{ success: false, error: 'No active subscribers to send to' } satisfies ApiResponse,
+			{
+				status: 400
+			}
+		);
 	}
 
 	try {
@@ -56,9 +64,14 @@ export const POST: RequestHandler = async ({ request }) => {
 			where: { id },
 			data: { status: 'sent', recipientCount: subscribers.length, sentAt: new Date() }
 		});
-		return json({ success: true, data: { recipientCount: subscribers.length } } satisfies ApiResponse);
+		return json({
+			success: true,
+			data: { recipientCount: subscribers.length }
+		} satisfies ApiResponse);
 	} catch {
 		await prisma.emailCampaign.update({ where: { id }, data: { status: 'failed' } });
-		return json({ success: false, error: 'Failed to send emails' } satisfies ApiResponse, { status: 500 });
+		return json({ success: false, error: 'Failed to send emails' } satisfies ApiResponse, {
+			status: 500
+		});
 	}
 };

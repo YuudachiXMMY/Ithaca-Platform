@@ -66,7 +66,10 @@ function tooManyRequests(limit: number, retryAfterSeconds: number): Response {
 }
 
 // Returns a 429 Response when the caller is over the limit, else null (allowed).
-export async function rateLimit(event: RequestEvent, config: RateLimitConfig): Promise<Response | null> {
+export async function rateLimit(
+	event: RequestEvent,
+	config: RateLimitConfig
+): Promise<Response | null> {
 	const { limit, windowMs, namespace } = config;
 	const key = `${namespace}:${event.getClientAddress()}`;
 	const now = Date.now();

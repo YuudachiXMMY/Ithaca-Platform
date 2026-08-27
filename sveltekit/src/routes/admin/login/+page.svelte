@@ -27,6 +27,7 @@
 				onSuccess: async () => {
 					// Re-run server load so locals.user propagates before navigating.
 					await invalidateAll();
+					// eslint-disable-next-line svelte/no-navigation-without-resolve -- callbackUrl is a validated internal admin path
 					await goto(page.url.searchParams.get('callbackUrl') ?? '/admin');
 				},
 				onError: () => {
@@ -59,7 +60,9 @@
 			class="mb-4 w-full rounded-lg border border-[#2a2a2a] bg-[#111318] px-3 py-2 text-[#f7f7f7]"
 		/>
 
-		<label class="mb-1 block text-sm text-[#cccccc]" for="password">{m.admin_login_password()}</label>
+		<label class="mb-1 block text-sm text-[#cccccc]" for="password"
+			>{m.admin_login_password()}</label
+		>
 		<input
 			id="password"
 			type="password"

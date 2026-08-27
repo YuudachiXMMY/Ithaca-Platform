@@ -15,8 +15,16 @@
 	let error = $state('');
 
 	const cards = [
-		{ key: 'totalSubscribers', label: () => m.admin_dashboard_stats_totalSubscribers(), icon: Users },
-		{ key: 'totalContacts', label: () => m.admin_dashboard_stats_totalContacts(), icon: MessageSquare },
+		{
+			key: 'totalSubscribers',
+			label: () => m.admin_dashboard_stats_totalSubscribers(),
+			icon: Users
+		},
+		{
+			key: 'totalContacts',
+			label: () => m.admin_dashboard_stats_totalContacts(),
+			icon: MessageSquare
+		},
 		{ key: 'campaignsSent', label: () => m.admin_dashboard_stats_campaignsSent(), icon: Mail },
 		{ key: 'activePopups', label: () => m.admin_dashboard_stats_activePopups(), icon: Megaphone }
 	] as const;
@@ -29,7 +37,12 @@
 				fetch('/api/admin/popups'),
 				fetch('/api/admin/contacts')
 			]);
-			const [s, c, p, ct] = await Promise.all([sRes.json(), cRes.json(), pRes.json(), ctRes.json()]);
+			const [s, c, p, ct] = await Promise.all([
+				sRes.json(),
+				cRes.json(),
+				pRes.json(),
+				ctRes.json()
+			]);
 			stats = {
 				totalSubscribers: s.data?.pagination?.total ?? 0,
 				totalContacts: ct.data?.total ?? 0,
