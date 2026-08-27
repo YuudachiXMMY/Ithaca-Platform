@@ -1,8 +1,9 @@
 import { sequence } from '@sveltejs/kit/hooks';
-import type { Handle } from '@sveltejs/kit';
+import { redirect, json, type Handle } from '@sveltejs/kit';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import { getTextDirection } from '$lib/paraglide/runtime';
 import { env } from '$env/dynamic/public';
+import { auth } from '$lib/server/auth';
 
 // GA is inlined at (pre)render time from PUBLIC_GA_TRACKING_ID (default G-675W5PPJEJ set as a
 // Docker/CI build-arg). Injected as real <script> tags via a %ga% placeholder — {@html}/
@@ -13,7 +14,8 @@ const gaSnippet = gaId
 	: '';
 
 // Resolves the request locale from the URL (strategy: ['url','baseLocale']) and injects it
-// into <html lang="%lang%" dir="%dir%">. No cookie/header read => prerender-safe.
+// into <html lang="%lang%" dir="%dir%">. No cookie/header read => prerender-safe. Stays FIRST
+// so the locale is set before any downstream handle runs.
 const i18n: Handle = ({ event, resolve }) =>
 	paraglideMiddleware(event.request, ({ request, locale }) => {
 		event.request = request;
@@ -26,15 +28,29 @@ const i18n: Handle = ({ event, resolve }) =>
 		});
 	});
 
-// Phase 0 stub for the fail-closed admin guard ported in Phase 3 (see the Next app's
-// src/proxy.ts). It guards /admin/* (except /admin/login) and redirects to login when
-// unauthenticated. Commented so the sequence() shape is ready without pulling auth in.
-// const auth: Handle = async ({ event, resolve }) => {
-// 	const { pathname } = event.url;
-// 	if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
-// 		// const token = await getAdminToken(event.request); if (!token) redirect(303, ...);
-// 	}
-// 	return resolve(event);
-// };
+// Better Auth: the single source of truth for the admin session. Populate event.locals once
+// per request (fail-closed on errors), then guard /admin/* pages (redirect to login) and
+// /api/admin/* endpoints (401 envelope). Mirrors the Next app's src/proxy.ts guard. The auth
+// catch-all route (/api/auth/[...all]) handles sign-in/out itself — do NOT dispatch here.
+const handleAuth: Handle = async ({ event, resolve }) => {
+	let session: Awaited<ReturnType<typeof auth.api.getSession>> = null;
+	try {
+		session = await auth.api.getSession({ headers: event.request.headers });
+	} catch {
+		session = null;
+	}
+	event.locals.user = session?.user ?? null;
+	event.locals.session = session?.session ?? null;
 
-export const handle = sequence(i18n /*, auth */);
+	const { pathname } = event.url;
+	if (pathname.startsWith('/admin') && pathname !== '/admin/login' && !event.locals.user) {
+		redirect(303, `/admin/login?callbackUrl=${encodeURIComponent(pathname)}`);
+	}
+	if (pathname.startsWith('/api/admin') && !event.locals.user) {
+		return json({ success: false, error: 'Unauthorized' }, { status: 401 });
+	}
+
+	return resolve(event);
+};
+
+export const handle = sequence(i18n, handleAuth);
