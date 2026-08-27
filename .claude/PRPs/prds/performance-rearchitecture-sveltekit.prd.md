@@ -180,7 +180,7 @@ The **minimum to validate the hypothesis** is the **public marketing site** rebu
 | 1 | Public site + media pipeline | Port all 12 public routes (content/images) as Svelte; enhanced-img AVIF/WebP; adaptive video; gated CJK fonts; prerender + edge cache | in-progress | with 3 | 0 | [plan](../plans/phase-1-public-site-media-pipeline-sveltekit.plan.md) |
 | 2 | Animation & 3D layer | Svelte transitions + `inview` + CSS scroll-timeline for sections; Threlte EV scene (lazy, on-demand); lazy GSAP where needed; reduced-motion | complete | - | 1 | [plan](../plans/completed/phase-2-animation-3d-layer-sveltekit.plan.md) |
 | 3 | Admin CMS + auth + API | Better Auth (bcrypt reuse + data-migration); port admin panel; API routes → `+server.ts` (subscribe/contact/admin CRUD/emails); nodemailer + rate-limit + Zod | complete | with 1 | 0 | [plan](../plans/completed/phase-3-admin-cms-auth-api-sveltekit.plan.md) |
-| 4 | Interaction & perf hardening | Loading skeletons/transitions; cached popup (SWR); SSR-seeded CSRF; focus-trap/Escape; global reduced-motion; SEO parity (metadata, sitemap, hreflang, GA); Lighthouse/CWV validation vs targets | pending | - | 2, 3 | - |
+| 4 | Interaction & perf hardening | Loading skeletons/transitions; cached popup (SWR); SSR-seeded CSRF; focus-trap/Escape; global reduced-motion; SEO parity (metadata, sitemap, hreflang, GA); Lighthouse/CWV validation vs targets | in-progress | - | 2, 3 | [plan](../plans/phase-4-interaction-perf-hardening-sveltekit.plan.md) |
 | 5 | Cutover & decommission | DNS/edge cutover, 301s if any path changed, monitor, retire Next.js app + old AdminUser table | pending | - | 4 | - |
 
 ### Phase Details
@@ -214,6 +214,7 @@ The **minimum to validate the hypothesis** is the **public marketing site** rebu
 - **Success signal**: Existing admin logs in with same password; all admin CRUD + email campaigns + public forms work; sessions revocable; rate-limit uses real client IP behind Cloudflare.
 
 **Phase 4: Interaction & perf hardening** _(depends on 2, 3)_
+- **Status**: in-progress — plan: `.claude/PRPs/plans/phase-4-interaction-perf-hardening-sveltekit.plan.md`. Note (surfaced during planning): two scope items are already partially shipped upstream — the **global reduced-motion CSS guard** (Phase 2, `sveltekit/src/app.css:184`) and the **popup SWR `Cache-Control` header** (Phase 3, `api/popups/active/+server.ts:25`); Phase 4 extends the guard (view-transition/skeleton) and adds only the in-process TTL cache. The **`/api/csrf` preflight was already removed** in Phase 3 (origin-only), so Phase 4 uses a client-minted double-submit token that preserves the blanket prerender rather than a literal SSR-seeded token (which would conflict with the prerender Must).
 - **Goal**: Human-centered polish + verified performance.
 - **Scope**: Navigation skeletons/transitions; popup via SWR cache; SSR-seeded CSRF (single-request submit); focus trap + Escape + focus restoration on popup/mobile-menu + hamburger↔X; global `prefers-reduced-motion` CSS; SEO parity (per-page metadata, sitemap, `hreflang` for en/zh, GA); Lighthouse CI + RUM against all success metrics.
 - **Success signal**: All success-metric targets met on staging; a11y checks pass; no CSRF preflight; popup off the critical path.
