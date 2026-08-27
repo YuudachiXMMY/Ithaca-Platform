@@ -31,6 +31,15 @@ ENV PUBLIC_GA_TRACKING_ID=$PUBLIC_GA_TRACKING_ID
 ARG PUBLIC_SITE_URL=https://ithacateens.com
 ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
 
+# Better Auth (src/lib/server/auth.ts) instantiates at module load, which `vite build`
+# evaluates while prerendering (hooks.server.ts imports it), so a secret + base URL must
+# exist at BUILD time or the build throws BetterAuthError. These are PLACEHOLDERS only —
+# auth reads BETTER_AUTH_SECRET/BETTER_AUTH_URL via $env/dynamic/private at RUNTIME, so the
+# real values are supplied as container env in production and these baked values are never
+# used to sign anything (same rationale as the placeholder DATABASE_URL above).
+ENV BETTER_AUTH_SECRET="build-time-placeholder-overridden-at-runtime"
+ENV BETTER_AUTH_URL="http://localhost:3000"
+
 RUN npx prisma generate
 RUN npm run build
 
