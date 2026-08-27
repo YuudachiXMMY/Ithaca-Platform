@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Users, MessageSquare, Mail, Megaphone, Loader2 } from 'lucide-svelte';
+	import { Users, MessageSquare, Mail, Megaphone } from 'lucide-svelte';
+	import Skeleton from '$lib/components/shared/Skeleton.svelte';
 	import * as m from '$lib/paraglide/messages';
 
 	type Stats = {
@@ -62,8 +63,16 @@
 <h1 class="mb-6 text-2xl font-bold">{m.admin_dashboard_title()}</h1>
 
 {#if loading}
-	<div class="flex items-center gap-2 text-[#888]">
-		<Loader2 class="h-5 w-5 animate-spin" /> …
+	<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+		{#each [0, 1, 2, 3] as i (i)}
+			<div class="rounded-xl border border-[#2a2a2a] bg-[#1e1e1e] p-6">
+				<div class="mb-4 flex items-center justify-between">
+					<Skeleton width="6rem" height="0.875rem" />
+					<Skeleton width="1.25rem" height="1.25rem" rounded="0.25rem" />
+				</div>
+				<Skeleton width="3.5rem" height="1.875rem" />
+			</div>
+		{/each}
 	</div>
 {:else if error}
 	<div class="rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-red-300">{error}</div>

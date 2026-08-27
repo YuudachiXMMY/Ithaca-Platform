@@ -14,6 +14,11 @@
 	};
 
 	let popup = $state<Popup | null>(null);
+	// Dismiss button — focus moves here when the banner appears (non-modal: focus
+	// move + restore only, NOT a full focus trap for a bottom toast).
+	let dismissEl = $state<HTMLButtonElement | null>(null);
+	// Element focused before the banner appeared, so focus can be restored on close.
+	let restoreEl: HTMLElement | null = null;
 
 	function dismissKey(id: string) {
 		return `popup-dismissed-${id}`;
@@ -22,7 +27,18 @@
 	function dismiss() {
 		if (popup) sessionStorage.setItem(dismissKey(popup.id), '1');
 		popup = null;
+		restoreEl?.focus();
+		restoreEl = null;
 	}
+
+	// When the banner appears, capture the prior focus then move focus to the
+	// dismiss button so keyboard/SR users land on it.
+	$effect(() => {
+		if (popup && dismissEl) {
+			restoreEl = document.activeElement as HTMLElement | null;
+			dismissEl.focus();
+		}
+	});
 
 	onMount(async () => {
 		try {
@@ -39,6 +55,12 @@
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- admin-configured external button URL -->
+<svelte:window
+	onkeydown={(e) => {
+		if (popup && e.key === 'Escape') dismiss();
+	}}
+/>
+
 {#if popup}
 	<div
 		class="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card-bg/95 px-4 py-4 backdrop-blur"
@@ -60,6 +82,7 @@
 					</a>
 				{/if}
 				<button
+					bind:this={dismissEl}
 					onclick={dismiss}
 					aria-label="Dismiss"
 					class="text-foreground/60 hover:text-foreground"

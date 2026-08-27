@@ -5,6 +5,7 @@
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import { loadGsap } from '$lib/motion/gsap';
 	import * as m from '$lib/paraglide/messages';
+	import Seo from '$lib/components/Seo.svelte';
 
 	import EVModel3DSection from '$lib/components/programs/ev-challenge/EVModel3DSection.svelte';
 	import WorkshopToRoles from '$lib/components/programs/ev-challenge/WorkshopToRoles.svelte';
@@ -137,10 +138,10 @@
 	});
 </script>
 
-<svelte:head>
-	<title>{m.programs_evChallenge_hero_title()} | Ithaca Family Academy</title>
-	<meta name="description" content={m.programs_evChallenge_hero_subtitle()} />
-</svelte:head>
+<Seo
+	title={m.programs_evChallenge_hero_title()}
+	description={m.programs_evChallenge_hero_subtitle()}
+/>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 

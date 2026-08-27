@@ -2,6 +2,7 @@
 	import { ArrowRight } from 'lucide-svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
+	import Seo from '$lib/components/Seo.svelte';
 	import { PROGRAM_CARDS, type ProgramCard } from '$lib/data/programs';
 
 	// Build-time enhanced images for the three cards that have photos.
@@ -53,10 +54,7 @@
 	const stackedCards = PROGRAM_CARDS.slice(4);
 </script>
 
-<svelte:head>
-	<title>{m.programs_index_title()} | Ithaca Family Academy</title>
-	<meta name="description" content={m.programs_index_subtitle()} />
-</svelte:head>
+<Seo title={m.programs_index_title()} description={m.programs_index_subtitle()} />
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 

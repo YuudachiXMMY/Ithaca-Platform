@@ -2,6 +2,8 @@
 	// Functional subscribe form (Phase 3): posts to /api/subscribe (Zod-validated,
 	// rate-limited server-side).
 	import { z } from 'zod';
+	import { getCsrfToken } from '$lib/csrf-client';
+	import * as m from '$lib/paraglide/messages';
 
 	let { variant = 'dark' }: { variant?: 'light' | 'dark' } = $props();
 
@@ -16,28 +18,28 @@
 		message = '';
 		if (!schema.safeParse({ email }).success) {
 			status = 'error';
-			message = 'Please enter a valid email address.';
+			message = m.newsletter_invalid_email();
 			return;
 		}
 		status = 'submitting';
 		try {
 			const res = await fetch('/api/subscribe', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: { 'Content-Type': 'application/json', 'x-csrf-token': getCsrfToken() },
 				body: JSON.stringify({ email })
 			});
 			const data = await res.json();
 			if (!data.success) {
 				status = 'error';
-				message = data.error ?? 'Something went wrong. Please try again.';
+				message = data.error ?? m.newsletter_error();
 				return;
 			}
 			status = 'success';
-			message = 'Thanks for subscribing!';
+			message = m.newsletter_success();
 			email = '';
 		} catch {
 			status = 'error';
-			message = 'Something went wrong. Please try again.';
+			message = m.newsletter_error();
 		}
 	}
 </script>
@@ -48,6 +50,7 @@
 			type="email"
 			bind:value={email}
 			required
+			aria-invalid={status === 'error'}
 			placeholder="you@example.com"
 			class="min-w-0 flex-1 rounded-md border border-border bg-card-bg px-3 py-2 text-sm text-foreground placeholder:text-foreground/30"
 		/>
@@ -59,7 +62,11 @@
 			Subscribe
 		</button>
 	</div>
-	{#if message}
-		<p class="text-xs {status === 'success' ? 'text-green-400' : 'text-red-400'}">{message}</p>
-	{/if}
+	<p
+		class="text-xs {status === 'success' ? 'text-green-400' : 'text-red-400'}"
+		role="alert"
+		aria-live="polite"
+	>
+		{message}
+	</p>
 </form>

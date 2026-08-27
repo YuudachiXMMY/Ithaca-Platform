@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
+	import Seo from '$lib/components/Seo.svelte';
 	import HeroSection from '$lib/components/home/HeroSection.svelte';
 	import MissionSection from '$lib/components/home/MissionSection.svelte';
 	import ProgramsShowcase from '$lib/components/home/ProgramsShowcase.svelte';
@@ -10,10 +11,7 @@
 	import ContactSection from '$lib/components/home/ContactSection.svelte';
 </script>
 
-<svelte:head>
-	<title>{m.metadata_title()}</title>
-	<meta name="description" content={m.metadata_description()} />
-</svelte:head>
+<Seo title={m.metadata_title()} description={m.metadata_description()} />
 
 <HeroSection />
 <MissionSection />

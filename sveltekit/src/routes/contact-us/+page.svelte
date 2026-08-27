@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { MapPin, Mail, Phone, MessageCircle } from 'lucide-svelte';
 	import { CONTACT_INFO } from '$lib/data/contact';
+	import { getCsrfToken } from '$lib/csrf-client';
+	import Seo from '$lib/components/Seo.svelte';
 	import * as m from '$lib/paraglide/messages';
 
 	// Google Maps embed for the IFA location (lazy-mounted on scroll).
@@ -53,28 +55,28 @@
 		cfMessage = '';
 		if (!cf.name.trim() || !cf.email.trim()) {
 			cfStatus = 'error';
-			cfMessage = 'Please fill in your name and email.';
+			cfMessage = m.contact_invalid();
 			return;
 		}
 		cfStatus = 'submitting';
 		try {
 			const res = await fetch('/api/contact', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: { 'Content-Type': 'application/json', 'x-csrf-token': getCsrfToken() },
 				body: JSON.stringify(cf)
 			});
 			const data = await res.json();
 			if (!data.success) {
 				cfStatus = 'error';
-				cfMessage = data.error ?? 'Something went wrong. Please try again.';
+				cfMessage = data.error ?? m.contact_error();
 				return;
 			}
 			cfStatus = 'success';
-			cfMessage = "Thanks — we'll be in touch soon.";
+			cfMessage = m.contact_success();
 			cf = { name: '', email: '', phone: '', message: '', subscribe: true };
 		} catch {
 			cfStatus = 'error';
-			cfMessage = 'Something went wrong. Please try again.';
+			cfMessage = m.contact_error();
 		}
 	}
 
@@ -99,10 +101,7 @@
 	});
 </script>
 
-<svelte:head>
-	<title>{m.contact_page_title()}</title>
-	<meta name="description" content={m.contact_page_description()} />
-</svelte:head>
+<Seo title={m.contact_page_title()} description={m.contact_page_description()} />
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- external contact links (maps/mailto/tel); dynamic href is not an internal route -->
 
@@ -195,6 +194,7 @@
 								type="text"
 								autocomplete="name"
 								bind:value={cf.name}
+								aria-invalid={cfStatus === 'error' && !cf.name.trim()}
 								placeholder={m.contact_form_namePlaceholder()}
 								class="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder-foreground/25 transition-colors focus:border-accent focus:outline-none"
 							/>
@@ -212,6 +212,7 @@
 								type="email"
 								autocomplete="email"
 								bind:value={cf.email}
+								aria-invalid={cfStatus === 'error' && !cf.email.trim()}
 								placeholder={m.contact_form_emailPlaceholder()}
 								class="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder-foreground/25 transition-colors focus:border-accent focus:outline-none"
 							/>
@@ -267,11 +268,13 @@
 						</button>
 					</div>
 
-					{#if cfMessage}
-						<p class="text-sm {cfStatus === 'success' ? 'text-green-400' : 'text-red-400'}">
-							{cfMessage}
-						</p>
-					{/if}
+					<p
+						class="text-sm {cfStatus === 'success' ? 'text-green-400' : 'text-red-400'}"
+						role="alert"
+						aria-live="polite"
+					>
+						{cfMessage}
+					</p>
 				</form>
 			</div>
 

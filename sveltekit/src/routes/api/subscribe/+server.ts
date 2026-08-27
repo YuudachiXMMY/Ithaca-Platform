@@ -2,7 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 import { prisma } from '$lib/server/prisma';
 import { rateLimit } from '$lib/server/rate-limit';
-import { validateOrigin } from '$lib/server/csrf';
+import { validateOrigin, verifyCsrfToken } from '$lib/server/csrf';
 import { sendMail } from '$lib/server/mail';
 import { escapeHtml } from '$lib/utils';
 import type { ApiResponse } from '$lib/types';
@@ -21,6 +21,12 @@ export const POST: RequestHandler = async (event) => {
 	// Guard order (parity with Next): origin → rate-limit → validate → db → mail → 500.
 	if (!validateOrigin(event)) {
 		return json({ success: false, error: 'Forbidden: invalid origin' } satisfies ApiResponse, {
+			status: 403
+		});
+	}
+
+	if (!verifyCsrfToken(event)) {
+		return json({ success: false, error: 'Forbidden: invalid CSRF token' } satisfies ApiResponse, {
 			status: 403
 		});
 	}
