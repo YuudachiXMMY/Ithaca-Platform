@@ -94,29 +94,34 @@
 		let cancelled = false;
 		let ctx: { revert: () => void } | undefined;
 
-		loadGsap().then(({ gsap }) => {
-			if (cancelled || !wrapEl || !trackEl) return;
-			animate = true;
+		loadGsap()
+			.then(({ gsap }) => {
+				if (cancelled || !wrapEl || !trackEl) return;
+				animate = true;
 
-			ctx = gsap.context(() => {
-				const distance = trackEl!.scrollWidth - window.innerWidth;
+				ctx = gsap.context(() => {
+					const distance = trackEl!.scrollWidth - window.innerWidth;
 
-				const tl = gsap.timeline({
-					scrollTrigger: {
-						trigger: wrapEl,
-						start: 'top top',
-						end: () => `+=${distance}`,
-						pin: true,
-						scrub: 1,
-						invalidateOnRefresh: true
-					}
-				});
+					const tl = gsap.timeline({
+						scrollTrigger: {
+							trigger: wrapEl,
+							start: 'top top',
+							end: () => `+=${distance}`,
+							pin: true,
+							scrub: 1,
+							invalidateOnRefresh: true
+						}
+					});
 
-				// Pan the mosaic track left by its overflow width; fill the progress bar in sync.
-				tl.to(trackEl!, { x: -distance, ease: 'none' }, 0);
-				tl.to(progressEl!, { scaleX: 1, ease: 'none' }, 0);
-			}, wrapEl);
-		});
+					// Pan the mosaic track left by its overflow width; fill the progress bar in sync.
+					tl.to(trackEl!, { x: -distance, ease: 'none' }, 0);
+					tl.to(progressEl!, { scaleX: 1, ease: 'none' }, 0);
+				}, wrapEl);
+			})
+			.catch((err) => {
+				// Dynamic GSAP import failed → keep the static overflow-x-auto strip (Phase-1 form).
+				console.error('[StudentHighlights] GSAP failed to load; using native scroll fallback', err);
+			});
 
 		return () => {
 			cancelled = true;
