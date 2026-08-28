@@ -89,12 +89,15 @@
 
 	let outerEl: HTMLDivElement | undefined = $state();
 
+	// Hoisted to component scope so the reduced-motion $effect below can revert
+	// them on a mid-session flip (a top-level $effect can't see onMount locals).
+	let initCtx: { revert: () => void } | undefined;
+	let scrollCtx: { revert: () => void } | undefined;
+
 	onMount(() => {
 		if (prefersReducedMotion.current || !outerEl) return;
 
 		let cancelled = false;
-		let initCtx: { revert: () => void } | undefined;
-		let scrollCtx: { revert: () => void } | undefined;
 		let rafId = 0;
 		let fallbackTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -113,6 +116,9 @@
 			}, outerEl);
 
 			const createScrollAnimation = () => {
+				// A pending rAF / fallback timer may fire after a reduce-motion flip
+				// unmounted outerEl; never (re)build the scrub trigger in that case.
+				if (cancelled || prefersReducedMotion.current || !outerEl) return;
 				scrollCtx = gsap.context(() => {
 					const tl = gsap.timeline({
 						scrollTrigger: {
@@ -204,6 +210,19 @@
 			initCtx?.revert();
 			scrollCtx?.revert();
 		};
+	});
+
+	// Reduced-motion flip guard: enabling OS reduce-motion mid-session makes Svelte
+	// swap to the static branch and unmount outerEl/.wtr-photo/.wtr-card. The
+	// scrub:2.5 timeline would otherwise keep animating detached nodes, so revert
+	// and null the GSAP contexts the moment the flag flips true.
+	$effect(() => {
+		if (prefersReducedMotion.current) {
+			initCtx?.revert();
+			scrollCtx?.revert();
+			initCtx = undefined;
+			scrollCtx = undefined;
+		}
 	});
 </script>
 

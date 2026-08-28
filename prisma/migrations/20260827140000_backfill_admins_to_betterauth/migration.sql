@@ -12,9 +12,15 @@
 -- `admin_users`. Do NOT merge the DROP into this file — the verify-login gate lives between.
 
 -- 1) Legacy admin -> Better Auth user (upsert by unique email; reuse the legacy id as PK).
+--    DISTINCT ON (LOWER(email)) collapses any case-variant duplicate admin_users rows
+--    (legal under the case-sensitive legacy unique index) to the OLDEST one, so lowercasing
+--    can't make two source rows hit the same ON CONFLICT target in one statement — which
+--    Postgres would otherwise reject as a cardinality violation, failing the whole deploy.
 INSERT INTO "user" ("id", "name", "email", "emailVerified", "createdAt", "updatedAt")
-SELECT a."id", COALESCE(a."name", 'Admin'), a."email", true, a."created_at", a."updated_at"
+SELECT DISTINCT ON (LOWER(a."email"))
+       a."id", COALESCE(a."name", 'Admin'), LOWER(a."email"), true, a."created_at", a."updated_at"
 FROM "admin_users" a
+ORDER BY LOWER(a."email"), a."created_at"
 ON CONFLICT ("email") DO UPDATE
   SET "emailVerified" = true,
       "name" = EXCLUDED."name";
@@ -24,7 +30,7 @@ ON CONFLICT ("email") DO UPDATE
 INSERT INTO "account" ("id", "issuer", "accountId", "providerId", "userId", "password", "createdAt", "updatedAt")
 SELECT gen_random_uuid()::text, 'local:credential', u."id", 'credential', u."id", a."password_hash", now(), now()
 FROM "admin_users" a
-JOIN "user" u ON u."email" = a."email"
+JOIN "user" u ON u."id" = a."id"
 WHERE NOT EXISTS (
   SELECT 1 FROM "account" ac
   WHERE ac."userId" = u."id" AND ac."providerId" = 'credential'

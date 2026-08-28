@@ -9,16 +9,35 @@ import { randomUUID } from 'node:crypto';
 const prisma = new PrismaClient();
 
 async function main() {
-	const admins = await prisma.adminUser.findMany();
+	const admins = await prisma.adminUser.findMany({ orderBy: { createdAt: 'asc' } });
 
-	for (const admin of admins) {
+	// Case-variant duplicate emails (legal under the legacy case-sensitive unique index)
+	// collapse to one Better Auth user once lowercased. Keep the OLDEST row per normalized
+	// email — matching migration.sql's DISTINCT ON — and warn instead of silently letting a
+	// later row overwrite an earlier admin's credential.
+	const seen = new Set<string>();
+	const uniqueAdmins = admins.filter((admin) => {
+		const key = admin.email.toLowerCase();
+		if (seen.has(key)) {
+			process.stderr.write(
+				`WARNING: skipping admin ${admin.email} (id ${admin.id}) — its lowercased email ` +
+					`collides with an already-migrated admin; resolve the duplicate manually.\n`
+			);
+			return false;
+		}
+		seen.add(key);
+		return true;
+	});
+
+	for (const admin of uniqueAdmins) {
 		// Reuse the legacy id as the User PK (any stable string is a valid Better Auth id).
+		const email = admin.email.toLowerCase();
 		const user = await prisma.user.upsert({
-			where: { email: admin.email },
+			where: { email },
 			update: { name: admin.name ?? 'Admin', emailVerified: true },
 			create: {
 				id: admin.id,
-				email: admin.email,
+				email,
 				name: admin.name ?? 'Admin',
 				emailVerified: true, // pre-existing admin: skip the verification flow
 				createdAt: admin.createdAt,
@@ -49,7 +68,7 @@ async function main() {
 		process.stdout.write(`Migrated ${admin.email} -> user ${user.id}\n`);
 	}
 
-	process.stdout.write(`Done: ${admins.length} admin(s) migrated.\n`);
+	process.stdout.write(`Done: ${uniqueAdmins.length} admin(s) migrated.\n`);
 }
 
 main()

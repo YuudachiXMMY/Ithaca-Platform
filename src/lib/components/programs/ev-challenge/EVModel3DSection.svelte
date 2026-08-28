@@ -62,15 +62,17 @@
 	let seamEl: HTMLDivElement | undefined = $state();
 	let hintEl: HTMLDivElement | undefined = $state();
 
+	// GSAP ScrollTrigger context (pin + scrub). Component-scoped so the
+	// reduced-motion $effect below can revert it on a live media-query flip.
+	let ctx: { revert: () => void } | undefined;
+	let cancelled = false;
+
 	onMount(() => {
 		// Reduced motion → keep the static branch untouched (motion is additive).
 		if (prefersReducedMotion.current || !sectionEl) return;
 
-		let cancelled = false;
-		let ctx: { revert: () => void } | undefined;
-
 		loadGsap().then(({ gsap }) => {
-			if (cancelled || !sectionEl) return;
+			if (cancelled || prefersReducedMotion.current || !sectionEl) return;
 			const isLg = window.innerWidth >= 1024;
 
 			ctx = gsap.context(() => {
@@ -159,7 +161,19 @@
 		return () => {
 			cancelled = true;
 			ctx?.revert();
+			ctx = undefined;
 		};
+	});
+
+	// When reduced-motion turns on at runtime, the {#if} swaps the animated
+	// <section> away. Revert the GSAP context first so its pin:true .pin-spacer
+	// and ScrollTrigger are torn down instead of stranded as a blank gap that
+	// keeps firing on detached DOM nodes.
+	$effect(() => {
+		if (prefersReducedMotion.current && ctx) {
+			ctx.revert();
+			ctx = undefined;
+		}
 	});
 </script>
 

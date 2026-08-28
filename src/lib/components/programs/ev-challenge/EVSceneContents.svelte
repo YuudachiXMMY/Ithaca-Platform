@@ -7,6 +7,7 @@
 -->
 <script lang="ts">
 	import { T, useTask, useThrelte } from '@threlte/core';
+	import { onDestroy } from 'svelte';
 	import { OrbitControls, Grid } from '@threlte/extras';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { Group, Points, BufferGeometry, BufferAttribute, PointsMaterial } from 'three';
@@ -68,6 +69,13 @@
 		},
 		{ autoInvalidate: false, running: () => visible && !prefersReducedMotion.current }
 	);
+
+	// THREE.Points has no dispose(), so Threlte never auto-disposes the particle
+	// buffers — release them explicitly on unmount (reduce-motion toggles remount).
+	onDestroy(() => {
+		particleGeometry.dispose();
+		particleMaterial.dispose();
+	});
 </script>
 
 <T.PerspectiveCamera makeDefault position={[3.5, 2, 3.5]} fov={32} />

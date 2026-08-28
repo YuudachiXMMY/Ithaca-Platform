@@ -102,8 +102,8 @@
 		const payload = {
 			title,
 			content,
-			buttonText: buttonText || undefined,
-			buttonLink: buttonLink || undefined,
+			buttonText: buttonText || null,
+			buttonLink: buttonLink || null,
 			isActive,
 			startDate: startDate ? new Date(startDate).toISOString() : null,
 			endDate: endDate ? new Date(endDate).toISOString() : null
