@@ -46,21 +46,23 @@ export const POST: RequestHandler = async ({ request }) => {
 		);
 	}
 
-	const subscribers = await prisma.subscriber.findMany({
-		where: { status: 'active' },
-		select: { email: true }
-	});
-	if (subscribers.length === 0) {
-		await prisma.emailCampaign.update({ where: { id }, data: { status: 'failed' } });
-		return json(
-			{ success: false, error: 'No active subscribers to send to' } satisfies ApiResponse,
-			{
-				status: 400
-			}
-		);
-	}
-
+	// Everything after the atomic claim runs inside try/catch so ANY failure — the
+	// subscriber query included — flips status back to 'failed'. Otherwise a throw here
+	// would strand the campaign at 'sending' forever, un-reclaimable by the
+	// notIn:['sending','sent'] guard above.
 	try {
+		const subscribers = await prisma.subscriber.findMany({
+			where: { status: 'active' },
+			select: { email: true }
+		});
+		if (subscribers.length === 0) {
+			await prisma.emailCampaign.update({ where: { id }, data: { status: 'failed' } });
+			return json(
+				{ success: false, error: 'No active subscribers to send to' } satisfies ApiResponse,
+				{ status: 400 }
+			);
+		}
+
 		for (let i = 0; i < subscribers.length; i += BATCH_SIZE) {
 			const emails = subscribers.slice(i, i + BATCH_SIZE).map((s) => ({
 				to: s.email,
