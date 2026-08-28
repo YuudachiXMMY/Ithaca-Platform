@@ -71,7 +71,18 @@ export async function rateLimit(
 	config: RateLimitConfig
 ): Promise<Response | null> {
 	const { limit, windowMs, namespace } = config;
-	const key = `${namespace}:${event.getClientAddress()}`;
+	// adapter-node's getClientAddress() throws synchronously when the configured
+	// ADDRESS_HEADER (cf-connecting-ip) is absent — health checks, LB probes, or a
+	// direct :3000 hit. Callers await rateLimit() BEFORE their own try/catch and there
+	// is no handleError hook, so a propagated throw would bypass the ApiResponse
+	// envelope. Fail safe to a constant fallback key instead of throwing.
+	let clientAddress: string;
+	try {
+		clientAddress = event.getClientAddress();
+	} catch {
+		clientAddress = 'unknown';
+	}
+	const key = `${namespace}:${clientAddress}`;
 	const now = Date.now();
 
 	const upstash = await getUpstash(limit, windowMs);
