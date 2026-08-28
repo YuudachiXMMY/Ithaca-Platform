@@ -3,12 +3,16 @@ import adapter from '@sveltejs/adapter-node';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { enhancedImages } from '@sveltejs/enhanced-img';
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
 	// three (and three/addons/*) touch browser globals and ship ESM that must be
 	// bundled for SSR/prerender rather than externalized as a bare Node require.
 	ssr: { noExternal: ['three'] },
+	test: {
+		include: ['src/**/*.{test,spec}.{js,ts}'],
+		environment: 'node'
+	},
 	plugins: [
 		tailwindcss(),
 		// strategy + urlPatterns live HERE (the Vite plugin), not in settings.json.
