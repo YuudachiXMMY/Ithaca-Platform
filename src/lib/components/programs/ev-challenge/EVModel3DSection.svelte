@@ -71,92 +71,97 @@
 		// Reduced motion → keep the static branch untouched (motion is additive).
 		if (prefersReducedMotion.current || !sectionEl) return;
 
-		loadGsap().then(({ gsap }) => {
-			if (cancelled || prefersReducedMotion.current || !sectionEl) return;
-			const isLg = window.innerWidth >= 1024;
+		loadGsap()
+			.then(({ gsap }) => {
+				if (cancelled || prefersReducedMotion.current || !sectionEl) return;
+				const isLg = window.innerWidth >= 1024;
 
-			ctx = gsap.context(() => {
-				const tl = gsap.timeline({
-					scrollTrigger: {
-						trigger: sectionEl,
-						start: 'top top',
-						end: '+=400%',
-						pin: true,
-						scrub: 1,
-						onUpdate: (self) => {
-							scrollProgress = self.progress;
+				ctx = gsap.context(() => {
+					const tl = gsap.timeline({
+						scrollTrigger: {
+							trigger: sectionEl,
+							start: 'top top',
+							end: '+=400%',
+							pin: true,
+							scrub: 1,
+							onUpdate: (self) => {
+								scrollProgress = self.progress;
+							}
 						}
-					}
-				});
+					});
 
-				// Initial states for the cinematic entrance.
-				gsap.set(machineHeadEl!, { opacity: 0, y: -30 });
-				gsap.set(machineSpecEl!, { opacity: 0, y: 20 });
-				gsap.set(hintEl!, { opacity: 0 });
-				gsap.set(canvasEl!, { scale: 0.98, opacity: 0.6 });
+					// Initial states for the cinematic entrance.
+					gsap.set(machineHeadEl!, { opacity: 0, y: -30 });
+					gsap.set(machineSpecEl!, { opacity: 0, y: 20 });
+					gsap.set(hintEl!, { opacity: 0 });
+					gsap.set(canvasEl!, { scale: 0.98, opacity: 0.6 });
 
-				// 0.00 – 0.12  The Machine reveals.
-				tl.to(canvasEl!, { scale: 1, opacity: 1, duration: 0.12, ease: 'power2.out' }, 0.0)
-					.to(machineHeadEl!, { opacity: 1, y: 0, duration: 0.12, ease: 'power2.out' }, 0.02)
-					.to(machineSpecEl!, { opacity: 1, y: 0, duration: 0.1, ease: 'power2.out' }, 0.08)
-					.to(hintEl!, { opacity: 1, duration: 0.08, ease: 'power2.out' }, 0.1);
+					// 0.00 – 0.12  The Machine reveals.
+					tl.to(canvasEl!, { scale: 1, opacity: 1, duration: 0.12, ease: 'power2.out' }, 0.0)
+						.to(machineHeadEl!, { opacity: 1, y: 0, duration: 0.12, ease: 'power2.out' }, 0.02)
+						.to(machineSpecEl!, { opacity: 1, y: 0, duration: 0.1, ease: 'power2.out' }, 0.08)
+						.to(hintEl!, { opacity: 1, duration: 0.08, ease: 'power2.out' }, 0.1);
 
-				// 0.35 – 0.70  Cross-dissolve: machine fades, tracks emerge.
-				tl.to(machineHeadEl!, { opacity: 0, y: -20, duration: 0.2, ease: 'power2.inOut' }, 0.35)
-					.to(machineSpecEl!, { opacity: 0, y: 8, duration: 0.15, ease: 'power2.inOut' }, 0.35)
-					.to(hintEl!, { opacity: 0, duration: 0.12, ease: 'power2.inOut' }, 0.35)
-					.to(canvasEl!, { opacity: 0.45, duration: 0.3, ease: 'power2.inOut' }, 0.38)
-					.to(overlayEl!, { opacity: 1, duration: 0.25, ease: 'power2.inOut' }, 0.4);
+					// 0.35 – 0.70  Cross-dissolve: machine fades, tracks emerge.
+					tl.to(machineHeadEl!, { opacity: 0, y: -20, duration: 0.2, ease: 'power2.inOut' }, 0.35)
+						.to(machineSpecEl!, { opacity: 0, y: 8, duration: 0.15, ease: 'power2.inOut' }, 0.35)
+						.to(hintEl!, { opacity: 0, duration: 0.12, ease: 'power2.inOut' }, 0.35)
+						.to(canvasEl!, { opacity: 0.45, duration: 0.3, ease: 'power2.inOut' }, 0.38)
+						.to(overlayEl!, { opacity: 1, duration: 0.25, ease: 'power2.inOut' }, 0.4);
 
-				tl.to(tracksEl!, { opacity: 1, duration: 0.01 }, 0.44);
+					tl.to(tracksEl!, { opacity: 1, duration: 0.01 }, 0.44);
 
-				tl.fromTo(
-					tracksHeadEl!,
-					{ opacity: 0, y: -12 },
-					{ opacity: 1, y: 0, duration: 0.2, ease: 'power2.inOut' },
-					0.46
-				);
-
-				if (isLg) {
-					// Desktop: panels glide in from partial offset.
 					tl.fromTo(
-						engEl!,
-						{ x: '-60%', opacity: 0 },
-						{ x: '0%', opacity: 1, duration: 0.3, ease: 'power2.inOut' },
-						0.45
-					)
-						.fromTo(
-							bizEl!,
-							{ x: '60%', opacity: 0 },
-							{ x: '0%', opacity: 1, duration: 0.3, ease: 'power2.inOut' },
-							0.48
-						)
-						.fromTo(
-							seamEl!,
-							{ scaleY: 0, opacity: 0 },
-							{ scaleY: 1, opacity: 1, duration: 0.2, ease: 'power2.inOut' },
-							0.62
-						);
-				} else {
-					// Mobile: stacked fade-in.
-					tl.fromTo(
-						engEl!,
-						{ opacity: 0, y: 30 },
-						{ opacity: 1, y: 0, duration: 0.25, ease: 'power2.inOut' },
+						tracksHeadEl!,
+						{ opacity: 0, y: -12 },
+						{ opacity: 1, y: 0, duration: 0.2, ease: 'power2.inOut' },
 						0.46
-					).fromTo(
-						bizEl!,
-						{ opacity: 0, y: 30 },
-						{ opacity: 1, y: 0, duration: 0.25, ease: 'power2.inOut' },
-						0.54
 					);
-				}
 
-				// Extend the timeline so the original beats map to the first ~250%
-				// of scroll; the remaining 200% is a pure "Two Tracks" hold.
-				tl.to({}, { duration: 0.01 }, 1.3);
-			}, sectionEl);
-		});
+					if (isLg) {
+						// Desktop: panels glide in from partial offset.
+						tl.fromTo(
+							engEl!,
+							{ x: '-60%', opacity: 0 },
+							{ x: '0%', opacity: 1, duration: 0.3, ease: 'power2.inOut' },
+							0.45
+						)
+							.fromTo(
+								bizEl!,
+								{ x: '60%', opacity: 0 },
+								{ x: '0%', opacity: 1, duration: 0.3, ease: 'power2.inOut' },
+								0.48
+							)
+							.fromTo(
+								seamEl!,
+								{ scaleY: 0, opacity: 0 },
+								{ scaleY: 1, opacity: 1, duration: 0.2, ease: 'power2.inOut' },
+								0.62
+							);
+					} else {
+						// Mobile: stacked fade-in.
+						tl.fromTo(
+							engEl!,
+							{ opacity: 0, y: 30 },
+							{ opacity: 1, y: 0, duration: 0.25, ease: 'power2.inOut' },
+							0.46
+						).fromTo(
+							bizEl!,
+							{ opacity: 0, y: 30 },
+							{ opacity: 1, y: 0, duration: 0.25, ease: 'power2.inOut' },
+							0.54
+						);
+					}
+
+					// Extend the timeline so the original beats map to the first ~250%
+					// of scroll; the remaining 200% is a pure "Two Tracks" hold.
+					tl.to({}, { duration: 0.01 }, 1.3);
+				}, sectionEl);
+			})
+			.catch((err) => {
+				// Dynamic GSAP import failed → keep the static branch (motion is additive).
+				console.error('[EVModel3DSection] GSAP failed to load; using static fallback', err);
+			});
 
 		return () => {
 			cancelled = true;
@@ -166,10 +171,18 @@
 	});
 
 	// When reduced-motion turns on at runtime, the {#if} swaps the animated
-	// <section> away. Revert the GSAP context first so its pin:true .pin-spacer
-	// and ScrollTrigger are torn down instead of stranded as a blank gap that
-	// keeps firing on detached DOM nodes.
-	$effect(() => {
+	// <section> away. Revert the GSAP context FIRST so its pin:true .pin-spacer and
+	// ScrollTrigger are torn down instead of stranded.
+	//
+	// This MUST be $effect.pre, not $effect: .pre runs BEFORE Svelte patches the DOM
+	// for this flip, while <section> is still parented inside GSAP's .pin-spacer, so
+	// ctx.revert() -> _swapPinOut restores it to its real parent and removes the
+	// spacer cleanly. A plain $effect runs AFTER the {#if} branch-swap has already
+	// detached <section> via node.remove(); _swapPinOut would then insertBefore() that
+	// stale, Svelte-unmounted node back into the live DOM as a zombie duplicate next to
+	// the new static section. (onDestroy has the same too-late ordering — Svelte removes
+	// the block's DOM before running teardown — so only $effect.pre fires early enough.)
+	$effect.pre(() => {
 		if (prefersReducedMotion.current && ctx) {
 			ctx.revert();
 			ctx = undefined;

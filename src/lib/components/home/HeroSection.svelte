@@ -102,7 +102,10 @@
 				/* Solid exit overlay completes the handoff to the page background */
 				tl.to('.hero-overlay-exit', { opacity: 1, duration: 0.25, ease: 'power2.inOut' }, 0.72);
 			}, section);
-		})();
+		})().catch((err) => {
+			// Dynamic GSAP import failed → keep the static (invisible-rest) hero markup.
+			console.error('[HeroSection] GSAP failed to load; using static fallback', err);
+		});
 
 		return () => ctx?.revert();
 	});

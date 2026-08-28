@@ -101,107 +101,112 @@
 		let rafId = 0;
 		let fallbackTimer: ReturnType<typeof setTimeout> | undefined;
 
-		loadGsap().then(({ gsap }) => {
-			if (cancelled || !outerEl) return;
+		loadGsap()
+			.then(({ gsap }) => {
+				if (cancelled || !outerEl) return;
 
-			// Step 1: hidden initial states for the Team Roles layer (scroll-independent).
-			initCtx = gsap.context(() => {
-				gsap.set('.wtr-bg', { opacity: 0 });
-				gsap.set('.wtr-h-in', { opacity: 0, scale: 0.5, y: 60 });
-				const cards = gsap.utils.toArray<HTMLElement>('.wtr-card');
-				cards.forEach((card, i) => {
-					const e = CARD_ENTRY[i];
-					gsap.set(card, { opacity: 0, x: e.x, y: e.y, rotation: e.r, scale: 0.15 });
-				});
-			}, outerEl);
-
-			const createScrollAnimation = () => {
-				// A pending rAF / fallback timer may fire after a reduce-motion flip
-				// unmounted outerEl; never (re)build the scrub trigger in that case.
-				if (cancelled || prefersReducedMotion.current || !outerEl) return;
-				scrollCtx = gsap.context(() => {
-					const tl = gsap.timeline({
-						scrollTrigger: {
-							trigger: outerEl,
-							start: 'top top',
-							end: 'bottom bottom',
-							scrub: 2.5
-						}
-					});
-
-					// Phase 1: photos drift outward.
-					const photos = gsap.utils.toArray<HTMLElement>('.wtr-photo');
-					photos.forEach((el, i) => {
-						const s = SCATTER[i];
-						tl.to(
-							el,
-							{
-								x: s.x,
-								y: s.y,
-								rotation: s.r,
-								scale: 1.5,
-								opacity: 0,
-								duration: 0.4,
-								ease: 'power3.inOut'
-							},
-							i * 0.02
-						);
-					});
-
-					// Workshop heading dissolves upward (overlaps photo scatter).
-					tl.to(
-						'.wtr-h-out',
-						{ opacity: 0, y: -60, scale: 0.92, duration: 0.35, ease: 'power2.inOut' },
-						0.05
-					);
-
-					// Background crossfades in while photos still drift.
-					tl.to('.wtr-bg', { opacity: 1, duration: 0.45, ease: 'power1.inOut' }, 0.25);
-
-					// Roles heading springs in.
-					tl.to(
-						'.wtr-h-in',
-						{ opacity: 1, scale: 1, y: 0, duration: 0.3, ease: 'back.out(1.8)' },
-						0.42
-					);
-
-					// Cards swoop in with broad stagger.
+				// Step 1: hidden initial states for the Team Roles layer (scroll-independent).
+				initCtx = gsap.context(() => {
+					gsap.set('.wtr-bg', { opacity: 0 });
+					gsap.set('.wtr-h-in', { opacity: 0, scale: 0.5, y: 60 });
 					const cards = gsap.utils.toArray<HTMLElement>('.wtr-card');
 					cards.forEach((card, i) => {
-						tl.to(
-							card,
-							{
-								opacity: 1,
-								x: 0,
-								y: 0,
-								rotation: 0,
-								scale: 1,
-								duration: 0.35,
-								ease: 'back.out(1.2)'
-							},
-							0.48 + i * 0.08
-						);
+						const e = CARD_ENTRY[i];
+						gsap.set(card, { opacity: 0, x: e.x, y: e.y, rotation: e.r, scale: 0.15 });
 					});
 				}, outerEl);
-			};
 
-			// Step 2: wait for the EV pin-spacer before building the ScrollTrigger.
-			const waitForPinSpacer = () => {
-				if (document.querySelector('.pin-spacer')) {
-					rafId = requestAnimationFrame(() => createScrollAnimation());
-				} else {
-					rafId = requestAnimationFrame(waitForPinSpacer);
-				}
-			};
+				const createScrollAnimation = () => {
+					// A pending rAF / fallback timer may fire after a reduce-motion flip
+					// unmounted outerEl; never (re)build the scrub trigger in that case.
+					if (cancelled || prefersReducedMotion.current || !outerEl) return;
+					scrollCtx = gsap.context(() => {
+						const tl = gsap.timeline({
+							scrollTrigger: {
+								trigger: outerEl,
+								start: 'top top',
+								end: 'bottom bottom',
+								scrub: 2.5
+							}
+						});
 
-			// Fallback: if the pin-spacer never appears, initialize anyway after 3s.
-			fallbackTimer = setTimeout(() => {
-				cancelAnimationFrame(rafId);
-				if (!scrollCtx) createScrollAnimation();
-			}, 3000);
+						// Phase 1: photos drift outward.
+						const photos = gsap.utils.toArray<HTMLElement>('.wtr-photo');
+						photos.forEach((el, i) => {
+							const s = SCATTER[i];
+							tl.to(
+								el,
+								{
+									x: s.x,
+									y: s.y,
+									rotation: s.r,
+									scale: 1.5,
+									opacity: 0,
+									duration: 0.4,
+									ease: 'power3.inOut'
+								},
+								i * 0.02
+							);
+						});
 
-			waitForPinSpacer();
-		});
+						// Workshop heading dissolves upward (overlaps photo scatter).
+						tl.to(
+							'.wtr-h-out',
+							{ opacity: 0, y: -60, scale: 0.92, duration: 0.35, ease: 'power2.inOut' },
+							0.05
+						);
+
+						// Background crossfades in while photos still drift.
+						tl.to('.wtr-bg', { opacity: 1, duration: 0.45, ease: 'power1.inOut' }, 0.25);
+
+						// Roles heading springs in.
+						tl.to(
+							'.wtr-h-in',
+							{ opacity: 1, scale: 1, y: 0, duration: 0.3, ease: 'back.out(1.8)' },
+							0.42
+						);
+
+						// Cards swoop in with broad stagger.
+						const cards = gsap.utils.toArray<HTMLElement>('.wtr-card');
+						cards.forEach((card, i) => {
+							tl.to(
+								card,
+								{
+									opacity: 1,
+									x: 0,
+									y: 0,
+									rotation: 0,
+									scale: 1,
+									duration: 0.35,
+									ease: 'back.out(1.2)'
+								},
+								0.48 + i * 0.08
+							);
+						});
+					}, outerEl);
+				};
+
+				// Step 2: wait for the EV pin-spacer before building the ScrollTrigger.
+				const waitForPinSpacer = () => {
+					if (document.querySelector('.pin-spacer')) {
+						rafId = requestAnimationFrame(() => createScrollAnimation());
+					} else {
+						rafId = requestAnimationFrame(waitForPinSpacer);
+					}
+				};
+
+				// Fallback: if the pin-spacer never appears, initialize anyway after 3s.
+				fallbackTimer = setTimeout(() => {
+					cancelAnimationFrame(rafId);
+					if (!scrollCtx) createScrollAnimation();
+				}, 3000);
+
+				waitForPinSpacer();
+			})
+			.catch((err) => {
+				// Dynamic GSAP import failed → keep the static stacked branch (motion is additive).
+				console.error('[WorkshopToRoles] GSAP failed to load; using static fallback', err);
+			});
 
 		return () => {
 			cancelled = true;

@@ -112,24 +112,29 @@
 		let cancelled = false;
 		let ctx: { revert: () => void } | undefined;
 
-		loadGsap().then(({ gsap }) => {
-			if (cancelled || !heroSectionEl) return;
-			ctx = gsap.context(() => {
-				// Bump scale to 1.25 (from the static 1.15) for parallax headroom, then
-				// drift the photo down as the hero scrolls out (10% < 12.5% overflow).
-				gsap.set(heroImgEl!, { scale: 1.25 });
-				gsap.to(heroImgEl!, {
-					yPercent: 10,
-					ease: 'none',
-					scrollTrigger: {
-						trigger: heroSectionEl,
-						start: 'top top',
-						end: 'bottom top',
-						scrub: true
-					}
-				});
-			}, heroSectionEl);
-		});
+		loadGsap()
+			.then(({ gsap }) => {
+				if (cancelled || !heroSectionEl) return;
+				ctx = gsap.context(() => {
+					// Bump scale to 1.25 (from the static 1.15) for parallax headroom, then
+					// drift the photo down as the hero scrolls out (10% < 12.5% overflow).
+					gsap.set(heroImgEl!, { scale: 1.25 });
+					gsap.to(heroImgEl!, {
+						yPercent: 10,
+						ease: 'none',
+						scrollTrigger: {
+							trigger: heroSectionEl,
+							start: 'top top',
+							end: 'bottom top',
+							scrub: true
+						}
+					});
+				}, heroSectionEl);
+			})
+			.catch((err) => {
+				// Dynamic GSAP import failed → keep the static hero (parallax is additive).
+				console.error('[ev-challenge] GSAP failed to load; using static fallback', err);
+			});
 
 		return () => {
 			cancelled = true;
