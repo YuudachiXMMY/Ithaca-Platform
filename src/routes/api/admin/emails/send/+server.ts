@@ -29,13 +29,22 @@ export const POST: RequestHandler = async ({ request }) => {
 			status: 404
 		});
 	}
-	if (campaign.status === 'sent') {
-		return json({ success: false, error: 'Campaign has already been sent' } satisfies ApiResponse, {
-			status: 400
-		});
+	// Atomically claim the campaign: only one concurrent request can transition it
+	// out of a non-sending/non-sent state into 'sending'. Prevents two parallel POSTs
+	// from both passing the guard and blasting every subscriber twice.
+	const claimed = await prisma.emailCampaign.updateMany({
+		where: { id, status: { notIn: ['sending', 'sent'] } },
+		data: { status: 'sending' }
+	});
+	if (claimed.count !== 1) {
+		return json(
+			{
+				success: false,
+				error: 'Campaign has already been sent or is currently sending'
+			} satisfies ApiResponse,
+			{ status: 409 }
+		);
 	}
-
-	await prisma.emailCampaign.update({ where: { id }, data: { status: 'sending' } });
 
 	const subscribers = await prisma.subscriber.findMany({
 		where: { status: 'active' },
