@@ -26,6 +26,15 @@ export function loadGsap(): Promise<LoadedGsap> {
 			gsap.registerPlugin(ScrollTrigger);
 			return { gsap, ScrollTrigger };
 		})();
+		// A transient import() failure (stale chunk hash after a redeploy, ad-blocker,
+		// flaky network) must NOT permanently poison the memoized promise: clear it on
+		// rejection so the next caller retries with a fresh import instead of receiving
+		// the same already-rejected promise for the rest of the session. This handler
+		// only resets the cache — it does NOT swallow the rejection, so every call site
+		// still sees (and must .catch()) its own loadGsap() rejection.
+		cached.catch(() => {
+			cached = undefined;
+		});
 	}
 	return cached;
 }

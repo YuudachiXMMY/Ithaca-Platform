@@ -15,8 +15,8 @@ export const createPopupSchema = z.object({
 	buttonText: z.string().optional().nullable(),
 	buttonLink: httpUrl.optional().nullable().or(z.literal('')),
 	isActive: z.boolean().default(false),
-	startDate: z.string().datetime().optional().nullable(),
-	endDate: z.string().datetime().optional().nullable(),
+	startDate: z.iso.datetime().optional().nullable(),
+	endDate: z.iso.datetime().optional().nullable(),
 	displayRules: z.string().optional()
 });
 
@@ -27,7 +27,7 @@ export const updatePopupSchema = z.object({
 	buttonText: z.string().optional().nullable(),
 	buttonLink: httpUrl.optional().nullable().or(z.literal('')),
 	isActive: z.boolean().optional(),
-	startDate: z.string().datetime().optional().nullable(),
-	endDate: z.string().datetime().optional().nullable(),
+	startDate: z.iso.datetime().optional().nullable(),
+	endDate: z.iso.datetime().optional().nullable(),
 	displayRules: z.string().optional().nullable()
 });

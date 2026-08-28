@@ -24,61 +24,66 @@
 		let cancelled = false;
 		let ctx: { revert: () => void } | undefined;
 
-		loadGsap().then(({ gsap }) => {
-			if (cancelled || !sectionEl) return;
-			const isMobile = window.innerWidth < 768;
+		loadGsap()
+			.then(({ gsap }) => {
+				if (cancelled || !sectionEl) return;
+				const isMobile = window.innerWidth < 768;
 
-			ctx = gsap.context(() => {
-				const tl = gsap.timeline({
-					scrollTrigger: {
-						trigger: sectionEl,
-						start: 'top top',
-						end: isMobile ? '+=110%' : '+=180%',
-						pin: true,
-						scrub: 1.5
-					}
-				});
+				ctx = gsap.context(() => {
+					const tl = gsap.timeline({
+						scrollTrigger: {
+							trigger: sectionEl,
+							start: 'top top',
+							end: isMobile ? '+=110%' : '+=180%',
+							pin: true,
+							scrub: 1.5
+						}
+					});
 
-				// Phase 1: video scales up 1 → 1.15 across the whole sequence.
-				tl.fromTo(videoWrapEl!, { scale: 1 }, { scale: 1.15, duration: 1, ease: 'none' }, 0);
+					// Phase 1: video scales up 1 → 1.15 across the whole sequence.
+					tl.fromTo(videoWrapEl!, { scale: 1 }, { scale: 1.15, duration: 1, ease: 'none' }, 0);
 
-				// Phase 1: dark overlay dips to reveal the video, then reconceals @0.7.
-				tl.fromTo(
-					overlayEl!,
-					{ opacity: 1 },
-					{ opacity: 0.55, duration: 0.4, ease: 'power2.out' },
-					0
-				);
-				tl.to(overlayEl!, { opacity: 1, duration: 0.3, ease: 'power2.in' }, 0.7);
+					// Phase 1: dark overlay dips to reveal the video, then reconceals @0.7.
+					tl.fromTo(
+						overlayEl!,
+						{ opacity: 1 },
+						{ opacity: 0.55, duration: 0.4, ease: 'power2.out' },
+						0
+					);
+					tl.to(overlayEl!, { opacity: 1, duration: 0.3, ease: 'power2.in' }, 0.7);
 
-				// Phase 2: glow pulses in @0.25 then fades out @0.65.
-				tl.fromTo(
-					glowEl!,
-					{ opacity: 0, scale: 0.7 },
-					{ opacity: 1, scale: 1, duration: 0.25, ease: 'power3.out' },
-					0.25
-				);
-				tl.to(glowEl!, { opacity: 0, scale: 1.5, duration: 0.3, ease: 'power3.in' }, 0.65);
+					// Phase 2: glow pulses in @0.25 then fades out @0.65.
+					tl.fromTo(
+						glowEl!,
+						{ opacity: 0, scale: 0.7 },
+						{ opacity: 1, scale: 1, duration: 0.25, ease: 'power3.out' },
+						0.25
+					);
+					tl.to(glowEl!, { opacity: 0, scale: 1.5, duration: 0.3, ease: 'power3.in' }, 0.65);
 
-				// Phase 2: title fades in with upward drift @0.25 then out @0.65.
-				tl.fromTo(
-					titleEl!,
-					{ opacity: 0, y: 30 },
-					{ opacity: 1, y: 0, duration: 0.25, ease: 'power3.out' },
-					0.25
-				);
-				tl.to(titleEl!, { opacity: 0, y: -20, duration: 0.15, ease: 'power2.in' }, 0.65);
+					// Phase 2: title fades in with upward drift @0.25 then out @0.65.
+					tl.fromTo(
+						titleEl!,
+						{ opacity: 0, y: 30 },
+						{ opacity: 1, y: 0, duration: 0.25, ease: 'power3.out' },
+						0.25
+					);
+					tl.to(titleEl!, { opacity: 0, y: -20, duration: 0.15, ease: 'power2.in' }, 0.65);
 
-				// Phase 3: accent line fires @0.25 then expands (scaleX:2) while fading @0.65.
-				tl.fromTo(
-					lineEl!,
-					{ scaleX: 0, opacity: 0 },
-					{ scaleX: 1, opacity: 1, duration: 0.3, ease: 'power3.out' },
-					0.25
-				);
-				tl.to(lineEl!, { scaleX: 2, opacity: 0, duration: 0.35, ease: 'power3.in' }, 0.65);
-			}, sectionEl);
-		});
+					// Phase 3: accent line fires @0.25 then expands (scaleX:2) while fading @0.65.
+					tl.fromTo(
+						lineEl!,
+						{ scaleX: 0, opacity: 0 },
+						{ scaleX: 1, opacity: 1, duration: 0.3, ease: 'power3.out' },
+						0.25
+					);
+					tl.to(lineEl!, { scaleX: 2, opacity: 0, duration: 0.35, ease: 'power3.in' }, 0.65);
+				}, sectionEl);
+			})
+			.catch((err) => {
+				// Dynamic GSAP import failed → keep the static peak-visibility markup (Phase-1 form).
+				console.error('[CinematicDivider] GSAP failed to load; using static fallback', err);
+			});
 
 		return () => {
 			cancelled = true;
