@@ -79,7 +79,8 @@ export const POST: RequestHandler = async ({ request }) => {
 			success: true,
 			data: { recipientCount: subscribers.length }
 		} satisfies ApiResponse);
-	} catch {
+	} catch (error) {
+		console.error('[emails/send] campaign send failed', error);
 		await prisma.emailCampaign.update({ where: { id }, data: { status: 'failed' } });
 		return json({ success: false, error: 'Failed to send emails' } satisfies ApiResponse, {
 			status: 500

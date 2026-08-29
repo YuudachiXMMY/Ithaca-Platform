@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { SITE, type SeoMeta } from '$lib/seo';
+	import * as m from '$lib/paraglide/messages';
 
 	let { title, description, ogType = 'website', ogImage, noindex = false }: SeoMeta = $props();
 
-	// Normalize the title: append the brand suffix unless it is already present.
-	const SUFFIX = ' | Ithaca Family Academy';
-	const fullTitle = $derived(title.includes('Ithaca Family Academy') ? title : title + SUFFIX);
+	// Normalize the title: append the localized brand suffix unless it is already present.
+	const brand = m.metadata_title();
+	const fullTitle = $derived(title.includes(brand) ? title : `${title} | ${brand}`);
 	// Absolute OG image (falls back to the site default logo).
 	const ogImageAbs = $derived(SITE.url + (ogImage ?? SITE.ogImage));
 </script>

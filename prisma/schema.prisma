@@ -12,8 +12,8 @@ model Subscriber {
   email        String   @unique
   name         String?
   status       String   @default("active") // active, unsubscribed
-  subscribedAt DateTime @default(now()) @map("subscribed_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  subscribedAt DateTime @default(now()) @map("subscribed_at") @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@map("subscribers")
 }
@@ -25,7 +25,7 @@ model ContactMessage {
   phone     String?
   message   String?
   subscribe Boolean  @default(false)
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   @@map("contact_messages")
 }
@@ -36,8 +36,8 @@ model AdminUser {
   passwordHash String   @map("password_hash")
   name         String?
   role         String   @default("admin")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@map("admin_users")
 }
@@ -48,9 +48,9 @@ model EmailCampaign {
   body           String
   status         String    @default("draft") // draft, sending, sent, failed
   recipientCount Int       @default(0) @map("recipient_count")
-  sentAt         DateTime? @map("sent_at")
-  createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
+  sentAt         DateTime? @map("sent_at") @db.Timestamptz(3)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@map("email_campaigns")
 }
@@ -62,11 +62,11 @@ model Popup {
   buttonText   String?   @map("button_text")
   buttonLink   String?   @map("button_link")
   isActive     Boolean   @default(false) @map("is_active")
-  startDate    DateTime? @map("start_date")
-  endDate      DateTime? @map("end_date")
+  startDate    DateTime? @map("start_date") @db.Timestamptz(3)
+  endDate      DateTime? @map("end_date") @db.Timestamptz(3)
   displayRules String?   @map("display_rules") // JSON: { pages: [], frequency: "once"|"session"|"always" }
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@map("popups")
 }
@@ -82,8 +82,8 @@ model User {
   email         String    @unique
   emailVerified Boolean   @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime  @updatedAt @db.Timestamptz(3)
   sessions      Session[]
   accounts      Account[]
 
@@ -92,15 +92,16 @@ model User {
 
 model Session {
   id        String   @id
-  expiresAt DateTime
+  expiresAt DateTime @db.Timestamptz(3)
   token     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
   ipAddress String?
   userAgent String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("session")
 }
 
@@ -114,13 +115,14 @@ model Account {
   accessToken           String?
   refreshToken          String?
   idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
+  accessTokenExpiresAt  DateTime? @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
   scope                 String?
   password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  createdAt             DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @db.Timestamptz(3)
 
+  @@index([userId])
   @@map("account")
 }
 
@@ -128,9 +130,9 @@ model Verification {
   id         String   @id
   identifier String
   value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  expiresAt  DateTime @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
 
   @@map("verification")
 }

@@ -20,7 +20,7 @@
 		loading="lazy"
 		allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
 		referrerpolicy="strict-origin-when-cross-origin"
-		title="Dr. Reza Moridi - AI in Ontario"
+		title={m.home_featured_videoTitle()}
 	></iframe>
 {/snippet}
 
@@ -41,7 +41,7 @@
 <div class="h-[200dvh] bg-[#111318]">
 	<section
 		class="sticky top-0 h-[100dvh] bg-[#111318] pt-[4.5rem] pb-8"
-		aria-label="Featured: Meet with Dr. Reza Moridi"
+		aria-label={m.home_featured_sectionAriaLabel()}
 	>
 		<div
 			class="mx-auto flex h-full max-w-[1400px] flex-col justify-center px-5 sm:px-8 md:px-[6vw]"

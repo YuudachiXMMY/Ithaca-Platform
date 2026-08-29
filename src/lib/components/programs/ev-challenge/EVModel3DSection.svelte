@@ -43,8 +43,18 @@
 			value: m.programs_evChallenge_model3d_specs_builtByValue
 		}
 	];
-	const ENG_TAGS = ['CAD Design', 'Chassis Build', 'Electrical Systems', 'Testing'];
-	const BIZ_TAGS = ['Sponsorship', 'Budget', 'Logistics', 'Team Mgmt'];
+	const ENG_TAGS = [
+		m.programs_evChallenge_model3d_engTags_0(),
+		m.programs_evChallenge_model3d_engTags_1(),
+		m.programs_evChallenge_model3d_engTags_2(),
+		m.programs_evChallenge_model3d_engTags_3()
+	];
+	const BIZ_TAGS = [
+		m.programs_evChallenge_model3d_bizTags_0(),
+		m.programs_evChallenge_model3d_bizTags_1(),
+		m.programs_evChallenge_model3d_bizTags_2(),
+		m.programs_evChallenge_model3d_bizTags_3()
+	];
 
 	// Scroll→3D bridge: written by GSAP onUpdate, read by EVScene's render loop.
 	let scrollProgress = $state(0);
@@ -194,7 +204,7 @@
 	<!-- Reduced motion: the Phase-1 static stacked layout (poster + Two Tracks). -->
 	<section
 		class="border-t border-border bg-background"
-		aria-label="The Ithaca EV trike and program tracks"
+		aria-label={m.programs_evChallenge_model3d_sectionAriaLabel()}
 	>
 		<div class="relative min-h-[calc(80dvh_-_var(--nav-h))] overflow-hidden">
 			<enhanced:img
@@ -299,7 +309,7 @@
 	<section
 		bind:this={sectionEl}
 		class="relative min-h-[100dvh] overflow-hidden border-t border-border bg-background"
-		aria-label="Interactive 3D wireframe of the Ithaca EV trike and program tracks"
+		aria-label={m.programs_evChallenge_model3d_canvasAriaLabel()}
 	>
 		<!-- Layer 0: 3D canvas (lazy, client-only) — transforms via GSAP. -->
 		<div bind:this={canvasEl} class="absolute inset-0 z-0 origin-center">

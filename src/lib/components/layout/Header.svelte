@@ -239,7 +239,7 @@
 				bind:this={toggleEl}
 				onclick={() => (mobileOpen = !mobileOpen)}
 				class="rounded-lg p-2 text-white/70 transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none lg:hidden"
-				aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
+				aria-label={mobileOpen ? m.common_nav_closeMenu() : m.common_nav_openMenu()}
 				aria-expanded={mobileOpen}
 			>
 				{#if mobileOpen}
@@ -258,7 +258,7 @@
 		type="button"
 		class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
 		onclick={closeMobile}
-		aria-label="Close navigation"
+		aria-label={m.common_nav_closeMenu()}
 		transition:fade={{ duration: 200 }}
 	></button>
 
@@ -272,7 +272,7 @@
 			<button
 				onclick={() => (mobileOpen = false)}
 				class="rounded-full p-2 text-white/50 transition-colors hover:bg-white/5 hover:text-white focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
-				aria-label="Close navigation"
+				aria-label={m.common_nav_closeMenu()}
 			>
 				<X class="h-5 w-5" />
 			</button>
