@@ -174,9 +174,12 @@ build-args (`Dockerfile` + `.github/workflows/deploy.yml`).
 
 ## Testing Strategy
 
-**No unit-test suite exists.** Validation is build/type/lint/smoke-based (matches the repo's
-actual gates):
+**Vitest is wired** (`vitest` ^4, config inline in `vite.config.ts` under `test:`). A small unit
+suite exists (`src/lib/utils.test.ts`, `src/lib/server/rate-limit.test.ts`,
+`src/routes/api/admin/popups/schema.test.ts`); coverage is still partial, so validation stays
+predominantly build/type/lint/smoke-based:
 
+- `npm test` -- `vitest run` (unit tests; `npm run test:watch` for the watcher)
 - `npm run check` -- Paraglide compile + `svelte-kit sync` + `svelte-check` (types + a11y)
 - `npm run lint` -- ESLint + Prettier
 - `npm run build` -- production build must emit `build/index.js`
@@ -256,4 +259,5 @@ The site uses **Paraglide** (`@inlang/paraglide-js`) for bilingual English/Chine
   prod admin login is verified -- the DROP is a separate, later, forward-only migration
   (`docs/CUTOVER.md` §7). The container CMD runs `migrate deploy` on boot, so any committed
   migration auto-applies on the next `-kit` rollout.
-- No unit-test infrastructure exists yet -- set up Vitest before writing tests.
+- Vitest is set up (`npm test` = `vitest run`; config inline in `vite.config.ts`). Put unit tests
+  next to their target as `*.test.ts` (see `src/lib/utils.test.ts` for the pattern).

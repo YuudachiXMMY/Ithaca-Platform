@@ -122,7 +122,7 @@
 	>
 		<!-- Left slot: desktop nav -->
 		<div class="flex items-center">
-			<nav class="hidden items-center gap-10 lg:flex" aria-label="Main navigation">
+			<nav class="hidden items-center gap-10 lg:flex" aria-label={m.common_nav_mainNavigation()}>
 				{#each LEFT_NAV as item (item.href)}
 					{@const active = checkActive(item.href)}
 					{#if item.children}
@@ -194,7 +194,7 @@
 		<a
 			href={localizeHref('/')}
 			class="shrink-0 justify-self-center"
-			aria-label="Ithaca Family Academy home"
+			aria-label={m.common_nav_homeLink()}
 		>
 			<img
 				src="/media/images/site/logo.png"
@@ -265,7 +265,7 @@
 	<nav
 		use:focustrap
 		class="fixed top-0 right-0 z-50 flex h-full w-72 flex-col bg-[#0a0c10]/95 shadow-2xl backdrop-blur-xl lg:hidden"
-		aria-label="Mobile navigation"
+		aria-label={m.common_nav_mobileNavigation()}
 		transition:fly={{ x: 288, duration: 300 }}
 	>
 		<div class="flex items-center justify-end p-4">
@@ -300,7 +300,7 @@
 								onclick={() => toggleExpanded(item.label)}
 								class="rounded-lg p-2 text-white/50 transition-colors hover:bg-white/5 hover:text-white focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
 								aria-expanded={expanded}
-								aria-label={`Toggle ${navLabel(item.label)} submenu`}
+								aria-label={m.common_nav_toggleSubmenu({ label: navLabel(item.label) })}
 							>
 								<ChevronDown
 									class={cn('h-4 w-4 transition-transform duration-200', expanded && 'rotate-180')}
