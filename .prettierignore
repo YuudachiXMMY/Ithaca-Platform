@@ -14,8 +14,8 @@ src/lib/paraglide/
 # Prisma migrations SQL
 prisma/migrations/
 
-# Paraglide compile cache
-project.inlang/cache/
+# inlang project (tool-generated: cache, .meta.json, README.md, settings.json)
+project.inlang/
 
 # Agent / planning scratch (not shippable source)
 .claude/
