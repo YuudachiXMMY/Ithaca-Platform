@@ -78,7 +78,7 @@ export const POST: RequestHandler = async (event) => {
 
 		return json({ success: true } satisfies ApiResponse);
 	} catch (error) {
-		const errMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-		return json({ success: false, error: errMessage } satisfies ApiResponse, { status: 500 });
+		console.error('[contact] unexpected error', error);
+		return json({ success: false } satisfies ApiResponse, { status: 500 });
 	}
 };

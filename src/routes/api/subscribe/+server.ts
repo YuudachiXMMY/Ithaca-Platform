@@ -70,7 +70,7 @@ export const POST: RequestHandler = async (event) => {
 
 		return json({ success: true } satisfies ApiResponse);
 	} catch (error) {
-		const message = error instanceof Error ? error.message : 'An unexpected error occurred';
-		return json({ success: false, error: message } satisfies ApiResponse, { status: 500 });
+		console.error('[subscribe] unexpected error', error);
+		return json({ success: false } satisfies ApiResponse, { status: 500 });
 	}
 };

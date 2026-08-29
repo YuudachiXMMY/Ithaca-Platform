@@ -95,7 +95,7 @@
 <div
 	bind:this={sectionEl}
 	class="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#0a0c10]"
-	aria-label="Meet with Dr. Reza Moridi"
+	aria-label={m.home_cinematic_title()}
 >
 	<!-- Full-bleed poster-LCP video background (lazy) -->
 	<div bind:this={videoWrapEl} class="absolute inset-0">

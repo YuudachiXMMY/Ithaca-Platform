@@ -49,7 +49,7 @@
 
 <section
 	class="relative flex items-center justify-center bg-[#111318] px-5 py-16 sm:px-8 lg:min-h-[calc(100dvh-25.5rem)] lg:pt-[4.5rem] lg:pb-0"
-	aria-label="Contact Us"
+	aria-label={m.nav_contactUs()}
 >
 	{#if !prefersReducedMotion.current}
 		<div

@@ -36,7 +36,8 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 	let session: Awaited<ReturnType<typeof auth.api.getSession>>;
 	try {
 		session = await auth.api.getSession({ headers: event.request.headers });
-	} catch {
+	} catch (error) {
+		console.error('[auth] getSession failed', error);
 		session = null;
 	}
 	event.locals.user = session?.user ?? null;

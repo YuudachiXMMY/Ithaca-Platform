@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { Loader2, Trash2, Download } from 'lucide-svelte';
 	import Skeleton from '$lib/components/shared/Skeleton.svelte';
+	import { sanitizeCsvCell } from '$lib/utils';
 	import * as m from '$lib/paraglide/messages';
 
 	type Subscriber = {
@@ -74,7 +75,7 @@
 			new Date(s.subscribedAt).toLocaleDateString()
 		]);
 		const csv = [headers, ...rows]
-			.map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(','))
+			.map((row) => row.map((cell) => `"${sanitizeCsvCell(cell).replace(/"/g, '""')}"`).join(','))
 			.join('\n');
 		const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);

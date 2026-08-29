@@ -59,7 +59,7 @@
 			disabled={status === 'submitting'}
 			class="rounded-md bg-accent px-4 py-2 text-sm font-medium text-foreground-dark disabled:opacity-60"
 		>
-			Subscribe
+			{m.newsletter_subscribeButton()}
 		</button>
 	</div>
 	<p
