@@ -8,8 +8,12 @@ export const prerender = false;
 
 export const GET: RequestHandler = async ({ url, setHeaders }) => {
 	setHeaders({ 'cache-control': 'private, no-store' });
-	const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1', 10));
-	const limit = Math.min(100, Math.max(1, parseInt(url.searchParams.get('limit') ?? '20', 10)));
+	// Non-numeric params parseInt → NaN, and Math.max/min propagate NaN → Prisma throws
+	// on skip/take: NaN. Fall back to defaults when the parsed value is not finite.
+	const rawPage = parseInt(url.searchParams.get('page') ?? '1', 10);
+	const rawLimit = parseInt(url.searchParams.get('limit') ?? '20', 10);
+	const page = Number.isFinite(rawPage) ? Math.max(1, rawPage) : 1;
+	const limit = Number.isFinite(rawLimit) ? Math.min(100, Math.max(1, rawLimit)) : 20;
 	const skip = (page - 1) * limit;
 
 	const [subscribers, total] = await Promise.all([

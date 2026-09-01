@@ -13,10 +13,10 @@ export const prerender = false;
 const STAFF_EMAIL = 'joshua.wang@ithacafo.com';
 
 const contactSchema = z.object({
-	name: z.string().min(1, 'Name is required'),
+	name: z.string().min(1, 'Name is required').max(200, 'Name is too long'),
 	email: z.email('Please enter a valid email address'),
-	phone: z.string().optional(),
-	message: z.string().optional(),
+	phone: z.string().max(50, 'Phone is too long').optional(),
+	message: z.string().max(5000, 'Message is too long').optional(),
 	subscribe: z.boolean().default(false)
 });
 
@@ -55,12 +55,13 @@ export const POST: RequestHandler = async (event) => {
 		await prisma.contactMessage.create({ data: { name, email, phone, message, subscribe } });
 
 		if (subscribe) {
-			const existing = await prisma.subscriber.findUnique({ where: { email } });
-			if (!existing) {
-				await prisma.subscriber.create({ data: { email, name, status: 'active' } });
-			} else if (existing.status !== 'active') {
-				await prisma.subscriber.update({ where: { email }, data: { status: 'active' } });
-			}
+			// Atomic upsert closes the TOCTOU between findUnique and create on the unique
+			// `email`; the update branch is a harmless no-op when already active.
+			await prisma.subscriber.upsert({
+				where: { email },
+				update: { status: 'active' },
+				create: { email, name, status: 'active' }
+			});
 		}
 
 		// Every user field (and the subject) is escaped before HTML interpolation.

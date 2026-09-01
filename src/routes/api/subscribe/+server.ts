@@ -11,7 +11,7 @@ export const prerender = false;
 
 const subscribeSchema = z.object({
 	email: z.email('Please enter a valid email address'),
-	name: z.string().optional()
+	name: z.string().max(200, 'Name is too long').optional()
 });
 
 export const POST: RequestHandler = async (event) => {
@@ -47,20 +47,19 @@ export const POST: RequestHandler = async (event) => {
 
 		const { email, name } = result.data;
 		const existing = await prisma.subscriber.findUnique({ where: { email } });
-		if (existing) {
-			if (existing.status === 'active') {
-				return json(
-					{ success: false, error: 'This email is already subscribed' } satisfies ApiResponse,
-					{ status: 409 }
-				);
-			}
-			await prisma.subscriber.update({
-				where: { email },
-				data: { status: 'active', name: name ?? existing.name }
-			});
-		} else {
-			await prisma.subscriber.create({ data: { email, name, status: 'active' } });
+		if (existing?.status === 'active') {
+			return json(
+				{ success: false, error: 'This email is already subscribed' } satisfies ApiResponse,
+				{ status: 409 }
+			);
 		}
+		// Atomic upsert closes the TOCTOU between findUnique and create: a concurrent
+		// request racing on the unique `email` no longer surfaces a raw P2002 → 500.
+		await prisma.subscriber.upsert({
+			where: { email },
+			update: { status: 'active', name: name ?? existing?.name },
+			create: { email, name, status: 'active' }
+		});
 
 		await sendMail({
 			to: email,

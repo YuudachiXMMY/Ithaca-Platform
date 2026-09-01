@@ -1,11 +1,12 @@
 import crypto from 'node:crypto';
 import type { RequestEvent } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
+import { dev } from '$app/environment';
 
 // Origin-based CSRF for JSON endpoints. SvelteKit's built-in csrf check only guards
 // form-encoded POSTs; application/json is exempt, so we validate Origin/Referer here (parity
-// with the Next app's validateOrigin). The token double-submit + /api/csrf preflight are
-// intentionally dropped — SSR-seeded token CSRF is Phase 4.
+// with the Next app's validateOrigin). This is paired with a double-submit token check
+// (verifyCsrfToken below); both are enforced on every public JSON POST route.
 function allowedHost(): string | null {
 	const raw = env.ORIGIN;
 	if (!raw) return null;
@@ -27,7 +28,9 @@ export function validateOrigin(event: RequestEvent): boolean {
 		return false;
 	}
 
-	if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
+	// Localhost is only trusted in dev; in production a localhost Origin/Referer is never
+	// a legitimate browser request and must fall through to the ORIGIN allow-list.
+	if (dev && (hostname === 'localhost' || hostname === '127.0.0.1')) return true;
 	const allowed = allowedHost();
 	return allowed !== null && hostname === allowed;
 }
