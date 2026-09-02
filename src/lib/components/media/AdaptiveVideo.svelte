@@ -17,6 +17,7 @@
 		sources,
 		poster,
 		lazy = false,
+		enabled = true,
 		ariaHidden = false,
 		class: className = 'h-full w-full object-cover'
 	}: {
@@ -24,6 +25,8 @@
 		poster: string;
 		/** gate <source> mounting behind an IntersectionObserver (CinematicDivider pattern) */
 		lazy?: boolean;
+		/** when false, render poster only (no <source>, no playback) — e.g. mobile HeroSection */
+		enabled?: boolean;
 		ariaHidden?: boolean;
 		class?: string;
 	} = $props();
@@ -32,8 +35,13 @@
 	// observer disconnects (one-shot). When not lazy, sources are present immediately.
 	// Non-lazy videos render their <source>s during SSR/prerender (template guard below),
 	// so they work without JS. Lazy videos keep sources out until the observer fires.
+	// `enabled` gates both paths: mobile HeroSection passes enabled={false} to render the
+	// poster only (zero video bytes) — SSR always starts poster-only until the client opts in.
 	let ready = $state(false);
 	let container: HTMLDivElement | undefined = $state();
+	let videoEl: HTMLVideoElement | undefined = $state();
+
+	const showSources = $derived(enabled && (!lazy || ready));
 
 	$effect(() => {
 		if (!lazy || ready || !container) return;
@@ -49,13 +57,25 @@
 		io.observe(container);
 		return () => io.disconnect();
 	});
+
+	// We dropped the `autoplay` attribute (it eagerly downloaded the clip, defeating
+	// preload="none"). Instead we drive playback from JS once the <source>s are in the DOM:
+	// force-mute (required for gesture-free autoplay), load the freshly-mounted sources, then
+	// play() — swallowing autoplay-policy rejections so a blocked play never throws.
+	$effect(() => {
+		if (!showSources || !videoEl) return;
+		videoEl.muted = true;
+		videoEl.load();
+		videoEl.play().catch(() => {});
+	});
 </script>
 
 <div bind:this={container} class="contents">
-	<!-- muted + playsinline are required for iOS autoplay; preload="none" is the transfer win -->
+	<!-- muted + playsinline are required for gesture-free autoplay; preload="none" is the
+	     transfer win; playback is started from JS (see the $effect above). -->
 	<video
+		bind:this={videoEl}
 		class={className}
-		autoplay
 		muted
 		loop
 		playsinline
@@ -63,7 +83,7 @@
 		{poster}
 		aria-hidden={ariaHidden}
 	>
-		{#if !lazy || ready}
+		{#if showSources}
 			{#each sources as source (source.src)}
 				<source src={source.src} type={source.type} media={source.media} />
 			{/each}

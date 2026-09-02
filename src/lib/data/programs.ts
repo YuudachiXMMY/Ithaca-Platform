@@ -21,7 +21,7 @@ export const PROGRAM_CARDS: readonly ProgramCard[] = [
 	{
 		id: 'evTeam',
 		href: '/programs/ev-challenge',
-		image: 'programs/ev-challenge/EV26-5.JPG',
+		image: 'programs/ev-challenge/EV26-5.jpg',
 		imageAlt: 'EV Challenge electric vehicle',
 		span: 'featured'
 	},

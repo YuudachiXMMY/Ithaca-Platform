@@ -10,6 +10,19 @@
 	];
 </script>
 
+<svelte:head>
+	<!-- Preload the about hero image (the LCP element). imagesizes byte-matches the enhanced:img
+	     `sizes`, and imagesrcset uses the AVIF source set + type="image/avif" so the browser
+	     preloads exactly the variant it will render (no double download). -->
+	<link
+		rel="preload"
+		as="image"
+		type="image/avif"
+		imagesrcset={aboutHero.sources.avif}
+		imagesizes="(min-width: 1024px) 65vw, 100vw"
+	/>
+</svelte:head>
+
 <section class="relative min-h-[100dvh] overflow-hidden" aria-labelledby="about-heading">
 	<!-- Photo - bleeds to right edge, covers right 65% on desktop -->
 	<div class="absolute inset-0 lg:left-[35%]">

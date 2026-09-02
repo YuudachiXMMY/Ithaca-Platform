@@ -15,7 +15,7 @@
 	import detailsImg from '$lib/assets/programs/ev-challenge/EV25-10.s.png?enhanced';
 	import gainsImg from '$lib/assets/programs/ev-challenge/EV25-8.jpg?enhanced';
 	import competitionImg from '$lib/assets/programs/ev-challenge/EV26-2.JPG?enhanced';
-	import ctaImg from '$lib/assets/programs/ev-challenge/EV26-5.JPG?enhanced';
+	import ctaImg from '$lib/assets/programs/ev-challenge/EV26-5.jpg?enhanced';
 
 	const STATS = [
 		{ label: m.programs_evChallenge_stats_season, value: '03' },

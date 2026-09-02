@@ -6,7 +6,7 @@
 	import { PROGRAM_CARDS, type ProgramCard } from '$lib/data/programs';
 
 	// Build-time enhanced images for the three cards that have photos.
-	import evImg from '$lib/assets/programs/ev-challenge/EV26-5.JPG?enhanced';
+	import evImg from '$lib/assets/programs/ev-challenge/EV26-5.jpg?enhanced';
 	import aiImg from '$lib/assets/programs/ai-entrepreneurship/AI-Entrep_81.jpg?enhanced';
 	import eliteImg from '$lib/assets/programs/ai-interview/carmi-levy.png?enhanced';
 
@@ -55,6 +55,19 @@
 </script>
 
 <Seo title={m.programs_index_title()} description={m.programs_index_subtitle()} />
+
+<svelte:head>
+	<!-- Preload the featured EV image (the LCP element). imagesizes byte-matches the featured
+	     enhanced:img `sizes`, and imagesrcset uses the AVIF source set + type="image/avif" so the
+	     browser preloads exactly the variant it will render (no double download). -->
+	<link
+		rel="preload"
+		as="image"
+		type="image/avif"
+		imagesrcset={evImg.sources.avif}
+		imagesizes="(max-width: 768px) 100vw, 66vw"
+	/>
+</svelte:head>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 

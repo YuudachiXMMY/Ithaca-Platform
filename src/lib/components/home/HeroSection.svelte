@@ -25,6 +25,21 @@
 
 	let section: HTMLElement;
 
+	// The 100dvh hero video is pure cost on mobile (the Lighthouse gate is mobile-only), so
+	// we mount its <source>s on desktop (>=768px) only. `isDesktop` starts false so SSR/prerender
+	// render poster-only (no video bytes requested); $effect is client-only, so the matchMedia
+	// call never runs during prerender. When the client confirms desktop, AdaptiveVideo mounts
+	// the sources and plays.
+	let isDesktop = $state(false);
+
+	$effect(() => {
+		const mq = window.matchMedia('(min-width: 768px)');
+		isDesktop = mq.matches;
+		const onChange = (e: MediaQueryListEvent) => (isDesktop = e.matches);
+		mq.addEventListener('change', onChange);
+		return () => mq.removeEventListener('change', onChange);
+	});
+
 	onMount(() => {
 		if (prefersReducedMotion.current) return;
 
@@ -123,6 +138,7 @@
 		<AdaptiveVideo
 			sources={[{ src: '/media/videos/hero-video-compressed.mp4', type: 'video/mp4' }]}
 			poster="/media/videos/hero-poster.jpg"
+			enabled={isDesktop}
 			ariaHidden
 		/>
 	</div>

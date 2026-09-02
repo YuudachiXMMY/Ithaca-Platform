@@ -1,7 +1,6 @@
 <script lang="ts">
 	// Functional subscribe form (Phase 3): posts to /api/subscribe (Zod-validated,
 	// rate-limited server-side).
-	import { z } from 'zod';
 	import { getCsrfToken } from '$lib/csrf-client';
 	import * as m from '$lib/paraglide/messages';
 
@@ -11,12 +10,14 @@
 	let status = $state<'idle' | 'submitting' | 'success' | 'error'>('idle');
 	let message = $state('');
 
-	const schema = z.object({ email: z.email() });
+	// Lightweight client-side check only (drops the zod client bundle); the /api/subscribe
+	// endpoint still enforces the authoritative zod validation server-side.
+	const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 	async function onSubmit(e: SubmitEvent) {
 		e.preventDefault();
 		message = '';
-		if (!schema.safeParse({ email }).success) {
+		if (!EMAIL_RE.test(email)) {
 			status = 'error';
 			message = m.newsletter_invalid_email();
 			return;

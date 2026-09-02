@@ -36,6 +36,46 @@
 	let scrollRef = $state<HTMLDivElement | null>(null);
 	let activeIndex = $state(0);
 
+	// Lazy-gate the 4 Vimeo iframes (mirror the contact-us LazyMap pattern): each player only
+	// loads once its section nears the viewport, so the page no longer boots 4 Vimeo bundles.
+	// The aspect-ratio boxes reserve space, so gating causes no CLS.
+	let featuredRef = $state<HTMLDivElement | null>(null);
+	let featuredVisible = $state(false);
+	let galleryRef = $state<HTMLDivElement | null>(null);
+	let galleryVisible = $state(false);
+
+	$effect(() => {
+		const el = featuredRef;
+		if (!el) return;
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (entry?.isIntersecting) {
+					featuredVisible = true;
+					observer.disconnect();
+				}
+			},
+			{ rootMargin: '200px' }
+		);
+		observer.observe(el);
+		return () => observer.disconnect();
+	});
+
+	$effect(() => {
+		const el = galleryRef;
+		if (!el) return;
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (entry?.isIntersecting) {
+					galleryVisible = true;
+					observer.disconnect();
+				}
+			},
+			{ rootMargin: '200px' }
+		);
+		observer.observe(el);
+		return () => observer.disconnect();
+	});
+
 	function handleScroll() {
 		const container = scrollRef;
 		if (!container) return;
@@ -75,14 +115,19 @@
 
 		<!-- Featured spotlight: Andy Song - prominent display -->
 		<div class="mt-8 grid grid-cols-1 items-end gap-5 lg:grid-cols-[5fr_2fr] lg:gap-8">
-			<div class="relative aspect-video overflow-hidden rounded-xl bg-[#0c0e12]">
-				<iframe
-					class="absolute inset-0 h-full w-full"
-					src="https://player.vimeo.com/video/1118098299?badge=0&byline=0&h=7bcd85eebf&portrait=0&title=0&autoplay=0&loop=0&muted=0&controls=1"
-					frameborder="0"
-					allow="autoplay; fullscreen; picture-in-picture"
-					title={m.about_highlights_andySong_iframeTitle()}
-				></iframe>
+			<div
+				bind:this={featuredRef}
+				class="relative aspect-video overflow-hidden rounded-xl bg-[#0c0e12]"
+			>
+				{#if featuredVisible}
+					<iframe
+						class="absolute inset-0 h-full w-full"
+						src="https://player.vimeo.com/video/1118098299?badge=0&byline=0&h=7bcd85eebf&portrait=0&title=0&autoplay=0&loop=0&muted=0&controls=1"
+						frameborder="0"
+						allow="autoplay; fullscreen; picture-in-picture"
+						title={m.about_highlights_andySong_iframeTitle()}
+					></iframe>
+				{/if}
 			</div>
 			<div class="pb-1">
 				<p class="text-xl leading-tight font-bold tracking-tight text-white lg:text-2xl">
@@ -99,17 +144,19 @@
 		</div>
 
 		<!-- Gallery: compact vertical video strip -->
-		<div class="mt-8 grid max-w-[560px] grid-cols-3 gap-3">
+		<div bind:this={galleryRef} class="mt-8 grid max-w-[560px] grid-cols-3 gap-3">
 			{#each videos as video (video.src)}
 				<div>
 					<div class="relative aspect-[9/16] overflow-hidden rounded-lg bg-[#0c0e12]">
-						<iframe
-							class="absolute inset-0 h-full w-full"
-							src={video.src}
-							frameborder="0"
-							allow="autoplay; fullscreen; picture-in-picture"
-							title={video.title()}
-						></iframe>
+						{#if galleryVisible}
+							<iframe
+								class="absolute inset-0 h-full w-full"
+								src={video.src}
+								frameborder="0"
+								allow="autoplay; fullscreen; picture-in-picture"
+								title={video.title()}
+							></iframe>
+						{/if}
 					</div>
 					<p class="mt-1.5 line-clamp-2 text-xs text-gray-500">{video.caption()}</p>
 				</div>
