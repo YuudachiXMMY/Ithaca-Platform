@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { fly } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { loadGsap } from '$lib/motion/gsap';
 	import * as m from '$lib/paraglide/messages';
@@ -170,11 +168,14 @@
 			<blockquote>
 				{#each quoteLines as line, i (line)}
 					<div class="overflow-hidden">
+						<!-- Mask-reveal via a CSS animation that runs at CSS parse (~FCP), NOT on JS
+						     hydration. The old `in:fly|global` fired on mount, so under mobile CPU
+						     throttling the largest quote line (the LCP element) was hidden until
+						     ~hydration+delay and LCP slipped to ~6.7s. CSS decouples it from JS;
+						     reduced-motion falls back to the static visible rest state (see <style>). -->
 						<p
-							in:fly|global={prefersReducedMotion.current || i === 0
-								? { duration: 0 }
-								: { y: 80, duration: 800, delay: 500 + i * 140, easing: quintOut }}
-							class="text-[clamp(1.75rem,5vw,3.75rem)] leading-[1.12] font-light tracking-tight text-white"
+							class="quote-line text-[clamp(1.75rem,5vw,3.75rem)] leading-[1.12] font-light tracking-tight text-white"
+							style:animation-delay="{i === 0 ? 0 : 150 + i * 110}ms"
 						>
 							{line}
 						</p>
@@ -228,3 +229,30 @@
 		{m.home_hero_empowerment()}
 	</h2>
 </div>
+
+<style>
+	/* Hero quote mask-reveal. Pure CSS (no Svelte transition) so it runs during initial
+	   render at ~FCP instead of waiting on client hydration — the largest line is the LCP
+	   element, and the old JS-gated intro pushed LCP to ~6.7s under mobile CPU throttling.
+	   `both` fill-mode holds the pre-reveal (masked) state through the per-line delay. */
+	.quote-line {
+		animation: quote-reveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+		animation-delay: 0ms; /* overridden per line via style:animation-delay */
+	}
+	@keyframes quote-reveal {
+		from {
+			opacity: 0;
+			transform: translateY(110%);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+	/* Reduced motion: no animation → the line stays at its static, visible rest state. */
+	@media (prefers-reduced-motion: reduce) {
+		.quote-line {
+			animation: none;
+		}
+	}
+</style>
