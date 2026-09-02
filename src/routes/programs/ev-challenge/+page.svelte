@@ -14,7 +14,7 @@
 	import missionImg from '$lib/assets/programs/ev-challenge/EV25-12.jpg?enhanced';
 	import detailsImg from '$lib/assets/programs/ev-challenge/EV25-10.s.png?enhanced';
 	import gainsImg from '$lib/assets/programs/ev-challenge/EV25-8.jpg?enhanced';
-	import competitionImg from '$lib/assets/programs/ev-challenge/EV26-2.JPG?enhanced';
+	import competitionImg from '$lib/assets/programs/ev-challenge/EV26-2.jpg?enhanced';
 	import ctaImg from '$lib/assets/programs/ev-challenge/EV26-5.jpg?enhanced';
 
 	const STATS = [

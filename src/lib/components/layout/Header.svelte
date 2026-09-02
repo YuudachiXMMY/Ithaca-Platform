@@ -9,6 +9,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
 	import { focustrap } from '$lib/actions/focus-trap';
+	import logo from '$lib/assets/site/logo.png?enhanced';
 
 	// Split nav items: left group / center logo / right group.
 	const LEFT_NAV = NAV_ITEMS.filter((item) => item.href !== '/contact-us');
@@ -196,11 +197,15 @@
 			class="shrink-0 justify-self-center"
 			aria-label={m.common_nav_homeLink()}
 		>
-			<img
-				src="/media/images/site/logo.png"
+			<!-- The header logo is the homepage LCP element, so it's eager + fetchpriority=high.
+			     enhanced:img serves a small AVIF/WebP instead of the 128KB full-res PNG whose
+			     decode of a 1809x1823 source was ~85% of the LCP (4s render delay). The static
+			     PNG is retained for seo.ts og:image / Organization JSON-LD (absolute-URL refs). -->
+			<enhanced:img
+				src={logo}
 				alt="Ithaca Family Academy"
-				width="200"
-				height="60"
+				fetchpriority="high"
+				sizes="200px"
 				class={cn(
 					'w-auto transition-all duration-500 ease-out',
 					scrolled ? 'h-12' : 'h-20 lg:h-24'

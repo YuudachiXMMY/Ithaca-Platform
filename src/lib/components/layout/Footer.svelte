@@ -5,6 +5,7 @@
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 	import NewsletterForm from '$lib/components/NewsletterForm.svelte';
+	import logo from '$lib/assets/site/logo.png?enhanced';
 
 	const QUICK_LINKS = NAV_ITEMS.filter((item) => item.href !== '/');
 
@@ -33,11 +34,13 @@
 			<!-- About column -->
 			<div>
 				<a href={localizeHref('/')} aria-label="Ithaca Family Academy home">
-					<img
-						src="/media/images/site/logo.png"
+					<!-- Below the fold: lazy. enhanced:img serves a small variant instead of the
+					     128KB full-res PNG. Static PNG retained for seo.ts og:image / JSON-LD. -->
+					<enhanced:img
+						src={logo}
 						alt="Ithaca Family Academy"
-						width="140"
-						height="40"
+						loading="lazy"
+						sizes="140px"
 						class="h-10 w-auto"
 					/>
 				</a>
