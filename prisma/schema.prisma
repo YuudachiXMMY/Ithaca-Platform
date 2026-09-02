@@ -55,6 +55,20 @@ model EmailCampaign {
   @@map("email_campaigns")
 }
 
+// Retry-idempotency ledger (DEF-1): one row per (campaign, recipient) that was successfully
+// sent. The send handler filters already-delivered recipients before each batch, so a
+// mid-send failure + retry delivers only to the un-recorded remainder — never re-blasting.
+model EmailDelivery {
+  id         String   @id @default(cuid())
+  campaignId String   @map("campaign_id")
+  email      String
+  sentAt     DateTime @default(now()) @map("sent_at") @db.Timestamptz(3)
+
+  @@unique([campaignId, email])
+  @@index([campaignId])
+  @@map("email_deliveries")
+}
+
 model Popup {
   id           String    @id @default(cuid())
   title        String

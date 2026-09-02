@@ -63,21 +63,55 @@ export const POST: RequestHandler = async ({ request }) => {
 			);
 		}
 
-		for (let i = 0; i < subscribers.length; i += BATCH_SIZE) {
-			const emails = subscribers.slice(i, i + BATCH_SIZE).map((s) => ({
+		// Retry-idempotency (DEF-1): skip recipients already recorded in the delivery ledger for
+		// this campaign, so a retry after a mid-send failure only mails the un-delivered remainder.
+		const already = new Set(
+			(
+				await prisma.emailDelivery.findMany({
+					where: { campaignId: id },
+					select: { email: true }
+				})
+			).map((d) => d.email)
+		);
+		const pending = subscribers.filter((s) => !already.has(s.email));
+
+		// Fully delivered already (e.g. a retry after everything succeeded but the status write
+		// failed): mark sent and short-circuit without sending a single duplicate.
+		if (pending.length === 0) {
+			await prisma.emailCampaign.update({
+				where: { id },
+				data: { status: 'sent', recipientCount: already.size, sentAt: new Date() }
+			});
+			return json({
+				success: true,
+				data: { recipientCount: already.size }
+			} satisfies ApiResponse);
+		}
+
+		for (let i = 0; i < pending.length; i += BATCH_SIZE) {
+			const batch = pending.slice(i, i + BATCH_SIZE).map((s) => ({
 				to: s.email,
 				subject: campaign.subject,
 				html: campaign.body
 			}));
-			await sendMailBatch(emails);
+			await sendMailBatch(batch);
+			// Record the batch as delivered only after sendMailBatch resolves, so a throw mid-loop
+			// leaves earlier batches ledgered (skipped on retry) and this batch un-recorded (retried).
+			await prisma.emailDelivery.createMany({
+				data: batch.map((e) => ({ campaignId: id, email: e.to })),
+				skipDuplicates: true
+			});
 		}
+
+		// recipientCount reflects total delivered for this campaign (ledgered + this run's pending).
+		const recipientCount = already.size + pending.length;
 		await prisma.emailCampaign.update({
 			where: { id },
-			data: { status: 'sent', recipientCount: subscribers.length, sentAt: new Date() }
+			data: { status: 'sent', recipientCount, sentAt: new Date() }
 		});
 		return json({
 			success: true,
-			data: { recipientCount: subscribers.length }
+			data: { recipientCount }
 		} satisfies ApiResponse);
 	} catch (error) {
 		console.error('[emails/send] campaign send failed', error);

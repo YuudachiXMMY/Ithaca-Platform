@@ -18,7 +18,14 @@ const transporter = isConfigured
 			host: SMTP_HOST,
 			port: SMTP_PORT,
 			secure: SMTP_PORT === 465, // 465 = implicit TLS; 587 = STARTTLS
-			auth: { user: SMTP_USER, pass: SMTP_PASSWORD }
+			auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
+			// Pool bounds concurrent SMTP connections (M1): sends beyond maxConnections queue
+			// internally instead of opening a socket per message. maxConnections is conservative
+			// (Stalwart is self-hosted, but pooling is hygiene); maxMessages recycles a connection
+			// after N sends to avoid long-lived-socket edge cases.
+			pool: true,
+			maxConnections: 5,
+			maxMessages: 100
 		})
 	: null;
 
@@ -35,9 +42,10 @@ export async function sendMail(options: SendMailOptions): Promise<void> {
 	});
 }
 
-// The caller (emails/send) already slices recipients into BATCH_SIZE groups, so sending each
-// group with Promise.all bounds concurrency to that batch size. sendMail still no-ops per
-// message when SMTP is unset, preserving graceful degradation.
+// Concurrency is now bounded by the pooled transport (maxConnections) — sends beyond the pool
+// queue internally, so Promise.all here fans out safely without a socket per message. The
+// caller's BATCH_SIZE loop is retained for DB/memory footprint, not connection bounding.
+// sendMail still no-ops per message when SMTP is unset, preserving graceful degradation.
 export async function sendMailBatch(messages: SendMailOptions[]): Promise<void> {
 	await Promise.all(messages.map((message) => sendMail(message)));
 }

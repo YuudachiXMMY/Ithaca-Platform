@@ -58,6 +58,48 @@ Untracked artifacts staged for the same commit (repo convention — `pr-27-revie
   The plan stays in `.claude/PRPs/plans/` (NOT archived) until B is done.
 
 ## Next Steps
-- [ ] User confirms → commit A1/A2 + artifacts on `feat/advisory-cleanup-round3`, push, verify
-      `gh pr checks 30` green, then `gh pr ready 30`.
-- [ ] Start Milestone B on a fresh `feat/round4-email` branch/worktree (own PR + migration review).
+- [x] Milestone A shipped: PR #30 merged (`MERGED`, undrafted); A1 landed via #31.
+- [x] Milestone B executed — see below.
+
+---
+
+## Milestone B — Round 4 email subsystem (executed 2026-09-02)
+
+Shipped as its own PR **#36** on `feat/round4-email` (branched off `main`).
+
+| Task | Status | Notes |
+|---|---|---|
+| B1 — Stalwart SMTP in `.env.example` | ✅ Complete | Documented `mail.ithacateens.com:465` implicit-TLS transport, `noreply@` account + app-password; runtime env, not build-args. Kept as commented template (no secret committed). |
+| B2 — Pool SMTP (M1) | ✅ Complete | `mail.ts` transport: `pool:true`, `maxConnections:5`, `maxMessages:100`. `isConfigured=false` no-op preserved. Updated the `sendMailBatch` comment (pooling, not batch size, bounds concurrency). |
+| B3 — `EmailDelivery` ledger (DEF-1) | ✅ Complete | New model + migration `20260902183902_email_delivery_ledger` (`email_deliveries`, `@@unique([campaignId,email])` + index). Send handler filters delivered, records each batch **after** `sendMailBatch` resolves, short-circuits fully-delivered to `sent`. Atomic claim untouched. |
+
+### Validation Results (Milestone B)
+
+| Level | Status | Notes |
+|---|---|---|
+| Static (`npm run check`) | ✅ Pass | 0 errors / 0 warnings (6486 files) |
+| Lint (`npm run lint`) | ✅ Pass | ESLint + Prettier clean |
+| Unit tests (`npm test`) | ✅ Pass | 9/9 (unchanged baseline; new logic is route-handler + prisma, covered by docker-smoke not a unit) |
+| Build (`npm run build`) | ✅ Pass | `build/index.js` emitted with build-time env supplied (BetterAuthError is the known missing-env gate, not a code fault) |
+| Migration | ✅ Pass | `prisma migrate dev` created + applied; `migrate status` up to date (6 migrations) |
+| Docker smoke | ⏳ In progress at report time | `scripts/docker-smoke.sh` — verifies `migrate deploy` on container boot + routes + Better Auth login |
+
+### Files Changed (Milestone B)
+
+| File | Action |
+|---|---|
+| `.env.example` | UPDATED (SMTP block → Stalwart) |
+| `src/lib/server/mail.ts` | UPDATED (pooling + comment) |
+| `prisma/schema.prisma` | UPDATED (`EmailDelivery` model) |
+| `prisma/migrations/20260902183902_email_delivery_ledger/migration.sql` | CREATED |
+| `src/routes/api/admin/emails/send/+server.ts` | UPDATED (ledger filter + record + short-circuit) |
+
+### Deviations (Milestone B)
+
+- **Option B chosen** for the transport (`mail.ithacateens.com`, cert matches) → **zero `mail.ts` host/TLS change** beyond pooling. Option A (internal `stalwart` host + `SMTP_TLS_INSECURE`) was not needed and not wired.
+- **No dedicated unit test** for the ledger filter — it lives inside the route handler over live prisma; consistent with the repo's build/smoke-based validation. `docker-smoke` is the behavioral gate.
+
+### Follow-up (server-side, not code)
+
+- Register the sending domain + create `noreply@ithacateens.com` + an app-password in Stalwart admin; set `SMTP_*` in `.prod.env` via the `ops` deploy before enabling prod sends.
+- **DEF-2** (auth localhost `trustedOrigins`) stays deferred to post-cutover per `docs/CUTOVER.md` §7.
