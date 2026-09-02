@@ -25,7 +25,11 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        # engine-strict is off here (mirrors the Docker deps stage, which never copies .npmrc):
+        # camera-controls@3.1.2 declares engines.node >=22, but it only needs 22 at the install-time
+        # engine check, not at runtime, so the Node 20 runner (prod parity) builds fine. Without
+        # this, .npmrc's engine-strict=true turns that mismatch into an EBADENGINE abort.
+        run: npm ci --engine-strict=false
 
       - name: Build
         env:

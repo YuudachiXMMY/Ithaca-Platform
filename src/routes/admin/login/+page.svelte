@@ -27,8 +27,14 @@
 				onSuccess: async () => {
 					// Re-run server load so locals.user propagates before navigating.
 					await invalidateAll();
-					// eslint-disable-next-line svelte/no-navigation-without-resolve -- callbackUrl is a validated internal admin path
-					await goto(page.url.searchParams.get('callbackUrl') ?? '/admin');
+					const cb = page.url.searchParams.get('callbackUrl');
+					// Only follow internal same-origin paths: one leading '/' followed by a
+					// non-slash, non-backslash char. Rejects '//host' (protocol-relative),
+					// '/\host' (backslash normalizes to '/' under the WHATWG URL parser), and
+					// absolute URLs, so a crafted ?callbackUrl can't redirect off-site.
+					const target = cb && /^\/[^/\\]/.test(cb) ? cb : '/admin';
+					// eslint-disable-next-line svelte/no-navigation-without-resolve -- target is a validated internal path
+					await goto(target);
 				},
 				onError: () => {
 					// Generic message — no user enumeration (parity with Next).

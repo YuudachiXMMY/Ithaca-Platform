@@ -35,7 +35,13 @@
 	let shown = $state(false);
 </script>
 
-<div use:inview={{ once }} oninview={() => (shown = true)}>
+<div
+	use:inview={{ once }}
+	oninview={() => (shown = true)}
+	onoutview={() => {
+		if (!once) shown = false;
+	}}
+>
 	{#if prefersReducedMotion.current}
 		{@render children()}
 	{:else if shown}

@@ -35,9 +35,9 @@ export async function sendMail(options: SendMailOptions): Promise<void> {
 	});
 }
 
-// Sequential loop (parity with the Next app — nodemailer has no provider bulk API).
+// The caller (emails/send) already slices recipients into BATCH_SIZE groups, so sending each
+// group with Promise.all bounds concurrency to that batch size. sendMail still no-ops per
+// message when SMTP is unset, preserving graceful degradation.
 export async function sendMailBatch(messages: SendMailOptions[]): Promise<void> {
-	for (const message of messages) {
-		await sendMail(message);
-	}
+	await Promise.all(messages.map((message) => sendMail(message)));
 }

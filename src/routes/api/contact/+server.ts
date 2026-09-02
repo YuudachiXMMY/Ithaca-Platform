@@ -65,17 +65,24 @@ export const POST: RequestHandler = async (event) => {
 		}
 
 		// Every user field (and the subject) is escaped before HTML interpolation.
-		await sendMail({
-			to: STAFF_EMAIL,
-			subject: `New Contact Form Submission from ${escapeHtml(name)}`,
-			html: `
-				<h2>New Contact Form Submission</h2>
-				<p><strong>Name:</strong> ${escapeHtml(name)}</p>
-				<p><strong>Email:</strong> ${escapeHtml(email)}</p>
-				${phone ? `<p><strong>Phone:</strong> ${escapeHtml(phone)}</p>` : ''}
-				${message ? `<p><strong>Message:</strong></p><p>${escapeHtml(message)}</p>` : ''}
-			`
-		});
+		// Best-effort: the message is already committed (and readable in the admin panel),
+		// so a mail failure must NOT 500 — that would drive a client retry and duplicate the
+		// ContactMessage row (mirrors mail.ts graceful no-op).
+		try {
+			await sendMail({
+				to: STAFF_EMAIL,
+				subject: `New Contact Form Submission from ${escapeHtml(name)}`,
+				html: `
+					<h2>New Contact Form Submission</h2>
+					<p><strong>Name:</strong> ${escapeHtml(name)}</p>
+					<p><strong>Email:</strong> ${escapeHtml(email)}</p>
+					${phone ? `<p><strong>Phone:</strong> ${escapeHtml(phone)}</p>` : ''}
+					${message ? `<p><strong>Message:</strong></p><p>${escapeHtml(message)}</p>` : ''}
+				`
+			});
+		} catch (mailError) {
+			console.error('[contact] staff notification email failed (message saved)', mailError);
+		}
 
 		return json({ success: true } satisfies ApiResponse);
 	} catch (error) {

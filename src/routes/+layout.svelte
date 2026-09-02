@@ -74,7 +74,6 @@
 		{/each}
 		<meta property="og:site_name" content={SITE.name} />
 		<meta property="og:url" content={seo.ogUrl} />
-		<meta property="og:image" content={seo.ogImage} />
 		<!-- eslint-disable-next-line svelte/no-at-html-tags -- static Organization JSON-LD, no user input -->
 		{@html orgJsonLdScript}
 	{/if}

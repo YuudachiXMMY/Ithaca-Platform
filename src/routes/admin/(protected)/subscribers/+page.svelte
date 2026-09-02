@@ -53,7 +53,11 @@
 				error = data.error ?? m.admin_subscribers_errors_delete();
 				return;
 			}
-			await fetchSubscribers(pagination.page);
+			// If the current page held only the row we just deleted, step back a page so the
+			// admin doesn't land on a false "no subscribers" empty state.
+			const nextPage =
+				subscribers.length === 1 && pagination.page > 1 ? pagination.page - 1 : pagination.page;
+			await fetchSubscribers(nextPage);
 		} catch {
 			error = m.admin_subscribers_errors_delete();
 		} finally {

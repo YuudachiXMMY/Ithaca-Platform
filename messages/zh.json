@@ -251,6 +251,8 @@
 	"newsletter_invalid_email": "请输入有效的邮箱地址。",
 	"newsletter_subscribeButton": "订阅",
 	"newsletter_success": "感谢您的订阅！",
+	"error_generic_body": "发生了意外错误。请重试，或返回首页。",
+	"error_generic_title": "出错了",
 	"error_notFound_back": "返回首页",
 	"error_notFound_body": "您访问的页面不存在或已被移动。让我们帮您找到回去的路。",
 	"error_notFound_title": "页面未找到",

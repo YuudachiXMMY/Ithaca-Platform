@@ -1,5 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 import { prisma } from '$lib/server/prisma';
 import { rateLimit } from '$lib/server/rate-limit';
 import { validateOrigin, verifyCsrfToken } from '$lib/server/csrf';
@@ -46,26 +47,45 @@ export const POST: RequestHandler = async (event) => {
 		}
 
 		const { email, name } = result.data;
-		const existing = await prisma.subscriber.findUnique({ where: { email } });
-		if (existing?.status === 'active') {
-			return json(
-				{ success: false, error: 'This email is already subscribed' } satisfies ApiResponse,
-				{ status: 409 }
-			);
+		// Single-winner create: only the request that actually inserts the row sends the
+		// welcome mail. A concurrent racer hits the unique-email P2002 and is handled
+		// (409 if already active, else reactivate) — never leaked as a raw 500 (preserves
+		// the TOCTOU fix from #29).
+		let created = false;
+		try {
+			await prisma.subscriber.create({ data: { email, name, status: 'active' } });
+			created = true;
+		} catch (err) {
+			if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+				const existing = await prisma.subscriber.findUnique({ where: { email } });
+				if (existing?.status === 'active') {
+					return json(
+						{ success: false, error: 'This email is already subscribed' } satisfies ApiResponse,
+						{ status: 409 }
+					);
+				}
+				await prisma.subscriber.update({
+					where: { email },
+					data: { status: 'active', name: name ?? existing?.name }
+				});
+			} else {
+				throw err;
+			}
 		}
-		// Atomic upsert closes the TOCTOU between findUnique and create: a concurrent
-		// request racing on the unique `email` no longer surfaces a raw P2002 → 500.
-		await prisma.subscriber.upsert({
-			where: { email },
-			update: { status: 'active', name: name ?? existing?.name },
-			create: { email, name, status: 'active' }
-		});
 
-		await sendMail({
-			to: email,
-			subject: 'Welcome to Ithaca Family Academy',
-			html: `<p>Hi ${escapeHtml(name ?? 'there')},</p><p>Thanks for subscribing to Ithaca Family Academy updates.</p>`
-		});
+		// Best-effort welcome: the subscriber is committed, so a mail failure must NOT
+		// surface as a misleading 500 (mirrors mail.ts graceful no-op).
+		if (created) {
+			try {
+				await sendMail({
+					to: email,
+					subject: 'Welcome to Ithaca Family Academy',
+					html: `<p>Hi ${escapeHtml(name ?? 'there')},</p><p>Thanks for subscribing to Ithaca Family Academy updates.</p>`
+				});
+			} catch (mailError) {
+				console.error('[subscribe] welcome email failed (subscriber saved)', mailError);
+			}
+		}
 
 		return json({ success: true } satisfies ApiResponse);
 	} catch (error) {

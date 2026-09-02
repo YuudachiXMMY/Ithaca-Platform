@@ -242,11 +242,22 @@
 				aria-label={mobileOpen ? m.common_nav_closeMenu() : m.common_nav_openMenu()}
 				aria-expanded={mobileOpen}
 			>
-				{#if mobileOpen}
-					<X class="h-5 w-5" />
-				{:else}
-					<Menu class="h-5 w-5" />
-				{/if}
+				<span class="relative block h-5 w-5">
+					<Menu
+						class={cn(
+							'absolute inset-0 h-5 w-5 transition-all duration-200 motion-reduce:transition-none',
+							mobileOpen ? 'rotate-90 opacity-0' : 'rotate-0 opacity-100'
+						)}
+						aria-hidden="true"
+					/>
+					<X
+						class={cn(
+							'absolute inset-0 h-5 w-5 transition-all duration-200 motion-reduce:transition-none',
+							mobileOpen ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
+						)}
+						aria-hidden="true"
+					/>
+				</span>
 			</button>
 		</div>
 	</div>

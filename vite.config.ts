@@ -55,8 +55,9 @@ export default defineConfig({
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
 			adapter: adapter({ out: 'build', precompress: true }),
-			// CSRF: same-origin POSTs allowed by default; add the staging origin in Phase 3
-			// when POST form actions land (e.g. trustedOrigins: ['https://staging.ithacateens.com']).
+			// CSRF: SvelteKit blocks cross-origin POSTs by default; same-origin POSTs to
+			// /api/* are already allowed. Add extra trusted senders here only if a
+			// cross-origin POST is ever required (e.g. ['https://staging.ithacateens.com']).
 			csrf: { trustedOrigins: [] },
 			prerender: {
 				// Phase 1: crawl on — auto-discovers every real content route (+ /zh) from links.

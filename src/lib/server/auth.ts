@@ -34,6 +34,16 @@ export const auth = betterAuth({
 		cookieCache: { enabled: true, maxAge: 5 * 60 } // avoid a DB hit on every request
 	},
 
+	// Behind Cloudflare the built-in sign-in rate limiter must key on the real client IP.
+	// The default 'x-forwarded-for' is a multi-hop chain Better Auth rejects (collapsing
+	// every sign-in into one shared bucket); cf-connecting-ip is the single trusted client
+	// IP — the same header adapter-node resolves via ADDRESS_HEADER.
+	advanced: {
+		ipAddress: {
+			ipAddressHeaders: ['cf-connecting-ip']
+		}
+	},
+
 	trustedOrigins: [
 		env.BETTER_AUTH_URL,
 		env.ORIGIN,

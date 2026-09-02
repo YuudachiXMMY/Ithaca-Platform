@@ -6,22 +6,15 @@ export const prerender = true;
 
 const LOCALES = ['en', 'zh'] as const;
 
-// 12 canonical public paths × {en, zh}. EXCLUDES the two 308 redirect stubs
-// (elite-interview, ai-pioneers-interview) and everything under /admin + /api.
-const PATHS = [
-	'/',
-	'/about-us',
-	'/contact-us',
-	'/programs',
-	'/programs/ai-entrepreneurship-camp',
-	'/programs/engineering-projects',
-	'/programs/ev-challenge',
-	'/programs/ithaca-dialogues',
-	'/programs/ithaca-night',
-	'/programs/summer-winter-camps',
-	'/privacy',
-	'/terms'
-];
+// Public paths × {en, zh}, derived from the route tree so a new page auto-appears in the
+// sitemap. Globbing +page.svelte excludes the two 308 redirect stubs (ai-pioneers-interview,
+// elite-interview) — they use +page.ts — while the /admin filter drops the protected panel;
+// /api has no +page.svelte. Route groups like (protected) live only under /admin, so no
+// public path carries a "(group)" segment to strip.
+const PATHS = Object.keys(import.meta.glob('/src/routes/**/+page.svelte'))
+	.map((f) => f.replace('/src/routes', '').replace('/+page.svelte', '') || '/')
+	.filter((p) => !p.startsWith('/admin'))
+	.sort();
 
 const abs = (p: string, l: (typeof LOCALES)[number]) => SITE.url + localizeHref(p, { locale: l });
 
