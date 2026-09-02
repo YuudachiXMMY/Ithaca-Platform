@@ -138,6 +138,7 @@
 								src={img}
 								alt="{m.about_highlights_community_imageAlt()} {i + 1}"
 								sizes="(max-width: 768px) 260px, 380px"
+								loading="lazy"
 								class="absolute inset-0 h-full w-full object-cover"
 							/>
 						</div>

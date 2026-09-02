@@ -54,6 +54,7 @@
 									src={TEAM_IMAGE[member.name]}
 									alt={member.name}
 									sizes="(max-width: 640px) 50vw, 25vw"
+									loading="lazy"
 									class="absolute inset-0 h-full w-full object-cover"
 								/>
 							{/if}

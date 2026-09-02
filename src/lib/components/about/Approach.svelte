@@ -14,6 +14,7 @@
 					src={teachImg}
 					alt={m.about_approach_howWeTeach_imageAlt()}
 					sizes="(max-width: 1024px) 100vw, 80vw"
+					loading="lazy"
 					class="absolute inset-0 h-full w-full object-cover"
 				/>
 			</div>
@@ -39,6 +40,7 @@
 						src={ethicsImg}
 						alt={m.about_approach_ethics_imageAlt()}
 						sizes="(max-width: 1024px) 100vw, 60vw"
+						loading="lazy"
 						class="absolute inset-0 h-full w-full object-cover"
 					/>
 				</div>

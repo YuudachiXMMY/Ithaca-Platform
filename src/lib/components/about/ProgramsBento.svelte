@@ -64,6 +64,7 @@
 								src={programs[0].image}
 								alt={programs[0].label()}
 								sizes="(max-width: 1024px) 100vw, 60vw"
+								loading="lazy"
 								class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
 							/>
 							<div
@@ -91,6 +92,7 @@
 									src={program.image}
 									alt={program.label()}
 									sizes="(max-width: 1024px) 50vw, 20vw"
+									loading="lazy"
 									class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
 								/>
 							</div>

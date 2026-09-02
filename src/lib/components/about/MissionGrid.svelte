@@ -60,6 +60,7 @@
 								src={block.image}
 								alt={block.imageAlt()}
 								sizes="(max-width: 1024px) 100vw, 50vw"
+								loading="lazy"
 								class="absolute inset-0 h-full w-full object-cover"
 							/>
 						</div>

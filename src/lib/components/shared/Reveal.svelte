@@ -1,20 +1,19 @@
 <!--
   Reveal — Tier-0 reveal-on-scroll wrapper.
 
-  Replaces the framer-motion FadeIn / StaggerContainer / StaggerItem trio: an
-  `use:inview` observer flips `shown` on first entry, which mounts the child and
-  fires a `transition:fly` (|global so a parent {#if}/page toggle can't suppress
-  it). For staggered lists, pass `delay = i * step` per instance.
+  Children are rendered UNCONDITIONALLY, so the text/markup is always present in the
+  SSR HTML (view-source shows it) and stays visible with no JS and under
+  prefers-reduced-motion. The reveal is a pure visual enhancement: after mount, when
+  motion is allowed, `armed` applies the pre-reveal (faded + translated) rest state and
+  an `use:inview` observer flips `visible` to transition it back in — using ONLY opacity
+  and transform (CLS-safe), never layout properties.
 
-  Under prefers-reduced-motion the children render immediately with no gate and
-  no transition — i.e. the static Phase-1 markup, unchanged.
+  For staggered lists, pass `delay = i * step` per instance. Public props/API unchanged.
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { inview } from '$lib/actions/inview';
-	import { fly } from 'svelte/transition';
 	import { prefersReducedMotion } from 'svelte/motion';
-	import { cubicOut } from 'svelte/easing';
 
 	let {
 		y = 24,
@@ -32,21 +31,51 @@
 		children: Snippet;
 	} = $props();
 
-	let shown = $state(false);
+	// SSR / no-JS / reduced-motion: content renders visible (armed stays false). Only after
+	// mount, when motion is allowed, do we arm the pre-reveal state — so nothing is ever
+	// hidden from the server-rendered HTML.
+	let armed = $state(false);
+	let visible = $state(false);
+
+	$effect(() => {
+		if (prefersReducedMotion.current) return;
+		armed = true;
+	});
 </script>
 
 <div
 	use:inview={{ once }}
-	oninview={() => (shown = true)}
+	oninview={() => (visible = true)}
 	onoutview={() => {
-		if (!once) shown = false;
+		if (!once) visible = false;
 	}}
+	class="reveal"
+	class:reveal--armed={armed}
+	class:reveal--visible={visible}
+	style:--reveal-x="{x}px"
+	style:--reveal-y="{y}px"
+	style:--reveal-delay="{delay}ms"
+	style:--reveal-duration="{duration}ms"
 >
-	{#if prefersReducedMotion.current}
-		{@render children()}
-	{:else if shown}
-		<div transition:fly|global={{ y, x, delay, duration, easing: cubicOut }}>
-			{@render children()}
-		</div>
-	{/if}
+	{@render children()}
 </div>
+
+<style>
+	/* Rest state (SSR / no-JS / reduced-motion): fully visible, no transition. */
+	.reveal--armed {
+		/* Applied instantly (no transition here) so armed content hides before first paint
+		   without a fade-out flicker. */
+		opacity: 0;
+		transform: translate3d(var(--reveal-x), var(--reveal-y), 0);
+		will-change: opacity, transform;
+	}
+
+	.reveal--armed.reveal--visible {
+		opacity: 1;
+		transform: translate3d(0, 0, 0);
+		/* cubicOut easing; delay/duration mirror the former transition:fly params. */
+		transition:
+			opacity var(--reveal-duration) var(--reveal-delay) cubic-bezier(0.33, 1, 0.68, 1),
+			transform var(--reveal-duration) var(--reveal-delay) cubic-bezier(0.33, 1, 0.68, 1);
+	}
+</style>

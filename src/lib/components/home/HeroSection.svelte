@@ -155,7 +155,7 @@
 				{#each quoteLines as line, i (line)}
 					<div class="overflow-hidden">
 						<p
-							in:fly|global={prefersReducedMotion.current
+							in:fly|global={prefersReducedMotion.current || i === 0
 								? { duration: 0 }
 								: { y: 80, duration: 800, delay: 500 + i * 140, easing: quintOut }}
 							class="text-[clamp(1.75rem,5vw,3.75rem)] leading-[1.12] font-light tracking-tight text-white"

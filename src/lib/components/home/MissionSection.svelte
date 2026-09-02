@@ -43,6 +43,7 @@
 							src={pillar.img}
 							alt={pillar.alt()}
 							sizes="(max-width: 768px) 100vw, 50vw"
+							loading="lazy"
 							class="absolute inset-0 h-full w-full object-cover"
 						/>
 					</div>

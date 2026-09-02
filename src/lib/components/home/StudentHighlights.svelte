@@ -136,6 +136,7 @@
 			src={highlight.img}
 			alt={highlight.alt()}
 			sizes="(min-width: 768px) 520px, 50vw"
+			loading="lazy"
 			class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
 		/>
 

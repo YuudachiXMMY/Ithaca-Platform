@@ -13,6 +13,18 @@ on:
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
+    # Placeholder auth/DB env so both `npm run build` AND the lhci server (`node build/index.js`)
+    # can build and boot with no real infra. `vite build` prerenders pages, importing
+    # hooks.server.ts -> auth.ts, whose top-level betterAuth({ secret }) throws BetterAuthError
+    # under NODE_ENV=production when the secret is unset; the started server crashes the same way.
+    # Mirrors the Dockerfile build stage. These are NEVER real — prod supplies real values as
+    # container env. No DB connects while prerendering the 4 audited public pages, so a
+    # syntactically-valid placeholder DATABASE_URL is enough (PrismaClient validates the URL shape
+    # at construction but connects lazily).
+    env:
+      BETTER_AUTH_SECRET: build-time-placeholder-overridden-at-runtime
+      BETTER_AUTH_URL: http://localhost:3000
+      DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
     steps:
       - name: Checkout
         uses: actions/checkout@v4

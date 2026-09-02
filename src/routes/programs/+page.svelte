@@ -83,6 +83,8 @@
 						src={IMAGES[program.id]}
 						alt={program.imageAlt}
 						sizes={isFeatured ? '(max-width: 768px) 100vw, 66vw' : '(max-width: 768px) 100vw, 33vw'}
+						loading={isFeatured ? 'eager' : 'lazy'}
+						fetchpriority={isFeatured ? 'high' : undefined}
 						class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
 					/>
 				{:else}

@@ -65,6 +65,7 @@
 								src={outcome.image}
 								alt={outcome.title()}
 								sizes="(max-width: 768px) 100vw, 50vw"
+								loading="lazy"
 								class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
 							/>
 							<!-- Gradient overlay for text legibility -->
