@@ -112,6 +112,8 @@
 	"admin_emails_newCampaign": "New Campaign",
 	"admin_emails_send": "Send",
 	"admin_emails_sendAriaLabel": "Send campaign: {subject}",
+	"admin_emails_retry": "Retry",
+	"admin_emails_retryAriaLabel": "Retry campaign: {subject}",
 	"admin_emails_table_actions": "Actions",
 	"admin_emails_table_date": "Date",
 	"admin_emails_table_recipients": "Recipients",

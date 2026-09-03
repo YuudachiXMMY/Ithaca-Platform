@@ -210,17 +210,19 @@
 						<td class="px-4 py-3">{c.recipientCount}</td>
 						<td class="px-4 py-3">{new Date(c.sentAt ?? c.createdAt).toLocaleDateString()}</td>
 						<td class="px-4 py-3 text-right">
-							{#if c.status === 'draft'}
+							{#if c.status === 'draft' || c.status === 'failed'}
 								<button
 									onclick={() => handleSend(c.id)}
 									disabled={sendingId === c.id}
-									aria-label={m.admin_emails_sendAriaLabel({ subject: c.subject })}
+									aria-label={c.status === 'failed'
+										? m.admin_emails_retryAriaLabel({ subject: c.subject })
+										: m.admin_emails_sendAriaLabel({ subject: c.subject })}
 									class="inline-flex items-center gap-1 text-[#ccdef0] hover:text-white disabled:opacity-50"
 								>
 									{#if sendingId === c.id}<Loader2 class="h-4 w-4 animate-spin" />{:else}<Send
 											class="h-4 w-4"
 										/>{/if}
-									{m.admin_emails_send()}
+									{c.status === 'failed' ? m.admin_emails_retry() : m.admin_emails_send()}
 								</button>
 							{/if}
 						</td>

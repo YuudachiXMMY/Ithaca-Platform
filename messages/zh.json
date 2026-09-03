@@ -112,6 +112,8 @@
 	"admin_emails_newCampaign": "新建营销",
 	"admin_emails_send": "发送",
 	"admin_emails_sendAriaLabel": "发送营销活动：{subject}",
+	"admin_emails_retry": "重试",
+	"admin_emails_retryAriaLabel": "重试营销活动：{subject}",
 	"admin_emails_table_actions": "操作",
 	"admin_emails_table_date": "日期",
 	"admin_emails_table_recipients": "收件人",
