@@ -4,6 +4,15 @@ import { paraglideMiddleware } from '$lib/paraglide/server';
 import { getTextDirection } from '$lib/paraglide/runtime';
 import { env } from '$env/dynamic/public';
 import { auth } from '$lib/server/auth';
+import { closeMailTransports } from '$lib/server/mail';
+
+// Release pooled SMTP sockets on shutdown so they don't keep the event loop busy and delay
+// adapter-node's graceful HTTP drain (#8). Coexists with adapter-node's own SIGTERM/SIGINT handlers
+// (all listeners fire). This module is imported once at server start, so importing mail.ts here also
+// surfaces the [mail] transport-ready diagnostic at boot rather than on first send.
+for (const signal of ['SIGTERM', 'SIGINT'] as const) {
+	process.once(signal, () => closeMailTransports());
+}
 
 // GA is inlined at (pre)render time from PUBLIC_GA_TRACKING_ID (default G-675W5PPJEJ set as a
 // Docker/CI build-arg). Injected as real <script> tags via a %ga% placeholder — {@html}/

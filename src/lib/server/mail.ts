@@ -27,37 +27,68 @@ if (isConfigured) {
 		);
 	}
 	console.info(
-		`[mail] SMTP transport ready: ${SMTP_HOST}:${SMTP_PORT} secure=${SMTP_PORT === 465}`
+		`[mail] SMTP ready: ${SMTP_HOST}:${SMTP_PORT} secure=${SMTP_PORT === 465} (transactional=2, bulk=5)`
 	);
 }
 
-const transporter = isConfigured
-	? nodemailer.createTransport({
-			host: SMTP_HOST,
-			port: SMTP_PORT,
-			secure: SMTP_PORT === 465, // 465 = implicit TLS; 587 = STARTTLS
-			auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
-			// Pool bounds concurrent SMTP connections (M1): sends beyond maxConnections queue
-			// internally instead of opening a socket per message. maxConnections is conservative
-			// (Stalwart is self-hosted, but pooling is hygiene); maxMessages recycles a connection
-			// after N sends to avoid long-lived-socket edge cases.
-			pool: true,
-			maxConnections: 5,
-			maxMessages: 100
-		})
+// Shared connection options for both pools. Explicit timeouts fail fast on a dead/blackholed
+// Stalwart host instead of stalling on nodemailer's defaults (connect 120s, socket 600s) (#7).
+const SMTP_TIMEOUTS = {
+	connectionTimeout: 10_000, // TCP connect budget for the internal submission path
+	greetingTimeout: 10_000, // wait for the SMTP banner
+	socketTimeout: 30_000 // cap a stalled send far below the 600s default
+} as const;
+
+const baseSmtp = {
+	host: SMTP_HOST,
+	port: SMTP_PORT,
+	secure: SMTP_PORT === 465, // 465 = implicit TLS; 587 = STARTTLS
+	auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
+	...SMTP_TIMEOUTS
+};
+
+// Two isolated pools. Pool bounds concurrent SMTP connections: sends beyond maxConnections queue
+// internally instead of opening a socket per message; maxMessages recycles a connection after N
+// sends to avoid long-lived-socket edge cases.
+//
+// Transactional pool: awaited-in-request single sends (subscribe/contact). Kept separate from the
+// bulk pool so a public welcome/notification never queues behind an in-flight campaign batch (#6).
+const transactionalTransporter = isConfigured
+	? nodemailer.createTransport({ ...baseSmtp, pool: true, maxConnections: 2, maxMessages: 50 })
 	: null;
 
-export async function sendMail(options: SendMailOptions): Promise<void> {
-	if (!transporter) {
+// Bulk pool: admin campaign batch sends. Bounded connections keep self-hosted Stalwart from being
+// hammered.
+const bulkTransporter = isConfigured
+	? nodemailer.createTransport({ ...baseSmtp, pool: true, maxConnections: 5, maxMessages: 100 })
+	: null;
+
+type MailTransport = NonNullable<typeof transactionalTransporter>;
+
+// Single low-level send used by both public single-sends and campaign batches, parameterized by
+// which pool to use. Graceful no-op (resolves) when SMTP is unset — subscribe/contact rely on this.
+async function sendVia(transport: MailTransport | null, options: SendMailOptions): Promise<void> {
+	if (!transport) {
 		console.warn('[mail] SMTP not configured — skipping email send');
 		return;
 	}
-	await transporter.sendMail({
+	await transport.sendMail({
 		from: options.from ?? SMTP_FROM,
 		to: options.to,
 		subject: options.subject,
 		html: options.html
 	});
+}
+
+export async function sendMail(options: SendMailOptions): Promise<void> {
+	return sendVia(transactionalTransporter, options);
+}
+
+// Close both pools' sockets on shutdown so they don't keep the event loop busy / delay adapter-node's
+// graceful exit (#8). Best-effort; `.close()` is a no-op when the transport was never created.
+export function closeMailTransports(): void {
+	transactionalTransporter?.close();
+	bulkTransporter?.close();
 }
 
 export type BatchSendResult = { delivered: string[]; failed: Array<{ to: string; error: string }> };
@@ -88,6 +119,6 @@ export function splitSettled(
 export async function sendMailBatchSettled(messages: SendMailOptions[]): Promise<BatchSendResult> {
 	return splitSettled(
 		messages,
-		await Promise.allSettled(messages.map((message) => sendMail(message)))
+		await Promise.allSettled(messages.map((message) => sendVia(bulkTransporter, message)))
 	);
 }

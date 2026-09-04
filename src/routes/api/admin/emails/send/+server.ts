@@ -79,10 +79,12 @@ export const POST: RequestHandler = async ({ request }) => {
 	// crash that skips the catch strands 'sending', but the stale-window branch in the claim
 	// above reclaims it after STALE_SENDING_MS.
 	try {
-		const subscribers = await prisma.subscriber.findMany({
-			where: { status: 'active' },
-			select: { email: true }
-		});
+		// #14: the active-subscriber read and the delivery-ledger read are independent — issue them
+		// together with one Promise.all instead of two serial round-trips.
+		const [subscribers, delivered] = await Promise.all([
+			prisma.subscriber.findMany({ where: { status: 'active' }, select: { email: true } }),
+			prisma.emailDelivery.findMany({ where: { campaignId: id }, select: { email: true } })
+		]);
 		if (subscribers.length === 0) {
 			await prisma.emailCampaign.update({ where: { id }, data: { status: 'failed' } });
 			return json(
@@ -93,28 +95,18 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		// Retry-idempotency (DEF-1): partition active subscribers against the delivery ledger so a
 		// retry after a partial failure mails only the un-delivered remainder.
-		const delivered = await prisma.emailDelivery.findMany({
-			where: { campaignId: id },
-			select: { email: true }
-		});
-		const { pending, recipientCount } = partitionRecipients(
+		const { pending, alreadyCount } = partitionRecipients(
 			subscribers.map((s) => s.email),
 			delivered.map((d) => d.email)
 		);
 
-		// Fully delivered already (e.g. a retry after every send succeeded but the status write
-		// failed): mark sent and short-circuit without sending a single duplicate.
-		if (pending.length === 0) {
-			await prisma.emailCampaign.update({
-				where: { id },
-				data: { status: 'sent', recipientCount, sentAt: new Date() }
-			});
-			return json({ success: true, data: { recipientCount } } satisfies ApiResponse);
-		}
-
 		// Per-message idempotency: send each batch with Promise.allSettled and ledger ONLY the
 		// recipients that actually delivered, so a partial-batch failure never re-blasts a delivered
 		// recipient on retry. Every batch is attempted (no early abort), so the tail is never skipped.
+		// #9: count recipients ACTUALLY delivered (already-ledgered + delivered this run), not the
+		// ledger∪pending union, so recipientCount == "how many received this campaign". Seeding with
+		// alreadyCount makes a fully-delivered retry (empty loop) report the true total.
+		let deliveredCount = alreadyCount;
 		let failedCount = 0;
 		for (let i = 0; i < pending.length; i += BATCH_SIZE) {
 			const batch = pending.slice(i, i + BATCH_SIZE).map((email) => ({
@@ -128,6 +120,7 @@ export const POST: RequestHandler = async ({ request }) => {
 					data: sent.map((email) => ({ campaignId: id, email })),
 					skipDuplicates: true
 				});
+				deliveredCount += sent.length;
 			}
 			if (failed.length > 0) {
 				failedCount += failed.length;
@@ -150,11 +143,13 @@ export const POST: RequestHandler = async ({ request }) => {
 			);
 		}
 
+		// #11: single finalization for a normal send AND a fully-delivered retry (the loop no-ops
+		// when pending is empty → deliveredCount stays alreadyCount).
 		await prisma.emailCampaign.update({
 			where: { id },
-			data: { status: 'sent', recipientCount, sentAt: new Date() }
+			data: { status: 'sent', recipientCount: deliveredCount, sentAt: new Date() }
 		});
-		return json({ success: true, data: { recipientCount } } satisfies ApiResponse);
+		return json({ success: true, data: { recipientCount: deliveredCount } } satisfies ApiResponse);
 	} catch (error) {
 		console.error('[emails/send] campaign send failed', error);
 		await prisma.emailCampaign.update({ where: { id }, data: { status: 'failed' } });

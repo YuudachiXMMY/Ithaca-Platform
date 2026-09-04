@@ -43,14 +43,15 @@ model AdminUser {
 }
 
 model EmailCampaign {
-  id             String    @id @default(cuid())
+  id             String          @id @default(cuid())
   subject        String
   body           String
-  status         String    @default("draft") // draft, sending, sent, failed
-  recipientCount Int       @default(0) @map("recipient_count")
-  sentAt         DateTime? @map("sent_at") @db.Timestamptz(3)
-  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  status         String          @default("draft") // draft, sending, sent, failed
+  recipientCount Int             @default(0) @map("recipient_count")
+  sentAt         DateTime?       @map("sent_at") @db.Timestamptz(3)
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deliveries     EmailDelivery[]
 
   @@map("email_campaigns")
 }
@@ -59,13 +60,13 @@ model EmailCampaign {
 // sent. The send handler filters already-delivered recipients before each batch, so a
 // mid-send failure + retry delivers only to the un-recorded remainder — never re-blasting.
 model EmailDelivery {
-  id         String   @id @default(cuid())
-  campaignId String   @map("campaign_id")
+  id         String        @id @default(cuid())
+  campaignId String        @map("campaign_id")
+  campaign   EmailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   email      String
-  sentAt     DateTime @default(now()) @map("sent_at") @db.Timestamptz(3)
+  sentAt     DateTime      @default(now()) @map("sent_at") @db.Timestamptz(3)
 
   @@unique([campaignId, email])
-  @@index([campaignId])
   @@map("email_deliveries")
 }
 
