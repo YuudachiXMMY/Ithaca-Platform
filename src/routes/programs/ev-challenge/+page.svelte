@@ -10,7 +10,7 @@
 	import EVModel3DSection from '$lib/components/programs/ev-challenge/EVModel3DSection.svelte';
 	import WorkshopToRoles from '$lib/components/programs/ev-challenge/WorkshopToRoles.svelte';
 
-	import heroImg from '$lib/assets/programs/ev-challenge/EV26-1.JPG?enhanced';
+	import heroImg from '$lib/assets/programs/ev-challenge/EV26-1.jpg?enhanced';
 	import missionImg from '$lib/assets/programs/ev-challenge/EV25-12.jpg?enhanced';
 	import detailsImg from '$lib/assets/programs/ev-challenge/EV25-10.s.png?enhanced';
 	import gainsImg from '$lib/assets/programs/ev-challenge/EV25-8.jpg?enhanced';
