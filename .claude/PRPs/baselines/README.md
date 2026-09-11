@@ -1,11 +1,12 @@
-# Phase 0 Baselines — current Next.js production (PENDING capture)
+# Phase 0 Baselines — current Next.js production (CAPTURED 2026-09-11)
 
-> ⚠️ **These numbers MUST be captured from the LIVE Next.js production site**
-> (https://ithacateens.com), NOT the SvelteKit staging build. They close PRD Open
-> Question #1 and unblock the Success-Metrics deltas Phases 1–4 are measured against.
-> They were **not** captured during Phase-0 implementation because that ran in a
-> sandbox without access to the live prod site + a throttled-mobile Lighthouse runner.
-> Run the commands below (CI or a workstation) and commit the results here.
+> ✅ **Captured 2026-09-11** from the LIVE Next.js production site
+> (https://ithacateens.com) with Lighthouse 12.8.2, throttled mobile. These close PRD
+> Open Question #1 and are the "before" the Success-Metrics deltas for Phases 1–4 are
+> measured against. Raw reports are the sibling `home.json` / `about.json` / `ev.json`
+> / `contact.json` files; the table below is filled from them.
+>
+> Re-run the commands below (CI or a workstation) to refresh; commit the JSON here.
 
 ## Lighthouse (throttled mobile) — run per route
 
@@ -16,14 +17,21 @@ npx lighthouse https://ithacateens.com/programs/ev-challenge --preset=perf --for
 npx lighthouse https://ithacateens.com/contact-us  --preset=perf --form-factor=mobile --output=json --output-path=./contact.json
 ```
 
-## Metrics to record (fill from the JSON above)
+## Metrics (filled from the JSON above — Lighthouse 12.8.2, throttled mobile, 2026-09-11)
 
-| Route | Perf score | LCP | CLS | INP/TBT | Transfer (hero media) | CJK font bytes |
-|-------|-----------|-----|-----|---------|-----------------------|----------------|
-| `/`            | TBD | TBD | TBD | TBD | ~6 MB (hero) | TBD |
-| `/about-us`    | TBD | TBD | TBD | TBD | TBD | TBD |
-| `/programs/ev-challenge` | TBD | TBD | TBD | TBD | TBD | TBD |
-| `/contact-us`  | TBD | TBD | TBD | TBD | TBD | TBD |
+| Route | Perf score | FCP | LCP | CLS | TBT | Total transfer | Hero media | CJK font bytes |
+|-------|-----------|-----|-----|-----|-----|----------------|------------|----------------|
+| `/`            | **56** | 6.8 s | **12.6 s** | 0 | 10 ms  | 6,985 KiB | 5,854 KiB (`hero-video-compressed.mp4`) | 0 (en route) |
+| `/about-us`    | 66 | 5.4 s | 5.6 s | 0 | 0 ms   | 1,488 KiB | 53 KiB (`pillar-pbl.jpg`) | 0 (en route) |
+| `/programs/ev-challenge` | 61 | 5.6 s | 5.6 s | 0 | 220 ms | 2,499 KiB | 213 KiB (largest image) | 0 (en route) |
+| `/contact-us`  | 73 | 4.5 s | 4.5 s | 0 | 10 ms  | 723 KiB   | 31 KiB (`logo.png`) | 0 (en route) |
+
+> **Reading these:** the homepage is the worst offender — a **12.6 s LCP** driven almost
+> entirely by a **5.85 MB autoplaying hero video** (84% of the page's 6.98 MB). This is
+> the target the SvelteKit LCP work is measured against (CI now gates LCP at a hard
+> 4.5 s). CLS is already 0 everywhere. CJK font bytes read 0 because these captures are
+> of the **English** routes; the Next.js `/zh` variants shipped the full Noto Sans SC set
+> (~4.6 MB, see the bundle table below), which the SvelteKit rewrite drops to per-locale.
 
 ## Bundle baseline (from the Next.js build)
 
