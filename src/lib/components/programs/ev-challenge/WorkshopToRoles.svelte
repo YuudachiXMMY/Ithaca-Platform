@@ -23,12 +23,12 @@
 	import { loadGsap } from '$lib/motion/gsap';
 	import * as m from '$lib/paraglide/messages';
 
-	import wtr0 from '$lib/assets/programs/ev-challenge/EV26-3.JPG?enhanced';
+	import wtr0 from '$lib/assets/programs/ev-challenge/EV26-3.jpg?enhanced';
 	import wtr1 from '$lib/assets/programs/ev-challenge/EV25-2.png?enhanced';
 	import wtr2 from '$lib/assets/programs/ev-challenge/EV25-5.jpg?enhanced';
 	import wtr3 from '$lib/assets/programs/ev-challenge/EV25-6.jpg?enhanced';
 	import wtr4 from '$lib/assets/programs/ev-challenge/EV25-9.jpg?enhanced';
-	import wtr5 from '$lib/assets/programs/ev-challenge/EV26-4.JPG?enhanced';
+	import wtr5 from '$lib/assets/programs/ev-challenge/EV26-4.jpg?enhanced';
 
 	const PHOTOS = [
 		{
