@@ -7,7 +7,7 @@
 	import '@fontsource/outfit/500.css';
 	import '@fontsource/outfit/600.css';
 	import '@fontsource/outfit/700.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import favicon from '$lib/assets/favicon.png';
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import PopupBanner from '$lib/components/PopupBanner.svelte';
@@ -59,7 +59,8 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<link rel="icon" type="image/png" href={favicon} />
+	<link rel="apple-touch-icon" href={favicon} />
 	<!-- CJK font gating: Noto Sans SC subsets load ONLY on Chinese pages, so
 	     English pages ship 0 CJK font bytes. unicode-range keeps fetches on-demand. -->
 	{#if getLocale() === 'zh'}
