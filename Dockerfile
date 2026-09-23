@@ -77,13 +77,10 @@ ENV ADDRESS_HEADER=cf-connecting-ip
 ENV PROTOCOL_HEADER=x-forwarded-proto
 ENV HOST_HEADER=x-forwarded-host
 # Runtime-supplied env (left unset here on purpose):
-#   ORIGIN               canonical URL — CSRF origin check + absolute URLs (Phase 0)
-#   BETTER_AUTH_SECRET   session signing secret (Phase 3; required in production)
-#   BETTER_AUTH_URL      canonical origin for auth cookies/redirects (Phase 3)
-#   SMTP_* / UPSTASH_*   email + optional distributed rate-limit (Phase 3; optional)
-# One-time at cutover (NOT in this CMD — tsx is a dev dep): after `migrate deploy`, run
-#   `npx tsx prisma/migrate-admins-to-betterauth.ts` once to copy existing bcrypt admin
-#   hashes into Better Auth (User + credential Account) so the same password keeps working.
+#   ORIGIN               canonical URL — CSRF origin check + absolute URLs
+#   BETTER_AUTH_SECRET   session signing secret (required in production)
+#   BETTER_AUTH_URL      canonical origin for auth cookies/redirects
+#   SMTP_* / UPSTASH_*   email + optional distributed rate-limit (optional)
 
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 sveltekit
