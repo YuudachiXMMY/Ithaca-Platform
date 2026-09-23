@@ -2,8 +2,8 @@
 # SvelteKit is the sole application at the repository ROOT (the legacy Next.js app
 # and its `deploy.yml` were removed in the repo cleanup/reorg). This builds the app
 # (adapter-node, self-migrating on start) from the repo root and publishes
-# `ghcr.io/<repo>-kit`. The `-kit` image suffix is retained until the external deploy
-# target is confirmed to pull the renamed `ghcr.io/<repo>` image.
+# `ghcr.io/<repo>` (lowercased). The legacy `-kit` suffix was dropped now that the
+# deploy target (IthacaServer ops compose) pulls the unsuffixed image.
 name: Build & Deploy (SvelteKit)
 
 on:
@@ -12,7 +12,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}-kit
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-push:
