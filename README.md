@@ -68,13 +68,14 @@ bash scripts/docker-smoke.sh          # build + migrate + route checks + Better 
 
 ## Deployment
 
-CI builds and pushes `ghcr.io/<repo>-kit` on push to the `prod` branch
+CI builds and pushes `ghcr.io/yuudachixmmy/ithacafa-web` on push to the `prod` branch
 (`.github/workflows/deploy.yml`). `.github/workflows/lighthouse.yml` gates mobile performance
-on every PR. The full go-live and rollback procedure lives in `docs/CUTOVER.md`; Cloudflare
-cache rules are in `docs/DEPLOYMENT.md`.
+on every PR. The green app's image is digest-pinned in the sibling `IthacaServer` ops compose
+and shipped with `provision.sh` — the full build, release, rollback, topology, and Cloudflare
+cache-rule procedure lives in **[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)**.
 
 ## Documentation
 
 - [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md) — architecture overview + AI-agent guidance
-- [`docs/CUTOVER.md`](docs/CUTOVER.md) — cutover & decommission runbook
-- [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — Cloudflare cache rules & deployment
+- [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — **build & deploy runbook** (image, release flow, topology, Cloudflare, rollback)
+- [`docs/CUTOVER.md`](docs/CUTOVER.md) — post-cutover history + the deferred `admin_users` decommission
