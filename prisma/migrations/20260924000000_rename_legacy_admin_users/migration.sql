@@ -1,0 +1,13 @@
+-- CONTRACT step (part 1 of 2) of the Next.js -> SvelteKit cutover, see docs/CUTOVER.md.
+--
+-- The legacy admin store (`admin_users`) has already been EXPANDED into Better Auth
+-- (`user` + credential `account`) by 20260827140000_backfill_admins_to_betterauth, and
+-- prod admin login on Better Auth has been VERIFIED stable. This is the safe, reversible
+-- half of the decommission: RENAME the table aside for one release rather than dropping it
+-- outright, so a mis-verification can still be recovered with a plain rename-back (Prisma
+-- has no down-migration; a true DROP would only come back from a full DB restore).
+--
+-- The `DROP TABLE "admin_users_legacy"` is the SEPARATE, later, forward-only second half —
+-- author it in its own migration once this rename has ridden one production release with no
+-- issues. Do NOT bundle the DROP here.
+ALTER TABLE "admin_users" RENAME TO "admin_users_legacy";
