@@ -27,23 +27,31 @@
 	});
 	let loading = $state(true);
 	let error = $state<string | null>(null);
+	// Monotonic request token: guards against a slow earlier page response overwriting a
+	// faster later one when the admin clicks Next/Previous quickly (last-request-wins).
+	let latestRequest = 0;
 
 	async function fetchContacts(page: number) {
+		const requestId = ++latestRequest;
 		loading = true;
 		error = null;
 		try {
 			const res = await fetch(`/api/admin/contacts?page=${page}&limit=${DEFAULT_PAGE_SIZE}`);
 			const data: ApiResponse<ContactsPayload> = await res.json();
-			if (!data.success || !data.data) {
+			if (requestId !== latestRequest) return; // a newer request superseded this one
+			// Runtime shape guard: res.json() is `any`, so verify the payload actually matches
+			// ContactsPayload before trusting it (the type annotation is compile-time only).
+			if (!data.success || !data.data || !Array.isArray(data.data.contacts)) {
 				error = data.error ?? m.admin_contacts_errors_load();
 				return;
 			}
 			contacts = data.data.contacts;
 			pagination = data.data.pagination;
 		} catch {
+			if (requestId !== latestRequest) return;
 			error = m.admin_contacts_errors_load();
 		} finally {
-			loading = false;
+			if (requestId === latestRequest) loading = false;
 		}
 	}
 
