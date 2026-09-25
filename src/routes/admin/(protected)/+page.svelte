@@ -36,7 +36,7 @@
 				fetch('/api/admin/subscribers?page=1&limit=1'),
 				fetch('/api/admin/emails'),
 				fetch('/api/admin/popups'),
-				fetch('/api/admin/contacts')
+				fetch('/api/admin/contacts?page=1&limit=1')
 			]);
 			const [s, c, p, ct] = await Promise.all([
 				sRes.json(),
@@ -46,7 +46,7 @@
 			]);
 			stats = {
 				totalSubscribers: s.data?.pagination?.total ?? 0,
-				totalContacts: ct.data?.total ?? 0,
+				totalContacts: ct.data?.pagination?.total ?? 0,
 				campaignsSent: (c.data ?? []).filter((x: { status: string }) => x.status === 'sent').length,
 				activePopups: (p.data ?? []).filter((x: { isActive: boolean }) => x.isActive).length
 			};

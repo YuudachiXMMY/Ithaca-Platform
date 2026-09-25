@@ -9,8 +9,11 @@ import type { ApiResponse } from '$lib/types';
 
 export const prerender = false;
 
-// Staff recipient (parity with Next CONTACT_INFO.email).
-const STAFF_EMAIL = 'joshua.wang@ithacafo.com';
+// Internal recipient of new-submission notification emails. Intentionally DISTINCT from the
+// public-facing CONTACT_INFO.email in src/lib/data/contact.ts (the address shown to visitors):
+// form notifications route to whoever currently triages the inbox, which need not equal the
+// address advertised on the contact page. Update this independently of CONTACT_INFO.email.
+const STAFF_EMAIL = 'jadyn.wu@ithacafo.com';
 
 const contactSchema = z.object({
 	name: z.string().min(1, 'Name is required').max(200, 'Name is too long'),

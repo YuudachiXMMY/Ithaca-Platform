@@ -10,8 +10,36 @@ const SMTP_PORT = Number(env.SMTP_PORT ?? '465'); // Stalwart implicit-TLS submi
 const SMTP_USER = env.SMTP_USER;
 const SMTP_PASSWORD = env.SMTP_PASSWORD;
 const SMTP_FROM = env.SMTP_FROM ?? 'Ithaca Family Academy <noreply@ithacateens.com>';
+// Internal Docker path only: the app connects to the Stalwart container by its network alias
+// (`stalwart`), which never matches the TLS cert's public hostname (mail.<domain>), so the
+// cert's CN/SAN check fails and every send throws. Setting SMTP_TLS_INSECURE=1 keeps the
+// connection encrypted (implicit TLS) but skips hostname/chain verification — safe on the
+// trusted internal network, and the only way to use the internal host (mirrors the other apps
+// on this server). Leave UNSET when pointing at the public submission host, where the cert matches.
+const SMTP_TLS_INSECURE = env.SMTP_TLS_INSECURE === '1' || env.SMTP_TLS_INSECURE === 'true';
 
 const isConfigured = Boolean(SMTP_HOST && SMTP_USER && SMTP_PASSWORD);
+
+// Internal Docker-network aliases for which SMTP_TLS_INSECURE is legitimate: their cert can't
+// validate against a public hostname, and traffic never leaves the trusted internal network.
+// Anything NOT on this allowlist is treated as public-looking, so insecure TLS is rejected BY
+// DEFAULT — a dotted FQDN, an IPv6 literal, or an unknown single-label host all fail closed.
+const INTERNAL_TLS_INSECURE_HOSTS = new Set(['stalwart']);
+
+// Hard-fail guard, extracted pure so it is unit-testable without loading the env-driven transport
+// (mirrors `splitSettled`). Disabling TLS verification against any host not on the internal
+// allowlist silently downgrades that path to skip cert checks, exposing it to on-path MITM — so we
+// REFUSE TO START rather than only warn. (security review M1 + allowlist hardening follow-up)
+export function assertTlsConfigSafe(host: string | undefined, tlsInsecure: boolean): void {
+	if (tlsInsecure && !(host && INTERNAL_TLS_INSECURE_HOSTS.has(host))) {
+		throw new Error(
+			`[mail] Refusing to start: SMTP_TLS_INSECURE is set with host "${host ?? '(unset)'}", which is not a ` +
+				'known internal alias. Certificate verification would be OFF against a host whose cert should ' +
+				'validate, exposing the submission path to on-path MITM. SMTP_TLS_INSECURE is only valid for an ' +
+				`internal Docker alias (${[...INTERNAL_TLS_INSECURE_HOSTS].join(', ')}); unset it otherwise.`
+		);
+	}
+}
 
 // Exposed so the admin campaign-send handler can hard-fail (503) instead of writing a phantom
 // delivery ledger and marking the campaign 'sent' when SMTP is unset. Single-send callers
@@ -26,8 +54,11 @@ if (isConfigured) {
 			'[mail] SMTP_PORT unset — defaulting to 465 (implicit TLS); set SMTP_PORT to override'
 		);
 	}
+	// Refuse to boot on the dangerous misconfiguration (insecure TLS + public host) — see
+	// assertTlsConfigSafe. Throwing here surfaces at container start (fail-loud), not silently in logs.
+	assertTlsConfigSafe(SMTP_HOST, SMTP_TLS_INSECURE);
 	console.info(
-		`[mail] SMTP ready: ${SMTP_HOST}:${SMTP_PORT} secure=${SMTP_PORT === 465} (transactional=2, bulk=5)`
+		`[mail] SMTP ready: ${SMTP_HOST}:${SMTP_PORT} secure=${SMTP_PORT === 465} tlsVerify=${!SMTP_TLS_INSECURE} (transactional=2, bulk=5)`
 	);
 }
 
@@ -44,6 +75,9 @@ const baseSmtp = {
 	port: SMTP_PORT,
 	secure: SMTP_PORT === 465, // 465 = implicit TLS; 587 = STARTTLS
 	auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
+	// Only downgrade cert verification when explicitly opted in (internal-host path); otherwise
+	// nodemailer's default full verification stays on.
+	...(SMTP_TLS_INSECURE ? { tls: { rejectUnauthorized: false } } : {}),
 	...SMTP_TIMEOUTS
 };
 

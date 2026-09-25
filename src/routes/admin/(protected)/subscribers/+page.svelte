@@ -3,6 +3,8 @@
 	import { Loader2, Trash2, Download } from 'lucide-svelte';
 	import Skeleton from '$lib/components/shared/Skeleton.svelte';
 	import { sanitizeCsvCell } from '$lib/utils';
+	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+	import type { ApiResponse, Pagination } from '$lib/types';
 	import * as m from '$lib/paraglide/messages';
 
 	type Subscriber = {
@@ -12,30 +14,43 @@
 		status: string;
 		subscribedAt: string;
 	};
-	type Pagination = { total: number; page: number; limit: number; totalPages: number };
+	type SubscribersPayload = { subscribers: Subscriber[]; pagination: Pagination };
 
 	let subscribers = $state<Subscriber[]>([]);
-	let pagination = $state<Pagination>({ total: 0, page: 1, limit: 20, totalPages: 0 });
+	let pagination = $state<Pagination>({
+		total: 0,
+		page: 1,
+		limit: DEFAULT_PAGE_SIZE,
+		totalPages: 0
+	});
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	let deletingId = $state<string | null>(null);
+	// Monotonic request token: guards against a slow earlier page response overwriting a
+	// faster later one when the admin clicks Next/Previous quickly (last-request-wins).
+	let latestRequest = 0;
 
 	async function fetchSubscribers(page: number) {
+		const requestId = ++latestRequest;
 		loading = true;
 		error = null;
 		try {
-			const res = await fetch(`/api/admin/subscribers?page=${page}&limit=20`);
-			const data = await res.json();
-			if (!data.success) {
+			const res = await fetch(`/api/admin/subscribers?page=${page}&limit=${DEFAULT_PAGE_SIZE}`);
+			const data: ApiResponse<SubscribersPayload> = await res.json();
+			if (requestId !== latestRequest) return; // a newer request superseded this one
+			// Runtime shape guard: res.json() is `any`, so verify the payload actually matches
+			// SubscribersPayload before trusting it (the type annotation is compile-time only).
+			if (!data.success || !data.data || !Array.isArray(data.data.subscribers)) {
 				error = data.error ?? m.admin_subscribers_errors_load();
 				return;
 			}
 			subscribers = data.data.subscribers;
 			pagination = data.data.pagination;
 		} catch {
+			if (requestId !== latestRequest) return;
 			error = m.admin_subscribers_errors_load();
 		} finally {
-			loading = false;
+			if (requestId === latestRequest) loading = false;
 		}
 	}
 
@@ -48,7 +63,7 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ id })
 			});
-			const data = await res.json();
+			const data: ApiResponse = await res.json();
 			if (!data.success) {
 				error = data.error ?? m.admin_subscribers_errors_delete();
 				return;
