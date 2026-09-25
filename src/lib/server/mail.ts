@@ -20,6 +20,27 @@ const SMTP_TLS_INSECURE = env.SMTP_TLS_INSECURE === '1' || env.SMTP_TLS_INSECURE
 
 const isConfigured = Boolean(SMTP_HOST && SMTP_USER && SMTP_PASSWORD);
 
+// Internal Docker-network aliases for which SMTP_TLS_INSECURE is legitimate: their cert can't
+// validate against a public hostname, and traffic never leaves the trusted internal network.
+// Anything NOT on this allowlist is treated as public-looking, so insecure TLS is rejected BY
+// DEFAULT — a dotted FQDN, an IPv6 literal, or an unknown single-label host all fail closed.
+const INTERNAL_TLS_INSECURE_HOSTS = new Set(['stalwart']);
+
+// Hard-fail guard, extracted pure so it is unit-testable without loading the env-driven transport
+// (mirrors `splitSettled`). Disabling TLS verification against any host not on the internal
+// allowlist silently downgrades that path to skip cert checks, exposing it to on-path MITM — so we
+// REFUSE TO START rather than only warn. (security review M1 + allowlist hardening follow-up)
+export function assertTlsConfigSafe(host: string | undefined, tlsInsecure: boolean): void {
+	if (tlsInsecure && !(host && INTERNAL_TLS_INSECURE_HOSTS.has(host))) {
+		throw new Error(
+			`[mail] Refusing to start: SMTP_TLS_INSECURE is set with host "${host ?? '(unset)'}", which is not a ` +
+				'known internal alias. Certificate verification would be OFF against a host whose cert should ' +
+				'validate, exposing the submission path to on-path MITM. SMTP_TLS_INSECURE is only valid for an ' +
+				`internal Docker alias (${[...INTERNAL_TLS_INSECURE_HOSTS].join(', ')}); unset it otherwise.`
+		);
+	}
+}
+
 // Exposed so the admin campaign-send handler can hard-fail (503) instead of writing a phantom
 // delivery ledger and marking the campaign 'sent' when SMTP is unset. Single-send callers
 // (subscribe/contact) still rely on sendMail's graceful no-op below.
@@ -33,16 +54,9 @@ if (isConfigured) {
 			'[mail] SMTP_PORT unset — defaulting to 465 (implicit TLS); set SMTP_PORT to override'
 		);
 	}
-	// Fail loud on the likely misconfiguration: TLS verification disabled while pointing at a
-	// public FQDN (contains a dot, e.g. mail.ithacateens.com) whose cert WOULD validate. The
-	// insecure flag is only meant for the internal container alias (`stalwart`, no dot); on a
-	// public host it needlessly opens the submission path to on-path MITM. (security review M1)
-	if (SMTP_TLS_INSECURE && SMTP_HOST?.includes('.')) {
-		console.warn(
-			`[mail] SMTP_TLS_INSECURE=1 with a public-looking host ("${SMTP_HOST}") — cert verification is OFF. ` +
-				'This is only intended for the internal `stalwart` alias; unset SMTP_TLS_INSECURE for a public submission host.'
-		);
-	}
+	// Refuse to boot on the dangerous misconfiguration (insecure TLS + public host) — see
+	// assertTlsConfigSafe. Throwing here surfaces at container start (fail-loud), not silently in logs.
+	assertTlsConfigSafe(SMTP_HOST, SMTP_TLS_INSECURE);
 	console.info(
 		`[mail] SMTP ready: ${SMTP_HOST}:${SMTP_PORT} secure=${SMTP_PORT === 465} tlsVerify=${!SMTP_TLS_INSECURE} (transactional=2, bulk=5)`
 	);
