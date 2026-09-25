@@ -10,6 +10,13 @@ const SMTP_PORT = Number(env.SMTP_PORT ?? '465'); // Stalwart implicit-TLS submi
 const SMTP_USER = env.SMTP_USER;
 const SMTP_PASSWORD = env.SMTP_PASSWORD;
 const SMTP_FROM = env.SMTP_FROM ?? 'Ithaca Family Academy <noreply@ithacateens.com>';
+// Internal Docker path only: the app connects to the Stalwart container by its network alias
+// (`stalwart`), which never matches the TLS cert's public hostname (mail.<domain>), so the
+// cert's CN/SAN check fails and every send throws. Setting SMTP_TLS_INSECURE=1 keeps the
+// connection encrypted (implicit TLS) but skips hostname/chain verification — safe on the
+// trusted internal network, and the only way to use the internal host (mirrors the other apps
+// on this server). Leave UNSET when pointing at the public submission host, where the cert matches.
+const SMTP_TLS_INSECURE = env.SMTP_TLS_INSECURE === '1' || env.SMTP_TLS_INSECURE === 'true';
 
 const isConfigured = Boolean(SMTP_HOST && SMTP_USER && SMTP_PASSWORD);
 
@@ -26,8 +33,18 @@ if (isConfigured) {
 			'[mail] SMTP_PORT unset — defaulting to 465 (implicit TLS); set SMTP_PORT to override'
 		);
 	}
+	// Fail loud on the likely misconfiguration: TLS verification disabled while pointing at a
+	// public FQDN (contains a dot, e.g. mail.ithacateens.com) whose cert WOULD validate. The
+	// insecure flag is only meant for the internal container alias (`stalwart`, no dot); on a
+	// public host it needlessly opens the submission path to on-path MITM. (security review M1)
+	if (SMTP_TLS_INSECURE && SMTP_HOST?.includes('.')) {
+		console.warn(
+			`[mail] SMTP_TLS_INSECURE=1 with a public-looking host ("${SMTP_HOST}") — cert verification is OFF. ` +
+				'This is only intended for the internal `stalwart` alias; unset SMTP_TLS_INSECURE for a public submission host.'
+		);
+	}
 	console.info(
-		`[mail] SMTP ready: ${SMTP_HOST}:${SMTP_PORT} secure=${SMTP_PORT === 465} (transactional=2, bulk=5)`
+		`[mail] SMTP ready: ${SMTP_HOST}:${SMTP_PORT} secure=${SMTP_PORT === 465} tlsVerify=${!SMTP_TLS_INSECURE} (transactional=2, bulk=5)`
 	);
 }
 
@@ -44,6 +61,9 @@ const baseSmtp = {
 	port: SMTP_PORT,
 	secure: SMTP_PORT === 465, // 465 = implicit TLS; 587 = STARTTLS
 	auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
+	// Only downgrade cert verification when explicitly opted in (internal-host path); otherwise
+	// nodemailer's default full verification stays on.
+	...(SMTP_TLS_INSECURE ? { tls: { rejectUnauthorized: false } } : {}),
 	...SMTP_TIMEOUTS
 };
 

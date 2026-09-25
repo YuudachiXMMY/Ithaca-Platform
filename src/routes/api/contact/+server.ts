@@ -9,8 +9,8 @@ import type { ApiResponse } from '$lib/types';
 
 export const prerender = false;
 
-// Staff recipient (parity with Next CONTACT_INFO.email).
-const STAFF_EMAIL = 'joshua.wang@ithacafo.com';
+// Staff recipient for new-submission notifications.
+const STAFF_EMAIL = 'jadyn.wu@ithacafo.com';
 
 const contactSchema = z.object({
 	name: z.string().min(1, 'Name is required').max(200, 'Name is too long'),
