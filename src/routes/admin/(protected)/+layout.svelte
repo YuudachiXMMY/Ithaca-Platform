@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { authClient } from '$lib/auth-client';
-	import { LayoutDashboard, Users, Mail, Megaphone, LogOut } from 'lucide-svelte';
+	import { LayoutDashboard, Users, MessageSquare, Mail, Megaphone, LogOut } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages';
 	import type { Snippet } from 'svelte';
 
@@ -11,6 +11,7 @@
 	const nav = [
 		{ href: '/admin', label: () => m.admin_sidebar_dashboard(), icon: LayoutDashboard },
 		{ href: '/admin/subscribers', label: () => m.admin_sidebar_subscribers(), icon: Users },
+		{ href: '/admin/contacts', label: () => m.admin_sidebar_contacts(), icon: MessageSquare },
 		{ href: '/admin/emails', label: () => m.admin_sidebar_emailCampaigns(), icon: Mail },
 		{ href: '/admin/popups', label: () => m.admin_sidebar_popups(), icon: Megaphone }
 	];
