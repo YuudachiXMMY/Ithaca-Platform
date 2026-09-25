@@ -3,6 +3,8 @@
 	import { Loader2, Trash2, Download } from 'lucide-svelte';
 	import Skeleton from '$lib/components/shared/Skeleton.svelte';
 	import { sanitizeCsvCell } from '$lib/utils';
+	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+	import type { ApiResponse, Pagination } from '$lib/types';
 	import * as m from '$lib/paraglide/messages';
 
 	type Subscriber = {
@@ -12,10 +14,15 @@
 		status: string;
 		subscribedAt: string;
 	};
-	type Pagination = { total: number; page: number; limit: number; totalPages: number };
+	type SubscribersPayload = { subscribers: Subscriber[]; pagination: Pagination };
 
 	let subscribers = $state<Subscriber[]>([]);
-	let pagination = $state<Pagination>({ total: 0, page: 1, limit: 20, totalPages: 0 });
+	let pagination = $state<Pagination>({
+		total: 0,
+		page: 1,
+		limit: DEFAULT_PAGE_SIZE,
+		totalPages: 0
+	});
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	let deletingId = $state<string | null>(null);
@@ -24,9 +31,9 @@
 		loading = true;
 		error = null;
 		try {
-			const res = await fetch(`/api/admin/subscribers?page=${page}&limit=20`);
-			const data = await res.json();
-			if (!data.success) {
+			const res = await fetch(`/api/admin/subscribers?page=${page}&limit=${DEFAULT_PAGE_SIZE}`);
+			const data: ApiResponse<SubscribersPayload> = await res.json();
+			if (!data.success || !data.data) {
 				error = data.error ?? m.admin_subscribers_errors_load();
 				return;
 			}
@@ -48,7 +55,7 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ id })
 			});
-			const data = await res.json();
+			const data: ApiResponse = await res.json();
 			if (!data.success) {
 				error = data.error ?? m.admin_subscribers_errors_delete();
 				return;

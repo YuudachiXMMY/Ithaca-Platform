@@ -1,5 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { prisma } from '$lib/server/prisma';
+import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '$lib/constants';
 import type { ApiResponse } from '$lib/types';
 
 // Auth is enforced in hooks.server.ts (/api/admin/* → 401 when no session).
@@ -13,9 +14,11 @@ export const GET: RequestHandler = async ({ url, setHeaders }) => {
 	// on skip/take: NaN. Fall back to defaults when the parsed value is not finite (parity
 	// with the subscribers endpoint).
 	const rawPage = parseInt(url.searchParams.get('page') ?? '1', 10);
-	const rawLimit = parseInt(url.searchParams.get('limit') ?? '20', 10);
+	const rawLimit = parseInt(url.searchParams.get('limit') ?? String(DEFAULT_PAGE_SIZE), 10);
 	const page = Number.isFinite(rawPage) ? Math.max(1, rawPage) : 1;
-	const limit = Number.isFinite(rawLimit) ? Math.min(100, Math.max(1, rawLimit)) : 20;
+	const limit = Number.isFinite(rawLimit)
+		? Math.min(MAX_PAGE_SIZE, Math.max(1, rawLimit))
+		: DEFAULT_PAGE_SIZE;
 	const skip = (page - 1) * limit;
 
 	const [contacts, total] = await Promise.all([

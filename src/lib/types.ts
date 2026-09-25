@@ -5,3 +5,12 @@ export interface ApiResponse<T = unknown> {
 	data?: T;
 	error?: string;
 }
+
+// Pagination envelope returned by the paginated admin-list endpoints
+// (`/api/admin/subscribers`, `/api/admin/contacts`); consumed by their client pages.
+export interface Pagination {
+	total: number;
+	page: number;
+	limit: number;
+	totalPages: number;
+}
