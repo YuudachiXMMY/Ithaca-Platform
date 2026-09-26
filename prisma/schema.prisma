@@ -30,23 +30,6 @@ model ContactMessage {
   @@map("contact_messages")
 }
 
-// LEGACY (decommissioning). The pre-cutover admin store, already backfilled into Better Auth
-// (`User` + credential `Account`). CONTRACT part 1 renamed the table to `admin_users_legacy`
-// (migration 20260924000000_rename_legacy_admin_users) as a one-release safety window before the
-// final `DROP TABLE "admin_users_legacy"`. Keep this model only until that DROP ships — see
-// docs/CUTOVER.md §"Still pending".
-model AdminUser {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String   @map("password_hash")
-  name         String?
-  role         String   @default("admin")
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
-
-  @@map("admin_users_legacy")
-}
-
 model EmailCampaign {
   id             String          @id @default(cuid())
   subject        String
