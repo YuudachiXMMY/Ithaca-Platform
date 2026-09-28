@@ -16,7 +16,10 @@
 	<a
 		href={enHref}
 		data-sveltekit-reload
-		class={locale === 'en' ? 'text-accent' : 'text-white/60 transition-colors hover:text-white'}
+		class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand {locale ===
+		'en'
+			? 'text-brand-bright'
+			: 'text-white/60 transition-colors hover:text-white'}"
 		aria-label="Switch to English"
 	>
 		EN
@@ -25,7 +28,10 @@
 	<a
 		href={zhHref}
 		data-sveltekit-reload
-		class={locale === 'zh' ? 'text-accent' : 'text-white/60 transition-colors hover:text-white'}
+		class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand {locale ===
+		'zh'
+			? 'text-brand-bright'
+			: 'text-white/60 transition-colors hover:text-white'}"
 		aria-label="切换为中文"
 	>
 		中文

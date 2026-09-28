@@ -81,7 +81,7 @@
 </svelte:head>
 
 {#if navigating.to}
-	<div class="nav-progress" role="status" aria-label="Loading page" aria-live="polite"></div>
+	<div class="nav-progress" role="status" aria-label={m.common_loading()} aria-live="polite"></div>
 {/if}
 
 {#if isAdmin}

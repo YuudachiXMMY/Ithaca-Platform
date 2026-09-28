@@ -91,7 +91,7 @@
 />
 
 <T.AmbientLight intensity={0.3} />
-<T.PointLight position={[5, 5, 5]} intensity={0.15} color="#ccdef0" />
+<T.PointLight position={[5, 5, 5]} intensity={0.15} color="#5aa6db" />
 
 <Grid
 	position={[0, -0.03, 0]}

@@ -7,10 +7,18 @@
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
-<section class="bg-[#111318] py-12 lg:py-16" aria-label={m.about_connect_ariaLabel()}>
-	<div class="mx-auto max-w-[1400px] px-4 lg:px-6">
+<section class="bg-[#111318] py-14 md:py-20" aria-label={m.about_connect_ariaLabel()}>
+	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
+		<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+			{m.about_connect_eyebrow()}
+		</p>
+		<div
+			class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+			aria-hidden="true"
+		></div>
+
 		<!-- Cinematic CTA image strip -->
-		<div class="relative aspect-[21/9] overflow-hidden rounded-lg">
+		<div class="relative mt-8 aspect-[21/9] overflow-hidden">
 			<enhanced:img
 				src={connectImg}
 				alt={m.about_connect_imageAlt()}
@@ -30,14 +38,14 @@
 		<div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
 			<div>
 				<h3 class="text-sm font-bold text-white">{m.about_connect_educators_heading()}</h3>
-				<p class="mt-2 text-xs leading-relaxed text-gray-400">
+				<p class="mt-2 text-xs leading-relaxed text-white/60">
 					{m.about_connect_educators_description()}
 				</p>
 			</div>
 
 			<div>
 				<h3 class="text-sm font-bold text-white">{m.about_connect_mentors_heading()}</h3>
-				<p class="mt-2 text-xs leading-relaxed text-gray-400">
+				<p class="mt-2 text-xs leading-relaxed text-white/60">
 					{m.about_connect_mentors_description()}
 				</p>
 			</div>
@@ -46,14 +54,14 @@
 				<h3 class="mb-2 text-sm font-bold text-white">
 					{m.about_connect_newsletter_heading()}
 				</h3>
-				<NewsletterForm variant="dark" />
+				<NewsletterForm />
 			</div>
 		</div>
 
 		<div class="mt-6">
 			<a
 				href={localizeHref('/contact-us')}
-				class="inline-block rounded-lg bg-[#ccdef0] px-6 py-3 text-sm font-semibold text-[#111318] transition-colors hover:bg-[#b8d0e8] active:scale-[0.98]"
+				class="inline-flex h-12 items-center justify-center bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 			>
 				{m.about_connect_cta()}
 			</a>

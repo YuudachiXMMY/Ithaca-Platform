@@ -18,7 +18,7 @@
 
 <section
 	class="relative flex min-h-[100dvh] w-full flex-col justify-end overflow-hidden"
-	aria-label="Hero"
+	aria-label={m.home_hero_ariaLabel()}
 >
 	<!-- Static poster background — the LCP element (no autoplay video bytes). -->
 	<img

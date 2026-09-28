@@ -19,7 +19,9 @@
 </svelte:head>
 
 <section class="flex min-h-[70dvh] flex-col items-center justify-center px-6 text-center">
-	<p class="mb-4 text-sm font-medium tracking-[0.2em] text-accent uppercase">{page.status}</p>
+	<p class="mb-4 font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+		{page.status}
+	</p>
 	<h1 class="mb-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
 		{title}
 	</h1>
@@ -28,7 +30,7 @@
 	</p>
 	<a
 		href={localizeHref('/')}
-		class="group inline-flex items-center gap-2 rounded-full bg-accent px-8 py-3 text-sm font-semibold text-foreground-dark transition-all duration-300 hover:bg-accent-hover active:scale-[0.97]"
+		class="group inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 	>
 		<ArrowLeft class="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
 		{m.error_notFound_back()}

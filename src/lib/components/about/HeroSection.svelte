@@ -28,7 +28,7 @@
 	<div class="absolute inset-0 lg:left-[35%]">
 		<enhanced:img
 			src={aboutHero}
-			alt="Ithaca Family Academy students collaborating"
+			alt={m.about_hero_imageAlt()}
 			sizes="(min-width: 1024px) 65vw, 100vw"
 			fetchpriority="high"
 			class="absolute inset-0 h-full w-full object-cover"
@@ -42,18 +42,25 @@
 
 	<!-- Content - bottom-left -->
 	<div
-		class="relative z-10 mx-auto flex min-h-[100dvh] max-w-[1400px] items-end px-4 pb-12 lg:px-6 lg:pb-16"
+		class="relative z-10 mx-auto flex min-h-[100dvh] max-w-[1400px] items-end px-5 pb-12 sm:px-8 md:px-[6vw] lg:pb-16"
 	>
 		<!-- Above-the-fold hero text renders statically in SSR (no Reveal gate) so the LCP
 		     <p> paints immediately; mirrors how the homepage keeps its hero text in SSR. -->
 		<div class="max-w-md">
+			<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+				{m.about_hero_eyebrow()}
+			</p>
 			<h1
 				id="about-heading"
-				class="text-5xl leading-none font-bold tracking-tighter text-white md:text-7xl"
+				class="mt-6 text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-white"
 			>
 				{m.about_hero_title()}
 			</h1>
-			<p class="mt-4 text-base leading-relaxed text-white/50">
+			<div
+				class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+				aria-hidden="true"
+			></div>
+			<p class="mt-6 text-base leading-relaxed text-white/70">
 				{m.about_hero_subtitle()}
 			</p>
 
@@ -61,7 +68,7 @@
 			<div class="mt-6 flex gap-8 border-t border-white/10 pt-4">
 				{#each facts as fact (fact.label)}
 					<div>
-						<span class="block font-mono text-xs tracking-[0.15em] text-white/30 uppercase">
+						<span class="block font-mono text-xs tracking-[0.15em] text-brand-bright uppercase">
 							{fact.label()}
 						</span>
 						<span class="mt-0.5 block font-mono text-base text-white/70">

@@ -18,7 +18,7 @@
 </script>
 
 <div
-	class="relative overflow-hidden rounded-sm border border-border bg-card-bg transition-colors hover:border-accent/15"
+	class="relative overflow-hidden border border-border bg-card-bg transition-colors hover:border-brand/15"
 	style="padding-top: {aspectPadding}"
 >
 	<iframe

@@ -31,7 +31,7 @@
 	];
 </script>
 
-<section class="bg-[#111318]" aria-label="Our Mission">
+<section class="bg-[#111318]" aria-label={m.home_mission_eyebrow()}>
 	<!-- Mission showcase: the empowerment statement, relocated here from the hero band as the
 	     page's single <h1>, set in soft brand light. Large light display echoes the hero Cavafy
 	     quote so the mission reads as the journey's destination. SSR-safe; Reveal is opacity-only. -->

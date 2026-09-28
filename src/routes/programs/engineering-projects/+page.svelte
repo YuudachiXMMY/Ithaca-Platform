@@ -2,7 +2,7 @@
 	import PlaceholderProgram from '$lib/components/programs/PlaceholderProgram.svelte';
 	import * as m from '$lib/paraglide/messages';
 	import Seo from '$lib/components/Seo.svelte';
-	import heroImage from '$lib/assets/programs/ev-challenge/ev-challenge-stock.jpg?enhanced';
+	import heroImage from '$lib/assets/programs/ev-challenge/EV26-3.jpg?enhanced';
 </script>
 
 <Seo
@@ -10,4 +10,10 @@
 	description={m.metadata_engineeringProjects_description()}
 />
 
-<PlaceholderProgram hero={heroImage} heroAlt="Students collaborating on engineering projects" />
+<PlaceholderProgram
+	hero={heroImage}
+	heroAlt="Students collaborating on engineering projects"
+	title={m.programs_index_cards_engineering_title()}
+	tag={m.programs_index_cards_engineering_tag()}
+	description={m.programs_index_cards_engineering_description()}
+/>

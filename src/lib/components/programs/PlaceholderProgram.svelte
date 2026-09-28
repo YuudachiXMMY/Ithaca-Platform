@@ -4,38 +4,92 @@
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 
-	// Static/reduced-motion port of src/components/programs/PlaceholderProgram.tsx.
-	// The framer fadeUp entrance is dropped (Phase 2); final-state markup only.
-	// `hero` is a build-time enhanced-img Picture (import ... from '...?enhanced').
-	let { hero, heroAlt }: { hero: Picture; heroAlt: string } = $props();
+	// Elevated "coming soon" program stub: a full-bleed hero photo under a cinematic legibility
+	// gradient with bottom-left anchored editorial content (mono eyebrow, brand hairline, light
+	// display title, optional squared tag chip, description + note, squared primary CTA). Matches
+	// the home / about hero idiom so every stub reads as ONE institution.
+	//
+	// SSR-visible (the hero is the LCP element — no Reveal), squared geometry throughout,
+	// reduced-motion safe (no JS motion). `hero` is a build-time enhanced-img Picture
+	// (import ... from '...?enhanced'). Callers pass localized strings (m.key()); title and
+	// description fall back to the generic placeholder copy when a caller omits them.
+	interface Props {
+		hero: Picture;
+		heroAlt: string;
+		eyebrow?: string;
+		title?: string;
+		tag?: string;
+		description?: string;
+		note?: string;
+	}
+	let {
+		hero,
+		heroAlt,
+		eyebrow = m.programs_comingSoon_eyebrow(),
+		title = m.programs_placeholder_title(),
+		tag,
+		description = m.programs_placeholder_description(),
+		note = m.programs_comingSoon_note()
+	}: Props = $props();
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
-<div class="min-h-screen bg-background">
-	<!-- Hero -->
-	<section class="relative flex h-[60vh] min-h-[400px] items-center justify-center overflow-hidden">
+<div class="bg-background">
+	<!-- Full-bleed hero — the LCP element, SSR-visible (no Reveal). -->
+	<section class="relative flex min-h-[100dvh] w-full flex-col justify-end overflow-hidden">
 		<enhanced:img
 			src={hero}
 			alt={heroAlt}
 			sizes="100vw"
+			fetchpriority="high"
 			class="absolute inset-0 h-full w-full object-cover"
 		/>
-		<div class="absolute inset-0 bg-black/60"></div>
-		<div class="relative z-10 px-6 text-center">
-			<h1 class="mb-6 text-4xl font-bold text-foreground md:text-5xl lg:text-6xl">
-				{m.programs_placeholder_title()}
-			</h1>
-			<p class="mx-auto mb-10 max-w-2xl text-lg text-foreground/80 md:text-xl">
-				{m.programs_placeholder_description()}
-			</p>
-			<a
-				href={localizeHref('/contact-us')}
-				class="inline-flex items-center gap-2 rounded-full bg-accent px-8 py-4 font-semibold text-foreground-dark transition-colors hover:bg-accent-hover"
-			>
-				{m.programs_placeholder_contactUs()}
-				<ArrowRight class="h-5 w-5" />
-			</a>
+
+		<!-- Legibility gradient — lighter than a flat wash so the photograph stays present. -->
+		<div
+			class="absolute inset-0 bg-gradient-to-tr from-black/85 via-black/55 to-black/20"
+			aria-hidden="true"
+		></div>
+
+		<!-- Bottom-left anchored editorial content. -->
+		<div class="relative z-10 px-5 pb-14 sm:px-8 md:px-[6vw] md:pb-20">
+			<div class="max-w-3xl">
+				<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+					{eyebrow}
+				</p>
+				<div
+					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+					aria-hidden="true"
+				></div>
+				<h1
+					class="mt-6 text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-white"
+				>
+					{title}
+				</h1>
+				{#if tag}
+					<p
+						class="mt-6 inline-block border border-brand/30 px-3 py-1 font-mono text-xs tracking-[0.2em] text-brand-bright uppercase"
+					>
+						{tag}
+					</p>
+				{/if}
+				<p class="mt-6 max-w-2xl text-base leading-relaxed text-white/60 md:text-lg">
+					{description}
+				</p>
+				<p class="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
+					{note}
+				</p>
+				<a
+					href={localizeHref('/contact-us')}
+					class="group mt-10 inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
+				>
+					{m.programs_placeholder_contactUs()}
+					<ArrowRight
+						class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
+					/>
+				</a>
+			</div>
 		</div>
 	</section>
 </div>

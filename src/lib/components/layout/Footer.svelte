@@ -20,12 +20,16 @@
 		<div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
 			<!-- About column -->
 			<div>
-				<a href={localizeHref('/')} aria-label="Ithaca Family Academy home">
+				<a
+					href={localizeHref('/')}
+					aria-label={m.common_footerHomeAriaLabel()}
+					class="inline-block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+				>
 					<!-- Below the fold: lazy. enhanced:img serves a small variant instead of the
 					     128KB full-res PNG. Static PNG retained for seo.ts og:image / JSON-LD. -->
 					<enhanced:img
 						src={logo}
-						alt="Ithaca Family Academy"
+						alt={m.common_logoAlt()}
 						loading="lazy"
 						sizes="140px"
 						class="h-10 w-auto"
@@ -46,7 +50,7 @@
 						<li>
 							<a
 								href={localizeHref(item.href)}
-								class="text-sm text-foreground/60 transition-colors hover:text-accent"
+								class="text-sm text-foreground/60 transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 							>
 								{navLabel(item.label)}
 							</a>
@@ -64,7 +68,7 @@
 					<li>
 						<a
 							href={CONTACT_HREFS.mailto}
-							class="flex items-start gap-2.5 text-sm text-foreground/60 transition-colors hover:text-accent"
+							class="flex items-start gap-2.5 text-sm text-foreground/60 transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 						>
 							<Mail class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
 							{CONTACT_INFO.email}
@@ -73,7 +77,7 @@
 					<li>
 						<a
 							href={CONTACT_HREFS.tel}
-							class="flex items-start gap-2.5 text-sm text-foreground/60 transition-colors hover:text-accent"
+							class="flex items-start gap-2.5 text-sm text-foreground/60 transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 						>
 							<Phone class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
 							{CONTACT_INFO.phone}
@@ -88,10 +92,14 @@
 		</div>
 
 		<!-- Newsletter -->
-		<div class="mt-6 border-t border-border pt-5">
+		<div class="mt-6">
+			<div
+				class="mb-5 h-px bg-gradient-to-r from-brand via-brand/40 to-transparent"
+				aria-hidden="true"
+			></div>
 			<div class="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
 				<p class="text-sm text-foreground/60">{m.common_footer_newsletter()}</p>
-				<NewsletterForm variant="dark" />
+				<NewsletterForm />
 			</div>
 		</div>
 
@@ -102,15 +110,24 @@
 			>
 				<p>&copy; {currentYear} Ithaca Family Academy. {m.common_footer_rights()}</p>
 				<div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-					<a href={localizeHref('/privacy')} class="transition-colors hover:text-accent">
+					<a
+						href={localizeHref('/privacy')}
+						class="transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+					>
 						{m.common_footer_privacy()}
 					</a>
 					<span class="hidden sm:inline" aria-hidden="true">|</span>
-					<a href={localizeHref('/terms')} class="transition-colors hover:text-accent">
+					<a
+						href={localizeHref('/terms')}
+						class="transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+					>
 						{m.common_footer_terms()}
 					</a>
 					<span class="hidden sm:inline" aria-hidden="true">|</span>
-					<a href={CONTACT_HREFS.mailto} class="transition-colors hover:text-accent">
+					<a
+						href={CONTACT_HREFS.mailto}
+						class="transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+					>
 						{CONTACT_INFO.email}
 					</a>
 				</div>

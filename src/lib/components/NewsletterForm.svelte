@@ -4,8 +4,6 @@
 	import { getCsrfToken } from '$lib/csrf-client';
 	import * as m from '$lib/paraglide/messages';
 
-	let { variant = 'dark' }: { variant?: 'light' | 'dark' } = $props();
-
 	let email = $state('');
 	let status = $state<'idle' | 'submitting' | 'success' | 'error'>('idle');
 	let message = $state('');
@@ -45,7 +43,7 @@
 	}
 </script>
 
-<form class="flex w-full max-w-sm flex-col gap-2" data-variant={variant} onsubmit={onSubmit}>
+<form class="flex w-full max-w-sm flex-col gap-2" onsubmit={onSubmit}>
 	<div class="flex items-center gap-2">
 		<input
 			type="email"
@@ -53,12 +51,12 @@
 			required
 			aria-invalid={status === 'error'}
 			placeholder="you@example.com"
-			class="min-w-0 flex-1 rounded-md border border-border bg-card-bg px-3 py-2 text-sm text-foreground placeholder:text-foreground/30"
+			class="min-w-0 flex-1 border border-border bg-card-bg px-3 py-2 text-sm text-foreground transition-colors placeholder:text-foreground/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 		/>
 		<button
 			type="submit"
 			disabled={status === 'submitting'}
-			class="rounded-md bg-accent px-4 py-2 text-sm font-medium text-foreground-dark disabled:opacity-60"
+			class="bg-action px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-60"
 		>
 			{m.newsletter_subscribeButton()}
 		</button>

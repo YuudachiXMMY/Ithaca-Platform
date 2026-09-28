@@ -3,6 +3,7 @@
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 	import Seo from '$lib/components/Seo.svelte';
+	import Reveal from '$lib/components/shared/Reveal.svelte';
 
 	import heroImg from '$lib/assets/site/about-hero.jpg?enhanced';
 	import tracksImg from '$lib/assets/pillars/pillar-explore.png?enhanced';
@@ -149,30 +150,30 @@
 <div class="min-h-screen bg-background">
 	<!-- 1. Hero: Extreme Asymmetric Split (5:7) -->
 	<section class="grid min-h-[85dvh] grid-cols-1 items-center gap-0 lg:grid-cols-[5fr_7fr]">
-		<div class="order-2 px-6 py-24 md:px-12 lg:order-1 lg:py-0 lg:pr-12 lg:pl-[12vw]">
+		<div
+			class="order-2 px-5 py-16 sm:px-8 md:px-[6vw] md:py-20 lg:order-1 lg:py-0 lg:pr-12 lg:pl-[12vw]"
+		>
 			<h1
-				class="mb-3 text-4xl leading-[1.05] font-bold tracking-tighter text-foreground md:text-5xl lg:text-6xl"
+				class="mb-3 text-4xl leading-[1.05] font-light tracking-tight text-foreground md:text-5xl lg:text-6xl"
 			>
 				{m.programs_eliteInterview_hero_title()}
 			</h1>
-			<p class="mb-8 text-xl font-light tracking-tight text-foreground/50 md:text-2xl">
+			<p class="mb-8 text-xl font-light tracking-tight text-white/70 md:text-2xl">
 				{m.programs_eliteInterview_hero_subtitle()}
 			</p>
-			<p class="mb-10 max-w-[44ch] text-lg leading-relaxed text-foreground/60">
+			<p class="mb-10 max-w-[44ch] text-lg leading-relaxed text-white/60">
 				{m.programs_eliteInterview_hero_description()}
 			</p>
 			<div class="mb-10 flex flex-wrap gap-3">
 				{#each HERO_PILLS as pill, i (i)}
-					<span
-						class="rounded-full border border-border px-4 py-2 text-xs font-medium text-foreground/50"
-					>
+					<span class="border border-border px-4 py-2 text-xs font-medium text-white/70">
 						{pill()}
 					</span>
 				{/each}
 			</div>
 			<a
 				href={localizeHref('/contact-us')}
-				class="inline-flex items-center gap-2 rounded-full bg-accent px-8 py-4 font-semibold text-foreground-dark transition-colors hover:bg-accent-hover active:scale-[0.98]"
+				class="inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 			>
 				{m.programs_eliteInterview_hero_applyNow()}
 				<ArrowRight class="h-5 w-5" />
@@ -204,93 +205,121 @@
 	</section>
 
 	<!-- 2. The Question: Editorial Pull-Quote -->
-	<section class="bg-card-bg py-20 md:py-28">
-		<div class="px-6 md:px-12 lg:px-[8vw]">
-			<blockquote
-				class="mb-12 max-w-[22ch] text-2xl leading-snug font-light tracking-tight text-foreground/90 md:text-3xl lg:text-4xl"
-			>
-				{m.programs_eliteInterview_question_quote()}
-			</blockquote>
-			<div class="lg:pl-[20vw]">
-				<p class="max-w-[55ch] leading-relaxed text-foreground/60">
-					{m.programs_eliteInterview_question_body()}
-				</p>
-			</div>
+	<section class="bg-card-bg py-14 md:py-20">
+		<div class="mx-auto max-w-[1100px] px-5 sm:px-8 md:px-[6vw]">
+			<Reveal y={24}>
+				<blockquote
+					class="mb-12 max-w-[22ch] text-2xl leading-snug font-light tracking-tight text-white/80 md:text-3xl lg:text-4xl"
+				>
+					{m.programs_eliteInterview_question_quote()}
+				</blockquote>
+				<div class="lg:pl-[20vw]">
+					<p class="max-w-[55ch] leading-relaxed text-white/60">
+						{m.programs_eliteInterview_question_body()}
+					</p>
+				</div>
+			</Reveal>
 		</div>
 	</section>
 
 	<!-- 3. Why Now: Staggered Stats -->
-	<section class="py-20 md:py-28">
-		<div class="px-6 md:px-12 lg:px-[8vw]">
-			<div class="mb-16 max-w-[55ch]">
-				<h2 class="mb-6 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-					{m.programs_eliteInterview_whyNow_title()}
-				</h2>
-				<p class="leading-relaxed text-foreground/60">
-					{m.programs_eliteInterview_whyNow_description()}
-				</p>
-			</div>
+	<section class="py-14 md:py-20">
+		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
+			<Reveal y={24}>
+				<div class="mb-16 max-w-[55ch]">
+					<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+						{m.programs_eliteInterview_whyNow_title()}
+					</h2>
+					<div
+						class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+						aria-hidden="true"
+					></div>
+					<p class="mt-6 leading-relaxed text-white/60">
+						{m.programs_eliteInterview_whyNow_description()}
+					</p>
+				</div>
+			</Reveal>
 
 			<div class="space-y-4">
-				<div class="rounded-xl bg-card-bg p-8 md:p-12 lg:max-w-[70%]">
-					<span
-						class="mb-3 block text-5xl font-bold tracking-tighter text-foreground md:text-6xl lg:text-7xl"
-					>
-						{m.programs_eliteInterview_whyNow_stats_gdp_value()}
-					</span>
-					<span class="text-sm tracking-wide text-foreground/40 uppercase">
-						{m.programs_eliteInterview_whyNow_stats_gdp_label()}
-					</span>
-				</div>
-				<div class="rounded-xl bg-card-bg p-8 md:p-12 lg:ml-auto lg:max-w-[50%]">
-					<span class="mb-3 block text-4xl font-bold tracking-tighter text-foreground md:text-5xl">
-						{m.programs_eliteInterview_whyNow_stats_jobs_value()}
-					</span>
-					<span class="text-sm tracking-wide text-foreground/40 uppercase">
-						{m.programs_eliteInterview_whyNow_stats_jobs_label()}
-					</span>
-				</div>
-				<div class="rounded-xl bg-card-bg p-8 md:p-12 lg:ml-[25%] lg:max-w-[55%]">
-					<span class="mb-3 block text-4xl font-bold tracking-tighter text-accent md:text-5xl">
-						{m.programs_eliteInterview_whyNow_stats_adoption_value()}
-					</span>
-					<span class="text-sm tracking-wide text-foreground/40 uppercase">
-						{m.programs_eliteInterview_whyNow_stats_adoption_label()}
-					</span>
-				</div>
+				<Reveal y={24}>
+					<div class="bg-card-bg p-8 md:p-12 lg:max-w-[70%]">
+						<span
+							class="mb-3 block text-5xl font-light tracking-tight text-foreground tabular-nums md:text-6xl lg:text-7xl"
+						>
+							{m.programs_eliteInterview_whyNow_stats_gdp_value()}
+						</span>
+						<span class="text-sm tracking-wide text-white/50 uppercase">
+							{m.programs_eliteInterview_whyNow_stats_gdp_label()}
+						</span>
+					</div>
+				</Reveal>
+				<Reveal y={24} delay={80}>
+					<div class="bg-card-bg p-8 md:p-12 lg:ml-auto lg:max-w-[50%]">
+						<span
+							class="mb-3 block text-4xl font-light tracking-tight text-foreground tabular-nums md:text-5xl"
+						>
+							{m.programs_eliteInterview_whyNow_stats_jobs_value()}
+						</span>
+						<span class="text-sm tracking-wide text-white/50 uppercase">
+							{m.programs_eliteInterview_whyNow_stats_jobs_label()}
+						</span>
+					</div>
+				</Reveal>
+				<Reveal y={24} delay={160}>
+					<div class="bg-card-bg p-8 md:p-12 lg:ml-[25%] lg:max-w-[55%]">
+						<span
+							class="mb-3 block text-4xl font-light tracking-tight text-brand tabular-nums md:text-5xl"
+						>
+							{m.programs_eliteInterview_whyNow_stats_adoption_value()}
+						</span>
+						<span class="text-sm tracking-wide text-white/50 uppercase">
+							{m.programs_eliteInterview_whyNow_stats_adoption_label()}
+						</span>
+					</div>
+				</Reveal>
 			</div>
 		</div>
 	</section>
 
 	<!-- 4. Research Tracks: Numbered List + Side Image -->
-	<section class="bg-card-bg py-20 md:py-28">
-		<div class="px-6 md:px-12 lg:px-[8vw]">
+	<section class="bg-card-bg py-14 md:py-20">
+		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<div class="grid grid-cols-1 gap-12 lg:grid-cols-[3fr_2fr] lg:gap-16">
 				<div>
-					<h2 class="mb-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-						{m.programs_eliteInterview_tracks_title()}
-					</h2>
-					<p class="mb-12 max-w-[50ch] leading-relaxed text-foreground/60">
-						{m.programs_eliteInterview_tracks_subtitle()}
-					</p>
+					<Reveal y={24}>
+						<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+							{m.programs_eliteInterview_tracks_title()}
+						</h2>
+						<div
+							class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+							aria-hidden="true"
+						></div>
+						<p class="mt-6 mb-12 max-w-[50ch] leading-relaxed text-white/60">
+							{m.programs_eliteInterview_tracks_subtitle()}
+						</p>
+					</Reveal>
 					<div>
-						{#each TRACKS as track (track.id)}
-							<div class="flex gap-6 border-b border-border py-6 last:border-b-0">
-								<span
-									class="w-16 shrink-0 text-4xl leading-none font-extralight text-foreground/15 tabular-nums md:text-5xl"
+						{#each TRACKS as track, i (track.id)}
+							<Reveal y={20} delay={i * 80}>
+								<div
+									class="flex gap-6 py-6 {i < TRACKS.length - 1 ? 'border-b border-border' : ''}"
 								>
-									{track.id}
-								</span>
-								<div class="pt-1">
-									<h3 class="mb-1.5 text-lg font-semibold text-foreground">{track.name()}</h3>
-									<p class="leading-relaxed text-foreground/60">{track.question()}</p>
+									<span
+										class="w-16 shrink-0 font-mono text-4xl leading-none tracking-[0.2em] text-brand tabular-nums md:text-5xl"
+									>
+										{track.id}
+									</span>
+									<div class="pt-1">
+										<h3 class="mb-1.5 text-lg font-semibold text-foreground">{track.name()}</h3>
+										<p class="leading-relaxed text-white/60">{track.question()}</p>
+									</div>
 								</div>
-							</div>
+							</Reveal>
 						{/each}
 					</div>
 				</div>
 
-				<div class="relative h-[300px] overflow-hidden rounded-xl lg:h-auto">
+				<div class="relative h-[300px] overflow-hidden lg:h-auto">
 					<enhanced:img
 						src={tracksImg}
 						alt="Mentor guiding students through research on laptops"
@@ -303,13 +332,19 @@
 	</section>
 
 	<!-- 5. Who You'll Interview -->
-	<section class="py-20 md:py-28">
-		<div class="px-6 md:px-12 lg:px-[8vw]">
-			<h2 class="mb-8 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-				{m.programs_eliteInterview_interviewSectors_title()}
-			</h2>
+	<section class="py-14 md:py-20">
+		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
+			<Reveal y={24}>
+				<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+					{m.programs_eliteInterview_interviewSectors_title()}
+				</h2>
+				<div
+					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+					aria-hidden="true"
+				></div>
+			</Reveal>
 
-			<div class="relative mb-12 h-[240px] overflow-hidden rounded-xl md:h-[360px]">
+			<div class="relative mt-8 mb-12 h-[240px] overflow-hidden md:h-[360px]">
 				<enhanced:img
 					src={sectorsImg}
 					alt="Students presenting research findings to an audience"
@@ -320,98 +355,117 @@
 
 			<div class="grid grid-cols-1 gap-8 md:grid-cols-[2fr_1.5fr_1.5fr] md:gap-12">
 				{#each SECTORS as sector, i (i)}
-					<div>
-						<h3 class="mb-4 text-xl font-bold text-foreground">{sector.title()}</h3>
-						<ul class="space-y-2">
-							{#each sector.roles as role, i (i)}
-								<li class="leading-relaxed text-foreground/60">{role()}</li>
-							{/each}
-						</ul>
-					</div>
+					<Reveal y={20} delay={i * 80}>
+						<div>
+							<h3 class="mb-4 text-xl font-bold text-foreground">{sector.title()}</h3>
+							<ul class="space-y-2">
+								{#each sector.roles as role, j (j)}
+									<li class="leading-relaxed text-white/60">{role()}</li>
+								{/each}
+							</ul>
+						</div>
+					</Reveal>
 				{/each}
 			</div>
 		</div>
 	</section>
 
 	<!-- 6. The Journey: Three Phases -->
-	<section class="bg-card-bg py-20 md:py-28">
-		<div class="px-6 md:px-12 lg:px-[8vw]">
-			<h2 class="mb-12 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-				{m.programs_eliteInterview_journey_title()}
-			</h2>
+	<section class="bg-card-bg py-14 md:py-20">
+		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
+			<Reveal y={24}>
+				<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+					{m.programs_eliteInterview_journey_title()}
+				</h2>
+				<div
+					class="mt-6 mb-12 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+					aria-hidden="true"
+				></div>
+			</Reveal>
 
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_1.5fr_1fr]">
 				{#each PHASES as phase, i (i)}
-					<div class="rounded-xl bg-background p-8 md:p-10">
-						<span class="mb-4 block text-xs font-medium tracking-[0.2em] text-accent uppercase">
-							Phase {phase.phase()}
-						</span>
-						<h3 class="mb-2 text-2xl font-bold text-foreground">{phase.title()}</h3>
-						<p class="mb-6 text-sm text-foreground/40">{phase.duration()}</p>
-						<ul class="space-y-2.5">
-							{#each phase.tasks as task, i (i)}
-								<li class="text-sm leading-relaxed text-foreground/60">{task()}</li>
-							{/each}
-						</ul>
-					</div>
+					<Reveal y={24} delay={i * 80}>
+						<div class="h-full bg-background p-8 md:p-10">
+							<span class="mb-4 block font-mono text-[11px] tracking-[0.2em] text-brand uppercase">
+								{m.programs_eliteInterview_journey_phaseLabel()}
+								{phase.phase()}
+							</span>
+							<h3 class="mb-2 text-2xl font-bold text-foreground">{phase.title()}</h3>
+							<p class="mb-6 text-sm text-white/50">{phase.duration()}</p>
+							<ul class="space-y-2.5">
+								{#each phase.tasks as task, j (j)}
+									<li class="text-sm leading-relaxed text-white/60">{task()}</li>
+								{/each}
+							</ul>
+						</div>
+					</Reveal>
 				{/each}
 			</div>
 		</div>
 	</section>
 
 	<!-- 7. What You'll Produce -->
-	<section class="py-20 md:py-28">
-		<div class="px-6 md:px-12 lg:px-[8vw]">
-			<h2 class="mb-12 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-				{m.programs_eliteInterview_produce_title()}
-			</h2>
+	<section class="py-14 md:py-20">
+		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
+			<Reveal y={24}>
+				<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+					{m.programs_eliteInterview_produce_title()}
+				</h2>
+				<div
+					class="mt-6 mb-12 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+					aria-hidden="true"
+				></div>
+			</Reveal>
 
 			<div class="grid grid-cols-1 gap-4 lg:grid-cols-[3fr_2fr]">
-				<div class="rounded-xl bg-card-bg p-8 md:p-12">
-					<span class="mb-4 block text-xs font-medium tracking-[0.2em] text-accent uppercase">
-						{m.programs_eliteInterview_produce_report_badge()}
-					</span>
-					<h3 class="mb-4 text-2xl font-bold text-foreground">
-						{m.programs_eliteInterview_produce_report_title()}
-					</h3>
-					<p class="mb-6 max-w-[50ch] leading-relaxed text-foreground/60">
-						{m.programs_eliteInterview_produce_report_description()}
-					</p>
-					<div class="flex flex-wrap gap-3">
-						{#each REPORT_TAGS as tag, i (i)}
-							<span
-								class="rounded-full border border-border/50 px-3 py-1.5 text-xs text-foreground/40"
-							>
-								{tag()}
-							</span>
-						{/each}
+				<Reveal y={24}>
+					<div class="h-full bg-card-bg p-8 md:p-12">
+						<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+							{m.programs_eliteInterview_produce_report_badge()}
+						</p>
+						<div class="mt-4 h-px w-10 bg-brand/30" aria-hidden="true"></div>
+						<h3 class="mt-4 mb-4 text-2xl font-bold text-foreground">
+							{m.programs_eliteInterview_produce_report_title()}
+						</h3>
+						<p class="mb-6 max-w-[50ch] leading-relaxed text-white/60">
+							{m.programs_eliteInterview_produce_report_description()}
+						</p>
+						<div class="flex flex-wrap gap-3">
+							{#each REPORT_TAGS as tag, i (i)}
+								<span class="border border-border/50 px-3 py-1.5 text-xs text-white/50">
+									{tag()}
+								</span>
+							{/each}
+						</div>
 					</div>
-				</div>
+				</Reveal>
 
-				<div class="flex flex-col rounded-xl bg-card-bg p-8 md:p-12">
-					<span class="mb-4 block text-xs font-medium tracking-[0.2em] text-accent uppercase">
-						{m.programs_eliteInterview_produce_documentary_badge()}
-					</span>
-					<h3 class="mb-4 text-2xl font-bold text-foreground">
-						{m.programs_eliteInterview_produce_documentary_title()}
-					</h3>
-					<p class="mb-6 max-w-[50ch] leading-relaxed text-foreground/60">
-						{m.programs_eliteInterview_produce_documentary_description()}
-					</p>
-					<div class="mt-auto flex flex-wrap gap-3">
-						{#each DOC_TAGS as tag, i (i)}
-							<span
-								class="rounded-full border border-border/50 px-3 py-1.5 text-xs text-foreground/40"
-							>
-								{tag()}
-							</span>
-						{/each}
+				<Reveal y={24} delay={80}>
+					<div class="flex h-full flex-col bg-card-bg p-8 md:p-12">
+						<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+							{m.programs_eliteInterview_produce_documentary_badge()}
+						</p>
+						<div class="mt-4 h-px w-10 bg-brand/30" aria-hidden="true"></div>
+						<h3 class="mt-4 mb-4 text-2xl font-bold text-foreground">
+							{m.programs_eliteInterview_produce_documentary_title()}
+						</h3>
+						<p class="mb-6 max-w-[50ch] leading-relaxed text-white/60">
+							{m.programs_eliteInterview_produce_documentary_description()}
+						</p>
+						<div class="mt-auto flex flex-wrap gap-3">
+							{#each DOC_TAGS as tag, i (i)}
+								<span class="border border-border/50 px-3 py-1.5 text-xs text-white/50">
+									{tag()}
+								</span>
+							{/each}
+						</div>
 					</div>
-				</div>
+				</Reveal>
 			</div>
 
-			<div class="mt-8 max-w-[60ch] border-l-2 border-accent/30 pl-6">
-				<p class="text-sm leading-relaxed text-foreground/40">
+			<div class="mt-8 max-w-[60ch] border-l-2 border-brand/30 pl-6">
+				<p class="text-sm leading-relaxed text-white/50">
 					{m.programs_eliteInterview_produce_disclaimer()}
 				</p>
 			</div>
@@ -419,21 +473,27 @@
 	</section>
 
 	<!-- 8. FAQ: Native Details/Summary -->
-	<section class="bg-card-bg py-20 md:py-28">
-		<div class="mx-auto max-w-3xl px-6">
-			<h2 class="mb-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-				{m.programs_eliteInterview_faq_title()}
-			</h2>
-			<p class="mb-12 text-foreground/40">
-				Reach us at
-				<a
-					href="mailto:{m.programs_eliteInterview_faq_contactEmail()}"
-					class="text-accent underline underline-offset-2 transition-colors hover:text-accent-hover"
-				>
-					{m.programs_eliteInterview_faq_contactEmail()}
-				</a>
-				if you need more information.
-			</p>
+	<section class="bg-card-bg py-14 md:py-20">
+		<div class="mx-auto max-w-3xl px-5 sm:px-8 md:px-[6vw]">
+			<Reveal y={24}>
+				<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+					{m.programs_eliteInterview_faq_title()}
+				</h2>
+				<div
+					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+					aria-hidden="true"
+				></div>
+				<p class="mt-6 mb-12 text-white/60">
+					{m.programs_eliteInterview_faq_reachUsPrefix()}
+					<a
+						href="mailto:{m.programs_eliteInterview_faq_contactEmail()}"
+						class="text-brand-bright underline underline-offset-2 transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+					>
+						{m.programs_eliteInterview_faq_contactEmail()}
+					</a>
+					{m.programs_eliteInterview_faq_reachUsSuffix()}
+				</p>
+			</Reveal>
 			<div>
 				{#each FAQ as item, i (i)}
 					<details class="group border-b border-border">
@@ -441,15 +501,15 @@
 							class="flex cursor-pointer list-none items-center justify-between py-6 [&::-webkit-details-marker]:hidden"
 						>
 							<span
-								class="pr-4 text-lg font-medium text-foreground transition-colors group-hover:text-accent"
+								class="pr-4 text-lg font-medium text-foreground transition-colors group-hover:text-brand-bright"
 							>
 								{item.question()}
 							</span>
 							<ChevronDown
-								class="h-5 w-5 shrink-0 text-foreground/40 transition-transform duration-300 group-open:rotate-180"
+								class="h-5 w-5 shrink-0 text-white/50 transition-transform duration-300 group-open:rotate-180"
 							/>
 						</summary>
-						<div class="max-w-[65ch] pb-6 leading-relaxed text-foreground/60">
+						<div class="max-w-[65ch] pb-6 leading-relaxed text-white/60">
 							{item.answer()}
 						</div>
 					</details>
@@ -459,7 +519,7 @@
 	</section>
 
 	<!-- 9. CTA -->
-	<section class="relative py-24 md:py-32">
+	<section class="relative py-14 md:py-20">
 		<enhanced:img
 			src={ctaImg}
 			alt="Student delivering a professional presentation"
@@ -467,20 +527,22 @@
 			class="absolute inset-0 h-full w-full object-cover"
 		/>
 		<div class="absolute inset-0 bg-background/80"></div>
-		<div class="relative z-10 px-6 text-center">
-			<h2 class="mb-6 text-3xl font-bold text-foreground md:text-4xl">
-				{m.programs_eliteInterview_cta_title()}
-			</h2>
-			<p class="mx-auto mb-10 max-w-xl text-foreground/60">
-				{m.programs_eliteInterview_cta_subtitle()}
-			</p>
-			<a
-				href={localizeHref('/contact-us')}
-				class="inline-flex items-center gap-2 rounded-full bg-accent px-8 py-4 font-semibold text-foreground-dark transition-colors hover:bg-accent-hover active:scale-[0.98]"
-			>
-				{m.programs_eliteInterview_cta_applyNow()}
-				<ArrowRight class="h-5 w-5" />
-			</a>
+		<div class="relative z-10 mx-auto max-w-[1100px] px-5 text-center sm:px-8 md:px-[6vw]">
+			<Reveal y={24}>
+				<h2 class="mb-6 text-3xl font-bold text-foreground md:text-4xl">
+					{m.programs_eliteInterview_cta_title()}
+				</h2>
+				<p class="mx-auto mb-10 max-w-xl text-white/60">
+					{m.programs_eliteInterview_cta_subtitle()}
+				</p>
+				<a
+					href={localizeHref('/contact-us')}
+					class="inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
+				>
+					{m.programs_eliteInterview_cta_applyNow()}
+					<ArrowRight class="h-5 w-5" />
+				</a>
+			</Reveal>
 		</div>
 	</section>
 </div>

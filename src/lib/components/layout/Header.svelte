@@ -31,6 +31,10 @@
 	// the same markup renders — the panel/accordion still open/close, just instantly.
 	const dropdownDuration = $derived(prefersReducedMotion.current ? 0 : 150);
 	const submenuDuration = $derived(prefersReducedMotion.current ? 0 : 200);
+	// Mobile drawer: backdrop fade + panel fly. Same reduced-motion gate — the
+	// drawer still opens/closes, just instantly when reduced motion is preferred.
+	const backdropDuration = $derived(prefersReducedMotion.current ? 0 : 200);
+	const drawerDuration = $derived(prefersReducedMotion.current ? 0 : 300);
 
 	// Desktop hover dropdown: keyed by href; 150ms close grace so the pointer can
 	// travel from the trigger into the panel without it snapping shut.
@@ -120,17 +124,15 @@
 							<a
 								href={localizeHref(item.href)}
 								class={cn(
-									'relative flex items-center gap-1.5 py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300',
-									active ? 'text-accent' : 'text-white/60 hover:text-white'
+									'relative flex items-center gap-1.5 py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+									active ? 'text-brand-bright' : 'text-white/60 hover:text-white'
 								)}
 								aria-expanded={open}
 								aria-haspopup="true"
 							>
 								{#if active}
-									<span
-										class="absolute top-1/2 -left-3.5 -translate-y-1/2 text-accent"
-										aria-hidden="true">-</span
-									>
+									<span class="absolute -bottom-px left-0 h-px w-4 bg-brand" aria-hidden="true"
+									></span>
 								{/if}
 								{navLabel(item.label)}
 								<ChevronDown
@@ -141,7 +143,7 @@
 
 							{#if open}
 								<div
-									class="absolute top-full left-0 z-50 mt-2 min-w-[220px] overflow-hidden rounded-lg border border-white/[0.08] bg-[#0a0c10]/90 py-2 shadow-2xl backdrop-blur-xl"
+									class="absolute top-full left-0 z-50 mt-2 min-w-[220px] overflow-hidden rounded-sm border border-white/[0.08] bg-[#0a0c10]/90 py-2 shadow-2xl backdrop-blur-xl"
 									role="menu"
 									transition:fly={{ y: 8, duration: dropdownDuration }}
 								>
@@ -161,15 +163,13 @@
 						<a
 							href={localizeHref(item.href)}
 							class={cn(
-								'relative py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300',
-								active ? 'text-accent' : 'text-white/60 hover:text-white'
+								'relative py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+								active ? 'text-brand-bright' : 'text-white/60 hover:text-white'
 							)}
 						>
 							{#if active}
-								<span
-									class="absolute top-1/2 -left-3.5 -translate-y-1/2 text-accent"
-									aria-hidden="true">-</span
-								>
+								<span class="absolute -bottom-px left-0 h-px w-4 bg-brand" aria-hidden="true"
+								></span>
 							{/if}
 							{navLabel(item.label)}
 						</a>
@@ -190,7 +190,7 @@
 			     PNG is retained for seo.ts og:image / Organization JSON-LD (absolute-URL refs). -->
 			<enhanced:img
 				src={logo}
-				alt="Ithaca Family Academy"
+				alt={m.common_logoAlt()}
 				fetchpriority="high"
 				sizes="200px"
 				class={cn(
@@ -208,15 +208,12 @@
 					<a
 						href={localizeHref(item.href)}
 						class={cn(
-							'relative py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300',
-							active ? 'text-accent' : 'text-white/60 hover:text-white'
+							'relative py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+							active ? 'text-brand-bright' : 'text-white/60 hover:text-white'
 						)}
 					>
 						{#if active}
-							<span
-								class="absolute top-1/2 -left-3.5 -translate-y-1/2 text-accent"
-								aria-hidden="true">-</span
-							>
+							<span class="absolute -bottom-px left-0 h-px w-4 bg-brand" aria-hidden="true"></span>
 						{/if}
 						{navLabel(item.label)}
 					</a>
@@ -230,7 +227,7 @@
 			<button
 				bind:this={toggleEl}
 				onclick={() => (mobileOpen = !mobileOpen)}
-				class="rounded-lg p-2 text-white/70 transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none lg:hidden"
+				class="rounded-sm p-2 text-white/70 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand lg:hidden"
 				aria-label={mobileOpen ? m.common_nav_closeMenu() : m.common_nav_openMenu()}
 				aria-expanded={mobileOpen}
 			>
@@ -262,19 +259,19 @@
 		class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
 		onclick={closeMobile}
 		aria-label={m.common_nav_closeMenu()}
-		transition:fade={{ duration: 200 }}
+		transition:fade={{ duration: backdropDuration }}
 	></button>
 
 	<nav
 		use:focustrap
 		class="fixed top-0 right-0 z-50 flex h-full w-72 flex-col bg-[#0a0c10]/95 shadow-2xl backdrop-blur-xl lg:hidden"
 		aria-label={m.common_nav_mobileNavigation()}
-		transition:fly={{ x: 288, duration: 300 }}
+		transition:fly={{ x: 288, duration: drawerDuration }}
 	>
 		<div class="flex items-center justify-end p-4">
 			<button
 				onclick={() => (mobileOpen = false)}
-				class="rounded-full p-2 text-white/50 transition-colors hover:bg-white/5 hover:text-white focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+				class="rounded-full p-2 text-white/50 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 				aria-label={m.common_nav_closeMenu()}
 			>
 				<X class="h-5 w-5" />
@@ -290,9 +287,9 @@
 						<a
 							href={localizeHref(item.href)}
 							class={cn(
-								'flex-1 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+								'flex-1 rounded-sm px-3 py-2.5 text-sm font-medium transition-colors',
 								active
-									? 'bg-accent/10 text-accent'
+									? 'bg-brand/10 text-brand-bright'
 									: 'text-white/70 hover:bg-white/5 hover:text-white'
 							)}
 						>
@@ -301,7 +298,7 @@
 						{#if item.children}
 							<button
 								onclick={() => toggleExpanded(item.label)}
-								class="rounded-lg p-2 text-white/50 transition-colors hover:bg-white/5 hover:text-white focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+								class="rounded-sm p-2 text-white/50 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 								aria-expanded={expanded}
 								aria-label={m.common_nav_toggleSubmenu({ label: navLabel(item.label) })}
 							>
@@ -321,7 +318,7 @@
 								<li>
 									<a
 										href={localizeHref(child.href)}
-										class="block rounded-lg px-3 py-2 text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white"
+										class="block rounded-sm px-3 py-2 text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white"
 									>
 										{navLabel(child.label)}
 									</a>
