@@ -8,6 +8,7 @@
 	},
 	"scripts": {
 		"dev": "vite dev",
+		"dev:up": "bash scripts/dev-up.sh",
 		"build": "vite build",
 		"preview": "vite preview",
 		"start": "node build/index.js",
