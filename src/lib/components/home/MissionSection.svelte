@@ -58,12 +58,12 @@
 	</div>
 
 	<!-- Our Approach: a short header so the three pillars no longer start cold. -->
-	<div class="mx-auto max-w-[1400px] px-5 pt-6 sm:px-8 md:px-[6vw] md:pt-8">
+	<div class="mx-auto max-w-[1400px] px-5 pt-6 text-center sm:px-8 md:px-[6vw] md:pt-8">
 		<Reveal y={20}>
 			<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
 				{m.home_mission_approachEyebrow()}
 			</p>
-			<p class="mt-3 max-w-md text-lg font-medium text-white/80">
+			<p class="mt-3 mx-auto max-w-md text-lg font-medium text-white/80">
 				{m.home_mission_approachIntro()}
 			</p>
 		</Reveal>
