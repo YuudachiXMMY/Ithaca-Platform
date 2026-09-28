@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '$lib/server/prisma';
 import { rateLimit } from '$lib/server/rate-limit';
 import { validateOrigin, verifyCsrfToken } from '$lib/server/csrf';
+import { parseJsonBody } from '$lib/server/validation';
 import { sendMail } from '$lib/server/mail';
 import { escapeHtml } from '$lib/utils';
 import type { ApiResponse } from '$lib/types';
@@ -43,17 +44,10 @@ export const POST: RequestHandler = async (event) => {
 	if (limited) return limited;
 
 	try {
-		const body: unknown = await request.json().catch(() => null);
-		const result = contactSchema.safeParse(body);
-		if (!result.success) {
-			const firstIssue = result.error.issues[0];
-			return json(
-				{ success: false, error: firstIssue?.message ?? 'Invalid input' } satisfies ApiResponse,
-				{ status: 400 }
-			);
-		}
+		const parsed = await parseJsonBody(request, contactSchema);
+		if (!parsed.success) return parsed.response;
 
-		const { name, email, phone, message, subscribe } = result.data;
+		const { name, email, phone, message, subscribe } = parsed.data;
 
 		await prisma.contactMessage.create({ data: { name, email, phone, message, subscribe } });
 

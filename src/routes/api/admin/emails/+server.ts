@@ -1,6 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 import { prisma } from '$lib/server/prisma';
+import { parseJsonBody } from '$lib/server/validation';
 import type { ApiResponse } from '$lib/types';
 
 export const prerender = false;
@@ -17,17 +18,9 @@ const createCampaignSchema = z.object({
 });
 
 export const POST: RequestHandler = async ({ request }) => {
-	const result = createCampaignSchema.safeParse(await request.json().catch(() => null));
-	if (!result.success) {
-		return json(
-			{
-				success: false,
-				error: result.error.issues[0]?.message ?? 'Invalid input'
-			} satisfies ApiResponse,
-			{ status: 400 }
-		);
-	}
-	const { subject, body } = result.data;
+	const parsed = await parseJsonBody(request, createCampaignSchema);
+	if (!parsed.success) return parsed.response;
+	const { subject, body } = parsed.data;
 	const campaign = await prisma.emailCampaign.create({ data: { subject, body } });
 	return json({ success: true, data: campaign } satisfies ApiResponse, { status: 201 });
 };

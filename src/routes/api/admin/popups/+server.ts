@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '$lib/server/prisma';
 import type { ApiResponse } from '$lib/types';
 import { invalidatePopupCache } from '$lib/server/popup-cache';
+import { parseJsonBody } from '$lib/server/validation';
 import { createPopupSchema, updatePopupSchema } from './schema';
 
 export const prerender = false;
@@ -14,17 +15,9 @@ export const GET: RequestHandler = async ({ setHeaders }) => {
 };
 
 export const POST: RequestHandler = async ({ request }) => {
-	const result = createPopupSchema.safeParse(await request.json().catch(() => null));
-	if (!result.success) {
-		return json(
-			{
-				success: false,
-				error: result.error.issues[0]?.message ?? 'Invalid input'
-			} satisfies ApiResponse,
-			{ status: 400 }
-		);
-	}
-	const data = result.data;
+	const parsed = await parseJsonBody(request, createPopupSchema);
+	if (!parsed.success) return parsed.response;
+	const data = parsed.data;
 	const popup = await prisma.popup.create({
 		data: {
 			title: data.title,
@@ -42,17 +35,9 @@ export const POST: RequestHandler = async ({ request }) => {
 };
 
 export const PUT: RequestHandler = async ({ request }) => {
-	const result = updatePopupSchema.safeParse(await request.json().catch(() => null));
-	if (!result.success) {
-		return json(
-			{
-				success: false,
-				error: result.error.issues[0]?.message ?? 'Invalid input'
-			} satisfies ApiResponse,
-			{ status: 400 }
-		);
-	}
-	const { id, ...updateFields } = result.data;
+	const parsed = await parseJsonBody(request, updatePopupSchema);
+	if (!parsed.success) return parsed.response;
+	const { id, ...updateFields } = parsed.data;
 
 	const existing = await prisma.popup.findUnique({ where: { id } });
 	if (!existing) {
@@ -84,17 +69,9 @@ export const PUT: RequestHandler = async ({ request }) => {
 const deleteSchema = z.object({ id: z.string().min(1, 'Popup ID is required') });
 
 export const DELETE: RequestHandler = async ({ request }) => {
-	const result = deleteSchema.safeParse(await request.json().catch(() => null));
-	if (!result.success) {
-		return json(
-			{
-				success: false,
-				error: result.error.issues[0]?.message ?? 'Invalid input'
-			} satisfies ApiResponse,
-			{ status: 400 }
-		);
-	}
-	const { id } = result.data;
+	const parsed = await parseJsonBody(request, deleteSchema);
+	if (!parsed.success) return parsed.response;
+	const { id } = parsed.data;
 	const existing = await prisma.popup.findUnique({ where: { id } });
 	if (!existing) {
 		return json({ success: false, error: 'Popup not found' } satisfies ApiResponse, {
