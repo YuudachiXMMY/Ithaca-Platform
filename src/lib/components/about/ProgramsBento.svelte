@@ -41,14 +41,24 @@
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
 <section
-	class="flex flex-col bg-[#111318] py-12 lg:min-h-[100dvh] lg:py-16"
+	class="flex flex-col bg-[#111318] py-14 md:py-20 lg:min-h-[100dvh]"
 	aria-labelledby="programs-heading"
 >
-	<div class="mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-4 lg:px-6">
+	<div class="mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={20} duration={500}>
-			<h2 id="programs-heading" class="text-2xl font-bold tracking-tight text-white md:text-4xl">
+			<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+				{m.about_programs_eyebrow()}
+			</p>
+			<h2
+				id="programs-heading"
+				class="mt-4 text-2xl font-bold tracking-tight text-white md:text-4xl"
+			>
 				{m.about_programs_heading()}
 			</h2>
+			<div
+				class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+				aria-hidden="true"
+			></div>
 		</Reveal>
 
 		<!-- Bento: hero card left (tall) + 3 stacked right -->
@@ -56,9 +66,12 @@
 			<!-- Hero program card -->
 			<Reveal y={20} duration={500} delay={50}>
 				<div class="h-full">
-					<a href={localizeHref(programs[0].href)} class="group block h-full">
+					<a
+						href={localizeHref(programs[0].href)}
+						class="group block h-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+					>
 						<div
-							class="relative aspect-[4/3] min-h-[240px] overflow-hidden rounded-lg lg:aspect-auto lg:h-full"
+							class="relative aspect-[4/3] min-h-[240px] overflow-hidden lg:aspect-auto lg:h-full"
 						>
 							<enhanced:img
 								src={programs[0].image}
@@ -85,9 +98,9 @@
 					<Reveal y={20} duration={500} delay={100 + i * 50}>
 						<a
 							href={localizeHref(program.href)}
-							class="group grid grid-cols-[1fr_1fr] items-center gap-3"
+							class="group grid grid-cols-[1fr_1fr] items-center gap-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 						>
-							<div class="relative aspect-[4/3] overflow-hidden rounded-lg">
+							<div class="relative aspect-[4/3] overflow-hidden">
 								<enhanced:img
 									src={program.image}
 									alt={program.label()}
@@ -98,11 +111,11 @@
 							</div>
 							<div>
 								<h3
-									class="text-base font-bold text-white transition-colors group-hover:text-[#ccdef0]"
+									class="text-base font-bold text-white transition-colors group-hover:text-brand-bright"
 								>
 									{program.label()}
 								</h3>
-								<p class="mt-0.5 text-sm text-gray-400">{program.description()}</p>
+								<p class="mt-0.5 text-sm text-white/60">{program.description()}</p>
 							</div>
 						</a>
 					</Reveal>

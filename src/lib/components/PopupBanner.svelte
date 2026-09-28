@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 	import { X } from 'lucide-svelte';
 	import { focustrap } from '$lib/actions/focus-trap';
+	import * as m from '$lib/paraglide/messages';
 
 	type Popup = {
 		id: string;
@@ -64,15 +65,15 @@
 				{#if popup.buttonText && popup.buttonLink}
 					<a
 						href={popup.buttonLink}
-						class="rounded-full bg-accent px-4 py-2 text-sm font-medium text-foreground-dark"
+						class="inline-flex h-12 items-center justify-center bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 					>
 						{popup.buttonText}
 					</a>
 				{/if}
 				<button
 					onclick={dismiss}
-					aria-label="Dismiss"
-					class="text-foreground/60 hover:text-foreground"
+					aria-label={m.common_dismiss()}
+					class="text-foreground/60 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 				>
 					<X class="h-5 w-5" />
 				</button>

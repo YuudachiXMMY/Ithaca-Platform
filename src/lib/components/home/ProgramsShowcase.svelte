@@ -49,7 +49,7 @@
 {#snippet cell(program: (typeof PROGRAMS)[number], large: boolean)}
 	<a
 		href={localizeHref(program.href)}
-		class="group relative flex h-full min-h-[180px] flex-col justify-end overflow-hidden bg-[#0a0c10] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent sm:min-h-[220px] md:min-h-[240px]"
+		class="group relative flex h-full min-h-[180px] flex-col justify-end overflow-hidden bg-[#0a0c10] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand sm:min-h-[220px] md:min-h-[240px]"
 	>
 		<enhanced:img
 			src={program.img}
@@ -87,7 +87,7 @@
 	</a>
 {/snippet}
 
-<section class="bg-[#0a0c10] py-8 md:py-10" aria-label="Our Programs">
+<section class="bg-[#0a0c10] py-8 md:py-10" aria-label={m.home_programs_ariaLabel()}>
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={24}>
 			<div class="mb-6">

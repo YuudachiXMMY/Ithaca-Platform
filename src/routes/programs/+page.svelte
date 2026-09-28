@@ -3,17 +3,24 @@
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 	import Seo from '$lib/components/Seo.svelte';
+	import Reveal from '$lib/components/shared/Reveal.svelte';
 	import { PROGRAM_CARDS, type ProgramCard } from '$lib/data/programs';
 
-	// Build-time enhanced images for the three cards that have photos.
+	// Build-time enhanced images for the program cards.
 	import evImg from '$lib/assets/programs/ev-challenge/EV26-5.jpg?enhanced';
 	import aiImg from '$lib/assets/programs/ai-entrepreneurship/AI-Entrep_81.jpg?enhanced';
 	import eliteImg from '$lib/assets/programs/ai-interview/carmi-levy.png?enhanced';
+	import engineeringImg from '$lib/assets/programs/ev-challenge/EV26-3.jpg?enhanced';
+	import summerWinterImg from '$lib/assets/programs/ai-camp/ai-camp-HB8A5065.jpg?enhanced';
+	import ithacaNightImg from '$lib/assets/programs/ai-entrepreneurship/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg?enhanced';
 
 	const IMAGES: Record<string, typeof evImg> = {
 		evTeam: evImg,
 		aiCamp: aiImg,
-		eliteInterview: eliteImg
+		eliteInterview: eliteImg,
+		engineering: engineeringImg,
+		summerWinter: summerWinterImg,
+		ithacaNight: ithacaNightImg
 	};
 
 	// Static key → message maps keep Paraglide tree-shaking (no dynamic m['..'+id]()).
@@ -42,13 +49,9 @@
 		ithacaNight: m.programs_index_cards_ithacaNight_description
 	};
 
-	// Bento grid + gradient presentation (ported from the Next page's lookup maps).
+	// Bento grid layout classes (ported from the Next page's lookup maps). Photo-less cards
+	// use a restrained deep base + brand hairline instead of an off-brand decorative gradient.
 	const GRID_CLASSES: Record<string, string> = { evTeam: 'lg:col-span-2' };
-	const CARD_GRADIENTS: Record<string, string> = {
-		engineering: 'bg-gradient-to-br from-cyan-950/60 via-slate-900/80 to-background',
-		summerWinter: 'bg-gradient-to-br from-violet-950/50 via-slate-900/80 to-background',
-		ithacaNight: 'bg-gradient-to-br from-rose-950/50 via-slate-900/80 to-background'
-	};
 
 	const topCards = PROGRAM_CARDS.slice(0, 4);
 	const stackedCards = PROGRAM_CARDS.slice(4);
@@ -75,11 +78,10 @@
 	{@const isFeatured = program.span === 'featured'}
 	{@const hasImage = Boolean(program.image)}
 	{@const gridClass = stacked ? '' : (GRID_CLASSES[program.id] ?? '')}
-	{@const gradientClass = CARD_GRADIENTS[program.id] ?? ''}
-	<div class={stacked ? 'min-h-0 flex-1' : `bento-card ${gridClass}`}>
+	<div class={stacked ? 'min-h-0 flex-1' : gridClass}>
 		<a
 			href={localizeHref(program.href)}
-			class="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card-bg transition-colors duration-300 hover:border-accent/40"
+			class="group flex h-full flex-col overflow-hidden border border-border bg-card-bg transition-colors duration-300 hover:border-brand/40 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand"
 		>
 			<div
 				class="relative shrink-0 overflow-hidden
@@ -89,7 +91,7 @@
 						? 'h-[240px] md:h-[300px]'
 						: 'h-[180px] md:h-[220px]'}
 					{isFeatured && !stacked ? 'lg:h-[360px]' : ''}
-					{!hasImage ? gradientClass : ''}"
+					{!hasImage ? 'bg-[#0a0c10]' : ''}"
 			>
 				{#if hasImage}
 					<enhanced:img
@@ -101,17 +103,18 @@
 						class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
 					/>
 				{:else}
+					<!-- Photo-less card: restrained deep base with a single brand hairline at the base
+					     edge (echoes the section hairline; no off-brand color, no dot-grid). -->
 					<div
-						class="absolute inset-0 opacity-[0.08]"
+						class="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-brand via-brand/40 to-transparent"
 						aria-hidden="true"
-						style="background-image: radial-gradient(circle 1px, currentColor 0%, transparent 100%); background-size: 24px 24px;"
 					></div>
 				{/if}
 			</div>
 
 			<div class="flex grow flex-col {stacked ? 'p-4' : 'p-5 md:p-6'}">
 				<h2
-					class="leading-tight font-bold tracking-tight text-foreground
+					class="leading-tight font-bold tracking-tight text-white
 						{stacked
 						? 'mb-2 text-sm md:text-base'
 						: isFeatured
@@ -122,15 +125,15 @@
 				</h2>
 
 				<span
-					class="inline-block w-fit rounded-full border border-accent/30 bg-accent/10 px-3 py-1 font-medium tracking-wide text-accent {stacked
-						? 'mb-2 text-[11px]'
-						: 'mb-3 text-xs'}"
+					class="inline-block w-fit border border-brand/30 px-3 py-1 font-mono tracking-[0.2em] text-brand-bright uppercase {stacked
+						? 'mb-2 text-[10px]'
+						: 'mb-3 text-[11px]'}"
 				>
 					{TAG[program.id]()}
 				</span>
 
 				<p
-					class="grow leading-relaxed text-foreground/55 {stacked
+					class="grow leading-relaxed text-white/60 {stacked
 						? 'mb-3 line-clamp-2 text-xs'
 						: 'mb-4 text-sm'}"
 				>
@@ -138,7 +141,7 @@
 				</p>
 
 				<span
-					class="inline-flex items-center gap-2 font-medium text-accent transition-all duration-300 group-hover:gap-3 {stacked
+					class="inline-flex items-center gap-2 font-medium text-brand-bright transition-all duration-300 group-hover:gap-3 {stacked
 						? 'text-xs'
 						: 'text-sm'}"
 				>
@@ -151,47 +154,47 @@
 {/snippet}
 
 <div class="min-h-screen bg-background">
-	<!-- Hero: Asymmetric Left-Aligned -->
-	<section class="relative px-6 pt-24 pb-16 md:px-12 md:pt-32 md:pb-20 lg:px-[8vw]">
-		<div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-			<div
-				class="absolute -top-[30%] right-[5%] h-[600px] w-[600px] rounded-full bg-accent/[0.04] blur-[120px]"
-			></div>
-			<div
-				class="absolute top-[20%] -left-[10%] h-[400px] w-[400px] rounded-full bg-accent/[0.03] blur-[100px]"
-			></div>
-		</div>
-
-		<div class="relative max-w-7xl">
-			<h1
-				class="mb-6 max-w-[14ch] text-4xl leading-[1.05] font-bold tracking-tighter text-foreground md:text-6xl lg:text-7xl"
-			>
-				{m.programs_index_title()}
-			</h1>
-			<div class="mb-6 flex items-center gap-6">
-				<div class="h-px w-16 shrink-0 bg-accent/40"></div>
-				<p class="max-w-[45ch] text-lg leading-relaxed text-foreground/55 md:text-xl">
+	<!-- Hero: editorial left-aligned — eyebrow + brand hairline over an airy light display head. -->
+	<section class="px-5 pt-24 pb-14 sm:px-8 md:px-[6vw] md:pt-36 md:pb-20">
+		<div class="max-w-[1400px]">
+			<Reveal y={24}>
+				<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+					{m.programs_index_heroEyebrow()}
+				</p>
+				<div
+					class="mt-5 h-px w-16 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+					aria-hidden="true"
+				></div>
+				<h1
+					class="mt-6 max-w-[16ch] text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-white"
+				>
+					{m.programs_index_title()}
+				</h1>
+				<p class="mt-6 max-w-[45ch] text-lg leading-relaxed text-white/60 md:text-xl">
 					{m.programs_index_subtitle()}
 				</p>
-			</div>
+			</Reveal>
 		</div>
 	</section>
 
-	<!-- Bento Grid -->
-	<section class="px-6 pb-24 md:px-12 md:pb-32 lg:px-[8vw]">
-		<div
-			class="grid max-w-7xl auto-rows-[minmax(260px,auto)] grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-3"
-		>
-			{#each topCards as program (program.id)}
-				{@render card(program, false)}
-			{/each}
-
-			<!-- Stacked pair: Summer/Winter + Ithaca Night -->
-			<div class="bento-card flex flex-col gap-4 md:gap-5">
-				{#each stackedCards as program (program.id)}
-					{@render card(program, true)}
+	<!-- Bento Grid: cells always render (SSR-safe); one Reveal fades the whole grid up on scroll,
+	     which keeps the col-span / auto-rows layout contract intact. -->
+	<section class="px-5 pb-14 sm:px-8 md:px-[6vw] md:pb-20">
+		<Reveal y={24}>
+			<div
+				class="grid max-w-[1400px] auto-rows-[minmax(260px,auto)] grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-3"
+			>
+				{#each topCards as program (program.id)}
+					{@render card(program, false)}
 				{/each}
+
+				<!-- Stacked pair: Summer/Winter + Ithaca Night -->
+				<div class="flex flex-col gap-4 md:gap-5">
+					{#each stackedCards as program (program.id)}
+						{@render card(program, true)}
+					{/each}
+				</div>
 			</div>
-		</div>
+		</Reveal>
 	</section>
 </div>

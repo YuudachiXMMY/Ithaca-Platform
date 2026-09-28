@@ -16,9 +16,9 @@
  */
 
 /* Colors — match globals.css theme (verbatim from EVModel3D.tsx:18-20). */
-export const ACCENT = '#ccdef0';
+export const ACCENT = '#3e8fc7';
 export const ACCENT_DIM = '#4a6a88';
-export const ACCENT_GLOW = '#e0eeff';
+export const ACCENT_GLOW = '#9cc4e8';
 
 type V3 = [number, number, number];
 

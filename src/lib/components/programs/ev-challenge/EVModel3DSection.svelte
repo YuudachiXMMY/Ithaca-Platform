@@ -220,7 +220,7 @@
 				class="relative z-10 flex min-h-[calc(80dvh_-_var(--nav-h))] flex-col justify-between px-6 pt-[calc(var(--nav-h)_+_1rem)] pb-8 md:px-12 md:pb-12 lg:px-[8vw]"
 			>
 				<div>
-					<h2 class="text-3xl font-bold tracking-tighter text-foreground md:text-4xl lg:text-5xl">
+					<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl">
 						{m.programs_evChallenge_model3d_machineName()}
 					</h2>
 					<p class="mt-2 max-w-[30ch] text-sm text-foreground/40">
@@ -242,7 +242,7 @@
 
 		<div class="relative overflow-hidden">
 			<h2
-				class="px-6 pt-10 pb-8 text-center text-2xl font-bold tracking-tighter text-foreground md:text-3xl lg:text-4xl"
+				class="px-6 pt-10 pb-8 text-center text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl"
 			>
 				{m.programs_evChallenge_model3d_twoTracksTitle()}
 			</h2>
@@ -251,7 +251,7 @@
 					<div class="dissolve-panel-eng absolute inset-0"></div>
 					<div class="relative z-10 px-6 py-8 md:px-12 lg:py-16 lg:pr-20 lg:pl-[8vw]">
 						<span
-							class="mb-3 block font-mono text-[10px] tracking-[0.25em] text-accent/30 uppercase"
+							class="mb-3 block font-mono text-[10px] tracking-[0.25em] text-brand-bright uppercase"
 						>
 							{m.programs_evChallenge_model3d_trackA()}
 						</span>
@@ -263,9 +263,7 @@
 						</p>
 						<div class="flex flex-wrap gap-1.5">
 							{#each ENG_TAGS as tag, i (i)}
-								<span
-									class="rounded-full border border-accent/10 bg-accent/8 px-2.5 py-1 text-[11px] text-accent/60"
-								>
+								<span class="border border-brand/30 px-2.5 py-1 text-[11px] text-brand-bright">
 									{tag}
 								</span>
 							{/each}
@@ -279,7 +277,7 @@
 					>
 						<div class="lg:max-w-[400px]">
 							<span
-								class="mb-3 block font-mono text-[10px] tracking-[0.25em] text-accent/30 uppercase"
+								class="mb-3 block font-mono text-[10px] tracking-[0.25em] text-brand-bright uppercase"
 							>
 								{m.programs_evChallenge_model3d_trackB()}
 							</span>
@@ -291,9 +289,7 @@
 							</p>
 							<div class="flex flex-wrap gap-1.5">
 								{#each BIZ_TAGS as tag, i (i)}
-									<span
-										class="rounded-full border border-accent/10 bg-accent/8 px-2.5 py-1 text-[11px] text-accent/60"
-									>
+									<span class="border border-brand/30 px-2.5 py-1 text-[11px] text-brand-bright">
 										{tag}
 									</span>
 								{/each}
@@ -336,7 +332,7 @@
 			class="pointer-events-none absolute inset-x-0 top-[var(--nav-h)] bottom-0 z-10 flex flex-col justify-between px-6 py-4 md:px-12 md:py-8 lg:px-[8vw]"
 		>
 			<div bind:this={machineHeadEl}>
-				<h2 class="text-3xl font-bold tracking-tighter text-foreground md:text-4xl lg:text-5xl">
+				<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl">
 					{m.programs_evChallenge_model3d_machineName()}
 				</h2>
 				<p class="mt-2 max-w-[30ch] text-sm text-foreground/40">
@@ -369,7 +365,7 @@
 				bind:this={tracksHeadEl}
 				class="absolute top-20 right-0 left-0 z-30 px-6 text-center lg:top-28"
 			>
-				<h2 class="text-2xl font-bold tracking-tighter text-foreground md:text-3xl lg:text-4xl">
+				<h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
 					{m.programs_evChallenge_model3d_twoTracksTitle()}
 				</h2>
 			</div>
@@ -381,7 +377,7 @@
 					<div
 						class="relative z-10 flex h-full flex-col justify-center px-6 py-6 pt-28 md:px-12 md:pt-36 lg:py-0 lg:pt-[max(10rem,12vh)] lg:pr-28 lg:pl-[8vw]"
 					>
-						<span class="mb-3 font-mono text-[10px] tracking-[0.25em] text-accent/30 uppercase">
+						<span class="mb-3 font-mono text-[10px] tracking-[0.25em] text-brand-bright uppercase">
 							{m.programs_evChallenge_model3d_trackA()}
 						</span>
 						<h3
@@ -396,9 +392,7 @@
 						</p>
 						<div class="flex flex-wrap gap-1.5">
 							{#each ENG_TAGS as tag, i (i)}
-								<span
-									class="rounded-full border border-accent/10 bg-accent/8 px-2.5 py-1 text-[11px] text-accent/60"
-								>
+								<span class="border border-brand/30 px-2.5 py-1 text-[11px] text-brand-bright">
 									{tag}
 								</span>
 							{/each}
@@ -414,7 +408,7 @@
 					>
 						<div class="lg:max-w-[400px]">
 							<span
-								class="mb-2 block font-mono text-[10px] tracking-[0.25em] text-accent/30 uppercase md:mb-3"
+								class="mb-2 block font-mono text-[10px] tracking-[0.25em] text-brand-bright uppercase md:mb-3"
 							>
 								{m.programs_evChallenge_model3d_trackB()}
 							</span>
@@ -430,9 +424,7 @@
 							</p>
 							<div class="flex flex-wrap gap-1.5">
 								{#each BIZ_TAGS as tag, i (i)}
-									<span
-										class="rounded-full border border-accent/10 bg-accent/8 px-2.5 py-1 text-[11px] text-accent/60"
-									>
+									<span class="border border-brand/30 px-2.5 py-1 text-[11px] text-brand-bright">
 										{tag}
 									</span>
 								{/each}
@@ -449,7 +441,7 @@
 			>
 				<div
 					class="w-px flex-1"
-					style="background: linear-gradient(to bottom, transparent 15%, rgba(204,222,240,0.2) 35%, rgba(204,222,240,0.35) 50%, rgba(204,222,240,0.2) 65%, transparent 85%);"
+					style="background: linear-gradient(to bottom, transparent 15%, rgba(62,143,199,0.2) 35%, rgba(62,143,199,0.35) 50%, rgba(62,143,199,0.2) 65%, transparent 85%);"
 				></div>
 			</div>
 
@@ -459,7 +451,7 @@
 			>
 				<div
 					class="h-full w-full"
-					style="background: radial-gradient(ellipse at center, rgba(204,222,240,0.04), transparent 70%);"
+					style="background: radial-gradient(ellipse at center, rgba(62,143,199,0.04), transparent 70%);"
 				></div>
 			</div>
 		</div>

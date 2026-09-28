@@ -41,15 +41,25 @@
 	];
 </script>
 
-<section class="bg-[#0c0e12] py-20 lg:py-28" aria-labelledby="outcomes-heading">
-	<div class="mx-auto max-w-[1400px] px-4 lg:px-6">
+<section class="bg-[#0c0e12] py-14 md:py-20" aria-labelledby="outcomes-heading">
+	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<!-- Section heading -->
 		<Reveal y={20} duration={500}>
 			<div>
-				<h2 id="outcomes-heading" class="text-2xl font-bold tracking-tight text-white md:text-4xl">
+				<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+					{m.about_outcomes_eyebrow()}
+				</p>
+				<h2
+					id="outcomes-heading"
+					class="mt-4 text-2xl font-bold tracking-tight text-white md:text-4xl"
+				>
 					{m.about_outcomes_heading()}
 				</h2>
-				<p class="mt-3 max-w-[56ch] text-base leading-relaxed text-gray-400">
+				<div
+					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+					aria-hidden="true"
+				></div>
+				<p class="mt-6 max-w-[56ch] text-base leading-relaxed text-white/60">
 					{m.about_outcomes_subtitle()}
 				</p>
 			</div>
@@ -59,7 +69,7 @@
 		<div class="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2">
 			{#each featured as outcome, i (outcome.title)}
 				<Reveal y={24} duration={500} delay={i * 80}>
-					<div class="group relative overflow-hidden rounded-lg">
+					<div class="group relative overflow-hidden">
 						<div class="relative aspect-[3/2]">
 							<enhanced:img
 								src={outcome.image}
@@ -93,12 +103,12 @@
 			{#each compact as outcome, i (outcome.num)}
 				<Reveal y={16} duration={400} delay={i * 60}>
 					<div class="flex gap-4 border-t border-white/[0.08] py-6">
-						<span class="shrink-0 pt-0.5 font-mono text-sm font-medium text-[#ccdef0]/40">
+						<span class="shrink-0 pt-0.5 font-mono text-sm font-medium tracking-[0.2em] text-brand">
 							{outcome.num}
 						</span>
 						<div>
 							<h3 class="text-base font-semibold text-white">{outcome.title()}</h3>
-							<p class="mt-1.5 text-sm leading-relaxed text-gray-400">
+							<p class="mt-1.5 text-sm leading-relaxed text-white/60">
 								{outcome.description()}
 							</p>
 						</div>

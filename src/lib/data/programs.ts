@@ -8,7 +8,7 @@ export interface ProgramCard {
 	 * Source asset path relative to public/media/images (mirror of $lib/assets).
 	 * The build-time `?enhanced` import is resolved in the page (enhanced-img needs
 	 * a static specifier); this string documents the source and drives the id→image map.
-	 * Omitted for gradient-only cards.
+	 * Omitted for photo-less cards (rendered with a deep base + brand hairline).
 	 */
 	readonly image?: string;
 	readonly imageAlt: string;
@@ -42,18 +42,21 @@ export const PROGRAM_CARDS: readonly ProgramCard[] = [
 	{
 		id: 'engineering',
 		href: '/programs/engineering-projects',
+		image: 'programs/ev-challenge/EV26-3.jpg',
 		imageAlt: 'Engineering Projects',
 		span: 'compact'
 	},
 	{
 		id: 'summerWinter',
 		href: '/programs/summer-winter-camps',
+		image: 'programs/ai-camp/ai-camp-HB8A5065.jpg',
 		imageAlt: 'Summer and Winter Camps',
 		span: 'compact'
 	},
 	{
 		id: 'ithacaNight',
 		href: '/programs/ithaca-night',
+		image: 'programs/ai-entrepreneurship/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg',
 		imageAlt: 'Ithaca Night community event',
 		span: 'compact'
 	}

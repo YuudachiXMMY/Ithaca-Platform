@@ -27,18 +27,25 @@
 	];
 </script>
 
-<section class="bg-[#111318] py-12 lg:py-16" aria-labelledby="mission-heading">
-	<div class="mx-auto max-w-[1400px] px-4 lg:px-6">
+<section class="bg-[#111318] py-14 md:py-20" aria-labelledby="mission-heading">
+	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<!-- Section heading -->
 		<Reveal y={20} duration={500}>
-			<div class="mb-10 flex flex-col gap-3 lg:mb-14">
+			<div class="mb-10 lg:mb-14">
+				<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+					{m.about_mission_eyebrow()}
+				</p>
 				<h2
 					id="mission-heading"
-					class="text-2xl leading-tight font-bold tracking-tight text-white md:text-4xl"
+					class="mt-6 text-2xl leading-tight font-bold tracking-tight text-white md:text-4xl"
 				>
 					{m.about_mission_heading()}
 				</h2>
-				<p class="max-w-xl text-base leading-relaxed text-gray-400">
+				<div
+					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+					aria-hidden="true"
+				></div>
+				<p class="mt-6 max-w-xl text-base leading-relaxed text-white/60">
 					{m.about_mission_subtitle()}
 				</p>
 			</div>
@@ -52,7 +59,7 @@
 					<div class="grid grid-cols-1 items-center gap-6 lg:grid-cols-2 lg:gap-10">
 						<!-- Image block -->
 						<div
-							class="relative aspect-[4/3] overflow-hidden rounded-lg {imageFirst
+							class="relative aspect-[4/3] overflow-hidden {imageFirst
 								? 'lg:order-1'
 								: 'lg:order-2'}"
 						>
@@ -70,7 +77,7 @@
 							<h3 class="text-xl leading-tight font-bold text-white md:text-2xl">
 								{block.title()}
 							</h3>
-							<p class="mt-3 max-w-lg text-base leading-relaxed text-gray-400">
+							<p class="mt-3 max-w-lg text-base leading-relaxed text-white/60">
 								{block.description()}
 							</p>
 						</div>

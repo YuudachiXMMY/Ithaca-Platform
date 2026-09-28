@@ -242,7 +242,7 @@
 				class="grid auto-rows-[160px] grid-cols-2 gap-2 md:auto-rows-[200px] md:grid-cols-3 lg:auto-rows-[240px]"
 			>
 				{#each PHOTOS as photo, i (i)}
-					<div class="relative overflow-hidden rounded-sm {photo.span}">
+					<div class="relative overflow-hidden {photo.span}">
 						<enhanced:img
 							src={photo.src}
 							alt={photo.alt}
@@ -261,7 +261,7 @@
 
 		<div class="relative px-6 md:px-12 lg:px-[8vw]">
 			<h2
-				class="mb-16 text-3xl font-bold tracking-tighter text-foreground md:mb-24 md:text-4xl lg:text-5xl"
+				class="mb-16 text-3xl font-bold tracking-tight text-foreground md:mb-24 md:text-4xl lg:text-5xl"
 			>
 				{m.programs_evChallenge_workshopToRoles_rolesTitle()}
 			</h2>
@@ -270,10 +270,10 @@
 					{#each ROLES_LEFT as role, i (i)}
 						{@const Icon = role.icon}
 						<div
-							class="group cursor-default rounded-sm border border-border p-8 transition-colors hover:border-accent/40 hover:bg-foreground/[0.02] lg:p-10"
+							class="group cursor-default border border-border p-8 transition-colors hover:border-brand/40 hover:bg-foreground/[0.02] lg:p-10"
 						>
 							<Icon
-								class="mb-6 h-8 w-8 text-accent/50 transition-colors group-hover:text-accent lg:h-10 lg:w-10"
+								class="mb-6 h-8 w-8 text-brand transition-colors group-hover:text-brand-bright lg:h-10 lg:w-10"
 								strokeWidth={1.5}
 							/>
 							<h3 class="mb-3 text-base font-semibold text-foreground lg:text-lg">
@@ -289,10 +289,10 @@
 					{#each ROLES_RIGHT as role, i (i)}
 						{@const Icon = role.icon}
 						<div
-							class="group cursor-default rounded-sm border border-border p-8 transition-colors hover:border-accent/40 hover:bg-foreground/[0.02] lg:p-10"
+							class="group cursor-default border border-border p-8 transition-colors hover:border-brand/40 hover:bg-foreground/[0.02] lg:p-10"
 						>
 							<Icon
-								class="mb-6 h-8 w-8 text-accent/50 transition-colors group-hover:text-accent lg:h-10 lg:w-10"
+								class="mb-6 h-8 w-8 text-brand transition-colors group-hover:text-brand-bright lg:h-10 lg:w-10"
 								strokeWidth={1.5}
 							/>
 							<h3 class="mb-3 text-base font-semibold text-foreground lg:text-lg">
@@ -314,7 +314,7 @@
 			<!-- Layer 1: workshop photos (scatter on scroll). -->
 			<div class="absolute inset-0 flex flex-col justify-center px-6 py-8 md:px-12 lg:px-[8vw]">
 				<h2
-					class="wtr-h-out mb-6 text-3xl font-bold tracking-tighter text-foreground md:mb-10 md:text-4xl lg:text-5xl"
+					class="wtr-h-out mb-6 text-3xl font-bold tracking-tight text-foreground md:mb-10 md:text-4xl lg:text-5xl"
 				>
 					{m.programs_evChallenge_workshopToRoles_workshopTitle()}
 				</h2>
@@ -322,9 +322,7 @@
 					class="grid auto-rows-[120px] grid-cols-2 gap-2 md:auto-rows-[170px] md:grid-cols-3 lg:auto-rows-[210px]"
 				>
 					{#each PHOTOS as photo, i (i)}
-						<div
-							class="wtr-photo relative overflow-hidden rounded-sm will-change-transform {photo.span}"
-						>
+						<div class="wtr-photo relative overflow-hidden will-change-transform {photo.span}">
 							<enhanced:img
 								src={photo.src}
 								alt={photo.alt}
@@ -348,7 +346,7 @@
 				></div>
 
 				<h2
-					class="wtr-h-in relative mb-4 text-2xl font-bold tracking-tighter text-foreground md:mb-12 md:text-4xl lg:mb-16 lg:text-5xl"
+					class="wtr-h-in relative mb-4 text-2xl font-bold tracking-tight text-foreground md:mb-12 md:text-4xl lg:mb-16 lg:text-5xl"
 				>
 					{m.programs_evChallenge_workshopToRoles_rolesTitle()}
 				</h2>
@@ -358,10 +356,10 @@
 						{#each ROLES_LEFT as role, i (i)}
 							{@const Icon = role.icon}
 							<div
-								class="wtr-card group cursor-default rounded-sm border border-border p-3 transition-colors will-change-transform hover:border-accent/40 hover:bg-foreground/[0.02] md:p-8 lg:p-10"
+								class="wtr-card group cursor-default border border-border p-3 transition-colors will-change-transform hover:border-brand/40 hover:bg-foreground/[0.02] md:p-8 lg:p-10"
 							>
 								<Icon
-									class="mb-2 h-5 w-5 text-accent/50 transition-colors group-hover:text-accent md:mb-5 md:h-8 md:w-8 lg:mb-6 lg:h-10 lg:w-10"
+									class="mb-2 h-5 w-5 text-brand transition-colors group-hover:text-brand-bright md:mb-5 md:h-8 md:w-8 lg:mb-6 lg:h-10 lg:w-10"
 									strokeWidth={1.5}
 								/>
 								<h3
@@ -382,10 +380,10 @@
 						{#each ROLES_RIGHT as role, i (i)}
 							{@const Icon = role.icon}
 							<div
-								class="wtr-card group cursor-default rounded-sm border border-border p-3 transition-colors will-change-transform hover:border-accent/40 hover:bg-foreground/[0.02] md:p-8 lg:p-10"
+								class="wtr-card group cursor-default border border-border p-3 transition-colors will-change-transform hover:border-brand/40 hover:bg-foreground/[0.02] md:p-8 lg:p-10"
 							>
 								<Icon
-									class="mb-2 h-5 w-5 text-accent/50 transition-colors group-hover:text-accent md:mb-5 md:h-8 md:w-8 lg:mb-6 lg:h-10 lg:w-10"
+									class="mb-2 h-5 w-5 text-brand transition-colors group-hover:text-brand-bright md:mb-5 md:h-8 md:w-8 lg:mb-6 lg:h-10 lg:w-10"
 									strokeWidth={1.5}
 								/>
 								<h3

@@ -31,7 +31,7 @@
 
 <section
 	class="bg-[#0a0c10] py-20 md:py-28"
-	aria-label="Impact"
+	aria-label={m.home_impact_ariaLabel()}
 	use:inview={{ threshold: 0.2 }}
 	oninview={start}
 >
