@@ -1,8 +1,5 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
-	import { onMount } from 'svelte';
-	import { prefersReducedMotion } from 'svelte/motion';
-	import { runGsapOnMount } from '$lib/motion/gsap-lifecycle';
 	import type { Picture } from 'vite-imagetools';
 	import img189 from '$lib/assets/highlights/wechat-img-189.jpg?enhanced';
 	import ev5 from '$lib/assets/programs/ev-challenge/EV25-5s.png?enhanced';
@@ -11,10 +8,10 @@
 	import img197 from '$lib/assets/highlights/wechat-img-197.jpg?enhanced';
 	import appImg from '$lib/assets/programs/app.png?enhanced';
 
-	// Tier-2 GSAP horizontal-scroll pin on md+ (StudentHighlights.tsx:203-247), layered on
-	// top of the static overflow-x-auto strip below. Under `prefersReducedMotion.current` OR
-	// viewport < 768px we early-return from onMount → the wrapper stays `overflow-x-auto`
-	// (the Phase-1 native-scroll form) and the mobile 2-col grid is untouched.
+	// Mobile: a 2-col grid. Desktop: a NATIVE horizontal scroll-snap mosaic (overflow-x-auto).
+	// The former build hijacked page scroll with a GSAP horizontal-pin whose trigger position
+	// drifted behind the other pinned/sticky sections — so the strip flashed in, jumped, then
+	// re-appeared. Native scroll can't drift: no pin, no progress-scrub, no overflow toggling.
 	interface Highlight {
 		img: Picture;
 		title: () => string;
@@ -79,54 +76,14 @@
 		{ type: 'hero', index: 3, width: 440 },
 		{ type: 'stack', indices: [4, 5], width: 380, split: ['58%', '42%'] }
 	];
-
-	// Desktop horizontal-pin refs. `animate` flips the wrapper overflow (auto → hidden)
-	// only once GSAP has actually taken over, so SSR/reduced/mobile keep native scroll.
-	let wrapEl: HTMLDivElement | undefined = $state();
-	let trackEl: HTMLDivElement | undefined = $state();
-	let progressEl: HTMLDivElement | undefined = $state();
-	let animate = $state(false);
-
-	onMount(() => {
-		// Reduced motion OR mobile → keep the static overflow-x-auto strip (Phase-1 form).
-		if (prefersReducedMotion.current || window.innerWidth < 768) return;
-
-		return runGsapOnMount(
-			// Dynamic GSAP import failed → keep the static overflow-x-auto strip (Phase-1 form).
-			'[StudentHighlights] GSAP failed to load; using native scroll fallback',
-			(gsap) => {
-				if (!wrapEl || !trackEl) return;
-				animate = true;
-
-				return gsap.context(() => {
-					const distance = trackEl!.scrollWidth - window.innerWidth;
-
-					const tl = gsap.timeline({
-						scrollTrigger: {
-							trigger: wrapEl,
-							start: 'top top',
-							end: () => `+=${distance}`,
-							pin: true,
-							scrub: 1,
-							invalidateOnRefresh: true
-						}
-					});
-
-					// Pan the mosaic track left by its overflow width; fill the progress bar in sync.
-					tl.to(trackEl!, { x: -distance, ease: 'none' }, 0);
-					tl.to(progressEl!, { scaleX: 1, ease: 'none' }, 0);
-				}, wrapEl);
-			}
-		);
-	});
 </script>
 
-{#snippet cell(highlight: Highlight, index: number, showDescription: boolean)}
+{#snippet cell(highlight: Highlight, index: number, showDescription: boolean, widthPx: number)}
 	<article class="group absolute inset-0 overflow-hidden">
 		<enhanced:img
 			src={highlight.img}
 			alt={highlight.alt()}
-			sizes="(min-width: 768px) 520px, 50vw"
+			sizes="(min-width: 768px) {widthPx}px, 50vw"
 			loading="lazy"
 			class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
 		/>
@@ -144,7 +101,9 @@
 		</span>
 
 		<div class="absolute inset-x-0 bottom-0 p-3 md:p-4">
-			<span class="font-mono text-[10px] tracking-[0.18em] text-accent/70 uppercase md:text-[9px]">
+			<span
+				class="font-mono text-[10px] tracking-[0.18em] text-brand-bright uppercase md:text-[9px]"
+			>
 				{highlight.tag()}
 			</span>
 			<h3 class="mt-1 text-sm leading-tight font-bold text-white md:text-sm">
@@ -170,76 +129,63 @@
 		<div class="grid grid-cols-2 gap-[2px] px-5 py-2 sm:px-8">
 			{#each HIGHLIGHTS as h, i (i)}
 				<div class="relative overflow-hidden {i < 2 ? 'aspect-[3/4]' : 'aspect-square'}">
-					{@render cell(h, i, i < 2)}
+					{@render cell(h, i, i < 2, 260)}
 				</div>
 			{/each}
 		</div>
 	</div>
 
-	<!-- Desktop: data-strip + horizontal mosaic (md+); overflow-x-auto until GSAP pins -->
-	<div class="hidden md:block">
+	<!-- Desktop: data-strip header + native horizontal scroll-snap mosaic (md+) -->
+	<div class="hidden bg-[#0e1015] md:block">
+		<!-- Compact data-strip header -->
+		<div class="px-5 sm:px-8 md:px-[6vw]">
+			<div class="flex items-end justify-between border-b border-white/[0.06] pt-16 pb-3">
+				<h2 class="text-xl font-bold tracking-tight text-white md:text-3xl">
+					{m.home_highlights_heading()}
+				</h2>
+				<p class="max-w-xs text-right text-[11px] leading-relaxed text-white/30">
+					{m.home_highlights_subheading()}
+				</p>
+			</div>
+			<div class="flex gap-6 overflow-x-auto py-2.5">
+				{#each HIGHLIGHTS as h, i (i)}
+					<span class="shrink-0 font-mono text-[9px] tracking-[0.15em] text-white/20 uppercase">
+						{String(i + 1).padStart(2, '0')}
+						{h.tag()}
+					</span>
+				{/each}
+			</div>
+		</div>
+
+		<!-- Native horizontal scroll-snap track (no GSAP pin). tabindex+role make the overflow
+		     region keyboard-scrollable (WCAG 2.1.1 / axe scrollable-region-focusable) since the
+		     cells are non-interactive. -->
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 		<div
-			bind:this={wrapEl}
-			class="relative bg-[#0e1015] {animate ? 'overflow-hidden' : 'overflow-x-auto'}"
+			role="group"
+			tabindex="0"
+			aria-label={m.home_highlights_heading()}
+			class="flex h-[min(70vh,560px)] snap-x snap-proximity items-stretch gap-[2px] overflow-x-auto px-5 pb-6 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent sm:px-8 md:px-[6vw]"
 		>
-			<div class="flex h-[100dvh] flex-col pt-18">
-				<!-- Compact data-strip header -->
-				<div class="shrink-0 px-5 sm:px-8 md:px-[6vw]">
-					<div class="flex items-end justify-between border-b border-white/[0.06] pt-4 pb-3">
-						<h2 class="text-xl font-bold tracking-tight text-white md:text-3xl">
-							{m.home_highlights_heading()}
-						</h2>
-						<p class="max-w-xs text-right text-[11px] leading-relaxed text-white/30">
-							{m.home_highlights_subheading()}
-						</p>
+			{#each COLUMNS as col, ci (ci)}
+				{#if col.type === 'hero'}
+					<div class="relative shrink-0 snap-start" style="width: {col.width}px">
+						{@render cell(HIGHLIGHTS[col.index], col.index, true, col.width)}
 					</div>
-					<div class="flex gap-6 overflow-x-auto py-2.5">
-						{#each HIGHLIGHTS as h, i (i)}
-							<span class="shrink-0 font-mono text-[9px] tracking-[0.15em] text-white/20 uppercase">
-								{String(i + 1).padStart(2, '0')}
-								{h.tag()}
-							</span>
-						{/each}
+				{:else}
+					<div class="flex shrink-0 snap-start flex-col gap-[2px]" style="width: {col.width}px">
+						<div class="relative overflow-hidden" style="flex-basis: {col.split[0]}; flex-grow: 1">
+							{@render cell(HIGHLIGHTS[col.indices[0]], col.indices[0], false, col.width)}
+						</div>
+						<div class="relative overflow-hidden" style="flex-basis: {col.split[1]}; flex-grow: 1">
+							{@render cell(HIGHLIGHTS[col.indices[1]], col.indices[1], false, col.width)}
+						</div>
 					</div>
-				</div>
+				{/if}
+			{/each}
 
-				<!-- Horizontal mosaic track -->
-				<div
-					bind:this={trackEl}
-					class="flex flex-1 items-stretch gap-[2px] px-5 pb-2 sm:px-8 md:px-[6vw]"
-				>
-					{#each COLUMNS as col, ci (ci)}
-						{#if col.type === 'hero'}
-							<div class="relative shrink-0" style="width: {col.width}px">
-								{@render cell(HIGHLIGHTS[col.index], col.index, true)}
-							</div>
-						{:else}
-							<div class="flex shrink-0 flex-col gap-[2px]" style="width: {col.width}px">
-								<div
-									class="relative overflow-hidden"
-									style="flex-basis: {col.split[0]}; flex-grow: 1"
-								>
-									{@render cell(HIGHLIGHTS[col.indices[0]], col.indices[0], false)}
-								</div>
-								<div
-									class="relative overflow-hidden"
-									style="flex-basis: {col.split[1]}; flex-grow: 1"
-								>
-									{@render cell(HIGHLIGHTS[col.indices[1]], col.indices[1], false)}
-								</div>
-							</div>
-						{/if}
-					{/each}
-
-					<!-- Trailing spacer -->
-					<div class="w-[20vw] shrink-0" aria-hidden="true"></div>
-				</div>
-			</div>
-
-			<!-- Thin progress indicator (GSAP fills scaleX 0 → 1 while pinned) -->
-			<div class="absolute inset-x-0 bottom-0 h-[2px] bg-white/[0.04]">
-				<div bind:this={progressEl} class="h-full w-full origin-left scale-x-0 bg-accent/40"></div>
-			</div>
+			<!-- Trailing spacer so the last column can clear the right edge -->
+			<div class="w-[2vw] shrink-0" aria-hidden="true"></div>
 		</div>
 	</div>
 </section>

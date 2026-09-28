@@ -57,12 +57,12 @@
 						{/if}
 					</p>
 					<div
-						class="mx-auto mt-3 h-px w-12 bg-accent/40"
+						class="mx-auto mt-3 h-px w-12 bg-brand/50"
 						style={prefersReducedMotion.current
 							? undefined
 							: `transform:scaleX(${started ? 1 : 0});transform-origin:center;transition:transform 0.5s cubic-bezier(0.33,1,0.68,1) ${i * 250 + 400}ms`}
 					></div>
-					<p class="mt-3 text-sm font-semibold text-accent/70">{stat.label()}</p>
+					<p class="mt-3 text-sm font-semibold text-brand-bright">{stat.label()}</p>
 					<p class="mt-1.5 text-xs leading-relaxed text-white/35">{stat.detail()}</p>
 				</div>
 			{/each}

@@ -10,8 +10,11 @@
 		title: string;
 		/** CSS padding-top that sets the box aspect ratio, e.g. '56.25%' (16:9) or '177.78%' (9:16). */
 		aspectPadding: string;
+		/** iframe loading strategy. Omit for eager (browser default) so existing embeds stay
+		 *  byte-identical; pass 'lazy' to defer the player fetch on below-the-fold embeds. */
+		loading?: 'lazy' | 'eager';
 	}
-	let { videoId, title, aspectPadding }: Props = $props();
+	let { videoId, title, aspectPadding, loading }: Props = $props();
 </script>
 
 <div
@@ -23,6 +26,7 @@
 		class="absolute inset-0 h-full w-full"
 		allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
 		referrerpolicy="strict-origin-when-cross-origin"
+		{loading}
 		{title}
 	></iframe>
 </div>

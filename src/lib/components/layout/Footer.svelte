@@ -98,7 +98,7 @@
 		<!-- Bottom bar -->
 		<div class="mt-4 border-t border-border pt-4">
 			<div
-				class="flex flex-col items-center gap-3 text-xs text-foreground/40 sm:flex-row sm:justify-between"
+				class="flex flex-col items-center gap-3 text-xs text-foreground/60 sm:flex-row sm:justify-between"
 			>
 				<p>&copy; {currentYear} Ithaca Family Academy. {m.common_footer_rights()}</p>
 				<div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
