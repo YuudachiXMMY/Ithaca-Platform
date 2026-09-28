@@ -23,8 +23,8 @@
 		<Reveal y={20} delay={120}>
 			<div class="mt-8 grid gap-6 md:grid-cols-[auto_1fr] md:items-start md:gap-10">
 				<div class="shrink-0">
-					<div class="mb-3 h-px w-10 bg-accent/30" aria-hidden="true"></div>
-					<p class="text-[11px] font-semibold tracking-[0.2em] text-accent uppercase">
+					<div class="mb-3 h-px w-10 bg-brand/40" aria-hidden="true"></div>
+					<p class="text-[11px] font-semibold tracking-[0.2em] text-brand-bright uppercase">
 						{m.home_featured_eyebrow()}
 					</p>
 					<h2 class="mt-2 text-xl font-bold text-white md:text-2xl">{m.home_featured_title()}</h2>

@@ -3,36 +3,22 @@ import { render } from 'svelte/server';
 import * as m from '$lib/paraglide/messages';
 import HeroSection from './HeroSection.svelte';
 
-// Regression guard for the homepage rewrite.
+// Regression guard for the homepage rewrite + the mission-showcase refactor.
 //
-// The empowerment tagline is the page's single <h1> and must appear EXACTLY ONCE. The
-// pre-rewrite hero rendered it twice — once as a GSAP scroll-revealed
-// `<p class="hero-empowerment-text">` and again as the static <h1> below — so on screen the
-// sentence showed up duplicated. These tests lock the dedup: one <h1>, no scroll-revealed copy.
-
-function count(haystack: string, needle: string): number {
-	if (!needle) return 0;
-	let n = 0;
-	let i = haystack.indexOf(needle);
-	while (i !== -1) {
-		n++;
-		i = haystack.indexOf(needle, i + needle.length);
-	}
-	return n;
-}
+// The empowerment tagline (the page's single <h1>) was RELOCATED into MissionSection's
+// "Our Mission" spread. The hero is now a pure poster + Cavafy quote + CTA unit: it must
+// carry NO <h1>, and must not render the empowerment sentence (that would duplicate the h1).
 
 describe('HeroSection', () => {
-	it('renders the empowerment tagline exactly once', () => {
-		const { body } = render(HeroSection);
-		expect(count(body, m.home_hero_empowerment())).toBe(1);
-	});
-
-	it('carries the empowerment tagline as the single <h1>', () => {
+	it('renders no <h1> (the single <h1> now lives in MissionSection)', () => {
 		const { body } = render(HeroSection);
 		const h1s = body.match(/<h1[\s>]/g) ?? [];
-		expect(h1s).toHaveLength(1);
-		const h1 = body.match(/<h1[\s\S]*?<\/h1>/)?.[0] ?? '';
-		expect(h1).toContain(m.home_hero_empowerment());
+		expect(h1s).toHaveLength(0);
+	});
+
+	it('does not render the empowerment tagline (moved to MissionSection)', () => {
+		const { body } = render(HeroSection);
+		expect(body).not.toContain(m.home_hero_empowerment());
 	});
 
 	it('drops the duplicated GSAP scroll-revealed copy', () => {

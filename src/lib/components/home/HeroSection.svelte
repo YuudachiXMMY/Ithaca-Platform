@@ -62,7 +62,7 @@
 			<div class="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
 				<a
 					href={localizeHref('/programs')}
-					class="inline-flex h-12 items-center justify-center bg-accent px-8 text-sm font-semibold tracking-wide text-foreground-dark transition-all duration-200 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:translate-y-px active:scale-[0.97]"
+					class="inline-flex h-12 items-center justify-center bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 				>
 					{m.home_hero_ctaPrograms()}
 				</a>
@@ -77,14 +77,8 @@
 	</div>
 </section>
 
-<!-- The page's single <h1>: the empowerment statement. Rendered once (the old cinematic
-     scroll-revealed duplicate is gone). -->
-<div class="bg-[#111318] px-5 py-24 sm:px-8 md:px-[6vw]">
-	<div class="mb-8 h-px w-16 bg-accent" aria-hidden="true"></div>
-	<h1 class="max-w-4xl text-2xl leading-snug font-bold text-white md:text-4xl lg:text-5xl">
-		{m.home_hero_empowerment()}
-	</h1>
-</div>
+<!-- The empowerment statement (the page's single <h1>) now lives in MissionSection as the
+     "Our Mission" showcase spread, so the hero stays a pure poster + Cavafy quote + CTA unit. -->
 
 <style>
 	/* Hero quote mask-reveal. Pure CSS (no Svelte transition) so it runs during initial render

@@ -11,6 +11,16 @@
 	--card-bg: #181b21;
 	--border: #252830;
 
+	/* Brand color — logo-derived cerulean (static/media/images/site/logo.png).
+	   Deployed on the HOMEPAGE; other pages keep --accent until a later rollout.
+	   All values WCAG AA on --background #111318: brand 5.27:1 (text), brand-bright
+	   7.00:1 (text), white on action 5.51:1, white on action-hover 6.96:1.
+	   Discipline: brand TEXT must be full-opacity (brand/70 = 3.19, brand/50 = 2.21). */
+	--brand: #3e8fc7; /* signature: hairlines, icons, numbers, mission rule, focus rings */
+	--brand-bright: #5aa6db; /* eyebrows / labels / small text — full opacity only */
+	--action: #2a6ca8; /* solid CTA fill, white text */
+	--action-hover: #215c93; /* CTA hover (deepens) */
+
 	/* Font families — sourced from Fontsource (@fontsource/outfit) instead of next/font.
 	   Noto Sans SC is NOT loaded in Phase 0 (gated to /zh in Phase 1); the family name
 	   is still declared so the @theme --font-sans map keeps resolving as a fallback. */
@@ -28,6 +38,10 @@
 	--color-accent-hover: var(--accent-hover);
 	--color-card-bg: var(--card-bg);
 	--color-border: var(--border);
+	--color-brand: var(--brand);
+	--color-brand-bright: var(--brand-bright);
+	--color-action: var(--action);
+	--color-action-hover: var(--action-hover);
 	--font-sans: var(--font-outfit), var(--font-noto-sans-sc);
 }
 
@@ -76,6 +90,15 @@ body::before {
 	top: 0;
 	outline: 2px solid var(--accent);
 	outline-offset: 2px;
+}
+
+/* Homepage — "Our Mission" ambient wash. Static, SSR-safe, no motion (needs no
+   reduced-motion guard). A low-alpha cerulean glow (brand #3e8fc7 at .10) so the mission
+   statement sits in soft brand light without becoming a glowing-accent cliche. */
+.mission-aura {
+	background:
+		radial-gradient(ellipse 900px 520px at 18% 0%, rgba(62, 143, 199, 0.1) 0%, transparent 62%),
+		var(--background);
 }
 
 /* EV Challenge: Two Tracks dissolve panels (glassmorphism over 3D background) */

@@ -101,7 +101,9 @@
 		</span>
 
 		<div class="absolute inset-x-0 bottom-0 p-3 md:p-4">
-			<span class="font-mono text-[10px] tracking-[0.18em] text-accent/70 uppercase md:text-[9px]">
+			<span
+				class="font-mono text-[10px] tracking-[0.18em] text-brand-bright uppercase md:text-[9px]"
+			>
 				{highlight.tag()}
 			</span>
 			<h3 class="mt-1 text-sm leading-tight font-bold text-white md:text-sm">
@@ -163,7 +165,7 @@
 			role="group"
 			tabindex="0"
 			aria-label={m.home_highlights_heading()}
-			class="flex h-[min(70vh,560px)] snap-x snap-proximity items-stretch gap-[2px] overflow-x-auto px-5 pb-6 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent sm:px-8 md:px-[6vw]"
+			class="flex h-[min(70vh,560px)] snap-x snap-proximity items-stretch gap-[2px] overflow-x-auto px-5 pb-6 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand sm:px-8 md:px-[6vw]"
 		>
 			{#each COLUMNS as col, ci (ci)}
 				{#if col.type === 'hero'}

@@ -58,49 +58,49 @@
 		>
 			<!-- Breathing ambient glow -->
 			<div
-				class="orbital-glow absolute h-40 w-40 rounded-full bg-accent blur-[100px] md:h-56 md:w-56"
+				class="orbital-glow absolute h-40 w-40 rounded-full bg-brand blur-[100px] md:h-56 md:w-56"
 			></div>
 
 			<!-- Outer ring — slowest, clockwise -->
 			<div
-				class="orbital-ring absolute h-[18rem] w-[18rem] rounded-full border border-accent/[0.06] md:h-[26rem] md:w-[26rem]"
+				class="orbital-ring absolute h-[18rem] w-[18rem] rounded-full border border-brand/[0.06] md:h-[26rem] md:w-[26rem]"
 				style="animation-duration: 40s;"
 			>
 				<div
-					class="absolute top-1/2 -left-1 h-2 w-2 -translate-y-1/2 rounded-full bg-accent/20"
+					class="absolute top-1/2 -left-1 h-2 w-2 -translate-y-1/2 rounded-full bg-brand/20"
 				></div>
 				<div
-					class="absolute top-1/2 -right-1 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-accent/10"
+					class="absolute top-1/2 -right-1 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-brand/10"
 				></div>
 			</div>
 
 			<!-- Middle ring — counter-clockwise -->
 			<div
-				class="orbital-ring absolute h-[12rem] w-[12rem] rounded-full border border-accent/[0.04] md:h-[17rem] md:w-[17rem]"
+				class="orbital-ring absolute h-[12rem] w-[12rem] rounded-full border border-brand/[0.04] md:h-[17rem] md:w-[17rem]"
 				style="animation-duration: 26s; animation-direction: reverse;"
 			>
 				<div
-					class="absolute -top-1 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-accent/25"
+					class="absolute -top-1 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-brand/25"
 				></div>
 			</div>
 
 			<!-- Inner ring — fastest, clockwise -->
 			<div
-				class="orbital-ring absolute h-[7rem] w-[7rem] rounded-full border border-accent/[0.08] md:h-[10rem] md:w-[10rem]"
+				class="orbital-ring absolute h-[7rem] w-[7rem] rounded-full border border-brand/[0.08] md:h-[10rem] md:w-[10rem]"
 				style="animation-duration: 16s;"
 			>
 				<div
-					class="absolute -bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-accent/30"
+					class="absolute -bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-brand/30"
 				></div>
 				<div
-					class="absolute -top-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-accent/15"
+					class="absolute -top-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-brand/15"
 				></div>
 			</div>
 
 			<!-- Drifting particles -->
 			{#each PARTICLES as particle (particle.x + particle.y)}
 				<div
-					class="orbital-particle absolute rounded-full bg-accent/20"
+					class="orbital-particle absolute rounded-full bg-brand/20"
 					style="left: {particle.x}; top: {particle.y}; width: {particle.size}px; height: {particle.size}px; animation-duration: {particle.dur}s; animation-delay: {particle.delay}s;"
 				></div>
 			{/each}
@@ -126,12 +126,12 @@
 						{#if item.href}
 							<a
 								href={item.href}
-								class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent [&_span]:hover:text-white"
+								class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand [&_span]:hover:text-white"
 							>
 								<span
 									class="flex items-center gap-2 text-sm text-white/50 transition-colors duration-200"
 								>
-									<Icon class="h-3.5 w-3.5 shrink-0 text-accent/50" />
+									<Icon class="h-3.5 w-3.5 shrink-0 text-brand/70" />
 									{item.value}
 								</span>
 							</a>
@@ -139,7 +139,7 @@
 							<span
 								class="flex items-center gap-2 text-sm text-white/50 transition-colors duration-200"
 							>
-								<Icon class="h-3.5 w-3.5 shrink-0 text-accent/50" />
+								<Icon class="h-3.5 w-3.5 shrink-0 text-brand/70" />
 								{item.value}
 							</span>
 						{/if}
@@ -158,7 +158,7 @@
 					style={prefersReducedMotion.current
 						? undefined
 						: `translate: ${p.current.x}px ${p.current.y}px`}
-					class="group/cta inline-flex h-12 items-center gap-2 bg-accent px-8 text-sm font-semibold tracking-wide text-foreground-dark transition-colors duration-200 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:translate-y-px active:scale-[0.97]"
+					class="group/cta inline-flex h-12 items-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-white transition-colors duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 				>
 					<span>{m.home_contact_cta()}</span>
 					<ArrowRight
