@@ -1,8 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 import { prisma } from '$lib/server/prisma';
-import { rateLimit } from '$lib/server/rate-limit';
-import { validateOrigin, verifyCsrfToken } from '$lib/server/csrf';
+import { guardPublicPost } from '$lib/server/guard';
 import { parseJsonBody } from '$lib/server/validation';
 import { sendMail } from '$lib/server/mail';
 import { escapeHtml } from '$lib/utils';
@@ -28,20 +27,8 @@ export const POST: RequestHandler = async (event) => {
 	const { request, setHeaders } = event;
 	setHeaders({ 'cache-control': 'no-store' });
 
-	if (!validateOrigin(event)) {
-		return json({ success: false, error: 'Forbidden: invalid origin' } satisfies ApiResponse, {
-			status: 403
-		});
-	}
-
-	if (!verifyCsrfToken(event)) {
-		return json({ success: false, error: 'Forbidden: invalid CSRF token' } satisfies ApiResponse, {
-			status: 403
-		});
-	}
-
-	const limited = await rateLimit(event, { limit: 5, windowMs: 60_000, namespace: 'contact' });
-	if (limited) return limited;
+	const guard = await guardPublicPost(event, { limit: 5, windowMs: 60_000, namespace: 'contact' });
+	if (guard) return guard;
 
 	try {
 		const parsed = await parseJsonBody(request, contactSchema);
