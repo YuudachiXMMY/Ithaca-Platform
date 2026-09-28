@@ -1,3 +1,5 @@
+import * as m from '$lib/paraglide/messages';
+
 export interface NavItem {
 	/** Message-key suffix; resolved at render via m.nav_<label>() (see Header). */
 	label: string;
@@ -23,3 +25,19 @@ export const NAV_ITEMS: NavItem[] = [
 	},
 	{ label: 'contactUs', href: '/contact-us' }
 ];
+
+// Static key -> message map keeps Paraglide tree-shaking (no dynamic m['nav_'+x]()).
+// Shared by Header and Footer so the NavItem.label -> localized-string mapping lives once.
+const NAV_LABEL: Record<string, () => string> = {
+	home: m.nav_home,
+	aboutUs: m.nav_aboutUs,
+	programs: m.nav_programs,
+	contactUs: m.nav_contactUs,
+	evTeam: m.nav_evTeam,
+	aiEntrepreneurshipCamp: m.nav_aiEntrepreneurshipCamp,
+	eliteInterviews: m.nav_eliteInterviews,
+	otherPrograms: m.nav_otherPrograms
+};
+
+/** Resolve a NavItem label key to its localized string (falls back to the raw key). */
+export const navLabel = (key: string) => (NAV_LABEL[key] ?? (() => key))();
