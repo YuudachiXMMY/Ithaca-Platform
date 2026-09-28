@@ -2,7 +2,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import { onMount } from 'svelte';
 	import { prefersReducedMotion } from 'svelte/motion';
-	import { loadGsap } from '$lib/motion/gsap';
+	import { runGsapOnMount } from '$lib/motion/gsap-lifecycle';
 	import AdaptiveVideo from '$lib/components/media/AdaptiveVideo.svelte';
 
 	// Tier-2 GSAP scroll-pin reveal layered ON TOP of the static peak-visibility markup
@@ -21,15 +21,14 @@
 		// Reduced motion OR mobile → keep the static markup untouched (motion is additive).
 		if (prefersReducedMotion.current || window.innerWidth < 768) return;
 
-		let cancelled = false;
-		let ctx: { revert: () => void } | undefined;
-
-		loadGsap()
-			.then(({ gsap }) => {
-				if (cancelled || !sectionEl) return;
+		return runGsapOnMount(
+			// Dynamic GSAP import failed → keep the static peak-visibility markup (Phase-1 form).
+			'[CinematicDivider] GSAP failed to load; using static fallback',
+			(gsap) => {
+				if (!sectionEl) return;
 				const isMobile = window.innerWidth < 768;
 
-				ctx = gsap.context(() => {
+				return gsap.context(() => {
 					const tl = gsap.timeline({
 						scrollTrigger: {
 							trigger: sectionEl,
@@ -79,16 +78,8 @@
 					);
 					tl.to(lineEl!, { scaleX: 2, opacity: 0, duration: 0.35, ease: 'power3.in' }, 0.65);
 				}, sectionEl);
-			})
-			.catch((err) => {
-				// Dynamic GSAP import failed → keep the static peak-visibility markup (Phase-1 form).
-				console.error('[CinematicDivider] GSAP failed to load; using static fallback', err);
-			});
-
-		return () => {
-			cancelled = true;
-			ctx?.revert();
-		};
+			}
+		);
 	});
 </script>
 
