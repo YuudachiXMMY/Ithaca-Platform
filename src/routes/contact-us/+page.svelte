@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { MapPin, Mail, Phone, MessageCircle } from 'lucide-svelte';
-	import { CONTACT_INFO } from '$lib/data/contact';
+	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
 	import { getCsrfToken } from '$lib/csrf-client';
 	import Seo from '$lib/components/Seo.svelte';
 	import * as m from '$lib/paraglide/messages';
@@ -15,7 +15,7 @@
 			icon: MapPin,
 			label: m.contact_page_channels_address(),
 			value: CONTACT_INFO.address,
-			href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(CONTACT_INFO.address)}`,
+			href: CONTACT_HREFS.mapsSearch,
 			external: true,
 			mono: false
 		},
@@ -23,7 +23,7 @@
 			icon: Mail,
 			label: m.contact_page_channels_email(),
 			value: CONTACT_INFO.email,
-			href: `mailto:${CONTACT_INFO.email}`,
+			href: CONTACT_HREFS.mailto,
 			external: false,
 			mono: false
 		},
@@ -31,7 +31,7 @@
 			icon: Phone,
 			label: m.contact_page_channels_phone(),
 			value: CONTACT_INFO.phone,
-			href: `tel:${CONTACT_INFO.phone.replace(/[^+\d]/g, '')}`,
+			href: CONTACT_HREFS.tel,
 			external: false,
 			mono: true
 		},

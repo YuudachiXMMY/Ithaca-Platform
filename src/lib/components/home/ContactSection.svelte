@@ -2,7 +2,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import { MapPin, Phone, Mail, ArrowRight } from 'lucide-svelte';
-	import { CONTACT_INFO } from '$lib/data/contact';
+	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
 	import { Spring, prefersReducedMotion } from 'svelte/motion';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 
@@ -11,9 +11,9 @@
 		{
 			icon: Phone,
 			value: CONTACT_INFO.phone,
-			href: `tel:${CONTACT_INFO.phone.replace(/[^+\d]/g, '')}`
+			href: CONTACT_HREFS.tel
 		},
-		{ icon: Mail, value: CONTACT_INFO.email, href: `mailto:${CONTACT_INFO.email}` }
+		{ icon: Mail, value: CONTACT_INFO.email, href: CONTACT_HREFS.mailto }
 	];
 
 	/* OrbitalField — pure-CSS infinite loops (rings/glow/particles). The keyframes

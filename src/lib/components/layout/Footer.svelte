@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Mail, Phone, MapPin } from 'lucide-svelte';
 	import { NAV_ITEMS, navLabel } from '$lib/data/nav';
-	import { CONTACT_INFO } from '$lib/data/contact';
+	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 	import NewsletterForm from '$lib/components/NewsletterForm.svelte';
@@ -10,7 +10,6 @@
 	const QUICK_LINKS = NAV_ITEMS.filter((item) => item.href !== '/');
 
 	const currentYear = new Date().getFullYear();
-	const telHref = 'tel:' + CONTACT_INFO.phone.replace(/[^+\d]/g, '');
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
@@ -64,7 +63,7 @@
 				<ul class="mt-3 space-y-2.5">
 					<li>
 						<a
-							href={'mailto:' + CONTACT_INFO.email}
+							href={CONTACT_HREFS.mailto}
 							class="flex items-start gap-2.5 text-sm text-foreground/60 transition-colors hover:text-accent"
 						>
 							<Mail class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
@@ -73,7 +72,7 @@
 					</li>
 					<li>
 						<a
-							href={telHref}
+							href={CONTACT_HREFS.tel}
 							class="flex items-start gap-2.5 text-sm text-foreground/60 transition-colors hover:text-accent"
 						>
 							<Phone class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
@@ -111,7 +110,7 @@
 						{m.common_footer_terms()}
 					</a>
 					<span class="hidden sm:inline" aria-hidden="true">|</span>
-					<a href={'mailto:' + CONTACT_INFO.email} class="transition-colors hover:text-accent">
+					<a href={CONTACT_HREFS.mailto} class="transition-colors hover:text-accent">
 						{CONTACT_INFO.email}
 					</a>
 				</div>
