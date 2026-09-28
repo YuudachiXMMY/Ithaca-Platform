@@ -230,17 +230,6 @@ html {
    Shared keyframes referenced by the component stage.
    -------------------------------------------------------------------------- */
 
-/* Tier 1 — MissionSection sticky-stack scrub (@supports animation-timeline).
-   The component authors the RESTING state as the finished/visible look and
-   applies this keyframe ONLY inside an @supports block with fill-mode:both,
-   so Firefox (no animation-timeline) keeps a clean sticky stack. */
-@keyframes mission-recede {
-	to {
-		scale: 0.92;
-		opacity: 0.4;
-	}
-}
-
 /* Tier 0 — ContactSection OrbitalField (pure-CSS infinite loops). */
 @keyframes ring-spin {
 	to {
