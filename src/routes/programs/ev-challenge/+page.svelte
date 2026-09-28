@@ -9,6 +9,7 @@
 
 	import EVModel3DSection from '$lib/components/programs/ev-challenge/EVModel3DSection.svelte';
 	import WorkshopToRoles from '$lib/components/programs/ev-challenge/WorkshopToRoles.svelte';
+	import VimeoEmbed from '$lib/components/media/VimeoEmbed.svelte';
 
 	import heroImg from '$lib/assets/programs/ev-challenge/EV26-1.jpg?enhanced';
 	import missionImg from '$lib/assets/programs/ev-challenge/EV25-12.jpg?enhanced';
@@ -364,18 +365,7 @@
 
 		<!-- Featured video -->
 		<div class="px-6 md:px-12 lg:px-[8vw]">
-			<div
-				class="relative overflow-hidden rounded-sm border border-border bg-card-bg transition-colors hover:border-accent/15"
-				style="padding-top: 56.25%"
-			>
-				<iframe
-					src="https://player.vimeo.com/video/1202133392?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479"
-					class="absolute inset-0 h-full w-full"
-					allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-					referrerpolicy="strict-origin-when-cross-origin"
-					title="EV 2026 Season Highlights"
-				></iframe>
-			</div>
+			<VimeoEmbed videoId="1202133392" title="EV 2026 Season Highlights" aspectPadding="56.25%" />
 			<div class="mt-4 flex items-center gap-3">
 				<div class="h-px w-10 bg-accent/50"></div>
 				<span class="font-mono text-[11px] tracking-wider text-accent/70">
@@ -390,18 +380,7 @@
 		<!-- Secondary videos -->
 		<div class="mt-12 space-y-3 px-6 md:mt-20 md:px-12 lg:space-y-4 lg:px-[8vw]">
 			<div class="lg:max-w-[62%]">
-				<div
-					class="relative overflow-hidden rounded-sm border border-border bg-card-bg transition-colors hover:border-accent/15"
-					style="padding-top: 56.25%"
-				>
-					<iframe
-						src="https://player.vimeo.com/video/1202133393?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479"
-						class="absolute inset-0 h-full w-full"
-						allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-						referrerpolicy="strict-origin-when-cross-origin"
-						title="EV 2025 Season Highlights"
-					></iframe>
-				</div>
+				<VimeoEmbed videoId="1202133393" title="EV 2025 Season Highlights" aspectPadding="56.25%" />
 				<div class="mt-3 flex items-center gap-2">
 					<div class="h-px w-6 bg-foreground/15"></div>
 					<span class="font-mono text-[10px] tracking-wider text-foreground/30">
@@ -412,18 +391,7 @@
 
 			<div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:ml-auto lg:max-w-[52%] lg:gap-3">
 				{#each CLIP_IDS as videoId (videoId)}
-					<div
-						class="relative overflow-hidden rounded-sm border border-border bg-card-bg transition-colors hover:border-accent/15"
-						style="padding-top: 177.78%"
-					>
-						<iframe
-							src="https://player.vimeo.com/video/{videoId}?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479"
-							class="absolute inset-0 h-full w-full"
-							allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-							referrerpolicy="strict-origin-when-cross-origin"
-							title="EV team clip"
-						></iframe>
-					</div>
+					<VimeoEmbed {videoId} title="EV team clip" aspectPadding="177.78%" />
 				{/each}
 			</div>
 		</div>
