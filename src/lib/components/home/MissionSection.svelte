@@ -36,13 +36,13 @@
 	     page's single <h1>, set in soft brand light. Large light display echoes the hero Cavafy
 	     quote so the mission reads as the journey's destination. SSR-safe; Reveal is opacity-only. -->
 	<div class="mission-aura">
-		<div class="mx-auto max-w-[1100px] px-5 py-24 sm:px-8 md:px-[6vw] md:py-36">
+		<div class="mx-auto max-w-[1100px] px-5 pt-24 pb-14 sm:px-8 md:px-[6vw] md:pt-36 md:pb-20">
 			<Reveal y={24}>
 				<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
 					{m.home_mission_eyebrow()}
 				</p>
 				<h1
-					class="mt-6 max-w-[20ch] text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-white"
+					class="mt-6 max-w-[28ch] text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-white"
 				>
 					{m.home_hero_empowerment()}
 				</h1>
@@ -58,7 +58,7 @@
 	</div>
 
 	<!-- Our Approach: a short header so the three pillars no longer start cold. -->
-	<div class="mx-auto max-w-[1400px] px-5 pt-16 sm:px-8 md:px-[6vw] md:pt-24">
+	<div class="mx-auto max-w-[1400px] px-5 pt-6 sm:px-8 md:px-[6vw] md:pt-8">
 		<Reveal y={20}>
 			<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
 				{m.home_mission_approachEyebrow()}

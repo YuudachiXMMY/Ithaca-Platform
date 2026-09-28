@@ -165,7 +165,7 @@
 			role="group"
 			tabindex="0"
 			aria-label={m.home_highlights_heading()}
-			class="flex h-[min(70vh,560px)] snap-x snap-proximity items-stretch gap-[2px] overflow-x-auto px-5 pb-6 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand sm:px-8 md:px-[6vw]"
+			class="flex h-[min(70vh,560px)] snap-x snap-proximity items-stretch gap-[2px] overflow-x-auto px-5 pb-6 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent sm:px-8 md:px-[6vw]"
 		>
 			{#each COLUMNS as col, ci (ci)}
 				{#if col.type === 'hero'}

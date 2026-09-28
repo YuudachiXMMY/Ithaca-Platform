@@ -49,7 +49,7 @@
 {#snippet cell(program: (typeof PROGRAMS)[number], large: boolean)}
 	<a
 		href={localizeHref(program.href)}
-		class="group relative flex h-full min-h-[180px] flex-col justify-end overflow-hidden bg-[#0a0c10] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand sm:min-h-[220px] md:min-h-[240px]"
+		class="group relative flex h-full min-h-[180px] flex-col justify-end overflow-hidden bg-[#0a0c10] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent sm:min-h-[220px] md:min-h-[240px]"
 	>
 		<enhanced:img
 			src={program.img}
