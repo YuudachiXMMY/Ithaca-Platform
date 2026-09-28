@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Mail, Phone, MapPin } from 'lucide-svelte';
-	import { NAV_ITEMS } from '$lib/data/nav';
+	import { NAV_ITEMS, navLabel } from '$lib/data/nav';
 	import { CONTACT_INFO } from '$lib/data/contact';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
@@ -8,18 +8,6 @@
 	import logo from '$lib/assets/site/logo.png?enhanced';
 
 	const QUICK_LINKS = NAV_ITEMS.filter((item) => item.href !== '/');
-
-	const NAV_LABEL: Record<string, () => string> = {
-		home: m.nav_home,
-		aboutUs: m.nav_aboutUs,
-		programs: m.nav_programs,
-		contactUs: m.nav_contactUs,
-		evTeam: m.nav_evTeam,
-		aiEntrepreneurshipCamp: m.nav_aiEntrepreneurshipCamp,
-		eliteInterviews: m.nav_eliteInterviews,
-		otherPrograms: m.nav_otherPrograms
-	};
-	const navLabel = (key: string) => (NAV_LABEL[key] ?? (() => key))();
 
 	const currentYear = new Date().getFullYear();
 	const telHref = 'tel:' + CONTACT_INFO.phone.replace(/[^+\d]/g, '');

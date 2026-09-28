@@ -3,7 +3,7 @@
 	import { fly, fade, slide } from 'svelte/transition';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { Menu, X, ChevronDown } from 'lucide-svelte';
-	import { NAV_ITEMS } from '$lib/data/nav';
+	import { NAV_ITEMS, navLabel } from '$lib/data/nav';
 	import { cn } from '$lib/utils';
 	import { localizeHref, deLocalizeUrl } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
@@ -14,19 +14,6 @@
 	// Split nav items: left group / center logo / right group.
 	const LEFT_NAV = NAV_ITEMS.filter((item) => item.href !== '/contact-us');
 	const RIGHT_NAV = NAV_ITEMS.filter((item) => item.href === '/contact-us');
-
-	// Static key -> message map keeps Paraglide tree-shaking (no dynamic m['nav_'+x]()).
-	const NAV_LABEL: Record<string, () => string> = {
-		home: m.nav_home,
-		aboutUs: m.nav_aboutUs,
-		programs: m.nav_programs,
-		contactUs: m.nav_contactUs,
-		evTeam: m.nav_evTeam,
-		aiEntrepreneurshipCamp: m.nav_aiEntrepreneurshipCamp,
-		eliteInterviews: m.nav_eliteInterviews,
-		otherPrograms: m.nav_otherPrograms
-	};
-	const navLabel = (key: string) => (NAV_LABEL[key] ?? (() => key))();
 
 	let scrolled = $state(false);
 	let mobileOpen = $state(false);
