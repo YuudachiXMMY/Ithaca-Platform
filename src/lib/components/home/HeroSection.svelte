@@ -213,21 +213,24 @@
 				class="hero-accent-line mx-auto mb-8 h-px w-16 origin-center scale-x-0 bg-accent"
 				aria-hidden="true"
 			></div>
-			<h2
+			<!-- Cinematic scroll-revealed duplicate of the page <h1> below; a <p> (not a
+			     heading) so the document outline has exactly one empowerment heading. -->
+			<p
 				class="hero-empowerment-text max-w-4xl text-2xl leading-snug font-bold text-white opacity-0 md:text-4xl lg:text-5xl"
 			>
 				{m.home_hero_empowerment()}
-			</h2>
+			</p>
 		</div>
 	</div>
 </section>
 
-<!-- Static empowerment statement (reduced-motion fallback branch in the Next source) -->
+<!-- Static empowerment statement (reduced-motion fallback branch in the Next source).
+     This always-visible block carries the page's single <h1> for a11y + SEO. -->
 <div class="bg-[#111318] px-5 py-24 sm:px-8 md:px-[6vw]">
 	<div class="mb-8 h-px w-16 bg-accent" aria-hidden="true"></div>
-	<h2 class="max-w-4xl text-2xl leading-snug font-bold text-white md:text-4xl lg:text-5xl">
+	<h1 class="max-w-4xl text-2xl leading-snug font-bold text-white md:text-4xl lg:text-5xl">
 		{m.home_hero_empowerment()}
-	</h2>
+	</h1>
 </div>
 
 <style>
