@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '$lib/server/prisma';
 import { sendMailBatchSettled, isMailConfigured } from '$lib/server/mail';
 import { partitionRecipients } from './recipients';
+import { parseJsonBody } from '$lib/server/validation';
 import type { ApiResponse } from '$lib/types';
 
 export const prerender = false;
@@ -18,17 +19,9 @@ const BATCH_SIZE = 50;
 const STALE_SENDING_MS = 30 * 60 * 1000;
 
 export const POST: RequestHandler = async ({ request }) => {
-	const result = sendSchema.safeParse(await request.json().catch(() => null));
-	if (!result.success) {
-		return json(
-			{
-				success: false,
-				error: result.error.issues[0]?.message ?? 'Invalid input'
-			} satisfies ApiResponse,
-			{ status: 400 }
-		);
-	}
-	const { id } = result.data;
+	const parsed = await parseJsonBody(request, sendSchema);
+	if (!parsed.success) return parsed.response;
+	const { id } = parsed.data;
 
 	const campaign = await prisma.emailCampaign.findUnique({ where: { id } });
 	if (!campaign) {

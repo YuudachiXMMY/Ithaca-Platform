@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '$lib/server/prisma';
 import { rateLimit } from '$lib/server/rate-limit';
 import { validateOrigin, verifyCsrfToken } from '$lib/server/csrf';
+import { parseJsonBody } from '$lib/server/validation';
 import { sendMail } from '$lib/server/mail';
 import { escapeHtml } from '$lib/utils';
 import type { ApiResponse } from '$lib/types';
@@ -36,17 +37,10 @@ export const POST: RequestHandler = async (event) => {
 	if (limited) return limited;
 
 	try {
-		const body: unknown = await request.json().catch(() => null);
-		const result = subscribeSchema.safeParse(body);
-		if (!result.success) {
-			const firstIssue = result.error.issues[0];
-			return json(
-				{ success: false, error: firstIssue?.message ?? 'Invalid input' } satisfies ApiResponse,
-				{ status: 400 }
-			);
-		}
+		const parsed = await parseJsonBody(request, subscribeSchema);
+		if (!parsed.success) return parsed.response;
 
-		const { email, name } = result.data;
+		const { email, name } = parsed.data;
 		// Single-winner create: only the request that actually inserts the row sends the
 		// welcome mail. A concurrent racer hits the unique-email P2002 and is handled
 		// (409 if already active, else reactivate) — never leaked as a raw 500 (preserves

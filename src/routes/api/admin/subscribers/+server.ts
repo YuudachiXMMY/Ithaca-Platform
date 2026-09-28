@@ -1,6 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 import { prisma } from '$lib/server/prisma';
+import { parseJsonBody } from '$lib/server/validation';
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '$lib/constants';
 import type { ApiResponse } from '$lib/types';
 
@@ -36,17 +37,9 @@ export const GET: RequestHandler = async ({ url, setHeaders }) => {
 const deleteSchema = z.object({ id: z.string().min(1, 'Subscriber ID is required') });
 
 export const DELETE: RequestHandler = async ({ request }) => {
-	const result = deleteSchema.safeParse(await request.json().catch(() => null));
-	if (!result.success) {
-		return json(
-			{
-				success: false,
-				error: result.error.issues[0]?.message ?? 'Invalid input'
-			} satisfies ApiResponse,
-			{ status: 400 }
-		);
-	}
-	const { id } = result.data;
+	const parsed = await parseJsonBody(request, deleteSchema);
+	if (!parsed.success) return parsed.response;
+	const { id } = parsed.data;
 	const existing = await prisma.subscriber.findUnique({ where: { id } });
 	if (!existing) {
 		return json({ success: false, error: 'Subscriber not found' } satisfies ApiResponse, {
