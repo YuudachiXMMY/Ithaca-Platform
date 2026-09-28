@@ -3,8 +3,9 @@
 	import { Download } from 'lucide-svelte';
 	import Skeleton from '$lib/components/shared/Skeleton.svelte';
 	import { downloadCsv } from '$lib/utils';
+	import { createAdminListLoader } from '$lib/admin-list';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
-	import type { ApiResponse, Pagination } from '$lib/types';
+	import type { Pagination } from '$lib/types';
 	import * as m from '$lib/paraglide/messages';
 
 	type Contact = {
@@ -16,7 +17,6 @@
 		subscribe: boolean;
 		createdAt: string;
 	};
-	type ContactsPayload = { contacts: Contact[]; pagination: Pagination };
 
 	let contacts = $state<Contact[]>([]);
 	let pagination = $state<Pagination>({
@@ -27,33 +27,21 @@
 	});
 	let loading = $state(true);
 	let error = $state<string | null>(null);
-	// Monotonic request token: guards against a slow earlier page response overwriting a
-	// faster later one when the admin clicks Next/Previous quickly (last-request-wins).
-	let latestRequest = 0;
 
-	async function fetchContacts(page: number) {
-		const requestId = ++latestRequest;
-		loading = true;
-		error = null;
-		try {
-			const res = await fetch(`/api/admin/contacts?page=${page}&limit=${DEFAULT_PAGE_SIZE}`);
-			const data: ApiResponse<ContactsPayload> = await res.json();
-			if (requestId !== latestRequest) return; // a newer request superseded this one
-			// Runtime shape guard: res.json() is `any`, so verify the payload actually matches
-			// ContactsPayload before trusting it (the type annotation is compile-time only).
-			if (!data.success || !data.data || !Array.isArray(data.data.contacts)) {
-				error = data.error ?? m.admin_contacts_errors_load();
-				return;
-			}
-			contacts = data.data.contacts;
-			pagination = data.data.pagination;
-		} catch {
-			if (requestId !== latestRequest) return;
-			error = m.admin_contacts_errors_load();
-		} finally {
-			if (requestId === latestRequest) loading = false;
+	// Last-request-wins paginated loader (staleness token + payload-shape validation live in the
+	// shared helper); the callbacks write back into this page's own reactive state.
+	const fetchContacts = createAdminListLoader<Contact>({
+		endpoint: '/api/admin/contacts',
+		pageSize: DEFAULT_PAGE_SIZE,
+		itemsKey: 'contacts',
+		loadError: m.admin_contacts_errors_load,
+		onLoading: (v) => (loading = v),
+		onError: (v) => (error = v),
+		onData: (items, p) => {
+			contacts = items;
+			pagination = p;
 		}
-	}
+	});
 
 	function exportCsv() {
 		const headers = [

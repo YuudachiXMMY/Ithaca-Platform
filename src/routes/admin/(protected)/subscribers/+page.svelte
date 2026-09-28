@@ -3,6 +3,7 @@
 	import { Loader2, Trash2, Download } from 'lucide-svelte';
 	import Skeleton from '$lib/components/shared/Skeleton.svelte';
 	import { downloadCsv } from '$lib/utils';
+	import { createAdminListLoader } from '$lib/admin-list';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import type { ApiResponse, Pagination } from '$lib/types';
 	import * as m from '$lib/paraglide/messages';
@@ -14,7 +15,6 @@
 		status: string;
 		subscribedAt: string;
 	};
-	type SubscribersPayload = { subscribers: Subscriber[]; pagination: Pagination };
 
 	let subscribers = $state<Subscriber[]>([]);
 	let pagination = $state<Pagination>({
@@ -26,33 +26,21 @@
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	let deletingId = $state<string | null>(null);
-	// Monotonic request token: guards against a slow earlier page response overwriting a
-	// faster later one when the admin clicks Next/Previous quickly (last-request-wins).
-	let latestRequest = 0;
 
-	async function fetchSubscribers(page: number) {
-		const requestId = ++latestRequest;
-		loading = true;
-		error = null;
-		try {
-			const res = await fetch(`/api/admin/subscribers?page=${page}&limit=${DEFAULT_PAGE_SIZE}`);
-			const data: ApiResponse<SubscribersPayload> = await res.json();
-			if (requestId !== latestRequest) return; // a newer request superseded this one
-			// Runtime shape guard: res.json() is `any`, so verify the payload actually matches
-			// SubscribersPayload before trusting it (the type annotation is compile-time only).
-			if (!data.success || !data.data || !Array.isArray(data.data.subscribers)) {
-				error = data.error ?? m.admin_subscribers_errors_load();
-				return;
-			}
-			subscribers = data.data.subscribers;
-			pagination = data.data.pagination;
-		} catch {
-			if (requestId !== latestRequest) return;
-			error = m.admin_subscribers_errors_load();
-		} finally {
-			if (requestId === latestRequest) loading = false;
+	// Last-request-wins paginated loader (staleness token + payload-shape validation live in the
+	// shared helper); the callbacks write back into this page's own reactive state.
+	const fetchSubscribers = createAdminListLoader<Subscriber>({
+		endpoint: '/api/admin/subscribers',
+		pageSize: DEFAULT_PAGE_SIZE,
+		itemsKey: 'subscribers',
+		loadError: m.admin_subscribers_errors_load,
+		onLoading: (v) => (loading = v),
+		onError: (v) => (error = v),
+		onData: (items, p) => {
+			subscribers = items;
+			pagination = p;
 		}
-	}
+	});
 
 	async function handleDelete(id: string) {
 		if (!window.confirm(m.admin_subscribers_confirmDelete())) return;
