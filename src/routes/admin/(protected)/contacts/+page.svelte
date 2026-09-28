@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { Download } from 'lucide-svelte';
 	import Skeleton from '$lib/components/shared/Skeleton.svelte';
-	import { sanitizeCsvCell } from '$lib/utils';
+	import { downloadCsv } from '$lib/utils';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import type { ApiResponse, Pagination } from '$lib/types';
 	import * as m from '$lib/paraglide/messages';
@@ -72,18 +72,7 @@
 			c.subscribe ? 'yes' : 'no',
 			new Date(c.createdAt).toLocaleString()
 		]);
-		const csv = [headers, ...rows]
-			.map((row) => row.map((cell) => `"${sanitizeCsvCell(cell).replace(/"/g, '""')}"`).join(','))
-			.join('\n');
-		const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-		const url = URL.createObjectURL(blob);
-		const link = document.createElement('a');
-		link.href = url;
-		link.download = `contacts-${new Date().toISOString().split('T')[0]}.csv`;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-		URL.revokeObjectURL(url);
+		downloadCsv('contacts', headers, rows);
 	}
 
 	onMount(() => fetchContacts(1));
