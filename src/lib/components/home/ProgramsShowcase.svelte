@@ -90,9 +90,9 @@
 <section class="bg-[#0a0c10] py-8 md:py-10" aria-label={m.home_programs_ariaLabel()}>
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={24}>
-			<div class="mb-6">
+			<div class="mb-6 text-center">
 				<h2 class="text-2xl font-bold text-white md:text-4xl">{m.home_programs_heading()}</h2>
-				<p class="mt-2 max-w-lg text-sm leading-relaxed text-white/45">
+				<p class="mt-2 mx-auto max-w-lg text-sm leading-relaxed text-white/45">
 					{m.home_programs_subheading()}
 				</p>
 			</div>
