@@ -2,7 +2,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import { onMount } from 'svelte';
 	import { prefersReducedMotion } from 'svelte/motion';
-	import { loadGsap } from '$lib/motion/gsap';
+	import { runGsapOnMount } from '$lib/motion/gsap-lifecycle';
 	import type { Picture } from 'vite-imagetools';
 	import img189 from '$lib/assets/highlights/wechat-img-189.jpg?enhanced';
 	import ev5 from '$lib/assets/programs/ev-challenge/EV25-5s.png?enhanced';
@@ -91,15 +91,14 @@
 		// Reduced motion OR mobile → keep the static overflow-x-auto strip (Phase-1 form).
 		if (prefersReducedMotion.current || window.innerWidth < 768) return;
 
-		let cancelled = false;
-		let ctx: { revert: () => void } | undefined;
-
-		loadGsap()
-			.then(({ gsap }) => {
-				if (cancelled || !wrapEl || !trackEl) return;
+		return runGsapOnMount(
+			// Dynamic GSAP import failed → keep the static overflow-x-auto strip (Phase-1 form).
+			'[StudentHighlights] GSAP failed to load; using native scroll fallback',
+			(gsap) => {
+				if (!wrapEl || !trackEl) return;
 				animate = true;
 
-				ctx = gsap.context(() => {
+				return gsap.context(() => {
 					const distance = trackEl!.scrollWidth - window.innerWidth;
 
 					const tl = gsap.timeline({
@@ -117,16 +116,8 @@
 					tl.to(trackEl!, { x: -distance, ease: 'none' }, 0);
 					tl.to(progressEl!, { scaleX: 1, ease: 'none' }, 0);
 				}, wrapEl);
-			})
-			.catch((err) => {
-				// Dynamic GSAP import failed → keep the static overflow-x-auto strip (Phase-1 form).
-				console.error('[StudentHighlights] GSAP failed to load; using native scroll fallback', err);
-			});
-
-		return () => {
-			cancelled = true;
-			ctx?.revert();
-		};
+			}
+		);
 	});
 </script>
 
