@@ -3,7 +3,7 @@
 	import { ArrowRight, ChevronDown } from 'lucide-svelte';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { localizeHref } from '$lib/paraglide/runtime';
-	import { loadGsap } from '$lib/motion/gsap';
+	import { runGsapOnMount } from '$lib/motion/gsap-lifecycle';
 	import * as m from '$lib/paraglide/messages';
 	import Seo from '$lib/components/Seo.svelte';
 
@@ -110,13 +110,12 @@
 	onMount(() => {
 		if (prefersReducedMotion.current || !heroSectionEl || !heroImgEl) return;
 
-		let cancelled = false;
-		let ctx: { revert: () => void } | undefined;
-
-		loadGsap()
-			.then(({ gsap }) => {
-				if (cancelled || !heroSectionEl) return;
-				ctx = gsap.context(() => {
+		return runGsapOnMount(
+			// Dynamic GSAP import failed → keep the static hero (parallax is additive).
+			'[ev-challenge] GSAP failed to load; using static fallback',
+			(gsap) => {
+				if (!heroSectionEl) return;
+				return gsap.context(() => {
 					// Bump scale to 1.25 (from the static 1.15) for parallax headroom, then
 					// drift the photo down as the hero scrolls out (10% < 12.5% overflow).
 					gsap.set(heroImgEl!, { scale: 1.25 });
@@ -131,16 +130,8 @@
 						}
 					});
 				}, heroSectionEl);
-			})
-			.catch((err) => {
-				// Dynamic GSAP import failed → keep the static hero (parallax is additive).
-				console.error('[ev-challenge] GSAP failed to load; using static fallback', err);
-			});
-
-		return () => {
-			cancelled = true;
-			ctx?.revert();
-		};
+			}
+		);
 	});
 </script>
 
