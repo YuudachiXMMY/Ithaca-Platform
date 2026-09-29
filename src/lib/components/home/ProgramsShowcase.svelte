@@ -49,7 +49,7 @@
 {#snippet cell(program: (typeof PROGRAMS)[number], large: boolean)}
 	<a
 		href={localizeHref(program.href)}
-		class="group relative flex h-full min-h-[180px] flex-col justify-end overflow-hidden bg-[#0a0c10] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand sm:min-h-[220px] md:min-h-[240px]"
+		class="group relative flex h-full min-h-[180px] flex-col justify-end overflow-hidden bg-surface-4 transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand sm:min-h-[220px] md:min-h-[240px]"
 	>
 		<enhanced:img
 			src={program.img}
@@ -60,23 +60,23 @@
 		/>
 
 		<div
-			class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
+			class="absolute inset-0 bg-gradient-to-t from-overlay/95 via-overlay/70 to-transparent"
 			aria-hidden="true"
 		></div>
 
 		<div class="relative z-10 p-4 md:p-5 {large ? 'md:p-6' : ''}">
 			<h3
-				class="font-bold text-white {large
+				class="font-bold text-band-foreground {large
 					? 'text-base sm:text-lg md:text-xl'
 					: 'text-sm md:text-base'}"
 			>
 				{program.title()}
 			</h3>
-			<p class="mt-1.5 hidden max-w-md text-xs leading-relaxed text-white/60 sm:block">
+			<p class="mt-1.5 hidden max-w-md text-xs leading-relaxed text-band-foreground/80 sm:block">
 				{program.description()}
 			</p>
 			<div
-				class="mt-3 flex items-center gap-1.5 text-xs font-medium text-brand-bright transition-colors duration-200 group-hover:text-white"
+				class="mt-3 flex items-center gap-1.5 text-xs font-medium text-band-brand-strong transition-colors duration-200 group-hover:text-band-foreground"
 			>
 				<span>{m.home_programs_learnMore()}</span>
 				<ArrowRight
@@ -87,12 +87,12 @@
 	</a>
 {/snippet}
 
-<section class="bg-[#0a0c10] py-8 md:py-10" aria-label={m.home_programs_ariaLabel()}>
+<section class="bg-surface-4 py-8 md:py-10" aria-label={m.home_programs_ariaLabel()}>
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={24}>
 			<div class="mb-6 text-center">
-				<h2 class="text-2xl font-bold text-white md:text-4xl">{m.home_programs_heading()}</h2>
-				<p class="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-white/45">
+				<h2 class="text-2xl font-bold text-foreground md:text-4xl">{m.home_programs_heading()}</h2>
+				<p class="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-foreground-subtle">
 					{m.home_programs_subheading()}
 				</p>
 			</div>
@@ -102,7 +102,7 @@
 		     Reveal fades the whole grid up on scroll. -->
 		<Reveal y={24}>
 			<div
-				class="grid gap-px overflow-hidden bg-white/[0.06] md:grid-cols-[2fr_1fr] md:grid-rows-[1fr_1fr_auto]"
+				class="grid gap-px overflow-hidden bg-surface-2 md:grid-cols-[2fr_1fr] md:grid-rows-[1fr_1fr_auto]"
 			>
 				<div class="md:row-span-2">{@render cell(PROGRAMS[0], true)}</div>
 				<div>{@render cell(PROGRAMS[1], false)}</div>

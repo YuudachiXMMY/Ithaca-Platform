@@ -4,6 +4,14 @@
 	import { getCsrfToken } from '$lib/csrf-client';
 	import * as m from '$lib/paraglide/messages';
 
+	interface Props {
+		/** Set when the form is hosted on a mist ground (`bg-surface-2` / `bg-card-bg`).
+		 *  docs/DESIGN-TOKENS.md §3.7's `bg-card-bg` row: "inside a mist band flip to
+		 *  `bg-surface-0` or it disappears" — mist-on-mist is 1.00:1. */
+		onMist?: boolean;
+	}
+	let { onMist = false }: Props = $props();
+
 	let email = $state('');
 	let status = $state<'idle' | 'submitting' | 'success' | 'error'>('idle');
 	let message = $state('');
@@ -51,18 +59,20 @@
 			required
 			aria-invalid={status === 'error'}
 			placeholder="you@example.com"
-			class="min-w-0 flex-1 border border-border bg-card-bg px-3 py-2 text-sm text-foreground transition-colors placeholder:text-foreground/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+			class="min-w-0 flex-1 border border-border-strong px-3 py-2 text-sm text-foreground transition-colors placeholder:text-foreground-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand {onMist
+				? 'bg-surface-0'
+				: 'bg-card-bg'}"
 		/>
 		<button
 			type="submit"
 			disabled={status === 'submitting'}
-			class="bg-action px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-60"
+			class="bg-action px-4 py-2 text-sm font-medium text-action-foreground transition-colors hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-60"
 		>
 			{m.newsletter_subscribeButton()}
 		</button>
 	</div>
 	<p
-		class="text-xs {status === 'success' ? 'text-green-400' : 'text-red-400'}"
+		class="text-xs {status === 'success' ? 'text-success' : 'text-danger'}"
 		role="alert"
 		aria-live="polite"
 	>

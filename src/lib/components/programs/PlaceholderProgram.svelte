@@ -48,41 +48,41 @@
 
 		<!-- Legibility gradient — lighter than a flat wash so the photograph stays present. -->
 		<div
-			class="absolute inset-0 bg-gradient-to-tr from-black/85 via-black/55 to-black/20"
+			class="absolute inset-0 bg-gradient-to-tr from-overlay/95 via-overlay/70 to-overlay/55"
 			aria-hidden="true"
 		></div>
 
 		<!-- Bottom-left anchored editorial content. -->
 		<div class="relative z-10 px-5 pb-14 sm:px-8 md:px-[6vw] md:pb-20">
 			<div class="max-w-3xl">
-				<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+				<p class="font-mono text-[11px] tracking-[0.28em] text-band-brand-strong uppercase">
 					{eyebrow}
 				</p>
 				<div
-					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+					class="mt-6 h-px w-24 bg-gradient-to-r from-band-brand via-band-brand/40 to-transparent"
 					aria-hidden="true"
 				></div>
 				<h1
-					class="mt-6 text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-white"
+					class="mt-6 text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-band-foreground"
 				>
 					{title}
 				</h1>
 				{#if tag}
 					<p
-						class="mt-6 inline-block border border-brand/30 px-3 py-1 font-mono text-xs tracking-[0.2em] text-brand-bright uppercase"
+						class="mt-6 inline-block border border-band-brand/30 px-3 py-1 font-mono text-xs tracking-[0.2em] text-band-brand-strong uppercase"
 					>
 						{tag}
 					</p>
 				{/if}
-				<p class="mt-6 max-w-2xl text-base leading-relaxed text-white/60 md:text-lg">
+				<p class="mt-6 max-w-2xl text-base leading-relaxed text-band-foreground/80 md:text-lg">
 					{description}
 				</p>
-				<p class="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
+				<p class="mt-3 max-w-2xl text-sm leading-relaxed text-band-foreground/80">
 					{note}
 				</p>
 				<a
 					href={localizeHref('/contact-us')}
-					class="group mt-10 inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
+					class="group mt-10 inline-flex h-12 items-center justify-center gap-2 bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
 				>
 					{m.programs_placeholder_contactUs()}
 					<ArrowRight

@@ -65,7 +65,7 @@
 				{#if popup.buttonText && popup.buttonLink}
 					<a
 						href={popup.buttonLink}
-						class="inline-flex h-12 items-center justify-center bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
+						class="inline-flex h-12 items-center justify-center bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 					>
 						{popup.buttonText}
 					</a>
@@ -73,7 +73,7 @@
 				<button
 					onclick={dismiss}
 					aria-label={m.common_dismiss()}
-					class="text-foreground/60 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+					class="text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 				>
 					<X class="h-5 w-5" />
 				</button>

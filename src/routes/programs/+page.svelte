@@ -81,7 +81,7 @@
 	<div class={stacked ? 'min-h-0 flex-1' : gridClass}>
 		<a
 			href={localizeHref(program.href)}
-			class="group flex h-full flex-col overflow-hidden border border-border bg-card-bg transition-colors duration-300 hover:border-brand/40 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand"
+			class="group flex h-full flex-col overflow-hidden border border-border-strong bg-card-bg transition-colors duration-300 hover:border-brand focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand"
 		>
 			<div
 				class="relative shrink-0 overflow-hidden
@@ -91,7 +91,7 @@
 						? 'h-[240px] md:h-[300px]'
 						: 'h-[180px] md:h-[220px]'}
 					{isFeatured && !stacked ? 'lg:h-[360px]' : ''}
-					{!hasImage ? 'bg-[#0a0c10]' : ''}"
+					{!hasImage ? 'bg-surface-4' : ''}"
 			>
 				{#if hasImage}
 					<enhanced:img
@@ -114,7 +114,7 @@
 
 			<div class="flex grow flex-col {stacked ? 'p-4' : 'p-5 md:p-6'}">
 				<h2
-					class="leading-tight font-bold tracking-tight text-white
+					class="leading-tight font-bold tracking-tight text-foreground
 						{stacked
 						? 'mb-2 text-sm md:text-base'
 						: isFeatured
@@ -133,7 +133,7 @@
 				</span>
 
 				<p
-					class="grow leading-relaxed text-white/60 {stacked
+					class="grow leading-relaxed text-foreground-muted {stacked
 						? 'mb-3 line-clamp-2 text-xs'
 						: 'mb-4 text-sm'}"
 				>
@@ -166,11 +166,11 @@
 					aria-hidden="true"
 				></div>
 				<h1
-					class="mt-6 max-w-[16ch] text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-white"
+					class="mt-6 max-w-[16ch] text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-foreground"
 				>
 					{m.programs_index_title()}
 				</h1>
-				<p class="mt-6 max-w-[45ch] text-lg leading-relaxed text-white/60 md:text-xl">
+				<p class="mt-6 max-w-[45ch] text-lg leading-relaxed text-foreground-muted md:text-xl">
 					{m.programs_index_subtitle()}
 				</p>
 			</Reveal>

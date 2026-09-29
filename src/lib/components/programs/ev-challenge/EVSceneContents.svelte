@@ -12,7 +12,7 @@
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { Group, Points, BufferGeometry, BufferAttribute, PointsMaterial } from 'three';
 	import FatLine from './FatLine.svelte';
-	import { buildTrikeLines, buildParticlePositions, ACCENT } from './trike-geometry';
+	import { buildTrikeLines, buildParticlePositions, BRAND } from './trike-geometry';
 
 	interface Props {
 		/** Normalized scroll progress (0–1) from the parent GSAP pin. */
@@ -33,7 +33,7 @@
 	particleGeometry.setAttribute('position', new BufferAttribute(buildParticlePositions(), 3));
 	const particleMaterial = new PointsMaterial({
 		size: 0.01,
-		color: ACCENT,
+		color: BRAND,
 		transparent: true,
 		opacity: 0.2,
 		sizeAttenuation: true
@@ -91,17 +91,19 @@
 />
 
 <T.AmbientLight intensity={0.3} />
-<T.PointLight position={[5, 5, 5]} intensity={0.15} color="#5aa6db" />
+<!-- Key light: --band-brand (teal-300). CSS variables are unreadable from a
+     WebGL material, so §3.8's band values are inlined here as literals. -->
+<T.PointLight position={[5, 5, 5]} intensity={0.15} color="#5FC3C4" />
 
 <Grid
 	position={[0, -0.03, 0]}
 	gridSize={[20, 20]}
 	cellSize={0.4}
 	cellThickness={0.5}
-	cellColor="#1c1f26"
+	cellColor="#14325C"
 	sectionSize={2}
 	sectionThickness={0.8}
-	sectionColor="#252830"
+	sectionColor="#7089A8"
 	fadeDistance={8}
 	infiniteGrid
 />

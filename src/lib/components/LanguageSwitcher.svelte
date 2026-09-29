@@ -19,19 +19,19 @@
 		class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand {locale ===
 		'en'
 			? 'text-brand-bright'
-			: 'text-white/60 transition-colors hover:text-white'}"
+			: 'text-foreground-muted transition-colors hover:text-foreground'}"
 		aria-label="Switch to English"
 	>
 		EN
 	</a>
-	<span class="text-white/30" aria-hidden="true">|</span>
+	<span class="text-foreground-subtle" aria-hidden="true">|</span>
 	<a
 		href={zhHref}
 		data-sveltekit-reload
 		class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand {locale ===
 		'zh'
 			? 'text-brand-bright'
-			: 'text-white/60 transition-colors hover:text-white'}"
+			: 'text-foreground-muted transition-colors hover:text-foreground'}"
 		aria-label="切换为中文"
 	>
 		中文

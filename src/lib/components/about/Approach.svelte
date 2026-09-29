@@ -5,7 +5,7 @@
 	import ethicsImg from '$lib/assets/programs/ai-camp/ai-camp-HB8A5065.jpg?enhanced';
 </script>
 
-<section class="bg-[#0c0e12] py-12 lg:py-16" aria-label={m.about_approach_ariaLabel()}>
+<section class="bg-surface-3 py-12 lg:py-16" aria-label={m.about_approach_ariaLabel()}>
 	<div class="mx-auto max-w-[1400px] px-4 lg:px-6">
 		<!-- Section kicker -->
 		<Reveal y={20} duration={500}>
@@ -17,10 +17,10 @@
 					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 					aria-hidden="true"
 				></div>
-				<h2 class="mt-6 text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+				<h2 class="mt-6 text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
 					{m.about_approach_title()}
 				</h2>
-				<p class="mt-4 max-w-xl text-base leading-relaxed text-white/60 md:text-lg">
+				<p class="mt-4 max-w-xl text-base leading-relaxed text-foreground-muted md:text-lg">
 					{m.about_approach_subtitle()}
 				</p>
 			</div>
@@ -43,8 +43,8 @@
 			<div class="hidden lg:block" aria-hidden="true"></div>
 			<Reveal y={20} duration={500} delay={50}>
 				<div>
-					<h3 class="text-xl font-bold text-white">{m.about_approach_howWeTeach_heading()}</h3>
-					<p class="mt-2 max-w-2xl text-base leading-relaxed text-white/60">
+					<h3 class="text-xl font-bold text-foreground">{m.about_approach_howWeTeach_heading()}</h3>
+					<p class="mt-2 max-w-2xl text-base leading-relaxed text-foreground-muted">
 						{m.about_approach_howWeTeach_description()}
 					</p>
 				</div>
@@ -64,8 +64,8 @@
 					/>
 				</div>
 				<div>
-					<h3 class="text-xl font-bold text-white">{m.about_approach_ethics_heading()}</h3>
-					<p class="mt-2 text-base leading-relaxed text-white/60">
+					<h3 class="text-xl font-bold text-foreground">{m.about_approach_ethics_heading()}</h3>
+					<p class="mt-2 text-base leading-relaxed text-foreground-muted">
 						{m.about_approach_ethics_description()}
 					</p>
 				</div>

@@ -32,7 +32,7 @@
 
 	<!-- Legibility gradient -->
 	<div
-		class="absolute inset-0 bg-gradient-to-tr from-black/85 via-black/55 to-black/20"
+		class="absolute inset-0 bg-gradient-to-tr from-overlay/95 via-overlay/70 to-overlay/55"
 		aria-hidden="true"
 	></div>
 
@@ -46,7 +46,7 @@
 						     hydration, so the largest quote line (the LCP text) is never gated behind
 						     hydration. Reduced-motion falls back to the static visible rest state. -->
 						<p
-							class="quote-line text-[clamp(1.75rem,5vw,3.75rem)] leading-[1.12] font-light tracking-tight text-white"
+							class="quote-line text-[clamp(1.75rem,5vw,3.75rem)] leading-[1.12] font-light tracking-tight text-band-foreground"
 							style:animation-delay="{i === 0 ? 0 : 150 + i * 110}ms"
 						>
 							{line}
@@ -55,20 +55,20 @@
 				{/each}
 			</blockquote>
 
-			<p class="mt-6 font-mono text-[11px] tracking-[0.25em] text-white/40 uppercase">
+			<p class="mt-6 font-mono text-[11px] tracking-[0.25em] text-band-foreground/80 uppercase">
 				{m.home_hero_author()}
 			</p>
 
 			<div class="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
 				<a
 					href={localizeHref('/programs')}
-					class="inline-flex h-12 items-center justify-center bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
+					class="inline-flex h-12 items-center justify-center bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
 				>
 					{m.home_hero_ctaPrograms()}
 				</a>
 				<a
 					href={localizeHref('/contact-us')}
-					class="inline-flex h-12 items-center justify-center border border-white/25 px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:border-white/60 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:translate-y-px active:scale-[0.97]"
+					class="inline-flex h-12 items-center justify-center border border-band-border-strong px-8 text-sm font-semibold tracking-wide text-band-foreground transition-all duration-200 hover:border-band-border-strong hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
 				>
 					{m.home_hero_ctaContact()}
 				</a>

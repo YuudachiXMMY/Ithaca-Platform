@@ -9,7 +9,8 @@
 	import * as m from '$lib/paraglide/messages';
 	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
 	import { focustrap } from '$lib/actions/focus-trap';
-	import logo from '$lib/assets/site/logo.png?enhanced';
+	import logoOnDark from '$lib/assets/site/logo.png?enhanced';
+	import logoOnLight from '$lib/assets/site/logo-ink.png?enhanced';
 
 	// Split nav items: left group / center logo / right group.
 	const LEFT_NAV = NAV_ITEMS.filter((item) => item.href !== '/contact-us');
@@ -102,6 +103,20 @@
 	// Canonical (de-localized) path so active-link detection works for /zh too.
 	const path = $derived(deLocalizeUrl(page.url).pathname);
 
+	// The stock logo's wordmark is ~50%-opacity WHITE (verified: its alpha channel peaks at 128),
+	// which the §8.2 light migration turned invisible on every light page. logo-ink.png recolours
+	// only the wordmark and leaves the blue mark alone, so the header picks whichever suits the
+	// ground it is actually sitting on.
+	//
+	// The header is transparent until scrolled, so before scroll the ground is the page's first
+	// section. Every route with a full-bleed photo hero — home, about, and each program DETAIL page
+	// (but not the /programs index, which opens on white) — still puts the logo on a dark scrim.
+	// Once scrolled the header paints `bg-surface-4/70` on every route, so the ink mark always wins.
+	const hasDarkHero = $derived(
+		path === '/' || path === '/about-us' || path.startsWith('/programs/')
+	);
+	const logo = $derived(!scrolled && hasDarkHero ? logoOnDark : logoOnLight);
+
 	function checkActive(href: string): boolean {
 		return href === '/' ? path === '/' : path === href || path.startsWith(href + '/');
 	}
@@ -142,7 +157,7 @@
 <header
 	class={cn(
 		'fixed inset-x-0 top-0 z-40 transition-all duration-500 ease-out',
-		scrolled ? 'border-b border-white/[0.06] bg-[#0a0c10]/70 backdrop-blur-xl' : 'bg-transparent'
+		scrolled ? 'border-b border-border bg-surface-4/70 backdrop-blur-xl' : 'bg-transparent'
 	)}
 >
 	<div
@@ -171,7 +186,7 @@
 								href={localizeHref(item.href)}
 								class={cn(
 									'relative flex items-center gap-1.5 py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
-									active ? 'text-brand-bright' : 'text-white/60 hover:text-white'
+									active ? 'text-brand-bright' : 'text-foreground-muted hover:text-foreground'
 								)}
 								aria-expanded={open}
 								aria-haspopup="true"
@@ -189,14 +204,14 @@
 
 							{#if open}
 								<div
-									class="absolute top-full left-0 z-50 mt-2 min-w-[220px] overflow-hidden rounded-sm border border-white/[0.08] bg-[#0a0c10]/90 py-2 shadow-2xl backdrop-blur-xl"
+									class="absolute top-full left-0 z-50 mt-2 min-w-[220px] overflow-hidden rounded-sm border border-border bg-surface-4/90 py-2 shadow-2xl backdrop-blur-xl"
 									role="menu"
 									transition:fly={{ y: 8, duration: dropdownDuration }}
 								>
 									{#each item.children as child (child.href)}
 										<a
 											href={localizeHref(child.href)}
-											class="block px-4 py-2.5 text-sm text-white/55 transition-colors hover:bg-white/5 hover:text-white"
+											class="block px-4 py-2.5 text-sm text-foreground-muted transition-colors hover:bg-surface-2 hover:text-foreground"
 											role="menuitem"
 										>
 											{navLabel(child.label)}
@@ -210,7 +225,7 @@
 							href={localizeHref(item.href)}
 							class={cn(
 								'relative py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
-								active ? 'text-brand-bright' : 'text-white/60 hover:text-white'
+								active ? 'text-brand-bright' : 'text-foreground-muted hover:text-foreground'
 							)}
 						>
 							{#if active}
@@ -255,7 +270,7 @@
 						href={localizeHref(item.href)}
 						class={cn(
 							'relative py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
-							active ? 'text-brand-bright' : 'text-white/60 hover:text-white'
+							active ? 'text-brand-bright' : 'text-foreground-muted hover:text-foreground'
 						)}
 					>
 						{#if active}
@@ -273,7 +288,7 @@
 			<button
 				bind:this={toggleEl}
 				onclick={() => (mobileOpen = !mobileOpen)}
-				class="rounded-sm p-2 text-white/70 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand lg:hidden"
+				class="rounded-sm p-2 text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand lg:hidden"
 				aria-label={mobileOpen ? m.common_nav_closeMenu() : m.common_nav_openMenu()}
 				aria-expanded={mobileOpen}
 			>
@@ -302,7 +317,7 @@
 	<!-- Backdrop as a full-screen button (a11y: keyboard-dismissable) -->
 	<button
 		type="button"
-		class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
+		class="fixed inset-0 z-40 bg-overlay/70 backdrop-blur-sm lg:hidden"
 		onclick={closeMobile}
 		aria-label={m.common_nav_closeMenu()}
 		transition:fade={{ duration: backdropDuration }}
@@ -310,14 +325,14 @@
 
 	<nav
 		use:focustrap
-		class="fixed top-0 right-0 z-50 flex h-full w-72 flex-col bg-[#0a0c10]/95 shadow-2xl backdrop-blur-xl lg:hidden"
+		class="fixed top-0 right-0 z-50 flex h-full w-72 flex-col bg-surface-4/95 shadow-2xl backdrop-blur-xl lg:hidden"
 		aria-label={m.common_nav_mobileNavigation()}
 		transition:fly={{ x: 288, duration: drawerDuration }}
 	>
 		<div class="flex items-center justify-end p-4">
 			<button
 				onclick={() => (mobileOpen = false)}
-				class="rounded-full p-2 text-white/50 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+				class="rounded-full p-2 text-foreground-subtle transition-colors hover:bg-surface-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 				aria-label={m.common_nav_closeMenu()}
 			>
 				<X class="h-5 w-5" />
@@ -336,7 +351,7 @@
 								'flex-1 rounded-sm px-3 py-2.5 text-sm font-medium transition-colors',
 								active
 									? 'bg-brand/10 text-brand-bright'
-									: 'text-white/70 hover:bg-white/5 hover:text-white'
+									: 'text-foreground-muted hover:bg-surface-2 hover:text-foreground'
 							)}
 						>
 							{navLabel(item.label)}
@@ -344,7 +359,7 @@
 						{#if item.children}
 							<button
 								onclick={() => toggleExpanded(item.label)}
-								class="rounded-sm p-2 text-white/50 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+								class="rounded-sm p-2 text-foreground-subtle transition-colors hover:bg-surface-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 								aria-expanded={expanded}
 								aria-label={m.common_nav_toggleSubmenu({ label: navLabel(item.label) })}
 							>
@@ -364,7 +379,7 @@
 								<li>
 									<a
 										href={localizeHref(child.href)}
-										class="block rounded-sm px-3 py-2 text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white"
+										class="block rounded-sm px-3 py-2 text-sm text-foreground-subtle transition-colors hover:bg-surface-2 hover:text-foreground"
 									>
 										{navLabel(child.label)}
 									</a>
@@ -376,7 +391,7 @@
 			{/each}
 		</ul>
 
-		<div class="border-t border-white/10 p-4">
+		<div class="border-t border-border p-4">
 			<LanguageSwitcher />
 		</div>
 	</nav>

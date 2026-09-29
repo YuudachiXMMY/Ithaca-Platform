@@ -41,7 +41,7 @@
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
 <section
-	class="flex flex-col bg-[#111318] py-14 md:py-20 lg:min-h-[100dvh]"
+	class="flex flex-col bg-surface-0 py-14 md:py-20 lg:min-h-[100dvh]"
 	aria-labelledby="programs-heading"
 >
 	<div class="mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-5 sm:px-8 md:px-[6vw]">
@@ -51,7 +51,7 @@
 			</p>
 			<h2
 				id="programs-heading"
-				class="mt-4 text-2xl font-bold tracking-tight text-white md:text-4xl"
+				class="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-4xl"
 			>
 				{m.about_programs_heading()}
 			</h2>
@@ -81,11 +81,11 @@
 								class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
 							/>
 							<div
-								class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"
+								class="absolute inset-0 bg-gradient-to-t from-overlay/95 via-overlay/70 to-transparent"
 							></div>
 							<div class="absolute bottom-0 left-0 p-4">
-								<h3 class="text-base font-bold text-white">{programs[0].label()}</h3>
-								<p class="mt-0.5 text-sm text-white/60">{programs[0].description()}</p>
+								<h3 class="text-base font-bold text-band-foreground">{programs[0].label()}</h3>
+								<p class="mt-0.5 text-sm text-band-foreground/80">{programs[0].description()}</p>
 							</div>
 						</div>
 					</a>
@@ -111,11 +111,11 @@
 							</div>
 							<div>
 								<h3
-									class="text-base font-bold text-white transition-colors group-hover:text-brand-bright"
+									class="text-base font-bold text-foreground transition-colors group-hover:text-brand-bright"
 								>
 									{program.label()}
 								</h3>
-								<p class="mt-0.5 text-sm text-white/60">{program.description()}</p>
+								<p class="mt-0.5 text-sm text-foreground-muted">{program.description()}</p>
 							</div>
 						</a>
 					</Reveal>

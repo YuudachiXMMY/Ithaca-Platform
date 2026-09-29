@@ -158,22 +158,22 @@
 			>
 				{m.programs_eliteInterview_hero_title()}
 			</h1>
-			<p class="mb-8 text-xl font-light tracking-tight text-white/70 md:text-2xl">
+			<p class="mb-8 text-xl font-light tracking-tight text-foreground-muted md:text-2xl">
 				{m.programs_eliteInterview_hero_subtitle()}
 			</p>
-			<p class="mb-10 max-w-[44ch] text-lg leading-relaxed text-white/60">
+			<p class="mb-10 max-w-[44ch] text-lg leading-relaxed text-foreground-muted">
 				{m.programs_eliteInterview_hero_description()}
 			</p>
 			<div class="mb-10 flex flex-wrap gap-3">
 				{#each HERO_PILLS as pill, i (i)}
-					<span class="border border-border px-4 py-2 text-xs font-medium text-white/70">
+					<span class="border border-border px-4 py-2 text-xs font-medium text-foreground-muted">
 						{pill()}
 					</span>
 				{/each}
 			</div>
 			<a
 				href={localizeHref('/contact-us')}
-				class="inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
+				class="inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 			>
 				{m.programs_eliteInterview_hero_applyNow()}
 				<ArrowRight class="h-5 w-5" />
@@ -199,7 +199,7 @@
 				class="absolute inset-0 h-full w-full object-cover"
 			/>
 			<div
-				class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"
+				class="absolute inset-0 bg-gradient-to-t from-overlay/95 via-overlay/70 to-transparent"
 			></div>
 		</div>
 	</section>
@@ -209,12 +209,12 @@
 		<div class="mx-auto max-w-[1100px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
 				<blockquote
-					class="mb-12 max-w-[22ch] text-2xl leading-snug font-light tracking-tight text-white/80 md:text-3xl lg:text-4xl"
+					class="mb-12 max-w-[22ch] text-2xl leading-snug font-light tracking-tight text-foreground/80 md:text-3xl lg:text-4xl"
 				>
 					{m.programs_eliteInterview_question_quote()}
 				</blockquote>
 				<div class="lg:pl-[20vw]">
-					<p class="max-w-[55ch] leading-relaxed text-white/60">
+					<p class="max-w-[55ch] leading-relaxed text-foreground-muted">
 						{m.programs_eliteInterview_question_body()}
 					</p>
 				</div>
@@ -234,7 +234,7 @@
 						class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 						aria-hidden="true"
 					></div>
-					<p class="mt-6 leading-relaxed text-white/60">
+					<p class="mt-6 leading-relaxed text-foreground-muted">
 						{m.programs_eliteInterview_whyNow_description()}
 					</p>
 				</div>
@@ -248,7 +248,7 @@
 						>
 							{m.programs_eliteInterview_whyNow_stats_gdp_value()}
 						</span>
-						<span class="text-sm tracking-wide text-white/50 uppercase">
+						<span class="text-sm tracking-wide text-foreground-subtle uppercase">
 							{m.programs_eliteInterview_whyNow_stats_gdp_label()}
 						</span>
 					</div>
@@ -260,7 +260,7 @@
 						>
 							{m.programs_eliteInterview_whyNow_stats_jobs_value()}
 						</span>
-						<span class="text-sm tracking-wide text-white/50 uppercase">
+						<span class="text-sm tracking-wide text-foreground-subtle uppercase">
 							{m.programs_eliteInterview_whyNow_stats_jobs_label()}
 						</span>
 					</div>
@@ -272,7 +272,7 @@
 						>
 							{m.programs_eliteInterview_whyNow_stats_adoption_value()}
 						</span>
-						<span class="text-sm tracking-wide text-white/50 uppercase">
+						<span class="text-sm tracking-wide text-foreground-subtle uppercase">
 							{m.programs_eliteInterview_whyNow_stats_adoption_label()}
 						</span>
 					</div>
@@ -294,7 +294,7 @@
 							class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 							aria-hidden="true"
 						></div>
-						<p class="mt-6 mb-12 max-w-[50ch] leading-relaxed text-white/60">
+						<p class="mt-6 mb-12 max-w-[50ch] leading-relaxed text-foreground-muted">
 							{m.programs_eliteInterview_tracks_subtitle()}
 						</p>
 					</Reveal>
@@ -311,7 +311,7 @@
 									</span>
 									<div class="pt-1">
 										<h3 class="mb-1.5 text-lg font-semibold text-foreground">{track.name()}</h3>
-										<p class="leading-relaxed text-white/60">{track.question()}</p>
+										<p class="leading-relaxed text-foreground-muted">{track.question()}</p>
 									</div>
 								</div>
 							</Reveal>
@@ -360,7 +360,7 @@
 							<h3 class="mb-4 text-xl font-bold text-foreground">{sector.title()}</h3>
 							<ul class="space-y-2">
 								{#each sector.roles as role, j (j)}
-									<li class="leading-relaxed text-white/60">{role()}</li>
+									<li class="leading-relaxed text-foreground-muted">{role()}</li>
 								{/each}
 							</ul>
 						</div>
@@ -392,10 +392,10 @@
 								{phase.phase()}
 							</span>
 							<h3 class="mb-2 text-2xl font-bold text-foreground">{phase.title()}</h3>
-							<p class="mb-6 text-sm text-white/50">{phase.duration()}</p>
+							<p class="mb-6 text-sm text-foreground-subtle">{phase.duration()}</p>
 							<ul class="space-y-2.5">
 								{#each phase.tasks as task, j (j)}
-									<li class="text-sm leading-relaxed text-white/60">{task()}</li>
+									<li class="text-sm leading-relaxed text-foreground-muted">{task()}</li>
 								{/each}
 							</ul>
 						</div>
@@ -428,12 +428,12 @@
 						<h3 class="mt-4 mb-4 text-2xl font-bold text-foreground">
 							{m.programs_eliteInterview_produce_report_title()}
 						</h3>
-						<p class="mb-6 max-w-[50ch] leading-relaxed text-white/60">
+						<p class="mb-6 max-w-[50ch] leading-relaxed text-foreground-muted">
 							{m.programs_eliteInterview_produce_report_description()}
 						</p>
 						<div class="flex flex-wrap gap-3">
 							{#each REPORT_TAGS as tag, i (i)}
-								<span class="border border-border/50 px-3 py-1.5 text-xs text-white/50">
+								<span class="border border-border/50 px-3 py-1.5 text-xs text-foreground-subtle">
 									{tag()}
 								</span>
 							{/each}
@@ -450,12 +450,12 @@
 						<h3 class="mt-4 mb-4 text-2xl font-bold text-foreground">
 							{m.programs_eliteInterview_produce_documentary_title()}
 						</h3>
-						<p class="mb-6 max-w-[50ch] leading-relaxed text-white/60">
+						<p class="mb-6 max-w-[50ch] leading-relaxed text-foreground-muted">
 							{m.programs_eliteInterview_produce_documentary_description()}
 						</p>
 						<div class="mt-auto flex flex-wrap gap-3">
 							{#each DOC_TAGS as tag, i (i)}
-								<span class="border border-border/50 px-3 py-1.5 text-xs text-white/50">
+								<span class="border border-border/50 px-3 py-1.5 text-xs text-foreground-subtle">
 									{tag()}
 								</span>
 							{/each}
@@ -465,7 +465,7 @@
 			</div>
 
 			<div class="mt-8 max-w-[60ch] border-l-2 border-brand/30 pl-6">
-				<p class="text-sm leading-relaxed text-white/50">
+				<p class="text-sm leading-relaxed text-foreground-subtle">
 					{m.programs_eliteInterview_produce_disclaimer()}
 				</p>
 			</div>
@@ -483,7 +483,7 @@
 					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 					aria-hidden="true"
 				></div>
-				<p class="mt-6 mb-12 text-white/60">
+				<p class="mt-6 mb-12 text-foreground-muted">
 					{m.programs_eliteInterview_faq_reachUsPrefix()}
 					<a
 						href="mailto:{m.programs_eliteInterview_faq_contactEmail()}"
@@ -506,10 +506,10 @@
 								{item.question()}
 							</span>
 							<ChevronDown
-								class="h-5 w-5 shrink-0 text-white/50 transition-transform duration-300 group-open:rotate-180"
+								class="h-5 w-5 shrink-0 text-foreground-subtle transition-transform duration-300 group-open:rotate-180"
 							/>
 						</summary>
-						<div class="max-w-[65ch] pb-6 leading-relaxed text-white/60">
+						<div class="max-w-[65ch] pb-6 leading-relaxed text-foreground-muted">
 							{item.answer()}
 						</div>
 					</details>
@@ -526,18 +526,18 @@
 			sizes="(max-width: 1024px) 100vw, 80vw"
 			class="absolute inset-0 h-full w-full object-cover"
 		/>
-		<div class="absolute inset-0 bg-background/80"></div>
+		<div class="absolute inset-0 bg-overlay/85"></div>
 		<div class="relative z-10 mx-auto max-w-[1100px] px-5 text-center sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
-				<h2 class="mb-6 text-3xl font-bold text-foreground md:text-4xl">
+				<h2 class="mb-6 text-3xl font-bold text-band-foreground md:text-4xl">
 					{m.programs_eliteInterview_cta_title()}
 				</h2>
-				<p class="mx-auto mb-10 max-w-xl text-white/60">
+				<p class="mx-auto mb-10 max-w-xl text-band-foreground/80">
 					{m.programs_eliteInterview_cta_subtitle()}
 				</p>
 				<a
 					href={localizeHref('/contact-us')}
-					class="inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
+					class="inline-flex h-12 items-center justify-center gap-2 bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
 				>
 					{m.programs_eliteInterview_cta_applyNow()}
 					<ArrowRight class="h-5 w-5" />

@@ -110,17 +110,17 @@
 	<section class="grid min-h-[85dvh] grid-cols-1 items-center gap-0 lg:grid-cols-2">
 		<div class="order-2 px-5 py-16 sm:px-8 md:px-[6vw] lg:order-1 lg:py-0 lg:pr-12 lg:pl-[6vw]">
 			<h1
-				class="mb-6 text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-white"
+				class="mb-6 text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-foreground"
 			>
 				{m.programs_aiCamp_hero_title()}
 			</h1>
-			<p class="mb-10 max-w-[44ch] text-lg leading-relaxed text-white/60">
+			<p class="mb-10 max-w-[44ch] text-lg leading-relaxed text-foreground-muted">
 				{m.programs_aiCamp_hero_subtitle()}<br /><br />
 				{m.programs_aiCamp_hero_startDate()}
 			</p>
 			<a
 				href={localizeHref('/contact-us')}
-				class="group inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
+				class="group inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 			>
 				{m.programs_aiCamp_hero_registerNow()}
 				<ArrowRight class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
@@ -164,7 +164,7 @@
 				class="absolute inset-0 h-full w-full object-cover"
 			/>
 			<div
-				class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"
+				class="absolute inset-0 bg-gradient-to-t from-overlay/95 via-overlay/70 to-transparent"
 			></div>
 		</div>
 	</section>
@@ -174,11 +174,11 @@
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
 				<div class="mb-12 max-w-[1100px]">
-					<h2 class="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+					<h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
 						{m.programs_aiCamp_overview_title()}
 					</h2>
 					<div class="mt-4 h-px w-10 bg-brand/30" aria-hidden="true"></div>
-					<div class="mt-8 max-w-[58ch] space-y-5 leading-relaxed text-white/60">
+					<div class="mt-8 max-w-[58ch] space-y-5 leading-relaxed text-foreground-muted">
 						<p>{m.programs_aiCamp_overview_p1()}</p>
 						<p>{m.programs_aiCamp_overview_p2()}</p>
 						<p>{m.programs_aiCamp_overview_p3()}</p>
@@ -240,7 +240,7 @@
 					</div>
 
 					<div>
-						<h2 class="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+						<h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
 							{m.programs_aiCamp_structure_title()}
 						</h2>
 						<div class="mt-4 mb-10 h-px w-10 bg-brand/30" aria-hidden="true"></div>
@@ -252,16 +252,16 @@
 									>
 										{detail.label()}
 									</span>
-									<span class="block leading-relaxed text-white/70">{detail.value()}</span>
+									<span class="block leading-relaxed text-foreground-muted">{detail.value()}</span>
 								</div>
 							{/each}
 						</div>
 
 						<div class="border-l-2 border-brand/30 pl-6">
-							<h3 class="mb-3 text-xl font-bold text-white">
+							<h3 class="mb-3 text-xl font-bold text-foreground">
 								{m.programs_aiCamp_structure_fieldTrips_title()}
 							</h3>
-							<p class="max-w-[55ch] leading-relaxed text-white/60">
+							<p class="max-w-[55ch] leading-relaxed text-foreground-muted">
 								{m.programs_aiCamp_structure_fieldTrips_description({
 									fidelity: m.programs_aiCamp_structure_fieldTrips_fidelity(),
 									vanguard: m.programs_aiCamp_structure_fieldTrips_vanguard(),
@@ -281,11 +281,11 @@
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
 				<div class="mb-12 lg:max-w-[60%]">
-					<h2 class="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+					<h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
 						{m.programs_aiCamp_contest_title()}
 					</h2>
 					<div class="mt-4 mb-6 h-px w-10 bg-brand/30" aria-hidden="true"></div>
-					<p class="mb-6 leading-relaxed text-white/60">
+					<p class="mb-6 leading-relaxed text-foreground-muted">
 						{m.programs_aiCamp_contest_intro()}
 						<a
 							href="https://aiec-youth.org"
@@ -296,12 +296,12 @@
 							{m.programs_aiCamp_contest_linkText()}
 						</a>
 					</p>
-					<p class="mb-6 leading-relaxed text-white/60">
+					<p class="mb-6 leading-relaxed text-foreground-muted">
 						{m.programs_aiCamp_contest_optional()}
 					</p>
 					<ol class="mb-8 space-y-3">
 						{#each MODULES as module, i (i)}
-							<li class="flex items-start gap-4 text-white/60">
+							<li class="flex items-start gap-4 text-foreground-muted">
 								<span
 									class="mt-1 shrink-0 font-mono text-[11px] tracking-[0.2em] text-brand uppercase"
 								>
@@ -350,7 +350,7 @@
 			<Reveal y={24}>
 				<div class="grid grid-cols-1 gap-12 lg:grid-cols-[3fr_2fr] lg:gap-16">
 					<div>
-						<h2 class="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+						<h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
 							{m.programs_aiCamp_goals_title()}
 						</h2>
 						<div class="mt-4 mb-10 h-px w-10 bg-brand/30" aria-hidden="true"></div>
@@ -361,21 +361,21 @@
 										class="flex cursor-pointer list-none items-center justify-between py-6 [&::-webkit-details-marker]:hidden"
 									>
 										<span
-											class="pr-4 text-lg font-medium text-white transition-colors group-hover:text-brand-bright"
+											class="pr-4 text-lg font-medium text-foreground transition-colors group-hover:text-brand-bright"
 										>
 											{goal.title()}
 										</span>
 										<ChevronDown
-											class="h-5 w-5 shrink-0 text-white/40 transition-transform duration-300 group-open:rotate-180"
+											class="h-5 w-5 shrink-0 text-foreground-subtle transition-transform duration-300 group-open:rotate-180"
 										/>
 									</summary>
-									<div class="max-w-[65ch] pb-6 leading-relaxed text-white/60">
+									<div class="max-w-[65ch] pb-6 leading-relaxed text-foreground-muted">
 										<p>{goal.description()}</p>
 									</div>
 								</details>
 							{/each}
 						</div>
-						<p class="mt-8 max-w-[50ch] text-sm leading-relaxed text-white/50">
+						<p class="mt-8 max-w-[50ch] text-sm leading-relaxed text-foreground-subtle">
 							{m.programs_aiCamp_goals_footer()}
 						</p>
 					</div>
@@ -397,7 +397,7 @@
 	<section class="bg-card-bg py-14 md:py-20">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
-				<h2 class="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+				<h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
 					{m.programs_aiCamp_team_title()}
 				</h2>
 				<div class="mt-4 mb-8 h-px w-10 bg-brand/30" aria-hidden="true"></div>
@@ -413,24 +413,24 @@
 
 				<div class="grid grid-cols-1 gap-12 md:grid-cols-2">
 					<div>
-						<h3 class="mb-4 text-xl font-bold text-white">
+						<h3 class="mb-4 text-xl font-bold text-foreground">
 							{m.programs_aiCamp_team_educators_title()}
 						</h3>
-						<p class="max-w-[50ch] leading-relaxed text-white/60">
+						<p class="max-w-[50ch] leading-relaxed text-foreground-muted">
 							{m.programs_aiCamp_team_educators_description()}
 						</p>
 					</div>
 
 					<div>
-						<h3 class="mb-4 text-xl font-bold text-white">
+						<h3 class="mb-4 text-xl font-bold text-foreground">
 							{m.programs_aiCamp_team_mentors_title()}
 						</h3>
-						<p class="mb-6 max-w-[50ch] leading-relaxed text-white/60">
+						<p class="mb-6 max-w-[50ch] leading-relaxed text-foreground-muted">
 							{m.programs_aiCamp_team_mentors_description()}
 						</p>
 						<a
 							href={localizeHref('/contact-us')}
-							class="group inline-flex h-12 items-center justify-center gap-2 border border-white/25 px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:border-white/60 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:translate-y-px active:scale-[0.97]"
+							class="group inline-flex h-12 items-center justify-center gap-2 border border-border-strong px-8 text-sm font-semibold tracking-wide text-foreground transition-all duration-200 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 						>
 							{m.programs_aiCamp_team_mentors_cta()}
 							<ArrowRight
@@ -447,10 +447,10 @@
 	<section class="py-14 md:py-20">
 		<div class="mx-auto max-w-3xl px-5 sm:px-8">
 			<Reveal y={24}>
-				<h2 class="mb-4 text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+				<h2 class="mb-4 text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
 					{m.programs_aiCamp_faq_title()}
 				</h2>
-				<p class="mb-12 text-white/50">
+				<p class="mb-12 text-foreground-subtle">
 					<a
 						href={localizeHref('/contact-us')}
 						class="text-brand-bright underline underline-offset-2 transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
@@ -466,15 +466,15 @@
 								class="flex cursor-pointer list-none items-center justify-between py-6 [&::-webkit-details-marker]:hidden"
 							>
 								<span
-									class="pr-4 text-lg font-medium text-white transition-colors group-hover:text-brand-bright"
+									class="pr-4 text-lg font-medium text-foreground transition-colors group-hover:text-brand-bright"
 								>
 									{item.question()}
 								</span>
 								<ChevronDown
-									class="h-5 w-5 shrink-0 text-white/40 transition-transform duration-300 group-open:rotate-180"
+									class="h-5 w-5 shrink-0 text-foreground-subtle transition-transform duration-300 group-open:rotate-180"
 								/>
 							</summary>
-							<div class="max-w-[65ch] pb-6 leading-relaxed text-white/60">
+							<div class="max-w-[65ch] pb-6 leading-relaxed text-foreground-muted">
 								<p>{item.answer()}</p>
 							</div>
 						</details>
@@ -492,19 +492,21 @@
 			sizes="(max-width: 1024px) 100vw, 80vw"
 			class="absolute inset-0 h-full w-full object-cover"
 		/>
-		<div class="absolute inset-0 bg-background/80"></div>
+		<div class="absolute inset-0 bg-overlay/85"></div>
 		<div class="relative z-10 px-5 text-center sm:px-8">
 			<Reveal y={24}>
-				<h2 class="mb-6 text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+				<h2
+					class="mb-6 text-2xl font-bold tracking-tight text-band-foreground md:text-3xl lg:text-4xl"
+				>
 					{m.programs_aiCamp_cta_title()}
 				</h2>
-				<p class="mx-auto mb-10 max-w-xl leading-relaxed text-white/60">
+				<p class="mx-auto mb-10 max-w-xl leading-relaxed text-band-foreground/80">
 					{m.programs_aiCamp_cta_subtitle()}
 				</p>
 				<div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
 					<a
 						href={localizeHref('/contact-us')}
-						class="group inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
+						class="group inline-flex h-12 items-center justify-center gap-2 bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
 					>
 						{m.programs_aiCamp_cta_registerNow()}
 						<ArrowRight
@@ -513,7 +515,7 @@
 					</a>
 					<a
 						href={localizeHref('/contact-us')}
-						class="group inline-flex items-center gap-2 text-sm font-medium text-white/70 transition-colors duration-200 hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+						class="group inline-flex items-center gap-2 text-sm font-medium text-band-foreground/80 transition-colors duration-200 hover:text-band-brand-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand"
 					>
 						{m.programs_aiCamp_cta_requestBrochure()}
 						<ArrowRight

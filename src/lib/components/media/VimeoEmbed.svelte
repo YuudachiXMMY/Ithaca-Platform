@@ -13,12 +13,19 @@
 		/** iframe loading strategy. Omit for eager (browser default) so existing embeds stay
 		 *  byte-identical; pass 'lazy' to defer the player fetch on below-the-fold embeds. */
 		loading?: 'lazy' | 'eager';
+		/** Set when the embed is mounted inside a navy band section (docs/DESIGN-TOKENS.md §2).
+		 *  The frame and the pre-load fill then take the BAND column of §3.7: `--line` (#E5E7EB)
+		 *  on navy-900 is a 13.34:1 white hairline and mist is a 15.39:1 white box, where a
+		 *  1.29:1 divider was meant. */
+		band?: boolean;
 	}
-	let { videoId, title, aspectPadding, loading }: Props = $props();
+	let { videoId, title, aspectPadding, loading, band = false }: Props = $props();
 </script>
 
 <div
-	class="relative overflow-hidden border border-border bg-card-bg transition-colors hover:border-brand/15"
+	class="relative overflow-hidden border transition-colors {band
+		? 'border-band-border bg-band-soft hover:border-band-brand/15'
+		: 'border-border bg-card-bg hover:border-brand/15'}"
 	style="padding-top: {aspectPadding}"
 >
 	<iframe

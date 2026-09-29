@@ -31,7 +31,7 @@
 	];
 </script>
 
-<section class="bg-[#111318]" aria-label={m.home_mission_eyebrow()}>
+<section class="bg-surface-0" aria-label={m.home_mission_eyebrow()}>
 	<!-- Mission showcase: the empowerment statement, relocated here from the hero band as the
 	     page's single <h1>, set in soft brand light. Large light display echoes the hero Cavafy
 	     quote so the mission reads as the journey's destination. SSR-safe; Reveal is opacity-only. -->
@@ -42,7 +42,7 @@
 					{m.home_mission_eyebrow()}
 				</p>
 				<h1
-					class="mt-6 max-w-[28ch] text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-white"
+					class="mt-6 max-w-[28ch] text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-foreground"
 				>
 					{m.home_hero_empowerment()}
 				</h1>
@@ -50,7 +50,7 @@
 					class="mt-8 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 					aria-hidden="true"
 				></div>
-				<p class="mt-8 max-w-xl text-base leading-relaxed text-white/60 md:text-lg">
+				<p class="mt-8 max-w-xl text-base leading-relaxed text-foreground-muted md:text-lg">
 					{m.home_mission_lede()}
 				</p>
 			</Reveal>
@@ -63,7 +63,7 @@
 			<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
 				{m.home_mission_approachEyebrow()}
 			</p>
-			<p class="mx-auto mt-3 max-w-md text-lg font-medium text-white/80">
+			<p class="mx-auto mt-3 max-w-md text-lg font-medium text-foreground/80">
 				{m.home_mission_approachIntro()}
 			</p>
 		</Reveal>
@@ -94,11 +94,11 @@
 					<p class="font-mono text-[11px] tracking-[0.2em] text-brand uppercase">
 						{String(i + 1).padStart(2, '0')}
 					</p>
-					<h2 class="mt-3 text-2xl font-bold text-white md:text-3xl lg:text-4xl">
+					<h2 class="mt-3 text-2xl font-bold text-foreground md:text-3xl lg:text-4xl">
 						{pillar.title()}
 					</h2>
 					<div class="mt-4 h-px w-10 bg-brand/30" aria-hidden="true"></div>
-					<p class="mt-4 max-w-md text-base leading-relaxed text-white/60">
+					<p class="mt-4 max-w-md text-base leading-relaxed text-foreground-muted">
 						{pillar.description()}
 					</p>
 				</Reveal>

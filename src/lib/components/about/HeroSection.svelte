@@ -37,7 +37,7 @@
 
 	<!-- Gradient: strong left fade for text readability -->
 	<div
-		class="absolute inset-0 bg-gradient-to-r from-[#111318] via-[#111318]/80 to-[#111318]/30 lg:via-[#111318]/50 lg:to-transparent"
+		class="absolute inset-0 bg-gradient-to-r from-overlay/95 via-overlay/70 to-overlay/55 lg:via-overlay/70 lg:to-transparent"
 	></div>
 
 	<!-- Content - bottom-left -->
@@ -47,31 +47,33 @@
 		<!-- Above-the-fold hero text renders statically in SSR (no Reveal gate) so the LCP
 		     <p> paints immediately; mirrors how the homepage keeps its hero text in SSR. -->
 		<div class="max-w-md">
-			<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+			<p class="font-mono text-[11px] tracking-[0.28em] text-band-brand-strong uppercase">
 				{m.about_hero_eyebrow()}
 			</p>
 			<h1
 				id="about-heading"
-				class="mt-6 text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-white"
+				class="mt-6 text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-band-foreground"
 			>
 				{m.about_hero_title()}
 			</h1>
 			<div
-				class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+				class="mt-6 h-px w-24 bg-gradient-to-r from-band-brand via-band-brand/40 to-transparent"
 				aria-hidden="true"
 			></div>
-			<p class="mt-6 text-base leading-relaxed text-white/70">
+			<p class="mt-6 text-base leading-relaxed text-band-foreground/80">
 				{m.about_hero_subtitle()}
 			</p>
 
 			<!-- Monospace data strip -->
-			<div class="mt-6 flex gap-8 border-t border-white/10 pt-4">
+			<div class="mt-6 flex gap-8 border-t border-band-border pt-4">
 				{#each facts as fact (fact.label)}
 					<div>
-						<span class="block font-mono text-xs tracking-[0.15em] text-brand-bright uppercase">
+						<span
+							class="block font-mono text-xs tracking-[0.15em] text-band-brand-strong uppercase"
+						>
 							{fact.label()}
 						</span>
-						<span class="mt-0.5 block font-mono text-base text-white/70">
+						<span class="mt-0.5 block font-mono text-base text-band-foreground/80">
 							{fact.value()}
 						</span>
 					</div>

@@ -89,12 +89,12 @@
 		/>
 
 		<div
-			class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
+			class="absolute inset-0 bg-gradient-to-t from-overlay/95 via-overlay/70 to-transparent"
 			aria-hidden="true"
 		></div>
 
 		<span
-			class="absolute top-2 right-3 font-mono text-[48px] leading-none font-bold text-white/[0.05] select-none md:text-[64px]"
+			class="absolute top-2 right-3 font-mono text-[48px] leading-none font-bold text-band-foreground/[0.05] select-none md:text-[64px]"
 			aria-hidden="true"
 		>
 			{String(index + 1).padStart(2, '0')}
@@ -102,15 +102,17 @@
 
 		<div class="absolute inset-x-0 bottom-0 p-3 md:p-4">
 			<span
-				class="font-mono text-[10px] tracking-[0.18em] text-brand-bright uppercase md:text-[9px]"
+				class="font-mono text-[10px] tracking-[0.18em] text-band-brand-strong uppercase md:text-[9px]"
 			>
 				{highlight.tag()}
 			</span>
-			<h3 class="mt-1 text-sm leading-tight font-bold text-white md:text-sm">
+			<h3 class="mt-1 text-sm leading-tight font-bold text-band-foreground md:text-sm">
 				{highlight.title()}
 			</h3>
 			{#if showDescription}
-				<p class="mt-1.5 line-clamp-2 text-[11px] leading-snug text-white/40 md:text-[11px]">
+				<p
+					class="mt-1.5 line-clamp-2 text-[11px] leading-snug text-band-foreground/80 md:text-[11px]"
+				>
 					{highlight.description()}
 				</p>
 			{/if}
@@ -120,10 +122,12 @@
 
 <section aria-label={m.home_highlights_ariaLabel()}>
 	<!-- Mobile: header + 2-col grid (< md) -->
-	<div class="bg-[#0e1015] md:hidden">
+	<div class="bg-surface-1 md:hidden">
 		<div class="px-5 sm:px-8">
-			<div class="flex items-end justify-between border-b border-white/[0.06] pt-10 pb-4">
-				<h2 class="text-xl font-bold tracking-tight text-white">{m.home_highlights_heading()}</h2>
+			<div class="flex items-end justify-between border-b border-border pt-10 pb-4">
+				<h2 class="text-xl font-bold tracking-tight text-foreground">
+					{m.home_highlights_heading()}
+				</h2>
 			</div>
 		</div>
 		<div class="grid grid-cols-2 gap-[2px] px-5 py-2 sm:px-8">
@@ -136,20 +140,22 @@
 	</div>
 
 	<!-- Desktop: data-strip header + native horizontal scroll-snap mosaic (md+) -->
-	<div class="hidden bg-[#0e1015] md:block">
+	<div class="hidden bg-surface-1 md:block">
 		<!-- Compact data-strip header -->
 		<div class="px-5 sm:px-8 md:px-[6vw]">
-			<div class="flex items-end justify-between border-b border-white/[0.06] pt-16 pb-3">
-				<h2 class="text-xl font-bold tracking-tight text-white md:text-3xl">
+			<div class="flex items-end justify-between border-b border-border pt-16 pb-3">
+				<h2 class="text-xl font-bold tracking-tight text-foreground md:text-3xl">
 					{m.home_highlights_heading()}
 				</h2>
-				<p class="max-w-xs text-right text-[11px] leading-relaxed text-white/50">
+				<p class="max-w-xs text-right text-[11px] leading-relaxed text-foreground-subtle">
 					{m.home_highlights_subheading()}
 				</p>
 			</div>
 			<div class="flex gap-6 overflow-x-auto py-2.5">
 				{#each HIGHLIGHTS as h, i (i)}
-					<span class="shrink-0 font-mono text-[9px] tracking-[0.15em] text-white/50 uppercase">
+					<span
+						class="shrink-0 font-mono text-[9px] tracking-[0.15em] text-foreground-subtle uppercase"
+					>
 						{String(i + 1).padStart(2, '0')}
 						{h.tag()}
 					</span>

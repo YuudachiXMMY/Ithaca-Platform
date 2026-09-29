@@ -118,11 +118,11 @@
 					aria-hidden="true"
 				></div>
 				<h1
-					class="mt-8 text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-white"
+					class="mt-8 text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-foreground"
 				>
 					{m.contact_page_title()}
 				</h1>
-				<p class="mx-auto mt-4 max-w-xl text-base leading-relaxed text-white/60 md:text-lg">
+				<p class="mx-auto mt-4 max-w-xl text-base leading-relaxed text-foreground-muted md:text-lg">
 					{m.contact_page_description()}
 				</p>
 			</div>
@@ -137,7 +137,7 @@
 					{@const Icon = ch.icon}
 					{#snippet card()}
 						<div
-							class="group h-full border border-border/60 p-4 transition-all duration-200 hover:border-brand/40"
+							class="group h-full border border-border-strong p-4 transition-all duration-200 hover:border-brand"
 						>
 							<div class="mb-2 flex items-center gap-3">
 								<Icon class="h-4 w-4 shrink-0 text-brand" />
@@ -146,7 +146,7 @@
 								</p>
 							</div>
 							<p
-								class="text-sm leading-snug text-white/80 transition-colors group-hover:text-white {ch.mono
+								class="text-sm leading-snug text-foreground/80 transition-colors group-hover:text-foreground {ch.mono
 									? 'font-mono'
 									: ''}"
 							>
@@ -178,7 +178,9 @@
 			<!-- Contact form (posts to /api/contact) -->
 			<Reveal y={24} delay={160}>
 				<div>
-					<h2 class="mb-5 text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+					<h2
+						class="mb-5 text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl"
+					>
 						{m.contact_page_sendMessage()}
 					</h2>
 
@@ -191,7 +193,7 @@
 							<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
 								{m.contact_form_successTitle()}
 							</p>
-							<p class="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-white/70">
+							<p class="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-foreground-muted">
 								{m.contact_form_successMessage()}
 							</p>
 							<button
@@ -200,7 +202,7 @@
 									cfStatus = 'idle';
 									cfMessage = '';
 								}}
-								class="mt-6 inline-flex h-11 items-center justify-center border border-white/25 px-6 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:border-white/60 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:translate-y-px active:scale-[0.97]"
+								class="mt-6 inline-flex h-11 items-center justify-center border border-border-strong px-6 text-sm font-semibold tracking-wide text-foreground transition-all duration-200 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 							>
 								{m.contact_form_sendAnother()}
 							</button>
@@ -213,8 +215,11 @@
 						>
 							<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 								<div>
-									<label for="contact-name" class="mb-1.5 block text-xs font-medium text-white/70">
-										{m.contact_form_nameLabel()} <span class="text-red-400">*</span>
+									<label
+										for="contact-name"
+										class="mb-1.5 block text-xs font-medium text-foreground-muted"
+									>
+										{m.contact_form_nameLabel()} <span class="text-danger">*</span>
 									</label>
 									<input
 										id="contact-name"
@@ -223,13 +228,16 @@
 										bind:value={cf.name}
 										aria-invalid={cfStatus === 'error' && !cf.name.trim()}
 										placeholder={m.contact_form_namePlaceholder()}
-										class="w-full border border-border bg-background px-3 py-2.5 text-sm text-white placeholder-white/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+										class="w-full border border-border-strong bg-background px-3 py-2.5 text-sm text-foreground placeholder-foreground-subtle transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 									/>
 								</div>
 
 								<div>
-									<label for="contact-email" class="mb-1.5 block text-xs font-medium text-white/70">
-										{m.contact_form_emailLabel()} <span class="text-red-400">*</span>
+									<label
+										for="contact-email"
+										class="mb-1.5 block text-xs font-medium text-foreground-muted"
+									>
+										{m.contact_form_emailLabel()} <span class="text-danger">*</span>
 									</label>
 									<input
 										id="contact-email"
@@ -238,13 +246,16 @@
 										bind:value={cf.email}
 										aria-invalid={cfStatus === 'error' && !cf.email.trim()}
 										placeholder={m.contact_form_emailPlaceholder()}
-										class="w-full border border-border bg-background px-3 py-2.5 text-sm text-white placeholder-white/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+										class="w-full border border-border-strong bg-background px-3 py-2.5 text-sm text-foreground placeholder-foreground-subtle transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 									/>
 								</div>
 							</div>
 
 							<div>
-								<label for="contact-phone" class="mb-1.5 block text-xs font-medium text-white/70">
+								<label
+									for="contact-phone"
+									class="mb-1.5 block text-xs font-medium text-foreground-muted"
+								>
 									{m.contact_form_phoneLabel()}
 								</label>
 								<input
@@ -253,12 +264,15 @@
 									autocomplete="tel"
 									bind:value={cf.phone}
 									placeholder={m.contact_form_phonePlaceholder()}
-									class="w-full border border-border bg-background px-3 py-2.5 font-mono text-sm text-white placeholder-white/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+									class="w-full border border-border-strong bg-background px-3 py-2.5 font-mono text-sm text-foreground placeholder-foreground-subtle transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 								/>
 							</div>
 
 							<div>
-								<label for="contact-message" class="mb-1.5 block text-xs font-medium text-white/70">
+								<label
+									for="contact-message"
+									class="mb-1.5 block text-xs font-medium text-foreground-muted"
+								>
 									{m.contact_form_messageLabel()}
 								</label>
 								<textarea
@@ -266,7 +280,7 @@
 									rows="4"
 									bind:value={cf.message}
 									placeholder={m.contact_form_messagePlaceholder()}
-									class="w-full resize-y border border-border bg-background px-3 py-2.5 text-sm text-white placeholder-white/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+									class="w-full resize-y border border-border-strong bg-background px-3 py-2.5 text-sm text-foreground placeholder-foreground-subtle transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 								></textarea>
 							</div>
 
@@ -275,15 +289,17 @@
 									<input
 										type="checkbox"
 										bind:checked={cf.subscribe}
-										class="h-3.5 w-3.5 border-border bg-background accent-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+										class="h-3.5 w-3.5 border-border-strong bg-background accent-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 									/>
-									<span class="text-xs text-white/60">{m.contact_form_subscribeLabel()}</span>
+									<span class="text-xs text-foreground-muted"
+										>{m.contact_form_subscribeLabel()}</span
+									>
 								</label>
 
 								<button
 									type="submit"
 									disabled={cfStatus === 'submitting'}
-									class="inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97] disabled:opacity-60"
+									class="inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97] disabled:opacity-60"
 								>
 									{cfStatus === 'submitting'
 										? m.contact_form_submittingButton()
@@ -292,7 +308,7 @@
 							</div>
 
 							{#if cfStatus === 'error'}
-								<p class="text-sm text-red-400" role="alert" aria-live="polite">
+								<p class="text-sm text-danger" role="alert" aria-live="polite">
 									{cfMessage}
 								</p>
 							{/if}
@@ -304,7 +320,9 @@
 			<!-- Google Maps (lazy) -->
 			<Reveal y={24} delay={240}>
 				<div class="flex h-full flex-col">
-					<h2 class="mb-5 text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+					<h2
+						class="mb-5 text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl"
+					>
 						{m.contact_page_findUs()}
 					</h2>
 					<div
@@ -325,8 +343,8 @@
 								class="h-full w-full"
 							></iframe>
 						{:else}
-							<div class="flex h-full w-full items-center justify-center bg-border/10">
-								<MapPin class="h-8 w-8 text-white/20" />
+							<div class="flex h-full w-full items-center justify-center bg-surface-2">
+								<MapPin class="h-8 w-8 text-foreground-subtle" />
 							</div>
 						{/if}
 					</div>

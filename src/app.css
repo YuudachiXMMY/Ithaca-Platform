@@ -1,47 +1,430 @@
 @import 'tailwindcss';
 
+/* ==========================================================================
+   Ithaca Family Academy — colour + surface token layer
+   --------------------------------------------------------------------------
+   ARCHITECTURE (do not flatten it). Two layers, on purpose:
+
+     :root          the VALUE layer. Every literal colour in the design system
+                    is declared exactly once, here.
+     @theme inline  the ALIAS layer. Maps each value onto a Tailwind v4 theme
+                    key. `inline` means Tailwind substitutes the *expression*
+                    into the utility, so `text-brand` compiles to
+                    `color: var(--brand)` — not `var(--color-brand)`. That
+                    indirection is the seam that makes ~456 utility
+                    occurrences (including every `/5`…`/95` opacity modifier,
+                    which Tailwind emits as `color-mix(… var(--brand) N% …)`)
+                    follow a change made in `:root` alone. PRESERVE IT.
+
+   DIRECTION (2026-09-29, docs/DECISIONS.md D-1). This file used to describe a
+   dark-first site: `--background #111318`, `--foreground #f0f1f3`, sections
+   between #0a0c10 and #111318, photo scrims at `from-black/80`. The owner
+   chose to implement prd.md §8.2 LITERALLY, and §8.2 is a LIGHT system —
+   `ink` body text on `mist`/`white`, navy reserved for dark section blocks.
+   So the token NAMES below are unchanged (the utilities depend on them) and
+   the VALUES are inverted. Everything that could not follow a value swap —
+   the rgba() literals, the `var()` fallback literals, the ambient/glass
+   classes — is rewritten here in `color-mix()` terms so it follows from now on.
+
+   The applier contract for the ~500 colour literals still living in `.svelte`
+   files is docs/DESIGN-TOKENS.md. Do not invent a replacement; look it up.
+
+   Contrast: every pair this system depends on is computed (WCAG 2.x relative
+   luminance, sRGB, 8-bit-rounded compositing for alpha) and tabulated in
+   docs/DESIGN-TOKENS.md §4. Numbers quoted in the comments below come from
+   that table and were recomputed 2026-09-29.
+
+   color-mix() DISCIPLINE — read before adding one. prd.md §14 R-COMPAT-1 makes
+   iOS Safari 16+ and the WeChat Android X5 webview required targets. color-mix()
+   landed in Safari 16.2 and Chrome 111; iOS Safari 16.0/16.1 and X5 (commonly
+   Chromium <= 107) do NOT have it, and WeChat-on-mobile is this site's primary
+   arrival path. Every color-mix() here also contains a var(), which makes the
+   declaration "invalid at COMPUTED-VALUE time", not at parse time — so the
+   property computes to its INITIAL value and an earlier plain declaration in the
+   same rule is NOT used as a fallback (CSS Custom Properties §3). The only
+   shapes that work are (a) an @supports guard, or (b) putting the fallback on a
+   DIFFERENT property (e.g. background-color) than the enhancement
+   (background-image). This file uses (a), with Tailwind's own feature test
+   `@supports (color: color-mix(in lab, red, red))` so our guard and Tailwind's
+   guard for its `/N` opacity modifiers agree — a browser never gets one and not
+   the other. Base rule = no color-mix, on-palette, legible. @supports block =
+   the enhancement.
+   ========================================================================== */
+
 :root {
+	/* ---- Layout scalars -------------------------------------------------- */
 	--nav-h: 4.5rem;
-	--background: #111318;
-	--background-secondary: #f7f8fa;
-	--foreground: #f0f1f3;
-	--foreground-dark: #1b1b1b;
-	--accent: #ccdef0;
-	--accent-hover: #b8d0e8;
-	--card-bg: #181b21;
-	--border: #252830;
 
-	/* Brand color — logo-derived cerulean (static/media/images/site/logo.png).
-	   Deployed on the HOMEPAGE; other pages keep --accent until a later rollout.
-	   All values WCAG AA on --background #111318: brand 5.27:1 (text), brand-bright
-	   7.00:1 (text), white on action 5.51:1, white on action-hover 6.96:1.
-	   Discipline: brand TEXT must be full-opacity (brand/70 = 3.19, brand/50 = 2.21). */
-	--brand: #3e8fc7; /* signature: hairlines, icons, numbers, mission rule, focus rings */
-	--brand-bright: #5aa6db; /* eyebrows / labels / small text — full opacity only */
-	--action: #2a6ca8; /* solid CTA fill, white text */
-	--action-hover: #215c93; /* CTA hover (deepens) */
+	/* §8.2's `--container`, verbatim, kept here because CSS reads it as
+	   `var(--container)`; @theme inline aliases it to `max-w-page`.
+	   §8.2's `--radius-md` / `--radius-lg` are NOT declared here — see the
+	   @theme inline block for why they had to be renamed. */
+	--container: 1200px;
 
-	/* Font families — sourced from Fontsource (@fontsource/outfit) instead of next/font.
-	   Noto Sans SC is NOT loaded in Phase 0 (gated to /zh in Phase 1); the family name
-	   is still declared so the @theme --font-sans map keeps resolving as a fallback. */
+	/* ======================================================================
+	   1. PALETTE — prd.md §8.2, verbatim.
+	   Bare names here; `--color-*` aliases live in @theme inline, which is
+	   where §8.2's own spelling lands. Values are byte-identical to the PRD.
+	   ====================================================================== */
+
+	/* Navy — the inverted-band family. §8.2: "text on navy-900 is white". */
+	--navy-950: #071426; /* deepest band / photo scrim base */
+	--navy-900: #0b1f3a; /* the default dark section block */
+	--navy-700: #14325c; /* raised plane inside a band; band hairlines */
+	--navy-500: #2b4c7e; /* informational blue on light (8.61:1 on white) */
+
+	/* Teal — the single accent (§8.1 "one accent"). */
+	--teal-600: #0b6e70; /* THE teal that works on white: 6.04:1 text, 6.04:1 under white */
+	--teal-500: #0f8b8d; /* 4.12:1 on white — GRAPHICS ONLY, never text */
+	--teal-300: #5fc3c4; /* the teal for dark bands: 7.94:1 on navy-900 */
+	--teal-100: #d9f1f1; /* band chips / strongest band brand tone */
+
+	/* Amber — badges and shapes only. §8.2: "amber is never used for body text".
+	   The ban is arithmetic, not taste: amber-500 is 2.03:1 on white and
+	   amber-600 (the darkest amber §8.2 defines) is 2.68:1 — both fail even the
+	   3:1 large-text floor. Amber is legible only ON navy (8.15:1) or as a fill
+	   carrying ink text (8.75:1). See --amber-800 for amber-flavoured TEXT. */
+	--amber-600: #d98e14;
+	--amber-500: #f5a623;
+	--amber-200: #fce3b0;
+
+	/* Neutrals — the light ground. */
+	--ink: #111827; /* body text. 17.74:1 on white, 16.53:1 on mist */
+	--ink-2: #374151; /* secondary text. 10.31:1 / 9.60:1 */
+	--mist: #f5f7fa; /* the tinted page surface */
+	--line: #e5e7eb; /* DECORATIVE hairline only — 1.24:1, never a control edge */
+	--white: #ffffff;
+
+	/* ======================================================================
+	   2. DERIVED PALETTE — values §8.2 does not supply but the contrast maths
+	   demands. Each one exists because a §8.2 value measurably fails its role.
+	   ====================================================================== */
+
+	/* §8.2's teal ramp bottoms out at teal-600 (6.04:1 on white). The old dark
+	   system gave `--brand-bright` the *more legible* tone for small text and
+	   eyebrows (7.00:1 vs brand's 5.27:1). Inverting that discipline onto a
+	   light ground needs a teal darker than teal-600; there isn't one. */
+	--teal-700: #075355; /* 8.83:1 on white, 8.23:1 on mist */
+
+	/* Warning TEXT. amber-600 is 2.68:1 on white. This is amber taken down
+	   until it reads: 6.33:1 on white, 5.90:1 on mist. */
+	--amber-800: #8a5300;
+
+	/* Status hues §8.2 omits entirely. The site currently spends ~40 utilities
+	   on `text-red-400` / `text-green-300` / `text-yellow-300` / `text-blue-300`
+	   — dark-mode choices that all fail on a light ground. Tailwind v4 spells them
+	   in oklch: red-400 = oklch(70.4% .191 22.216) ~= #ff6467 = 2.89:1 on white,
+	   green-400 = oklch(79.2% .209 151.711) ~= #05df72 = 1.78:1. These are their
+	   light-ground replacements. */
+	--danger-600: #b3261e; /* 6.54:1 on white, 6.09:1 on mist */
+	--success-700: #0f7a3d; /* 5.42:1 on white, 5.05:1 on mist */
+	/* info reuses --navy-500 (8.61:1) — no new hue needed. */
+
+	/* Status wash fills. Ink on any of them clears 15:1. */
+	--danger-tint: #fdecea;
+	--success-tint: #e8f6ee;
+	--warning-tint: #fdf3dc;
+	--info-tint: #e7effa;
+
+	/* Status tones for the inverted band (light tints on navy). */
+	--danger-300: #fca5a5; /* 8.70:1 on navy-900 */
+	--success-300: #86efac; /* 11.76:1 */
+	--info-300: #a9c7f0; /* 9.53:1 */
+	/* band warning reuses --amber-500 (8.15:1). */
+
+	/* Two neutrals the §8.2 ramp is missing between ink-2 and line. */
+	--ink-3: #5b6575; /* tertiary/meta text; still AA (5.01:1) on the deepest surface */
+	--rule-strong: #7b8593; /* CONTROL boundaries — WCAG 1.4.11 needs 3:1 and
+	                           --line gives 1.24:1. 3.74/3.48/3.18:1 across the ladder. */
+
+	/* Band-side neutrals (the same three roles, measured against navy). */
+	--band-ink-2: #c3cedc; /* 10.37:1 on navy-900 */
+	--band-ink-3: #9aacc0; /* 7.11:1 */
+	/* Control boundaries on a band. WCAG 1.4.11 needs 3:1 against WHATEVER band
+	   surface the control sits on, and a band has four: navy-900, navy-950,
+	   navy-700 (--band-soft, "raised plane (card) inside a band") and --band-warm.
+	   The first draft of this token was #5a7296, which is 3.37:1 on navy-900 but
+	   only 2.61:1 on navy-700 and 3.01:1 on band-warm — i.e. it failed on the very
+	   surface a focusable card is most likely to be on. #7089a8 clears 3:1 on all
+	   four: 4.59 / 5.13 / 3.56 / 4.10. It had zero consumers, so raising it is
+	   free. */
+	--band-rule-strong: #7089a8;
+
+	/* ======================================================================
+	   3. LIGHT SURFACE LADDER.
+	   The dark site carried a five-step ladder as raw literals in 18 files
+	   (#0a0c10 < #0c0e12 < #0d0f14 < #0e1015 < #111318, darkest band to base)
+	   with no token at all. This is that ladder inverted and tokenised, rung
+	   for rung, so docs/DESIGN-TOKENS.md §3 can map each old literal to exactly
+	   one of these. --surface-0 is the base (was #111318) and each step recedes
+	   by getting *darker*, preserving the old alternation rhythm.
+	   Ink clears AAA on every rung (17.74 → 15.07:1); teal-600 clears AA
+	   (6.04 → 5.13:1) on every rung, which is why it, and not teal-500, is the
+	   brand colour that may carry text.
+	   ====================================================================== */
+	--surface-0: var(--white); /* base page — was #111318 */
+	--surface-1: #fafbfc; /* was #0e1015 */
+	--surface-2: var(--mist); /* was #0d0f14 */
+	--surface-3: #eef2f7; /* was #0c0e12 */
+	--surface-4: #e8edf3; /* deepest band — was #0a0c10 */
+
+	/* ======================================================================
+	   4. SEMANTIC TOKENS — the names ~456 utility occurrences already depend on.
+	   The NAMES are frozen. Only the values invert.
+	   ====================================================================== */
+
+	--background: var(--surface-0); /* was #111318 */
+	--foreground: var(--ink); /* was #f0f1f3 */
+	--foreground-muted: var(--ink-2); /* NEW — the solid replacement for text-white/60 */
+	--foreground-subtle: var(--ink-3); /* NEW — the solid replacement for text-white/40-/50 */
+
+	/* Kept, re-scoped. `--foreground-dark` had zero utility consumers but is a
+	   real slot in a light system: ink used *because the surface under it is a
+	   bright fill* (amber-500, teal-300, teal-100, amber-200), not because it is
+	   the page. Same value as --foreground today; distinct so the two can drift. */
+	--foreground-dark: var(--ink);
+
+	/* Cards lift off the page by getting *more* tinted, not lighter — there is
+	   nothing above white. Inside a mist band a card flips to --surface-0; see
+	   docs/DESIGN-TOKENS.md §3, row `bg-card-bg`. */
+	--card-bg: var(--surface-2); /* was #181b21 */
+	--border: var(--line); /* was #252830 — decorative hairline */
+	--border-strong: var(--rule-strong); /* NEW — interactive control edges */
+
+	/* Brand. The dark system's discipline was "--brand for lines/icons/numbers,
+	   --brand-bright for text, full opacity only". That discipline survives the
+	   inversion but "bright" now means HIGHER CONTRAST AGAINST THE SURFACE, not
+	   lighter — on a light ground the legible teal is the dark one.
+	   --brand is safe for BOTH text (6.04:1) and graphics; --brand-bright
+	   (8.83:1) is the emphatic tone for eyebrows/labels/small caps.
+	   Opacity discipline still applies, and the new numbers are HARSHER than the
+	   old cerulean ones this comment used to quote (3.9 / 2.8 were #3e8fc7
+	   figures and are wrong for teal): on white, brand/90 = 4.88:1 (the AA floor,
+	   0.38 of margin), brand/80 = 3.98 (large text only), brand/70 = 3.24
+	   (graphics only — 0.24 over the 3:1 floor, not "comfortable"), brand/50 =
+	   2.22 (decorative only). brand TEXT must be full-opacity. */
+	--brand: var(--teal-600); /* was #3e8fc7 */
+	--brand-bright: var(--teal-700); /* was #5aa6db */
+	--brand-graphic: var(--teal-500); /* NEW — 3.5–4.1:1: hairlines/fills, never text */
+
+	/* CTA. White on teal-600 is 6.04:1; hover deepens to 8.83:1, so contrast
+	   only ever improves on interaction.
+	   NOTE — on a light ground there is exactly one teal that both carries text
+	   at 4.5:1 and takes white text at 4.5:1, so --brand and --action have
+	   COLLAPSED onto the same value (they were #3e8fc7 vs #2a6ca8 before the
+	   inversion). All 14 `bg-action` CTAs pair it with `outline-brand`, so the
+	   focus ring is now the same hue as the fill it surrounds (1.00:1). That
+	   still satisfies WCAG 1.4.11 — but ONLY because `outline-offset-2` leaves a
+	   2px gap of page background, and teal-600 vs white is 6.04:1. DO NOT remove
+	   the offset from those call sites. See docs/DESIGN-TOKENS.md §3.0 R-FILL. */
+	--action: var(--teal-600); /* was #2a6ca8 */
+	--action-hover: var(--teal-700); /* was #215c93 */
+	--action-foreground: var(--white); /* NEW — made explicit; used to be implicit */
+
+	/* ======================================================================
+	   5. INVERTED BAND (dark section block).
+	   §8.2 keeps navy for dark blocks, and this site leans on alternating
+	   section colour hard (29 hardcoded band backgrounds). A light system
+	   therefore needs the inverted band as a FIRST-CLASS concept, with its own
+	   text / border / brand / action tokens, so a component inside a band never
+	   has to hand-pick a literal. Every `--band-*` token below is measured
+	   against --band (navy-900); all clear AA, most clear AAA.
+	   ====================================================================== */
+	--band: var(--navy-900); /* the default dark block */
+	--band-deep: var(--navy-950); /* deepest block; also the photo-scrim base */
+	--band-soft: var(--navy-700); /* raised plane (card) inside a band */
+	/* The one warm dark the EV "business track" panel needs; §8.2 has no dark
+	   amber, so it is derived from one. It is declared as a LITERAL because it is
+	   the only band surface reachable *only* through color-mix: without a literal,
+	   `bg-band-warm`, `.dissolve-panel-biz` and the prefers-reduced-transparency
+	   fallback all resolve to nothing on a pre-16.2 iOS Safari / X5 WeChat webview.
+	   #292823 is the exact 8-bit result of mixing navy-950 84% with amber-600 in
+	   sRGB — verified, not eyeballed. The @supports block right below re-derives it
+	   from the two tokens where color-mix exists, so it still FOLLOWS an edit to
+	   --navy-950 or --amber-600 on every browser that can compute it.
+	   Measured: white 14.77:1, band-ink-2 9.27:1, teal-300 7.10:1 on it. */
+	--band-warm: #292823;
+
+	--band-foreground: var(--white); /* 16.52:1 on navy-900 */
+	--band-foreground-muted: var(--band-ink-2); /* 10.37:1 */
+	--band-foreground-subtle: var(--band-ink-3); /* 7.11:1 */
+	--band-border: var(--navy-700); /* decorative, 1.29:1 — not a control edge */
+	/* Control edges on a band: 4.59:1 on navy-900, 3.56 worst case (on band-soft).
+	   The figure this comment used to print was the rejected #5a7296 draft's —
+	   see the note at --band-rule-strong above. */
+	--band-border-strong: var(--band-rule-strong);
+	--band-brand: var(--teal-300); /* 7.94:1 — brand text/lines on a band */
+	--band-brand-strong: var(--teal-100); /* 14.00:1 */
+
+	/* A teal-600 button on navy-900 has a 2.74:1 *boundary* against the band and
+	   fails WCAG 1.4.11. On a band the CTA therefore inverts too: teal-300 fill
+	   (7.94:1 boundary) carrying ink text (8.52:1). */
+	--band-action: var(--teal-300);
+	--band-action-hover: var(--teal-100);
+	--band-action-foreground: var(--ink);
+
+	/* ======================================================================
+	   6. STATUS.
+	   Light-ground values first, band values second. Never mix the two sets.
+	   ====================================================================== */
+	--success: var(--success-700); /* 5.42:1 on white */
+	--success-bg: var(--success-tint);
+	--warning: var(--amber-800); /* 6.33:1 on white */
+	--warning-bg: var(--warning-tint);
+	--danger: var(--danger-600); /* 6.54:1 on white */
+	--danger-bg: var(--danger-tint);
+	--info: var(--navy-500); /* 8.61:1 on white */
+	--info-bg: var(--info-tint);
+
+	--band-success: var(--success-300); /* 11.76:1 on navy-900 */
+	--band-warning: var(--amber-500); /* 8.15:1 */
+	--band-danger: var(--danger-300); /* 8.70:1 */
+	--band-info: var(--info-300); /* 9.53:1 */
+
+	/* ======================================================================
+	   7. PHOTO SCRIM.
+	   §8.2 asks for "a navy gradient overlay (≥ 40% at the text region)". 40% is
+	   not enough and the arithmetic says so: navy-950 at 40% over a mid-grey
+	   photo leaves white text at 4.28:1 (large-text only) and over a blown
+	   highlight at 2.60:1 (fails outright). The measured floors are 70% for
+	   normal-size text and 55% for display text; docs/DESIGN-TOKENS.md §5 turns
+	   those into exact gradient utilities.
+	   ====================================================================== */
+	--overlay: var(--navy-950);
+
+	/* ======================================================================
+	   8. ADMIN LEGACY (deferred).
+	   The admin panel keeps its own dark greys this round — 125 hardcoded
+	   literals across 7 files, explicitly out of scope (docs/DECISIONS.md,
+	   "Open / deferred"). <Skeleton> is admin-only, so it must stay dark or it
+	   will glow inside a dark admin card. These two tokens exist purely to kill
+	   the `var(--card-bg, #1e1e1e)` fallback literals; retire them with the
+	   admin rework.
+	   ====================================================================== */
+	--skeleton-base: #1e1e1e;
+	--skeleton-sweep: #2e2e2e;
+
+	/* ======================================================================
+	   REMOVED in this pass (see docs/DESIGN-TOKENS.md §6):
+	     --accent, --accent-hover         0 consumers repo-wide (the *value*
+	                                      #ccdef0 lives on, hardcoded, in admin)
+	     --background-secondary           0 consumers; superseded by --surface-*
+	     --spacing-nav (@theme)           0 consumers; every call site already
+	                                      writes the arbitrary value var(--nav-h)
+	   ====================================================================== */
+
+	/* Font families — sourced from Fontsource (@fontsource/outfit). Untouched in
+	   this pass: the Manrope/Inter swap (§8.2 typography, plan task D6) is a
+	   separate change and must be measured against LCP on its own. */
 	--font-outfit: 'Outfit', sans-serif;
 	--font-noto-sans-sc: 'Noto Sans SC', sans-serif;
 }
 
+/* --band-warm, re-derived from its two source tokens wherever color-mix() is
+   available. The :root literal above is the floor; this is the enhancement. Same
+   value today (#292823), so nothing shifts visually — the point is that a future
+   edit to --navy-950 or --amber-600 propagates on modern browsers instead of
+   silently desynchronising from the literal. Feature test is Tailwind's own. */
+@supports (color: color-mix(in lab, red, red)) {
+	:root {
+		--band-warm: color-mix(in srgb, var(--navy-950) 84%, var(--amber-600));
+	}
+}
+
 @theme inline {
-	--spacing-nav: var(--nav-h);
+	/* §8.2 palette, under §8.2's own `--color-*` spelling. */
+	--color-navy-950: var(--navy-950);
+	--color-navy-900: var(--navy-900);
+	--color-navy-700: var(--navy-700);
+	--color-navy-500: var(--navy-500);
+	--color-teal-700: var(--teal-700);
+	--color-teal-600: var(--teal-600);
+	--color-teal-500: var(--teal-500);
+	--color-teal-300: var(--teal-300);
+	--color-teal-100: var(--teal-100);
+	--color-amber-800: var(--amber-800);
+	--color-amber-600: var(--amber-600);
+	--color-amber-500: var(--amber-500);
+	--color-amber-200: var(--amber-200);
+	--color-ink: var(--ink);
+	--color-ink-2: var(--ink-2);
+	--color-ink-3: var(--ink-3);
+	--color-mist: var(--mist);
+	--color-line: var(--line);
+	--color-white: var(--white);
+
+	/* Surface ladder. */
+	--color-surface-0: var(--surface-0);
+	--color-surface-1: var(--surface-1);
+	--color-surface-2: var(--surface-2);
+	--color-surface-3: var(--surface-3);
+	--color-surface-4: var(--surface-4);
+
+	/* Semantic — the frozen names. */
 	--color-background: var(--background);
-	--color-background-secondary: var(--background-secondary);
 	--color-foreground: var(--foreground);
+	--color-foreground-muted: var(--foreground-muted);
+	--color-foreground-subtle: var(--foreground-subtle);
 	--color-foreground-dark: var(--foreground-dark);
-	--color-accent: var(--accent);
-	--color-accent-hover: var(--accent-hover);
 	--color-card-bg: var(--card-bg);
 	--color-border: var(--border);
+	--color-border-strong: var(--border-strong);
 	--color-brand: var(--brand);
 	--color-brand-bright: var(--brand-bright);
+	--color-brand-graphic: var(--brand-graphic);
 	--color-action: var(--action);
 	--color-action-hover: var(--action-hover);
+	--color-action-foreground: var(--action-foreground);
+
+	/* Inverted band. */
+	--color-band: var(--band);
+	--color-band-deep: var(--band-deep);
+	--color-band-soft: var(--band-soft);
+	--color-band-warm: var(--band-warm);
+	--color-band-foreground: var(--band-foreground);
+	--color-band-foreground-muted: var(--band-foreground-muted);
+	--color-band-foreground-subtle: var(--band-foreground-subtle);
+	--color-band-border: var(--band-border);
+	--color-band-border-strong: var(--band-border-strong);
+	--color-band-brand: var(--band-brand);
+	--color-band-brand-strong: var(--band-brand-strong);
+	--color-band-action: var(--band-action);
+	--color-band-action-hover: var(--band-action-hover);
+	--color-band-action-foreground: var(--band-action-foreground);
+
+	/* Status. */
+	--color-success: var(--success);
+	--color-success-bg: var(--success-bg);
+	--color-warning: var(--warning);
+	--color-warning-bg: var(--warning-bg);
+	--color-danger: var(--danger);
+	--color-danger-bg: var(--danger-bg);
+	--color-info: var(--info);
+	--color-info-bg: var(--info-bg);
+	--color-band-success: var(--band-success);
+	--color-band-warning: var(--band-warning);
+	--color-band-danger: var(--band-danger);
+	--color-band-info: var(--band-info);
+
+	/* Photo scrim — exposed so `from-overlay/70` is spellable. */
+	--color-overlay: var(--overlay);
+
+	/* §8.2 radii, values verbatim, key names changed. §8.2 spells them
+	   `--radius-md: 12px` / `--radius-lg: 20px`, but BOTH are existing Tailwind
+	   v4 theme keys (node_modules/tailwindcss/theme.css:399-400 = 0.375rem /
+	   0.5rem). Taking those names would silently resize the 28 `rounded-lg` and
+	   5 `rounded-sm` call sites already in the tree. So the utilities are
+	   `rounded-card` (12px) and `rounded-panel` (20px). Declared with literal
+	   values rather than via :root: a `--radius-card: var(--radius-card)` alias
+	   would be a self-reference, and nothing needs to read these at runtime. */
+	--radius-card: 12px;
+	--radius-panel: 20px;
+
+	/* §8.2 `--container: 1200px` → `max-w-page`. A bare `--container` is not a
+	   Tailwind namespace key (the namespace is `--container-*`), so the :root
+	   declaration is safe and `max-w-md` etc. keep their defaults. */
+	--container-page: var(--container);
+
 	--font-sans: var(--font-outfit), var(--font-noto-sans-sc);
 }
 
@@ -51,26 +434,90 @@ body {
 	font-family: var(--font-outfit), var(--font-noto-sans-sc), Arial, Helvetica, sans-serif;
 }
 
-/* Balanced text wrapping for headings */
+/* Balanced text wrapping for headings. Latin only — see the :lang(zh) block. */
 h1,
 h2,
 h3 {
 	text-wrap: balance;
 }
 
-/* Subtle grain texture to break digital flatness */
+/* ==========================================================================
+   CJK typography — prd.md §8.2, plan task D7.
+   Scoped to `:lang(zh)`, which is safe and prerender-free: src/app.html renders
+   <html lang="%lang%"> and hooks.server.ts substitutes the locale from the URL
+   (no cookie, no header). So every /zh page is `:lang(zh)` in the prerendered
+   HTML, and no component needs a class.
+
+   These selectors are deliberately OUTSIDE any @layer. Unlayered rules beat
+   layered ones in the cascade, so they override Tailwind's `tracking-*` /
+   `leading-*` utilities without `!important`.
+
+   The root rule is `html:lang(zh)`, NOT `:lang(zh)`. Language is an inherited
+   property of every element, so a bare `:lang(zh)` matches every element on a
+   Chinese page directly rather than cascading from <html> — and being unlayered
+   at (0,1,0) it then beats every @layer utilities rule at the same specificity.
+   Verified in a browser: with the bare selector, `text-5xl leading-none` computed
+   to a line-height of 84px (1.75 × 48px) instead of 48px, and a bare `text-5xl`
+   heading to 84px instead of 48px. That silently overrode exactly the display
+   leading the block below says it does not touch. Targeting <html> instead means
+   body copy still gets 1.75 by inheritance, while any explicit `leading-*` on an
+   element wins — which is the intent.
+   ========================================================================== */
+
+html:lang(zh) {
+	line-height: 1.75; /* §8.2 */
+	letter-spacing: normal; /* §8.2: no letter-spacing on Chinese */
+}
+
+/* 136 `tracking-*` utilities exist, including 25 × `tracking-[0.28em]` on
+   eyebrow labels. Latin tracking on CJK glyphs reads as broken spacing. */
+:lang(zh) [class*='tracking-'] {
+	letter-spacing: normal;
+}
+
+/* Body-scale leading lifts to the §8.2 1.75. Display leading (`leading-tight`,
+   `leading-none`, `leading-[1.05]`) is intentionally NOT touched — 1.75 on a
+   72px heading is not a Chinese typography rule, it is a body rule. */
+:lang(zh) .leading-normal,
+:lang(zh) .leading-snug,
+:lang(zh) .leading-relaxed,
+:lang(zh) .leading-loose {
+	line-height: 1.75;
+}
+
+/* §8.2: `text-wrap: balance` off for Chinese headings. Balance re-breaks lines
+   to even them out, which fights CJK's own line-breaking (every glyph is a
+   break opportunity, so "balance" just produces ragged, arbitrary breaks). */
+:lang(zh) h1,
+:lang(zh) h2,
+:lang(zh) h3 {
+	text-wrap: normal;
+}
+
+/* Corner brackets. The ZH catalogue already authors 「」 in copy; this covers
+   any <q>/quoted markup so it cannot regress to Latin double quotes. */
+:lang(zh) q {
+	quotes: '「' '」' '『' '』';
+}
+
+/* Subtle grain texture to break digital flatness. On the old dark ground this
+   read as a faint lift; on white the same noise is nearly invisible, so the
+   opacity is raised. Deliberately NOT `mix-blend-mode: multiply` — a
+   full-viewport blended layer forces a compositing pass on every paint. */
 body::before {
 	content: '';
 	position: fixed;
 	inset: 0;
 	z-index: 9999;
 	pointer-events: none;
-	opacity: 0.018;
+	opacity: 0.03;
 	background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 	background-size: 256px;
 }
 
-/* Skip-to-content for keyboard navigation */
+/* Skip-to-content for keyboard navigation. Solid CTA fill + its own foreground
+   token: white on teal-600 = 6.04:1. Previously brand fill + --foreground-dark,
+   which on the new palette would be ink on teal-600 = 2.94:1. */
 .skip-to-content {
 	position: absolute;
 	top: -100%;
@@ -78,8 +525,8 @@ body::before {
 	transform: translateX(-50%);
 	z-index: 10000;
 	padding: 0.75rem 1.5rem;
-	background: var(--brand);
-	color: var(--foreground-dark);
+	background: var(--action);
+	color: var(--action-foreground);
 	font-weight: 600;
 	font-size: 0.875rem;
 	border-radius: 0 0 0.5rem 0.5rem;
@@ -93,56 +540,99 @@ body::before {
 }
 
 /* Homepage — "Our Mission" ambient wash. Static, SSR-safe, no motion (needs no
-   reduced-motion guard). A low-alpha cerulean glow (brand #3e8fc7 at .10) so the mission
-   statement sits in soft brand light without becoming a glowing-accent cliche. */
+   reduced-motion guard). Was a cerulean glow on a dark ground; now a teal wash
+   lying on the white page so the mission statement sits in soft brand light.
+   `color-mix(… var(--brand) N%, transparent)` replaces the channel-decomposed
+   rgba(62,143,199,…) literals — rgba() cannot take a hex custom property, which
+   is the only reason those 12 glows were ever hardcoded. They follow now. */
 .mission-aura {
-	background:
-		radial-gradient(ellipse 900px 520px at 18% 0%, rgba(62, 143, 199, 0.1) 0%, transparent 62%),
-		var(--background);
+	/* Fallback floor (no color-mix): the flat page surface. The aura is a wash,
+	   not information — losing it costs nothing, losing the base fill would leave
+	   the mission block transparent. */
+	background: var(--background);
 }
 
-/* EV Challenge: Two Tracks dissolve panels (glassmorphism over 3D background) */
+@supports (color: color-mix(in lab, red, red)) {
+	.mission-aura {
+		background:
+			radial-gradient(
+				ellipse 900px 520px at 18% 0%,
+				color-mix(in srgb, var(--brand) 12%, transparent) 0%,
+				transparent 62%
+			),
+			var(--background);
+	}
+}
+
+/* EV Challenge: Two Tracks dissolve panels (glass over a 3D background).
+   The whole EV 3D stretch stays an INVERTED BAND — a 3D scene reads best on a
+   dark ground, and §8.2 explicitly keeps navy for dark section blocks. So these
+   panels stay dark glass; they are now expressed in band tokens rather than
+   eight hand-mixed rgba() literals. */
 .dissolve-panel-eng {
-	background: linear-gradient(
-		to right,
-		rgba(10, 22, 40, 0.7) 0%,
-		rgba(15, 30, 50, 0.45) 50%,
-		rgba(17, 19, 24, 0.2) 100%
-	);
+	/* Fallback floor: the opaque band surface — exactly what the
+	   prefers-reduced-transparency branch below already ships, so the degraded
+	   render is a designed state, not an accident. White panel copy stays at
+	   18.47:1 (on band-deep) instead of landing on the white body. */
+	background: var(--band-deep);
 	backdrop-filter: blur(16px) saturate(140%);
 	-webkit-backdrop-filter: blur(16px) saturate(140%);
 }
 .dissolve-panel-biz {
-	background: linear-gradient(
-		to left,
-		rgba(26, 22, 16, 0.7) 0%,
-		rgba(22, 19, 16, 0.45) 50%,
-		rgba(17, 19, 24, 0.2) 100%
-	);
+	background: var(--band-warm); /* white 14.77:1 */
 	backdrop-filter: blur(16px) saturate(140%);
 	-webkit-backdrop-filter: blur(16px) saturate(140%);
 }
 
-@media (min-width: 1024px) {
+@supports (color: color-mix(in lab, red, red)) {
 	.dissolve-panel-eng {
 		background: linear-gradient(
-			135deg,
-			rgba(8, 20, 34, 0.72) 0%,
-			rgba(13, 27, 46, 0.5) 50%,
-			rgba(10, 22, 40, 0.15) 100%
+			to right,
+			color-mix(in srgb, var(--band-deep) 72%, transparent) 0%,
+			color-mix(in srgb, var(--band) 46%, transparent) 50%,
+			color-mix(in srgb, var(--band) 20%, transparent) 100%
 		);
+	}
+	.dissolve-panel-biz {
+		background: linear-gradient(
+			to left,
+			color-mix(in srgb, var(--band-warm) 72%, transparent) 0%,
+			color-mix(in srgb, var(--band-warm) 46%, transparent) 50%,
+			color-mix(in srgb, var(--band) 20%, transparent) 100%
+		);
+	}
+}
+
+@media (min-width: 1024px) {
+	/* The masks are color-mix-free, so they apply on every browser; only the
+	   translucent gradient is gated. Without color-mix the panel is the solid
+	   band fill from the base rule, masked out at 65% — still a clean edge. */
+	.dissolve-panel-eng {
 		mask-image: linear-gradient(to right, black 0%, black 65%, transparent 100%);
 		-webkit-mask-image: linear-gradient(to right, black 0%, black 65%, transparent 100%);
 	}
 	.dissolve-panel-biz {
-		background: linear-gradient(
-			225deg,
-			rgba(28, 24, 16, 0.72) 0%,
-			rgba(22, 19, 16, 0.5) 50%,
-			rgba(26, 22, 16, 0.15) 100%
-		);
 		mask-image: linear-gradient(to left, black 0%, black 65%, transparent 100%);
 		-webkit-mask-image: linear-gradient(to left, black 0%, black 65%, transparent 100%);
+	}
+
+	@supports (color: color-mix(in lab, red, red)) {
+		.dissolve-panel-eng {
+			background: linear-gradient(
+				135deg,
+				color-mix(in srgb, var(--band-deep) 74%, transparent) 0%,
+				color-mix(in srgb, var(--band) 50%, transparent) 50%,
+				color-mix(in srgb, var(--band-deep) 15%, transparent) 100%
+			);
+		}
+		.dissolve-panel-biz {
+			background: linear-gradient(
+				225deg,
+				color-mix(in srgb, var(--band-warm) 74%, transparent) 0%,
+				color-mix(in srgb, var(--band-warm) 50%, transparent) 50%,
+				color-mix(in srgb, var(--band-warm) 15%, transparent) 100%
+			);
+		}
 	}
 }
 
@@ -153,26 +643,111 @@ body::before {
 		-webkit-backdrop-filter: none;
 	}
 	.dissolve-panel-eng {
-		background: #0a1628;
+		background: var(--band-deep);
 	}
 	.dissolve-panel-biz {
-		background: #1a1610;
+		background: var(--band-warm);
 	}
 }
 
-/* EV Challenge: Team Roles ambient background */
+/* --------------------------------------------------------------------------
+   EV Challenge 3D section — the three decorative layers that were written as
+   inline `style="background: …rgba(…)…"` attributes in EVModel3DSection.svelte
+   (:327, :444, :454). They carried #111318 (the deleted --background) and
+   #3e8fc7 (the deleted --brand), so a token swap could never reach them, and an
+   inline style cannot carry an @supports guard. Named here so they follow the
+   token layer AND get the same color-mix floor as everything else.
+   The applier's job is markup-only: replace the `style=` attribute with the
+   class. See docs/DESIGN-TOKENS.md §3.9.
+   -------------------------------------------------------------------------- */
+
+/* :327 — scene vignette. GSAP animates `opacity` on this element, so it must
+   keep its inline `style="opacity: 0"`; only the background moves here. */
+.ev-scene-vignette {
+	background: none; /* no color-mix: the vignette simply does not paint */
+}
+
+/* :444 — the 1px vertical seam between the two tracks. */
+.ev-seam-line {
+	background: linear-gradient(to bottom, transparent 15%, var(--band-brand) 50%, transparent 85%);
+}
+
+/* :454 — the wider glow aura around that seam. Pure ornament. */
+.ev-seam-glow {
+	background: none;
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+	.ev-scene-vignette {
+		background: radial-gradient(
+			ellipse at center,
+			color-mix(in srgb, var(--overlay) 15%, transparent),
+			color-mix(in srgb, var(--overlay) 40%, transparent) 60%
+		);
+	}
+	.ev-seam-line {
+		background: linear-gradient(
+			to bottom,
+			transparent 15%,
+			color-mix(in srgb, var(--band-brand) 20%, transparent) 35%,
+			color-mix(in srgb, var(--band-brand) 35%, transparent) 50%,
+			color-mix(in srgb, var(--band-brand) 20%, transparent) 65%,
+			transparent 85%
+		);
+	}
+	.ev-seam-glow {
+		background: radial-gradient(
+			ellipse at center,
+			color-mix(in srgb, var(--band-brand) 4%, transparent),
+			transparent 70%
+		);
+	}
+}
+
+/* EV Challenge: Team Roles ambient background. Inverted band; brand glow now
+   reads from --band-brand (teal-300) instead of rgba(62,143,199,…). */
 .ev-roles-bg {
-	background:
-		radial-gradient(ellipse 800px 600px at 15% 30%, rgba(62, 143, 199, 0.15) 0%, transparent 65%),
-		radial-gradient(ellipse 600px 500px at 85% 70%, rgba(90, 166, 219, 0.1) 0%, transparent 60%),
-		radial-gradient(ellipse at 50% 50%, rgba(20, 24, 32, 1) 0%, rgba(14, 16, 22, 1) 100%);
+	/* Fallback floor: the navy ground WITHOUT the two teal glows. This is the
+	   layer that matters — it is the only background on an `absolute inset-0`
+	   ground element (WorkshopToRoles.svelte), so losing it drops the whole
+	   section onto the white body with white text on it. The glows are decorative. */
+	background: radial-gradient(ellipse at 50% 50%, var(--band) 0%, var(--band-deep) 100%);
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+	.ev-roles-bg {
+		background:
+			radial-gradient(
+				ellipse 800px 600px at 15% 30%,
+				color-mix(in srgb, var(--band-brand) 16%, transparent) 0%,
+				transparent 65%
+			),
+			radial-gradient(
+				ellipse 600px 500px at 85% 70%,
+				color-mix(in srgb, var(--band-brand-strong) 10%, transparent) 0%,
+				transparent 60%
+			),
+			radial-gradient(ellipse at 50% 50%, var(--band) 0%, var(--band-deep) 100%);
+	}
 }
 
 .ev-roles-grid {
-	background-image: radial-gradient(circle 1.5px, rgba(62, 143, 199, 0.18) 0%, transparent 100%);
+	/* Fallback floor: solid --band-soft dots (1.29:1 against the band — the same
+	   decorative weight the 20%-teal dots read at). Purely ornamental either way. */
+	background-image: radial-gradient(circle 1.5px, var(--band-soft) 0%, transparent 100%);
 	background-size: 32px 32px;
 	mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 10%, transparent 65%);
 	-webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 10%, transparent 65%);
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+	.ev-roles-grid {
+		background-image: radial-gradient(
+			circle 1.5px,
+			color-mix(in srgb, var(--band-brand) 20%, transparent) 0%,
+			transparent 100%
+		);
+	}
 }
 
 /* Smooth scroll + prevent horizontal overflow */
@@ -181,15 +756,16 @@ html {
 	overflow-x: hidden;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar. The thumb uses --border-strong, not --border: on a white
+   track a 1.24:1 hairline is an invisible scrollbar. */
 ::-webkit-scrollbar {
 	width: 8px;
 }
 ::-webkit-scrollbar-track {
-	background: var(--background);
+	background: var(--surface-2);
 }
 ::-webkit-scrollbar-thumb {
-	background: var(--border);
+	background: var(--border-strong);
 	border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -218,35 +794,77 @@ html {
 	}
 }
 
-/* EV Challenge: ambient section backgrounds (deferred from Phase 1).
-   Referenced by routes/programs/ev-challenge/+page.svelte (sections at
-   219/437/548/628). Radial-gradient ambience keyed to the .ev-roles-bg
-   cerulean brand palette (rgba(62, 143, 199, …) glow over the dark base). */
-.ev-ambient-a {
-	background:
-		radial-gradient(ellipse 700px 500px at 20% 15%, rgba(62, 143, 199, 0.12) 0%, transparent 60%),
-		radial-gradient(ellipse 600px 500px at 90% 85%, rgba(90, 166, 219, 0.08) 0%, transparent 60%),
-		radial-gradient(ellipse at 50% 50%, rgba(19, 22, 30, 1) 0%, rgba(14, 16, 22, 1) 100%);
-}
-
-.ev-ambient-b {
-	background:
-		radial-gradient(ellipse 750px 550px at 85% 20%, rgba(62, 143, 199, 0.13) 0%, transparent 62%),
-		radial-gradient(ellipse 600px 480px at 12% 78%, rgba(90, 166, 219, 0.09) 0%, transparent 60%),
-		radial-gradient(ellipse at 50% 50%, rgba(20, 24, 32, 1) 0%, rgba(13, 15, 21, 1) 100%);
-}
-
-.ev-ambient-c {
-	background:
-		radial-gradient(ellipse 900px 650px at 50% 25%, rgba(62, 143, 199, 0.14) 0%, transparent 65%),
-		radial-gradient(ellipse 620px 520px at 50% 90%, rgba(90, 166, 219, 0.08) 0%, transparent 58%),
-		radial-gradient(ellipse at 50% 50%, rgba(20, 24, 32, 1) 0%, rgba(14, 16, 22, 1) 100%);
-}
-
+/* EV Challenge: ambient section backgrounds. Referenced by
+   routes/programs/ev-challenge/+page.svelte. Same inverted-band treatment as
+   .ev-roles-bg — navy ground, teal glow, all of it token-driven. */
+/* Fallback floor for all four: the navy ground alone. These four classes ARE the
+   only background on their sections (routes/programs/ev-challenge/+page.svelte),
+   and everything inside them is band-context text — so this is the declaration
+   that has to survive a browser without color-mix(). The teal glows on top are
+   decorative and are gated in the @supports block below. */
+.ev-ambient-a,
+.ev-ambient-b,
+.ev-ambient-c,
 .ev-ambient-close {
-	background:
-		radial-gradient(ellipse 800px 400px at 50% 100%, rgba(62, 143, 199, 0.08) 0%, transparent 60%),
-		radial-gradient(ellipse at 50% 50%, rgba(17, 19, 24, 1) 0%, rgba(13, 15, 20, 1) 100%);
+	background: radial-gradient(ellipse at 50% 50%, var(--band) 0%, var(--band-deep) 100%);
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+	.ev-ambient-a {
+		background:
+			radial-gradient(
+				ellipse 700px 500px at 20% 15%,
+				color-mix(in srgb, var(--band-brand) 12%, transparent) 0%,
+				transparent 60%
+			),
+			radial-gradient(
+				ellipse 600px 500px at 90% 85%,
+				color-mix(in srgb, var(--band-brand-strong) 8%, transparent) 0%,
+				transparent 60%
+			),
+			radial-gradient(ellipse at 50% 50%, var(--band) 0%, var(--band-deep) 100%);
+	}
+
+	.ev-ambient-b {
+		background:
+			radial-gradient(
+				ellipse 750px 550px at 85% 20%,
+				color-mix(in srgb, var(--band-brand) 13%, transparent) 0%,
+				transparent 62%
+			),
+			radial-gradient(
+				ellipse 600px 480px at 12% 78%,
+				color-mix(in srgb, var(--band-brand-strong) 9%, transparent) 0%,
+				transparent 60%
+			),
+			radial-gradient(ellipse at 50% 50%, var(--band) 0%, var(--band-deep) 100%);
+	}
+
+	.ev-ambient-c {
+		background:
+			radial-gradient(
+				ellipse 900px 650px at 50% 25%,
+				color-mix(in srgb, var(--band-brand) 14%, transparent) 0%,
+				transparent 65%
+			),
+			radial-gradient(
+				ellipse 620px 520px at 50% 90%,
+				color-mix(in srgb, var(--band-brand-strong) 8%, transparent) 0%,
+				transparent 58%
+			),
+			radial-gradient(ellipse at 50% 50%, var(--band) 0%, var(--band-deep) 100%);
+	}
+
+	/* The closing band, which hands back to the light page below it. */
+	.ev-ambient-close {
+		background:
+			radial-gradient(
+				ellipse 800px 400px at 50% 100%,
+				color-mix(in srgb, var(--band-brand) 8%, transparent) 0%,
+				transparent 60%
+			),
+			radial-gradient(ellipse at 50% 50%, var(--band) 0%, var(--band-deep) 100%);
+	}
 }
 
 /* --------------------------------------------------------------------------
@@ -289,14 +907,18 @@ html {
    Phase 4 — Interaction & perf hardening
    ========================================================================== */
 
-/* Skeleton placeholder (admin async loads). The <Skeleton> component sizes the
-   block; this owns the shimmer sweep + its reduced-motion neutralization. */
+/* Skeleton placeholder. ADMIN-ONLY (<Skeleton> is used in five admin routes and
+   nowhere public), and the admin panel is explicitly deferred from this rework
+   — so it stays dark on purpose. The two literals it needs now live in :root as
+   --skeleton-base / --skeleton-sweep, which is what retires the old
+   `var(--card-bg, #1e1e1e)` fallback literals: the fallback only ever fired
+   because --card-bg was a dark grey, and it is not one any more. */
 .skeleton {
 	background: linear-gradient(
 		90deg,
-		var(--card-bg, #1e1e1e) 25%,
-		rgba(255, 255, 255, 0.06) 37%,
-		var(--card-bg, #1e1e1e) 63%
+		var(--skeleton-base) 25%,
+		var(--skeleton-sweep) 37%,
+		var(--skeleton-base) 63%
 	);
 	background-size: 400% 100%;
 	animation: skeleton-shimmer 1.4s ease-in-out infinite;
@@ -311,13 +933,15 @@ html {
 	}
 }
 
-/* Global top nav-progress bar (root layout, driven by the `navigating` store). */
+/* Global top nav-progress bar (root layout, driven by the `navigating` store).
+   The `var(--brand, #3e8fc7)` fallback literal is gone — the fallback was dead
+   weight (--brand is always defined) and it pinned the old cerulean. */
 .nav-progress {
 	position: fixed;
 	inset: 0 0 auto 0;
 	height: 3px;
 	z-index: 100;
-	background: var(--brand, #3e8fc7);
+	background: var(--brand);
 	transform-origin: left;
 	animation: nav-indeterminate 1.2s ease-in-out infinite;
 }

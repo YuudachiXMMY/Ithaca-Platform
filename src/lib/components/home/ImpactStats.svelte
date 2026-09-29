@@ -30,26 +30,28 @@
 </script>
 
 <section
-	class="bg-[#0a0c10] py-20 md:py-28"
+	class="bg-surface-4 py-20 md:py-28"
 	aria-label={m.home_impact_ariaLabel()}
 	use:inview={{ threshold: 0.2 }}
 	oninview={start}
 >
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<div class="mb-12 text-center md:mb-16">
-			<h2 class="text-2xl font-bold tracking-tight text-white md:text-4xl">
+			<h2 class="text-2xl font-bold tracking-tight text-foreground md:text-4xl">
 				{m.home_impact_heading()}
 			</h2>
 		</div>
-		<div class="grid grid-cols-2 gap-px overflow-hidden bg-white/[0.04] md:grid-cols-4">
+		<div class="grid grid-cols-2 gap-px overflow-hidden bg-surface-2 md:grid-cols-4">
 			{#each STATS as stat, i (stat.label)}
 				<div
-					class="bg-[#0a0c10] p-6 text-center md:p-10"
+					class="bg-surface-4 p-6 text-center md:p-10"
 					style={prefersReducedMotion.current
 						? undefined
 						: `opacity:${started ? 1 : 0};transform:translateY(${started ? 0 : 60}px);transition:opacity 0.8s cubic-bezier(0.33,1,0.68,1) ${i * 250}ms,transform 0.8s cubic-bezier(0.33,1,0.68,1) ${i * 250}ms`}
 				>
-					<p class="font-mono text-4xl font-bold tracking-tight text-white md:text-5xl lg:text-6xl">
+					<p
+						class="font-mono text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl"
+					>
 						{#if prefersReducedMotion.current}
 							{stat.value}{stat.suffix}
 						{:else}
@@ -63,7 +65,7 @@
 							: `transform:scaleX(${started ? 1 : 0});transform-origin:center;transition:transform 0.5s cubic-bezier(0.33,1,0.68,1) ${i * 250 + 400}ms`}
 					></div>
 					<p class="mt-3 text-sm font-semibold text-brand-bright">{stat.label()}</p>
-					<p class="mt-1.5 text-xs leading-relaxed text-white/35">{stat.detail()}</p>
+					<p class="mt-1.5 text-xs leading-relaxed text-foreground-subtle">{stat.detail()}</p>
 				</div>
 			{/each}
 		</div>

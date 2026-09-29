@@ -9,7 +9,7 @@
 	// flow, reveal-on-scroll block: the iframe renders server-side and there is no empty spacer.
 </script>
 
-<section class="bg-[#111318] py-20 md:py-28" aria-label={m.home_featured_sectionAriaLabel()}>
+<section class="bg-surface-0 py-20 md:py-28" aria-label={m.home_featured_sectionAriaLabel()}>
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={24}>
 			<VimeoEmbed
@@ -27,11 +27,15 @@
 					<p class="text-[11px] font-semibold tracking-[0.2em] text-brand-bright uppercase">
 						{m.home_featured_eyebrow()}
 					</p>
-					<h2 class="mt-2 text-xl font-bold text-white md:text-2xl">{m.home_featured_title()}</h2>
+					<h2 class="mt-2 text-xl font-bold text-foreground md:text-2xl">
+						{m.home_featured_title()}
+					</h2>
 				</div>
 
-				<div class="border-t border-white/10 pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-10">
-					<p class="text-sm leading-relaxed text-white/55">{m.home_featured_description()}</p>
+				<div class="border-t border-border pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-10">
+					<p class="text-sm leading-relaxed text-foreground-muted">
+						{m.home_featured_description()}
+					</p>
 				</div>
 			</div>
 		</Reveal>

@@ -48,7 +48,7 @@
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
 <section
-	class="relative flex items-center justify-center bg-[#111318] px-5 py-16 sm:px-8 lg:min-h-[calc(100dvh-25.5rem)] lg:pt-[4.5rem] lg:pb-0"
+	class="relative flex items-center justify-center bg-surface-0 px-5 py-16 sm:px-8 lg:min-h-[calc(100dvh-25.5rem)] lg:pt-[4.5rem] lg:pb-0"
 	aria-label={m.nav_contactUs()}
 >
 	{#if !prefersReducedMotion.current}
@@ -63,7 +63,7 @@
 
 			<!-- Outer ring — slowest, clockwise -->
 			<div
-				class="orbital-ring absolute h-[18rem] w-[18rem] rounded-full border border-brand/[0.06] md:h-[26rem] md:w-[26rem]"
+				class="orbital-ring absolute h-[18rem] w-[18rem] rounded-full border border-brand/20 md:h-[26rem] md:w-[26rem]"
 				style="animation-duration: 40s;"
 			>
 				<div
@@ -76,7 +76,7 @@
 
 			<!-- Middle ring — counter-clockwise -->
 			<div
-				class="orbital-ring absolute h-[12rem] w-[12rem] rounded-full border border-brand/[0.04] md:h-[17rem] md:w-[17rem]"
+				class="orbital-ring absolute h-[12rem] w-[12rem] rounded-full border border-brand/20 md:h-[17rem] md:w-[17rem]"
 				style="animation-duration: 26s; animation-direction: reverse;"
 			>
 				<div
@@ -86,7 +86,7 @@
 
 			<!-- Inner ring — fastest, clockwise -->
 			<div
-				class="orbital-ring absolute h-[7rem] w-[7rem] rounded-full border border-brand/[0.08] md:h-[10rem] md:w-[10rem]"
+				class="orbital-ring absolute h-[7rem] w-[7rem] rounded-full border border-brand/20 md:h-[10rem] md:w-[10rem]"
 				style="animation-duration: 16s;"
 			>
 				<div
@@ -109,11 +109,11 @@
 
 	<div class="relative z-10 mx-auto max-w-2xl text-center">
 		<Reveal delay={0}>
-			<h2 class="text-3xl font-bold text-white md:text-5xl">{m.home_contact_heading()}</h2>
+			<h2 class="text-3xl font-bold text-foreground md:text-5xl">{m.home_contact_heading()}</h2>
 		</Reveal>
 
 		<Reveal delay={80}>
-			<p class="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/50">
+			<p class="mx-auto mt-4 max-w-md text-sm leading-relaxed text-foreground-subtle">
 				{m.home_contact_subtext()}
 			</p>
 		</Reveal>
@@ -126,10 +126,10 @@
 						{#if item.href}
 							<a
 								href={item.href}
-								class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand [&_span]:hover:text-white"
+								class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand [&_span]:hover:text-foreground"
 							>
 								<span
-									class="flex items-center gap-2 text-sm text-white/50 transition-colors duration-200"
+									class="flex items-center gap-2 text-sm text-foreground-subtle transition-colors duration-200"
 								>
 									<Icon class="h-3.5 w-3.5 shrink-0 text-brand/70" />
 									{item.value}
@@ -137,7 +137,7 @@
 							</a>
 						{:else}
 							<span
-								class="flex items-center gap-2 text-sm text-white/50 transition-colors duration-200"
+								class="flex items-center gap-2 text-sm text-foreground-subtle transition-colors duration-200"
 							>
 								<Icon class="h-3.5 w-3.5 shrink-0 text-brand/70" />
 								{item.value}
@@ -158,7 +158,7 @@
 					style={prefersReducedMotion.current
 						? undefined
 						: `translate: ${p.current.x}px ${p.current.y}px`}
-					class="group/cta inline-flex h-12 items-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-white transition-colors duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
+					class="group/cta inline-flex h-12 items-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-colors duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 				>
 					<span>{m.home_contact_cta()}</span>
 					<ArrowRight
