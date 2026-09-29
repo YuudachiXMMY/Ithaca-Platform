@@ -143,13 +143,13 @@
 				<h2 class="text-xl font-bold tracking-tight text-white md:text-3xl">
 					{m.home_highlights_heading()}
 				</h2>
-				<p class="max-w-xs text-right text-[11px] leading-relaxed text-white/30">
+				<p class="max-w-xs text-right text-[11px] leading-relaxed text-white/50">
 					{m.home_highlights_subheading()}
 				</p>
 			</div>
 			<div class="flex gap-6 overflow-x-auto py-2.5">
 				{#each HIGHLIGHTS as h, i (i)}
-					<span class="shrink-0 font-mono text-[9px] tracking-[0.15em] text-white/20 uppercase">
+					<span class="shrink-0 font-mono text-[9px] tracking-[0.15em] text-white/50 uppercase">
 						{String(i + 1).padStart(2, '0')}
 						{h.tag()}
 					</span>

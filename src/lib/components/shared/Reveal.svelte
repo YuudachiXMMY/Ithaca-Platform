@@ -34,16 +34,25 @@
 	// SSR / no-JS / reduced-motion: content renders visible (armed stays false). Only after
 	// mount, when motion is allowed, do we arm the pre-reveal state — so nothing is ever
 	// hidden from the server-rendered HTML.
+	let node: HTMLDivElement | undefined = $state();
 	let armed = $state(false);
 	let visible = $state(false);
 
 	$effect(() => {
 		if (prefersReducedMotion.current) return;
+		// Content that is already on screen at mount has nothing to reveal: arming it fades
+		// above-the-fold text in on first paint, which costs LCP and — because the opacity
+		// transition composites the text against the page background — renders it below the
+		// 4.5:1 contrast minimum for the length of the transition. Only arm what the reader
+		// still has to scroll to; that content is opacity:0 (inert) until it enters view.
+		const box = node?.getBoundingClientRect();
+		if (!box || (box.top < window.innerHeight && box.bottom > 0)) return;
 		armed = true;
 	});
 </script>
 
 <div
+	bind:this={node}
 	use:inview={{ once }}
 	oninview={() => (visible = true)}
 	onoutview={() => {
