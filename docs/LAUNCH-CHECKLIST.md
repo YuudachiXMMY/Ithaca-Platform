@@ -41,9 +41,21 @@ Last reviewed: 2026-09-29 · Status: **not ready** (workstreams in progress)
 
 ## Performance
 
+- [ ] 🔴 **`/programs/ev-challenge` LCP is 7.2s against a 2.5s target.** This is pre-existing
+      debt, not a redesign regression: measured on the same localhost setup at commit `12e2629`
+      (before the palette work) it was **6.94s / perf 70 / 2120 KiB**, versus 7.24s / 68 after —
+      run-to-run noise on a seven-second page. It only became visible because that route had
+      **never been in the Lighthouse URL list** and was added during the CI work. `lighthouserc.json`
+      holds it at a 7800ms ceiling so it cannot get worse; the ceiling comes down as the page does.
+      The LCP element is the hero photograph, and the page ships ~4.3 MB of its own assets in
+      production — roughly 4.6× the homepage. Needs its own pass.
 - [ ] 🔴 Lighthouse mobile on `/`, `/programs/ev-challenge`, `/contact-us`:
       Performance ≥ 90 · Accessibility ≥ 95 · SEO ≥ 95 · Best Practices ≥ 95
+      (current medians, localhost: `/` 84 · `/about-us` 88 · `/programs` 84 ·
+      `/programs/ev-challenge` 68 · `/contact-us` 90 · `/zh` 83 · `/zh/programs/ev-challenge` 73)
 - [ ] 🔴 LCP ≤ 2500ms, CLS ≤ 0.1, INP ≤ 200ms
+      (current LCP medians: `/` 3.93s · `/about-us` 3.32s · `/programs` 4.21s · `/contact-us` 3.16s ·
+      `/zh` 4.07s. **CLS is 0.000 on every route** — no work needed there.)
 - [ ] 🔴 No LCP element starts at `opacity: 0` — Chrome excludes such elements from LCP
       candidacy, which both hides the real metric and delays the paint users perceive
 - [ ] 🟡 The `/admissions` booking embed is lazy-loaded and has a plain-link fallback

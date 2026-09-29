@@ -83,12 +83,31 @@ Also needed: the instructor list (currently absent entirely).
 Related defect: `src/lib/data/team.ts:15,20,25,30` hardcodes the English honorifics
 `Mr.` / `Ms.`, which render untranslated on the Chinese site.
 
-### C-5 · Real stat values and sources (Q2)
+### C-5 · Real stat values and sources (Q2) — 🔴 two rules are in direct conflict
 
-`ImpactStats` currently hardcodes 200+ / 6 / 10+ / 50+ with no provenance. R-CONTENT-3
-requires a `source` on every `Stat` and says to omit a stat rather than render a number
-without one. The existing figures are carried forward on the owner's instruction, but each
-needs a source before launch.
+`ImpactStats` currently hardcodes 200+ / 6 / 10+ / 50+ with no provenance.
+
+**The conflict.** `prd.md` R-CONTENT-3 says a `Stat` must carry a `source`, and that an unsourced
+stat is omitted rather than rendered. `DECISIONS.md` Q2 says to keep the four existing figures. Both
+cannot hold: the four figures have no recorded provenance, so obeying R-CONTENT-3 means the homepage
+proof band renders **no counters at all**.
+
+`src/lib/content/stats.ts` models this the way the PRD requires — every `source` is a
+`TODO(content)` sentinel and the file exports an `isSourced()` render gate — rather than inventing
+provenance to make the numbers appear. That is deliberate: a fabricated source is worse than a
+missing counter, and the whole point of R-CONTENT-3 is that the previous build shipped a
+server-rendered `0+`.
+
+**Needed from owner — one line each, then the counters come back:**
+
+| Stat     | Current figure | Where does this number come from? |
+| -------- | -------------- | --------------------------------- |
+| Students | 200+           |                                   |
+| Programs | 6              |                                   |
+| Mentors  | 10+            |                                   |
+| Projects | 50+            |                                   |
+
+"Internal roster as of <date>" is a perfectly good source. It just has to be true and recorded.
 
 ### C-6 · Booking link (Q6)
 
