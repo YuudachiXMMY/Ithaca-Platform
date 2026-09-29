@@ -40,3 +40,9 @@ project.inlang/cache/
 /test-results/
 /blob-report/
 /playwright/.cache/
+
+# Playwright MCP scratch (page snapshots from browser-driving agents)
+.playwright-mcp/
+
+# Lighthouse CI run artifacts
+/.lighthouseci/
