@@ -66,7 +66,14 @@
 	{#if getLocale() === 'zh'}
 		<link rel="stylesheet" href="/fonts/noto-sans-sc.css" />
 	{/if}
-	{#if !isAdmin}
+	{#if isAdmin}
+		<!-- Every /admin route, not just the (protected) group. /admin/login sits OUTSIDE that
+		     group, so it previously received neither the public SEO tags nor a noindex — the
+		     admin sign-in page was the one indexable admin URL. robots.txt disallows /admin,
+		     but robots.txt is a crawl directive, not an indexing one: a disallowed URL can
+		     still be indexed from an external link. -->
+		<meta name="robots" content="noindex, nofollow" />
+	{:else}
 		<!-- Phase 4 SEO: canonical + en/zh/x-default hreflang + OG url/site + Organization JSON-LD.
 		     Per-page title/description/og:title come from each page's <Seo> component. -->
 		<link rel="canonical" href={seo.canonical} />
