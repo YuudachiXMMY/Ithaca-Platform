@@ -203,10 +203,14 @@
 {#if prefersReducedMotion.current}
 	<!-- Reduced motion: the Phase-1 static stacked layout (poster + Two Tracks). -->
 	<section
-		class="border-t border-band-border bg-band"
+		class="border-t border-border bg-surface-2"
 		aria-label={m.programs_evChallenge_model3d_sectionAriaLabel()}
 	>
-		<div class="relative min-h-[calc(80dvh_-_var(--nav-h))] overflow-hidden">
+		<!-- The poster block is a PHOTO SCRIM, not a section: the `opacity-40`
+		     image is composited against this wrapper, so the wrapper has to stay
+		     the scrim base (navy-950) or the gradient below would be laid over a
+		     washed-out photo on white and the display copy would lose its ground. -->
+		<div class="relative min-h-[calc(80dvh_-_var(--nav-h))] overflow-hidden bg-overlay">
 			<enhanced:img
 				src={machineImg}
 				alt="The custom-built Ithaca EV trike"
@@ -244,7 +248,7 @@
 
 		<div class="relative overflow-hidden">
 			<h2
-				class="px-6 pt-10 pb-8 text-center text-2xl font-bold tracking-tight text-band-foreground md:text-3xl lg:text-4xl"
+				class="px-6 pt-10 pb-8 text-center text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl"
 			>
 				{m.programs_evChallenge_model3d_twoTracksTitle()}
 			</h2>
@@ -253,21 +257,19 @@
 					<div class="dissolve-panel-eng absolute inset-0"></div>
 					<div class="relative z-10 px-6 py-8 md:px-12 lg:py-16 lg:pr-20 lg:pl-[8vw]">
 						<span
-							class="mb-3 block font-mono text-[10px] tracking-[0.25em] text-band-brand-strong uppercase"
+							class="mb-3 block font-mono text-[10px] tracking-[0.25em] text-brand-bright uppercase"
 						>
 							{m.programs_evChallenge_model3d_trackA()}
 						</span>
-						<h3 class="mb-2 text-lg font-bold tracking-tight text-band-foreground md:text-xl">
+						<h3 class="mb-2 text-lg font-bold tracking-tight text-foreground md:text-xl">
 							{m.programs_evChallenge_model3d_engineering_title()}
 						</h3>
-						<p class="mb-4 max-w-[40ch] text-sm leading-relaxed text-band-foreground-subtle">
+						<p class="mb-4 max-w-[40ch] text-sm leading-relaxed text-foreground-subtle">
 							{m.programs_evChallenge_model3d_engineering_description()}
 						</p>
 						<div class="flex flex-wrap gap-1.5">
 							{#each ENG_TAGS as tag, i (i)}
-								<span
-									class="border border-band-brand/30 px-2.5 py-1 text-[11px] text-band-brand-strong"
-								>
+								<span class="border border-brand/30 px-2.5 py-1 text-[11px] text-brand-bright">
 									{tag}
 								</span>
 							{/each}
@@ -281,21 +283,19 @@
 					>
 						<div class="lg:max-w-[400px]">
 							<span
-								class="mb-3 block font-mono text-[10px] tracking-[0.25em] text-band-brand-strong uppercase"
+								class="mb-3 block font-mono text-[10px] tracking-[0.25em] text-brand-bright uppercase"
 							>
 								{m.programs_evChallenge_model3d_trackB()}
 							</span>
-							<h3 class="mb-2 text-lg font-bold tracking-tight text-band-foreground md:text-xl">
+							<h3 class="mb-2 text-lg font-bold tracking-tight text-foreground md:text-xl">
 								{m.programs_evChallenge_model3d_business_title()}
 							</h3>
-							<p class="mb-4 max-w-[40ch] text-sm leading-relaxed text-band-foreground-subtle">
+							<p class="mb-4 max-w-[40ch] text-sm leading-relaxed text-foreground-subtle">
 								{m.programs_evChallenge_model3d_business_description()}
 							</p>
 							<div class="flex flex-wrap gap-1.5">
 								{#each BIZ_TAGS as tag, i (i)}
-									<span
-										class="border border-band-brand/30 px-2.5 py-1 text-[11px] text-band-brand-strong"
-									>
+									<span class="border border-brand/30 px-2.5 py-1 text-[11px] text-brand-bright">
 										{tag}
 									</span>
 								{/each}
@@ -310,7 +310,7 @@
 	<!-- Animated: scroll-pinned cinematic transition over the live 3D trike. -->
 	<section
 		bind:this={sectionEl}
-		class="relative min-h-[100dvh] overflow-hidden border-t border-band-border bg-band"
+		class="relative min-h-[100dvh] overflow-hidden border-t border-border bg-surface-2"
 		aria-label={m.programs_evChallenge_model3d_canvasAriaLabel()}
 	>
 		<!-- Layer 0: 3D canvas (lazy, client-only) — transforms via GSAP. -->
@@ -338,10 +338,10 @@
 			class="pointer-events-none absolute inset-x-0 top-[var(--nav-h)] bottom-0 z-10 flex flex-col justify-between px-6 py-4 md:px-12 md:py-8 lg:px-[8vw]"
 		>
 			<div bind:this={machineHeadEl}>
-				<h2 class="text-3xl font-bold tracking-tight text-band-foreground md:text-4xl lg:text-5xl">
+				<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl">
 					{m.programs_evChallenge_model3d_machineName()}
 				</h2>
-				<p class="mt-2 max-w-[30ch] text-sm text-band-foreground-subtle">
+				<p class="mt-2 max-w-[30ch] text-sm text-foreground-subtle">
 					{m.programs_evChallenge_model3d_machineDesc()}
 				</p>
 			</div>
@@ -349,10 +349,10 @@
 			<div bind:this={machineSpecEl} class="flex flex-wrap gap-x-8 gap-y-2">
 				{#each SPECS as spec, i (i)}
 					<div>
-						<span class="block text-[10px] tracking-wider text-band-foreground-subtle uppercase"
+						<span class="block text-[10px] tracking-wider text-foreground-subtle uppercase"
 							>{spec.label()}</span
 						>
-						<span class="font-mono text-xs text-band-foreground-subtle">{spec.value()}</span>
+						<span class="font-mono text-xs text-foreground-subtle">{spec.value()}</span>
 					</div>
 				{/each}
 			</div>
@@ -360,7 +360,7 @@
 
 		<!-- Layer 3: drag hint. -->
 		<div bind:this={hintEl} class="absolute right-6 bottom-6 z-10 md:right-12 lg:right-[8vw]">
-			<p class="text-[10px] tracking-wider text-band-foreground-subtle uppercase">
+			<p class="text-[10px] tracking-wider text-foreground-subtle uppercase">
 				{m.programs_evChallenge_model3d_dragToRotate()}
 			</p>
 		</div>
@@ -371,7 +371,7 @@
 				bind:this={tracksHeadEl}
 				class="absolute top-20 right-0 left-0 z-30 px-6 text-center lg:top-28"
 			>
-				<h2 class="text-2xl font-bold tracking-tight text-band-foreground md:text-3xl lg:text-4xl">
+				<h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
 					{m.programs_evChallenge_model3d_twoTracksTitle()}
 				</h2>
 			</div>
@@ -383,26 +383,22 @@
 					<div
 						class="relative z-10 flex h-full flex-col justify-center px-6 py-6 pt-28 md:px-12 md:pt-36 lg:py-0 lg:pt-[max(10rem,12vh)] lg:pr-28 lg:pl-[8vw]"
 					>
-						<span
-							class="mb-3 font-mono text-[10px] tracking-[0.25em] text-band-brand-strong uppercase"
-						>
+						<span class="mb-3 font-mono text-[10px] tracking-[0.25em] text-brand-bright uppercase">
 							{m.programs_evChallenge_model3d_trackA()}
 						</span>
 						<h3
-							class="mb-1 text-lg font-bold tracking-tight text-band-foreground md:mb-2 md:text-2xl lg:text-3xl"
+							class="mb-1 text-lg font-bold tracking-tight text-foreground md:mb-2 md:text-2xl lg:text-3xl"
 						>
 							{m.programs_evChallenge_model3d_engineering_title()}
 						</h3>
 						<p
-							class="mb-3 max-w-[40ch] text-xs leading-relaxed text-band-foreground-subtle md:mb-5 md:text-sm"
+							class="mb-3 max-w-[40ch] text-xs leading-relaxed text-foreground-subtle md:mb-5 md:text-sm"
 						>
 							{m.programs_evChallenge_model3d_engineering_description()}
 						</p>
 						<div class="flex flex-wrap gap-1.5">
 							{#each ENG_TAGS as tag, i (i)}
-								<span
-									class="border border-band-brand/30 px-2.5 py-1 text-[11px] text-band-brand-strong"
-								>
+								<span class="border border-brand/30 px-2.5 py-1 text-[11px] text-brand-bright">
 									{tag}
 								</span>
 							{/each}
@@ -418,25 +414,23 @@
 					>
 						<div class="lg:max-w-[400px]">
 							<span
-								class="mb-2 block font-mono text-[10px] tracking-[0.25em] text-band-brand-strong uppercase md:mb-3"
+								class="mb-2 block font-mono text-[10px] tracking-[0.25em] text-brand-bright uppercase md:mb-3"
 							>
 								{m.programs_evChallenge_model3d_trackB()}
 							</span>
 							<h3
-								class="mb-1 text-lg font-bold tracking-tight text-band-foreground md:mb-2 md:text-2xl lg:text-3xl"
+								class="mb-1 text-lg font-bold tracking-tight text-foreground md:mb-2 md:text-2xl lg:text-3xl"
 							>
 								{m.programs_evChallenge_model3d_business_title()}
 							</h3>
 							<p
-								class="mb-3 max-w-[40ch] text-xs leading-relaxed text-band-foreground-subtle md:mb-5 md:text-sm"
+								class="mb-3 max-w-[40ch] text-xs leading-relaxed text-foreground-subtle md:mb-5 md:text-sm"
 							>
 								{m.programs_evChallenge_model3d_business_description()}
 							</p>
 							<div class="flex flex-wrap gap-1.5">
 								{#each BIZ_TAGS as tag, i (i)}
-									<span
-										class="border border-band-brand/30 px-2.5 py-1 text-[11px] text-band-brand-strong"
-									>
+									<span class="border border-brand/30 px-2.5 py-1 text-[11px] text-brand-bright">
 										{tag}
 									</span>
 								{/each}

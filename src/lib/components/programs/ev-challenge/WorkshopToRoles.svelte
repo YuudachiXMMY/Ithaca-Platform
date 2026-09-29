@@ -235,7 +235,7 @@
 	<!-- Reduced motion: the Phase-1 static stacked sections. -->
 	<section class="py-20 md:py-32">
 		<div class="px-6 md:px-12 lg:px-[8vw]">
-			<h2 class="mb-8 text-2xl font-bold tracking-tight text-band-foreground md:text-3xl">
+			<h2 class="mb-8 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
 				{m.programs_evChallenge_workshopToRoles_workshopTitle()}
 			</h2>
 			<div
@@ -255,13 +255,13 @@
 		</div>
 	</section>
 
-	<section class="relative overflow-hidden border-t border-band-border py-24 md:py-40">
+	<section class="relative overflow-hidden border-t border-border py-24 md:py-40">
 		<div class="ev-roles-bg pointer-events-none absolute inset-0"></div>
 		<div class="ev-roles-grid pointer-events-none absolute inset-0"></div>
 
 		<div class="relative px-6 md:px-12 lg:px-[8vw]">
 			<h2
-				class="mb-16 text-3xl font-bold tracking-tight text-band-foreground md:mb-24 md:text-4xl lg:text-5xl"
+				class="mb-16 text-3xl font-bold tracking-tight text-foreground md:mb-24 md:text-4xl lg:text-5xl"
 			>
 				{m.programs_evChallenge_workshopToRoles_rolesTitle()}
 			</h2>
@@ -270,16 +270,16 @@
 					{#each ROLES_LEFT as role, i (i)}
 						{@const Icon = role.icon}
 						<div
-							class="group cursor-default border border-band-border p-8 transition-colors hover:border-band-brand/40 hover:bg-white/[0.03] lg:p-10"
+							class="group cursor-default border border-border bg-surface-0 p-8 transition-colors hover:border-brand/40 hover:bg-surface-1 lg:p-10"
 						>
 							<Icon
-								class="mb-6 h-8 w-8 text-band-brand transition-colors group-hover:text-band-brand-strong lg:h-10 lg:w-10"
+								class="mb-6 h-8 w-8 text-brand transition-colors group-hover:text-brand-bright lg:h-10 lg:w-10"
 								strokeWidth={1.5}
 							/>
-							<h3 class="mb-3 text-base font-semibold text-band-foreground lg:text-lg">
+							<h3 class="mb-3 text-base font-semibold text-foreground lg:text-lg">
 								{role.title()}
 							</h3>
-							<p class="max-w-[36ch] text-sm leading-relaxed text-band-foreground-subtle">
+							<p class="max-w-[36ch] text-sm leading-relaxed text-foreground-subtle">
 								{role.description()}
 							</p>
 						</div>
@@ -289,16 +289,16 @@
 					{#each ROLES_RIGHT as role, i (i)}
 						{@const Icon = role.icon}
 						<div
-							class="group cursor-default border border-band-border p-8 transition-colors hover:border-band-brand/40 hover:bg-white/[0.03] lg:p-10"
+							class="group cursor-default border border-border bg-surface-0 p-8 transition-colors hover:border-brand/40 hover:bg-surface-1 lg:p-10"
 						>
 							<Icon
-								class="mb-6 h-8 w-8 text-band-brand transition-colors group-hover:text-band-brand-strong lg:h-10 lg:w-10"
+								class="mb-6 h-8 w-8 text-brand transition-colors group-hover:text-brand-bright lg:h-10 lg:w-10"
 								strokeWidth={1.5}
 							/>
-							<h3 class="mb-3 text-base font-semibold text-band-foreground lg:text-lg">
+							<h3 class="mb-3 text-base font-semibold text-foreground lg:text-lg">
 								{role.title()}
 							</h3>
-							<p class="max-w-[36ch] text-sm leading-relaxed text-band-foreground-subtle">
+							<p class="max-w-[36ch] text-sm leading-relaxed text-foreground-subtle">
 								{role.description()}
 							</p>
 						</div>
@@ -314,7 +314,7 @@
 			<!-- Layer 1: workshop photos (scatter on scroll). -->
 			<div class="absolute inset-0 flex flex-col justify-center px-6 py-8 md:px-12 lg:px-[8vw]">
 				<h2
-					class="wtr-h-out mb-6 text-3xl font-bold tracking-tight text-band-foreground md:mb-10 md:text-4xl lg:text-5xl"
+					class="wtr-h-out mb-6 text-3xl font-bold tracking-tight text-foreground md:mb-10 md:text-4xl lg:text-5xl"
 				>
 					{m.programs_evChallenge_workshopToRoles_workshopTitle()}
 				</h2>
@@ -346,7 +346,7 @@
 				></div>
 
 				<h2
-					class="wtr-h-in relative mb-4 text-2xl font-bold tracking-tight text-band-foreground md:mb-12 md:text-4xl lg:mb-16 lg:text-5xl"
+					class="wtr-h-in relative mb-4 text-2xl font-bold tracking-tight text-foreground md:mb-12 md:text-4xl lg:mb-16 lg:text-5xl"
 				>
 					{m.programs_evChallenge_workshopToRoles_rolesTitle()}
 				</h2>
@@ -356,19 +356,19 @@
 						{#each ROLES_LEFT as role, i (i)}
 							{@const Icon = role.icon}
 							<div
-								class="wtr-card group cursor-default border border-band-border p-3 transition-colors will-change-transform hover:border-band-brand/40 hover:bg-white/[0.03] md:p-8 lg:p-10"
+								class="wtr-card group cursor-default border border-border bg-surface-0 p-3 transition-colors will-change-transform hover:border-brand/40 hover:bg-surface-1 md:p-8 lg:p-10"
 							>
 								<Icon
-									class="mb-2 h-5 w-5 text-band-brand transition-colors group-hover:text-band-brand-strong md:mb-5 md:h-8 md:w-8 lg:mb-6 lg:h-10 lg:w-10"
+									class="mb-2 h-5 w-5 text-brand transition-colors group-hover:text-brand-bright md:mb-5 md:h-8 md:w-8 lg:mb-6 lg:h-10 lg:w-10"
 									strokeWidth={1.5}
 								/>
 								<h3
-									class="mb-1 text-xs font-semibold text-band-foreground md:mb-2 md:text-base lg:mb-3 lg:text-lg"
+									class="mb-1 text-xs font-semibold text-foreground md:mb-2 md:text-base lg:mb-3 lg:text-lg"
 								>
 									{role.title()}
 								</h3>
 								<p
-									class="hidden max-w-[36ch] text-[11px] leading-relaxed text-band-foreground-subtle sm:block md:text-sm"
+									class="hidden max-w-[36ch] text-[11px] leading-relaxed text-foreground-subtle sm:block md:text-sm"
 								>
 									{role.description()}
 								</p>
@@ -380,19 +380,19 @@
 						{#each ROLES_RIGHT as role, i (i)}
 							{@const Icon = role.icon}
 							<div
-								class="wtr-card group cursor-default border border-band-border p-3 transition-colors will-change-transform hover:border-band-brand/40 hover:bg-white/[0.03] md:p-8 lg:p-10"
+								class="wtr-card group cursor-default border border-border bg-surface-0 p-3 transition-colors will-change-transform hover:border-brand/40 hover:bg-surface-1 md:p-8 lg:p-10"
 							>
 								<Icon
-									class="mb-2 h-5 w-5 text-band-brand transition-colors group-hover:text-band-brand-strong md:mb-5 md:h-8 md:w-8 lg:mb-6 lg:h-10 lg:w-10"
+									class="mb-2 h-5 w-5 text-brand transition-colors group-hover:text-brand-bright md:mb-5 md:h-8 md:w-8 lg:mb-6 lg:h-10 lg:w-10"
 									strokeWidth={1.5}
 								/>
 								<h3
-									class="mb-1 text-xs font-semibold text-band-foreground md:mb-2 md:text-base lg:mb-3 lg:text-lg"
+									class="mb-1 text-xs font-semibold text-foreground md:mb-2 md:text-base lg:mb-3 lg:text-lg"
 								>
 									{role.title()}
 								</h3>
 								<p
-									class="hidden max-w-[36ch] text-[11px] leading-relaxed text-band-foreground-subtle sm:block md:text-sm"
+									class="hidden max-w-[36ch] text-[11px] leading-relaxed text-foreground-subtle sm:block md:text-sm"
 								>
 									{role.description()}
 								</p>

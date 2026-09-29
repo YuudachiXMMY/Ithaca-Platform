@@ -15,14 +15,26 @@
  * Coordinate frame: X = front(−) → rear(+), Y = up, Z = left(−) / right(+).
  */
 
-/* Colors — the inverted-band palette (docs/DESIGN-TOKENS.md §3.8). A WebGL
-   material cannot read a CSS variable, so these mirror the band tokens as
-   JS-side constants: --band-brand (teal-300), --navy-500, --band-brand-strong
-   (teal-100). Renamed from ACCENT* — the deleted --accent token was never
-   their source. */
-export const BRAND = '#5FC3C4';
-export const BRAND_DIM = '#2B4C7E';
-export const BRAND_GLOW = '#D9F1F1';
+/* Colors — the LIGHT palette (docs/DESIGN-TOKENS.md §3.8). A WebGL material
+   cannot read a CSS variable, so these mirror the tokens as JS-side constants:
+   --brand (teal-600), --ink-3, --brand-bright (teal-700).
+
+   These were the band teals (#5FC3C4 / #2B4C7E / #D9F1F1) until 2026-09-29,
+   when the EV stretch moved onto the light system. The hierarchy is inverted
+   rather than recoloured: on navy the cage highlight was the LIGHTEST tone
+   (teal-100, 14.00:1) and the structural body the darkest (navy-500, 1.68:1);
+   on a mist ground the highlight is the DARKEST teal (teal-700, 8.83:1 on
+   white) and the structural body a mid slate (--ink-3, 5.89:1). Ordering is
+   preserved — GLOW 8.83 > BRAND 6.04 > DIM 5.89 — so the cage still reads as
+   the accent and the frame filler still recedes. DIM landed on --ink-3 rather
+   than --rule-strong (3.74) after looking at a render: more than half the DIM
+   lines carry `opacity: 0.3–0.5`, which drops --rule-strong to ~1.5:1 and the
+   tyre outlines and chassis triangulation simply vanished on white. It is also
+   one rung darker than the ground grid's --rule-strong in EVSceneContents, so
+   the frame stays separable from the floor. */
+export const BRAND = '#0B6E70';
+export const BRAND_DIM = '#5B6575';
+export const BRAND_GLOW = '#075355';
 
 type V3 = [number, number, number];
 

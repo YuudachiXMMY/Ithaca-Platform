@@ -10,6 +10,26 @@ report it** (§8). Do not invent a value.
 and `.claude/PRPs/reviews/design-tokens-review-round2.md` (25 findings).
 Every ratio printed anywhere in this document was recomputed in those passes — see §4 for the method.
 
+> ### ⚠ AMENDMENT 2026-09-29 — **the EV Challenge stretch is LIGHT, not BAND**
+>
+> Every revision of this document up to and including the one above treated
+> `/programs/ev-challenge` as the one region that stays an inverted navy band, on the
+> reasoning that "a 3D scene reads best on a dark ground". **The owner has since decided the
+> EV page should be light like the rest of the site**, and that conversion has shipped.
+>
+> The consequence is narrow but it touches many rows: **BAND is now the 9 photo-scrim files
+> and nothing else.** There is no longer a file that is BAND end-to-end. The EV page and
+> `EVModel3DSection.svelte` are still BAND _in three places_ — they carry three photo scrims
+> between them — but by R-SCRIM, exactly like every other scrim site. §2's second table has
+> been struck and the affected rows in §3.1 / §3.7 / §3.8 / §3.9a / §9.3 carry an
+> `EV → LIGHT` note.
+>
+> `src/app.css` moved with it: `.ev-ambient-a|b|c|close`, `.ev-roles-bg`, `.ev-roles-grid`,
+> `.dissolve-panel-eng|biz`, `.ev-scene-vignette`, `.ev-seam-line` and `.ev-seam-glow` are now
+> light surfaces. **The token layer (`:root` / `@theme inline`) did not change** — including
+> the full `--band-*` set, which the scrim population still needs. `--band-warm` is the one
+> token this left with no consumer; it is kept, see §1.5.
+
 > ### ⚠ MERGE GATE — `src/app.css` MUST NOT LAND ALONE
 >
 > The token layer is already inverted; the `.svelte` tree is not. In the current checkout
@@ -31,7 +51,8 @@ Every ratio printed anywhere in this document was recomputed in those passes —
 > 2. **Text over a photograph is BAND, never LIGHT** — see **§3.0 R-SCRIM**, which outranks every
 >    table in §3. A scrim is an `absolute inset-0` **sibling**, so the "nearest ancestor with a
 >    background" walk in §2 lands on the (now white) section and gives you the wrong column.
->    The 9 files / 23 sites this affects are enumerated in §2. (Round-2 finding R2-1.)
+>    The 11 files / 36 sites this affects are enumerated in §2. (Round-2 finding R2-1; the EV
+>    amendment above added the 2 EV files / 13 sites.)
 
 ---
 
@@ -164,22 +185,22 @@ the floor, 0.38 of margin), `brand/80` = 3.98 (large text only), `brand/70` = 3.
 
 ### 1.5 Inverted band (dark section block)
 
-| Token                      | Resolves to          | Value     | Contrast on `--band` (navy-900)                                    |
-| -------------------------- | -------------------- | --------- | ------------------------------------------------------------------ |
-| `--band`                   | `--navy-900`         | `#0B1F3A` | — (the surface)                                                    |
-| `--band-deep`              | `--navy-950`         | `#071426` | —                                                                  |
-| `--band-soft`              | `--navy-700`         | `#14325C` | raised plane (1.29 vs band)                                        |
-| `--band-warm`              | **literal**          | `#292823` | 1.12 vs band — the one warm dark the EV business-track panel needs |
-| `--band-foreground`        | `--white`            | `#FFFFFF` | 16.52 AAA                                                          |
-| `--band-foreground-muted`  | `--band-ink-2`       | `#C3CEDC` | 10.37 AAA                                                          |
-| `--band-foreground-subtle` | `--band-ink-3`       | `#9AACC0` | 7.11 AAA                                                           |
-| `--band-border`            | `--navy-700`         | `#14325C` | 1.29 — decorative only                                             |
-| `--band-border-strong`     | `--band-rule-strong` | `#7089A8` | 4.59 — control edges (3.56 worst case, on band-soft)               |
-| `--band-brand`             | `--teal-300`         | `#5FC3C4` | 7.94 AAA                                                           |
-| `--band-brand-strong`      | `--teal-100`         | `#D9F1F1` | 14.00 AAA                                                          |
-| `--band-action`            | `--teal-300`         | `#5FC3C4` | 7.94 (boundary)                                                    |
-| `--band-action-hover`      | `--teal-100`         | `#D9F1F1` | 14.00 (boundary)                                                   |
-| `--band-action-foreground` | `--ink`              | `#111827` | 8.52 on teal-300, 15.04 on teal-100                                |
+| Token                      | Resolves to          | Value     | Contrast on `--band` (navy-900)                                  |
+| -------------------------- | -------------------- | --------- | ---------------------------------------------------------------- |
+| `--band`                   | `--navy-900`         | `#0B1F3A` | — (the surface)                                                  |
+| `--band-deep`              | `--navy-950`         | `#071426` | —                                                                |
+| `--band-soft`              | `--navy-700`         | `#14325C` | raised plane (1.29 vs band)                                      |
+| `--band-warm`              | **literal**          | `#292823` | 1.12 vs band — **0 consumers since the EV amendment**; see below |
+| `--band-foreground`        | `--white`            | `#FFFFFF` | 16.52 AAA                                                        |
+| `--band-foreground-muted`  | `--band-ink-2`       | `#C3CEDC` | 10.37 AAA                                                        |
+| `--band-foreground-subtle` | `--band-ink-3`       | `#9AACC0` | 7.11 AAA                                                         |
+| `--band-border`            | `--navy-700`         | `#14325C` | 1.29 — decorative only                                           |
+| `--band-border-strong`     | `--band-rule-strong` | `#7089A8` | 4.59 — control edges (3.56 worst case, on band-soft)             |
+| `--band-brand`             | `--teal-300`         | `#5FC3C4` | 7.94 AAA                                                         |
+| `--band-brand-strong`      | `--teal-100`         | `#D9F1F1` | 14.00 AAA                                                        |
+| `--band-action`            | `--teal-300`         | `#5FC3C4` | 7.94 (boundary)                                                  |
+| `--band-action-hover`      | `--teal-100`         | `#D9F1F1` | 14.00 (boundary)                                                 |
+| `--band-action-foreground` | `--ink`              | `#111827` | 8.52 on teal-300, 15.04 on teal-100                              |
 
 **`--band-warm` is a literal, on purpose.** It is `color-mix(in srgb, navy-950 84%, amber-600)`,
 which evaluates to `#292823` — but it is the only band surface reachable _only_ through
@@ -187,6 +208,13 @@ which evaluates to `#292823` — but it is the only band surface reachable _only
 `.dissolve-panel-biz` (including its `prefers-reduced-transparency` branch) would have no
 background. `src/app.css` therefore declares the literal in `:root` and re-derives it from the two
 source tokens inside `@supports (color: color-mix(in lab, red, red))`. See §1.8. (Review finding 8.)
+
+**`--band-warm` now has zero consumers.** Its only one was `.dissolve-panel-biz`, and the EV
+amendment moved that panel to `--amber-200` (ink 14.15:1) — the two tracks still read as two
+planes, but by _temperature_ (cool mist vs warm cream) rather than by lightness. The token and its
+`@supports` re-derivation are **kept**: the names in §1 are frozen, `bg-band-warm` is a spellable
+utility, and `--band-rule-strong`'s 3:1 argument in §1.2 is measured against it. Retire it only
+with a deliberate token-layer pass, not as incidental cleanup.
 
 **The CTA inverts on a band.** A `teal-600` button sitting on `navy-900` has a **2.74:1 boundary**
 against the band and fails WCAG 1.4.11. On a band the primary CTA is therefore a `teal-300` fill
@@ -315,7 +343,7 @@ If you land on **(b)**, or on **(a)** and it is `bg-band*` / `bg-overlay*` / `.e
 > scrim**. The binding rule is **§3.0 R-SCRIM**, which outranks every table in §3.
 > (Round-2 finding R2-1.)
 
-#### The scrim-text sites — 9 files, 23 text sites
+#### The scrim-text sites — 11 files, 36 text sites
 
 Every one of these is **BAND**. They are listed to `file:line` the same way every other §3 row is,
 because the §3.3 / §3.7 counts below are whole-tree figures and do **not** break the scrim sites
@@ -336,9 +364,25 @@ text column**, not over the photo — they are LIGHT).
 | `src/routes/programs/ai-entrepreneurship-camp/+page.svelte` | `:495` | `:498` `text-white`, `:501` `text-white/60`                                                                                      |
 | `src/routes/programs/ithaca-dialogues/+page.svelte`         | `:529` | `:532` **`text-foreground`** (ink on a navy scrim = 1.4:1), `:535` `text-white/60`                                               |
 
-Four further CTA labels sit on those scrims but are governed by **R-FILL**, not by the scrim:
+**Added by the 2026-09-29 EV amendment.** These two files used to be BAND end-to-end (see the
+struck table below); now only their photo regions are, and they are ordinary scrim sites. Line
+numbers are post-conversion and the token spellings are the ones the files carry **today**, not
+the pre-wave `text-white*` forms the rows above quote:
+
+| File                                                               | Scrim  | Text sites on it                                                                                                                                              |
+| ------------------------------------------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/routes/programs/ev-challenge/+page.svelte` (hero)             | `:161` | `:166` `text-band-foreground` (**the page's LCP element**), `:170` / `:184` / `:187` `text-band-foreground/80`                                                |
+| `src/routes/programs/ev-challenge/+page.svelte` (competition)      | `:344` | `:349` `text-band-foreground`, `:352` / `:362` `text-band-foreground/80`, `:357` chip (`border-band-brand/30` + `text-band-brand-strong`), `:369` link (same) |
+| `src/lib/components/programs/ev-challenge/EVModel3DSection.svelte` | `:221` | `:228` `text-band-foreground`, `:232` / `:239` / `:242` `text-band-foreground/80` — the **reduced-motion** poster only                                        |
+
+`EVModel3DSection:221`'s photo carries `opacity-40`, so its composite depends on the wrapper
+behind it. That wrapper (`:213`) is therefore pinned to `bg-overlay` — it is part of the scrim,
+not a section, and converting it to a light surface would have put a navy gradient over a
+washed-out photo and taken the display copy's ground with it.
+
+Five further CTA labels sit on these scrims but are governed by **R-FILL**, not by the scrim:
 `HeroSection:65`, `PlaceholderProgram:85`, `ai-entrepreneurship-camp:507`,
-`ithaca-dialogues:540` (R-FILL rows 3, 6, 13, 9).
+`ithaca-dialogues:540` (R-FILL rows 3, 6, 13, 9) and `ev-challenge/+page.svelte:175` (row 10).
 
 The two `bg-background/80` scrims (`ai-entrepreneurship-camp:495`, `ithaca-dialogues:529`) are
 themselves a §3 row — see §3.5. Left alone they become an **80 % white veil** over the photograph.
@@ -347,26 +391,22 @@ themselves a §3 row — see §3.5. Left alone they become an **80 % white veil*
 (`from-background via-background/40 to-transparent`, the mobile heroes) but carry **no text** —
 §3.5 + §3.7's gradient row still apply, R-SCRIM does not.
 
-**The three files that are BAND end-to-end** (`src/app.css` pins them; §3.1's default keeps them
-navy). These are BAND for a **different** reason than the scrim sites — do not treat this table as
-the whole BAND population:
+~~**The three files that are BAND end-to-end**~~ — **STRUCK 2026-09-29.** This table used to list
+`ev-challenge/+page.svelte`, `EVModel3DSection.svelte` and `WorkshopToRoles.svelte` as BAND for
+their whole length, on the strength of `src/app.css` pinning the EV 3D stretch navy. The owner
+then moved the EV page onto the light system, so:
 
-| File                                                               | BAND-context utilities inside it                                                                                   |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| `src/routes/programs/ev-challenge/+page.svelte`                    | 17 `text-foreground/N`, plus `text-foreground`, `text-brand-bright`, `border-border`, `bg-action`, `bg-background` |
-| `src/lib/components/programs/ev-challenge/EVModel3DSection.svelte` | 11 `text-foreground/N`, 8 `text-foreground`, 8 `text-brand-bright`, `bg-background` ×2, 3 inline `rgba()` styles   |
-| `src/lib/components/programs/ev-challenge/WorkshopToRoles.svelte`  | 4 `text-foreground/50`, `text-foreground`, `text-brand-bright`, 4 `bg-foreground/[0.02]`                           |
+- `WorkshopToRoles.svelte` is **LIGHT end to end** — it has no photo scrim at all and now carries
+  no `band-*` utility. Its ambient ground (`.ev-roles-bg` / `.ev-roles-grid`) is a tinted mist
+  radial with white role cards on it.
+- `ev-challenge/+page.svelte` and `EVModel3DSection.svelte` are **LIGHT except for their three
+  photo scrims**, which are in the table above and are decided by R-SCRIM like every other scrim.
+- The old census this table printed (26 bare `text-foreground`, 32 `text-foreground/N`, 21
+  `text-brand-bright`, …, all of which needed the BAND column) **no longer applies**. Those
+  utilities now take the LIGHT column, which is what a reader of §3.7 would already have assumed.
 
-Across those three files (all re-verified by grep, round 2): **26** bare `text-foreground`
-(10 + 8 + 8), **32** `text-foreground/N` (17 + 11 + 4), **21** `text-brand-bright` (9 + 8 + 4),
-**4** `text-brand`, **4** `outline-brand`, **13** `border-border` (6 + 2 + 5), **2** `bg-action`,
-**3** bare `bg-background`, **10** `from|via|to-background` stops. Every one of them needs the BAND
-column. Applying the LIGHT column there gives ink-on-navy at **1.07:1**.
-
-**BAND is these three files _plus_ the 9 scrim files above.** The per-row "N of these are BAND"
-figures in §3.7 are the sum of both populations, and each row says which is which. The three EV
-files are the only place the LIGHT/BAND split is a whole-file property; everywhere else it is
-per-element, decided by (b).
+**BAND is the 11 scrim files above and nothing else.** The LIGHT/BAND split is now a per-element
+property everywhere — always decided by (b) — with no whole-file exception left in the tree.
 
 ---
 
@@ -439,24 +479,26 @@ surrounding LIGHT/BAND context. Read the whole `class` attribute first.
 (`grep -rn 'text-white' src --include='*.svelte' | grep -v /admin/ | grep -E 'bg-action|bg-brand'`).
 Tick each one off:
 
-| #   | File                                                        | Line | Context                                     | Result                                                                                                               |
-| --- | ----------------------------------------------------------- | ---- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| 1   | `src/lib/components/NewsletterForm.svelte`                  | 59   | LIGHT                                       | `text-action-foreground`                                                                                             |
-| 2   | `src/lib/components/PopupBanner.svelte`                     | 68   | LIGHT                                       | `text-action-foreground`                                                                                             |
-| 3   | `src/lib/components/home/HeroSection.svelte`                | 65   | **BAND** (scrim `:35`, R-SCRIM)             | same as #10 \*                                                                                                       |
-| 4   | `src/lib/components/home/ContactSection.svelte`             | 161  | LIGHT                                       | `text-action-foreground`                                                                                             |
-| 5   | `src/lib/components/about/ConnectCTA.svelte`                | 64   | LIGHT                                       | `text-action-foreground`                                                                                             |
-| 6   | `src/lib/components/programs/PlaceholderProgram.svelte`     | 85   | **BAND** (scrim `:51`, R-SCRIM)             | same as #10                                                                                                          |
-| 7   | `src/routes/+error.svelte`                                  | 33   | LIGHT                                       | `text-action-foreground`                                                                                             |
-| 8   | `src/routes/programs/ithaca-dialogues/+page.svelte`         | 176  | LIGHT                                       | `text-action-foreground`                                                                                             |
-| 9   | `src/routes/programs/ithaca-dialogues/+page.svelte`         | 540  | **BAND** (scrim `:529`, R-SCRIM)            | same as #10                                                                                                          |
-| 10  | `src/routes/programs/ev-challenge/+page.svelte`             | 175  | **BAND** (`.ev-ambient-a`, opened :195)     | `bg-band-action` + `hover:bg-band-action-hover` + `text-band-action-foreground` + `focus-visible:outline-band-brand` |
-| 11  | `src/routes/programs/ev-challenge/+page.svelte`             | 458  | **BAND** (`.ev-ambient-close`, opened :444) | same as #10                                                                                                          |
-| 12  | `src/routes/programs/ai-entrepreneurship-camp/+page.svelte` | 123  | LIGHT                                       | `text-action-foreground`                                                                                             |
-| 13  | `src/routes/programs/ai-entrepreneurship-camp/+page.svelte` | 507  | **BAND** (scrim `:495`, R-SCRIM)            | same as #10                                                                                                          |
-| 14  | `src/routes/contact-us/+page.svelte`                        | 286  | LIGHT                                       | `text-action-foreground`                                                                                             |
+| #   | File                                                        | Line | Context                               | Result                                                                                                               |
+| --- | ----------------------------------------------------------- | ---- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| 1   | `src/lib/components/NewsletterForm.svelte`                  | 59   | LIGHT                                 | `text-action-foreground`                                                                                             |
+| 2   | `src/lib/components/PopupBanner.svelte`                     | 68   | LIGHT                                 | `text-action-foreground`                                                                                             |
+| 3   | `src/lib/components/home/HeroSection.svelte`                | 65   | **BAND** (scrim `:35`, R-SCRIM)       | same as #10 \*                                                                                                       |
+| 4   | `src/lib/components/home/ContactSection.svelte`             | 161  | LIGHT                                 | `text-action-foreground`                                                                                             |
+| 5   | `src/lib/components/about/ConnectCTA.svelte`                | 64   | LIGHT                                 | `text-action-foreground`                                                                                             |
+| 6   | `src/lib/components/programs/PlaceholderProgram.svelte`     | 85   | **BAND** (scrim `:51`, R-SCRIM)       | same as #10                                                                                                          |
+| 7   | `src/routes/+error.svelte`                                  | 33   | LIGHT                                 | `text-action-foreground`                                                                                             |
+| 8   | `src/routes/programs/ithaca-dialogues/+page.svelte`         | 176  | LIGHT                                 | `text-action-foreground`                                                                                             |
+| 9   | `src/routes/programs/ithaca-dialogues/+page.svelte`         | 540  | **BAND** (scrim `:529`, R-SCRIM)      | same as #10                                                                                                          |
+| 10  | `src/routes/programs/ev-challenge/+page.svelte`             | 175  | **BAND** (hero scrim `:161`, R-SCRIM) | `bg-band-action` + `hover:bg-band-action-hover` + `text-band-action-foreground` + `focus-visible:outline-band-brand` |
+| 11  | `src/routes/programs/ev-challenge/+page.svelte`             | 460  | ~~BAND~~ → **LIGHT** (EV amendment)   | `text-action-foreground` — `.ev-ambient-close` is a light surface now                                                |
+| 12  | `src/routes/programs/ai-entrepreneurship-camp/+page.svelte` | 123  | LIGHT                                 | `text-action-foreground`                                                                                             |
+| 13  | `src/routes/programs/ai-entrepreneurship-camp/+page.svelte` | 507  | **BAND** (scrim `:495`, R-SCRIM)      | same as #10                                                                                                          |
+| 14  | `src/routes/contact-us/+page.svelte`                        | 286  | LIGHT                                 | `text-action-foreground`                                                                                             |
 
-**6 BAND, 8 LIGHT.** Rows 3, 6, 9, 13 were "LIGHT" in the previous revision; **R-SCRIM moves them**
+**5 BAND, 9 LIGHT** (was 6 / 8 — the EV amendment moved row 11 to LIGHT; row 10 stays BAND, but
+because it sits on the hero photo scrim, not because the section behind it is navy). Rows 3, 6,
+9, 13 were "LIGHT" in the previous revision; **R-SCRIM moves them**
 — each sits on a photo scrim, so its fill is a `teal-600` button on `navy-950`, a **2.74:1**
 boundary that fails WCAG 1.4.11 (§1.5, "the CTA inverts on a band"). They take #10's treatment:
 `bg-band-action` + `hover:bg-band-action-hover` + `text-band-action-foreground` +
@@ -546,9 +588,11 @@ Files: `#0a0c10` → `home/ProgramsShowcase`, `layout/Header`, `home/ImpactStats
 `#0d0f14` → `layout/Footer`. `#0e1015` → `home/StudentHighlights`. `#111318` → `home/{MissionSection,
 ContactSection,FeaturedSection}`, `about/{ConnectCTA,MissionGrid,TeamGrid,HeroSection,ProgramsBento,Highlights}`.
 
-**Default for the alternation rhythm**: apply the LIGHT column everywhere _except_ the EV Challenge
-3D stretch, which `src/app.css` already pins to the band (`.ev-ambient-*`, `.ev-roles-bg`,
-`.dissolve-panel-*`). Which _other_ sections become navy bands is an editorial decision — see §8.
+**Default for the alternation rhythm**: apply the LIGHT column **everywhere**. The one exception
+this row used to carve out — the EV Challenge 3D stretch, pinned to the band by `src/app.css` —
+was removed by the 2026-09-29 EV amendment: `.ev-ambient-*`, `.ev-roles-bg`, `.ev-roles-grid` and
+`.dissolve-panel-*` are light surfaces now. Which sections (if any) become navy bands is an
+editorial decision — see §8.
 
 ### 3.2 Admin grey literals — **DEFERRED, DO NOT APPLY THIS ROUND**
 
@@ -681,22 +725,22 @@ dark-ground "lift" effects that are literally invisible on `#FFFFFF`. (Review fi
 two rows use a **plain** alpha (`/15`), not a bracketed one, and were pulled in here from §3.7 in
 round 2 — see the note under the table.
 
-| Found                             | Count | Where                                                                 | LIGHT                | BAND                                     |
-| --------------------------------- | ----- | --------------------------------------------------------------------- | -------------------- | ---------------------------------------- |
-| `bg-white/[0.02]`                 | 1     | `about/DecabFramework`                                                | `bg-surface-2`       | unchanged (1.05:1, decorative lift)      |
-| `bg-white/[0.04]`                 | 2     | `about/DecabFramework`, `home/ImpactStats`                            | `bg-surface-2`       | unchanged (1.11:1)                       |
-| `bg-white/[0.06]`                 | 1     | `home/ProgramsShowcase`                                               | `bg-surface-2`       | unchanged (1.17:1)                       |
-| `border-white/[0.06]`             | 4     | `about/DecabFramework`, `home/StudentHighlights` ×2, `layout/Header`  | `border-border`      | `border-band-border`                     |
-| `border-white/[0.08]`             | 2     | `about/Outcomes`, `layout/Header`                                     | `border-border`      | `border-band-border`                     |
-| `bg-foreground/[0.02]`            | 4     | `programs/ev-challenge/WorkshopToRoles.svelte:273,292,359,383`        | `bg-surface-2`       | `bg-white/[0.03]` — **these 4 are BAND** |
-| `border-brand/[0.04\|0.06\|0.08]` | 3     | `home/ContactSection`                                                 | `border-brand/20`    | `border-band-brand/20`                   |
-| `text-white/[0.05]`               | 1     | `home/StudentHighlights`                                              | **STOP — §8 item 6** | —                                        |
-| `bg-foreground/15`                | 1     | `programs/ev-challenge/+page.svelte:427` (`<div class="h-px w-6 …">`) | `bg-border`          | `bg-band-border` — **BAND**              |
-| `border-foreground/15`            | 1     | `programs/ev-challenge/+page.svelte:181` (`border-t`)                 | `border-border`      | `border-band-border` — **BAND**          |
+| Found                             | Count | Where                                                                 | LIGHT                | BAND                                         |
+| --------------------------------- | ----- | --------------------------------------------------------------------- | -------------------- | -------------------------------------------- |
+| `bg-white/[0.02]`                 | 1     | `about/DecabFramework`                                                | `bg-surface-2`       | unchanged (1.05:1, decorative lift)          |
+| `bg-white/[0.04]`                 | 2     | `about/DecabFramework`, `home/ImpactStats`                            | `bg-surface-2`       | unchanged (1.11:1)                           |
+| `bg-white/[0.06]`                 | 1     | `home/ProgramsShowcase`                                               | `bg-surface-2`       | unchanged (1.17:1)                           |
+| `border-white/[0.06]`             | 4     | `about/DecabFramework`, `home/StudentHighlights` ×2, `layout/Header`  | `border-border`      | `border-band-border`                         |
+| `border-white/[0.08]`             | 2     | `about/Outcomes`, `layout/Header`                                     | `border-border`      | `border-band-border`                         |
+| `bg-foreground/[0.02]`            | 4     | `programs/ev-challenge/WorkshopToRoles.svelte:273,292,359,383`        | `bg-surface-2`       | ~~`bg-white/[0.03]`~~ **EV → LIGHT**         |
+| `border-brand/[0.04\|0.06\|0.08]` | 3     | `home/ContactSection`                                                 | `border-brand/20`    | `border-band-brand/20`                       |
+| `text-white/[0.05]`               | 1     | `home/StudentHighlights`                                              | **STOP — §8 item 6** | —                                            |
+| `bg-foreground/15`                | 1     | `programs/ev-challenge/+page.svelte:429` (`<div class="h-px w-6 …">`) | `bg-border`          | ~~`bg-band-border`~~ **EV → LIGHT**          |
+| `border-foreground/15`            | 1     | `programs/ev-challenge/+page.svelte:181` (`border-t`)                 | `border-border`      | `border-band-border` — **BAND** (hero scrim) |
 
 **The two `/15` rows are here, not in §3.7.** §3.7's `bg-foreground` / `border-foreground` rows are
 **bare-utility** rows and there are **zero** bare occurrences of either utility in the public tree —
-all six sites carry an alpha, and all six are inside the three EV files, i.e. BAND. Following §3.7's
+all six sites carry an alpha, and all six are inside the EV files. **EV amendment:** five of the six are LIGHT now (`WorkshopToRoles` ×4 → `hover:bg-surface-1` on a `bg-surface-0` card, and the Past-Seasons rule → `bg-border`); only `+page.svelte:181` is still BAND, because it sits inside the hero photo scrim. Following §3.7's
 BAND cells would give `bg-band-foreground` / `border-band-foreground` = **solid `--white`**: an
 opaque white card fill under white body copy (**1.00:1**) and a solid-white 1px rule at **16.52:1**
 where a 1.01:1 hairline was — brighter even than the 13.34:1 `border-border` artefact §3.7's own
@@ -829,57 +873,82 @@ teal-600 focus rings at **2.74:1** (below the 3:1 of WCAG 1.4.11) and `--line` h
 **13.34:1**. (Review findings 1, 2, 5 — all three are this one structural defect.)
 
 **Counts are public-site (`| grep -v /admin/`). §3.0 R-FILL, R-SCRIM and R-OPACITY outrank every row
-here.** Each "**N are BAND**" figure below now sums **both** BAND populations — the three EV files
-(§2's table) and the 9 scrim files (§2's scrim table) — and says which contributes what. A row that
-names only the EV files means the scrim files contribute **zero** occurrences of that utility, which
-was verified by grep, not assumed.
+here.** Each "**N are BAND**" figure below used to sum **two** BAND populations — the three EV files
+and the 9 scrim files — and says which contributes what.
 
-| Utility                    | Count | LIGHT                                                                                                   | BAND                                                                                                                                                                               | Watch for                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| -------------------------- | ----- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bg-background` (bare)     | 14    | no edit (`#FFFFFF`)                                                                                     | `bg-band`                                                                                                                                                                          | a `bg-background` panel on a white page is now invisible — it probably wanted `bg-card-bg`. **3 of these are the EV stretch: `EVModel3DSection.svelte:206`, `:307`, `ev-challenge/+page.svelte:146` — see §3.9a.** The 2 `bg-background/80` sites are **not** in this count: they are photo scrims, §3.5.                                                                                                                                                                                                                         |
-| `from/via/to-background`   | 14    | no edit                                                                                                 | `from/via/to-band`, or `…-overlay/N` if it is a photo scrim (§3.5)                                                                                                                 | a fade-to-background over a photo now _brightens_ the photo edge. **10 of these are the EV stretch: see §3.9a** (`ev-challenge/+page.svelte` 7, `EVModel3DSection.svelte` 3); the other 4 are the mobile-hero scrims at `ai-entrepreneurship-camp:167` and `ithaca-dialogues:202`, 2 stops each — also §3.5.                                                                                                                                                                                                                      |
-| `text-foreground` (bare)   | 50    | no edit — 17.74 / 15.07 across the ladder                                                               | `text-band-foreground` (16.52)                                                                                                                                                     | ink on navy is 1.07:1. **27 of the 50 are BAND**: 26 in the three EV files (10 + 8 + 8) **plus `ithaca-dialogues/+page.svelte:532`, which is on a photo scrim (R-SCRIM)** — the one scrim site that carries this utility.                                                                                                                                                                                                                                                                                                         |
-| `text-foreground/N`        | 47    | **R-OPACITY-1** — `/70`+ keep, `/60`–`/65` → `text-foreground-muted`, `/55`− → `text-foreground-subtle` | **R-OPACITY-2** — **every alpha dies.** bare → `-muted`, `/65`− → `-subtle`; on a scrim → R-SCRIM instead                                                                          | these were **not** in any table before and every one of them regressed. **32 of the 47 are BAND**, all in the three EV files (17 + 11 + 4); **0 are on a scrim**. Note `/70`…`/95` survives on LIGHT and **must not** on BAND — see the §9 gate row.                                                                                                                                                                                                                                                                              |
-| `bg-foreground` (bare)     | **0** | — (0 occurrences; if one appears, paired text is `text-background`, R-FILL)                             | — (0 occurrences)                                                                                                                                                                  | **all 5 `bg-foreground` utilities in the tree carry an alpha and belong to §3.4a.** The previous revision's "5" was the alpha population; following the BAND cell would have turned a 2 %-white decorative lift into an **opaque white card fill** (1.00:1 against its own white body copy).                                                                                                                                                                                                                                      |
-| `border-foreground` (bare) | **0** | — (0 occurrences)                                                                                       | — (0 occurrences)                                                                                                                                                                  | same: the single `border-foreground/15` site is **§3.4a**. The previous BAND cell (`border-band-foreground`) is solid white at **16.52:1** where a 1.01:1 hairline was. (R2-5, R2-7.)                                                                                                                                                                                                                                                                                                                                             |
-| `bg-card-bg`               | 16    | no edit on `surface-0`; **inside a mist band flip to `bg-surface-0`** or it disappears (1.07:1 vs mist) | `bg-band-soft` (1.29 vs band)                                                                                                                                                      | mist on mist is invisible                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `border-border`            | 33    | no edit **if decorative**; a control edge → `border-border-strong` (§3.4 rule)                          | `border-band-border`, control edge → `border-band-border-strong`                                                                                                                   | **13 of the 33 are BAND**, where `--line` is a **13.34:1 white hairline** where a subtle divider was meant                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `bg-border`                | 1     | no edit — fine as a divider                                                                             | `bg-band-border`                                                                                                                                                                   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `text-brand`               | 18    | no edit — 6.04 on white, 5.63 on mist, 5.13 on surface-4                                                | `text-band-brand` (7.94)                                                                                                                                                           | teal-600 on navy is **2.74** — the number §4 already prints as FAIL. **4 are BAND**, all in `WorkshopToRoles.svelte`; **0 are on a scrim** (`about/Outcomes.svelte:106` is the only `text-brand` in a scrim file and it sits in the light list below the photos, not on one).                                                                                                                                                                                                                                                     |
-| `text-brand-bright`        | 72    | no edit — 8.83 / 8.23. "Bright" now means higher contrast, not lighter                                  | opaque band → `text-band-brand-strong` (14.00); **on a scrim → `text-band-brand-strong` too** (R-SCRIM — never `text-band-brand`/teal-300, which is 3.32:1 over a blown highlight) | teal-700 on navy is **1.87**. **25 are BAND**: **21** in the three EV files (9 + 8 + 4) — two of those are body copy, `ev-challenge/+page.svelte:367` (`text-xs`) and `:481` (an underlined link) — **plus 4 on photo scrims**: `ProgramsShowcase:79`, `StudentHighlights:105`, `PlaceholderProgram:58`, `PlaceholderProgram:72`. The remaining 47 are LIGHT.                                                                                                                                                                     |
-| `outline-brand`            | 53    | no edit — 6.04 / 5.63, passes the 3:1 focus-indicator floor                                             | `outline-band-brand` (7.94)                                                                                                                                                        | a teal-600 focus ring on navy is **2.74**, below 1.4.11. **8 are BAND**: 4 in the EV files (`ev-challenge/+page.svelte:175, 367, 458, 481`) + the 4 scrim CTAs (R-FILL rows 3, 6, 9, 13 — `HeroSection:65`, `PlaceholderProgram:85`, `ithaca-dialogues:540`, `ai-entrepreneurship-camp:507`). **Keep `outline-offset-2` on every one** (see R-FILL). A ring drawn with a _negative_ offset over a photo (`ProgramsShowcase:52`) has no measurable ground — leave it `outline-brand` and flag it at review, do not invent a value. |
-| `from/via-brand`           | 54    | no edit                                                                                                 | `from/via-band-brand`                                                                                                                                                              |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `border-brand`             | 24    | no edit (decorative)                                                                                    | `border-band-brand`                                                                                                                                                                | see §3.4a for the 3 `border-brand/[0.0x]` sites                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `bg-brand`                 | 23    | no edit; paired text per **R-FILL**                                                                     | `bg-band-brand` + `text-band-action-foreground`                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `bg-action`                | 14    | no edit; paired text **must** be `text-action-foreground` (white, 6.04)                                 | `bg-band-action` + `text-band-action-foreground`                                                                                                                                   | teal-600 fill on navy is a 2.74:1 boundary. **6 are BAND**: R-FILL rows 10, 11 (EV, opaque band) + rows 3, 6, 9, 13 (photo scrims, R-SCRIM).                                                                                                                                                                                                                                                                                                                                                                                      |
-| `bg-action-hover`          | 14    | no edit; contrast improves to 8.83                                                                      | `bg-band-action-hover` + `text-band-action-foreground`                                                                                                                             | never pair white with `bg-band-action-hover`: white on teal-100 is **1.18**. Same 6 BAND sites as the row above — they move together.                                                                                                                                                                                                                                                                                                                                                                                             |
+> **EV amendment, 2026-09-29 — read this before you trust a count.** The EV half of every "N are
+> BAND" figure below is **gone**: those files took the LIGHT column in the conversion. Only the
+> scrim contribution survives, and the EV files now contribute to the **scrim** population instead,
+> through the three photo scrims listed in §2. The per-row arithmetic has **not** been re-run —
+> the counts are a pre-wave census and are kept for provenance — so where a row says "N are BAND,
+> M in the three EV files", **subtract M** and read the EV files' non-scrim occurrences as LIGHT.
+> The rows where that subtraction takes the BAND figure to zero are marked `EV → LIGHT` inline.
+
+| Utility                    | Count | LIGHT                                                                                                   | BAND                                                                                                                                                                               | Watch for                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------------------- | ----- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bg-background` (bare)     | 14    | no edit (`#FFFFFF`)                                                                                     | `bg-band`                                                                                                                                                                          | a `bg-background` panel on a white page is now invisible — it probably wanted `bg-card-bg`. **EV → LIGHT: the 3 EV sites (`EVModel3DSection.svelte:206`, `:307`, `ev-challenge/+page.svelte:146`) took the LIGHT column in the 2026-09-29 conversion — see §3.9a. BAND count for this row is now 0.** The 2 `bg-background/80` sites are **not** in this count: they are photo scrims, §3.5.                                                                                                                                                                                                                                                                      |
+| `from/via/to-background`   | 14    | no edit                                                                                                 | `from/via/to-band`, or `…-overlay/N` if it is a photo scrim (§3.5)                                                                                                                 | a fade-to-background over a photo now _brightens_ the photo edge. **EV → the 10 EV stops are scrim gradients, not sections (§3.9a) — they stay `*-overlay/N` under R-SCRIM, so "BAND" here means "scrim", not "navy section".** The other 4 are the mobile-hero scrims at `ai-entrepreneurship-camp:167` and `ithaca-dialogues:202`, 2 stops each — also §3.5.                                                                                                                                                                                                                                                                                                    |
+| `text-foreground` (bare)   | 50    | no edit — 17.74 / 15.07 across the ladder                                                               | `text-band-foreground` (16.52)                                                                                                                                                     | ink on navy is 1.07:1. **EV → LIGHT. 27 of the 50 were BAND, 26 of them in the three EV files (10 + 8 + 8); those 26 are LIGHT now except the 3 that sit on an EV photo scrim (§2). What is left is `ithaca-dialogues/+page.svelte:532` plus those 3 — all scrim sites, all R-SCRIM.**                                                                                                                                                                                                                                                                                                                                                                            |
+| `text-foreground/N`        | 47    | **R-OPACITY-1** — `/70`+ keep, `/60`–`/65` → `text-foreground-muted`, `/55`− → `text-foreground-subtle` | **R-OPACITY-2** — **every alpha dies.** bare → `-muted`, `/65`− → `-subtle`; on a scrim → R-SCRIM instead                                                                          | these were **not** in any table before and every one of them regressed. **EV → LIGHT. All 32 of the 47 that were BAND were in the three EV files (17 + 11 + 4); they take R-OPACITY-1 now, except the 7 `/80` forms that sit on an EV photo scrim (§2), which are the permitted R-SCRIM alpha.** Note `/70`…`/95` survives on LIGHT and **must not** on BAND — see the §9 gate row.                                                                                                                                                                                                                                                                               |
+| `bg-foreground` (bare)     | **0** | — (0 occurrences; if one appears, paired text is `text-background`, R-FILL)                             | — (0 occurrences)                                                                                                                                                                  | **all 5 `bg-foreground` utilities in the tree carry an alpha and belong to §3.4a.** The previous revision's "5" was the alpha population; following the BAND cell would have turned a 2 %-white decorative lift into an **opaque white card fill** (1.00:1 against its own white body copy).                                                                                                                                                                                                                                                                                                                                                                      |
+| `border-foreground` (bare) | **0** | — (0 occurrences)                                                                                       | — (0 occurrences)                                                                                                                                                                  | same: the single `border-foreground/15` site is **§3.4a**. The previous BAND cell (`border-band-foreground`) is solid white at **16.52:1** where a 1.01:1 hairline was. (R2-5, R2-7.)                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `bg-card-bg`               | 16    | no edit on `surface-0`; **inside a mist band flip to `bg-surface-0`** or it disappears (1.07:1 vs mist) | `bg-band-soft` (1.29 vs band)                                                                                                                                                      | mist on mist is invisible                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `border-border`            | 33    | no edit **if decorative**; a control edge → `border-border-strong` (§3.4 rule)                          | `border-band-border`, control edge → `border-band-border-strong`                                                                                                                   | **EV → LIGHT. 13 of the 33 were BAND, all in the three EV files; only `ev-challenge/+page.svelte:181` (inside the hero scrim) is still BAND. On a band `--line` is a **13.34:1 white hairline** where a subtle divider was meant                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `bg-border`                | 1     | no edit — fine as a divider                                                                             | `bg-band-border`                                                                                                                                                                   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `text-brand`               | 18    | no edit — 6.04 on white, 5.63 on mist, 5.13 on surface-4                                                | `text-band-brand` (7.94)                                                                                                                                                           | teal-600 on navy is **2.74** — the number §4 already prints as FAIL. **EV → LIGHT. The 4 that were BAND were all in `WorkshopToRoles.svelte`, which is now LIGHT end to end; **0 are BAND** (`about/Outcomes.svelte:106` is the only `text-brand` in a scrim file and it sits in the light list below the photos, not on one).                                                                                                                                                                                                                                                                                                                                    |
+| `text-brand-bright`        | 72    | no edit — 8.83 / 8.23. "Bright" now means higher contrast, not lighter                                  | opaque band → `text-band-brand-strong` (14.00); **on a scrim → `text-band-brand-strong` too** (R-SCRIM — never `text-band-brand`/teal-300, which is 3.32:1 over a blown highlight) | teal-700 on navy is **1.87**. **EV → LIGHT. 25 were BAND: 21 in the three EV files (9 + 8 + 4) — of those, only the 2 on the competition photo scrim (`ev-challenge/+page.svelte:357`, `:369`, post-conversion line numbers) are still BAND — plus 4 on photo scrims: `ProgramsShowcase:79`, `StudentHighlights:105`, `PlaceholderProgram:58`, `PlaceholderProgram:72`. Everything else is LIGHT.                                                                                                                                                                                                                                                                 |
+| `outline-brand`            | 53    | no edit — 6.04 / 5.63, passes the 3:1 focus-indicator floor                                             | `outline-band-brand` (7.94)                                                                                                                                                        | a teal-600 focus ring on navy is **2.74**, below 1.4.11. **EV → LIGHT for 3 of 4. 8 were BAND: 4 in the EV files, of which only `ev-challenge/+page.svelte:175` (the hero-scrim CTA) survives; `:369` keeps `outline-band-brand` because it is on the competition scrim. Plus the 4 scrim CTAs (R-FILL rows 3, 6, 9, 13 — `HeroSection:65`, `PlaceholderProgram:85`, `ithaca-dialogues:540`, `ai-entrepreneurship-camp:507`). **Keep `outline-offset-2` on every one** (see R-FILL). A ring drawn with a _negative_ offset over a photo (`ProgramsShowcase:52`) has no measurable ground — leave it `outline-brand` and flag it at review, do not invent a value. |
+| `from/via-brand`           | 54    | no edit                                                                                                 | `from/via-band-brand`                                                                                                                                                              |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `border-brand`             | 24    | no edit (decorative)                                                                                    | `border-band-brand`                                                                                                                                                                | see §3.4a for the 3 `border-brand/[0.0x]` sites                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `bg-brand`                 | 23    | no edit; paired text per **R-FILL**                                                                     | `bg-band-brand` + `text-band-action-foreground`                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `bg-action`                | 14    | no edit; paired text **must** be `text-action-foreground` (white, 6.04)                                 | `bg-band-action` + `text-band-action-foreground`                                                                                                                                   | teal-600 fill on navy is a 2.74:1 boundary. **EV → LIGHT for row 11.** 5 are BAND: R-FILL row 10 (EV, hero photo scrim) + rows 3, 6, 9, 13 (photo scrims, R-SCRIM).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `bg-action-hover`          | 14    | no edit; contrast improves to 8.83                                                                      | `bg-band-action-hover` + `text-band-action-foreground`                                                                                                                             | never pair white with `bg-band-action-hover`: white on teal-100 is **1.18**. Same 5 BAND sites as the row above — they move together.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 
 ### 3.8 three.js material colours (7 occurrences / 3 files)
 
-CSS variables are unreadable from a WebGL material, so these are JS-side constants. The EV
-Challenge 3D stretch stays an **inverted band**, so they take band values. (The previous revision
-said "5 occurrences / 3 files" and folded the three `EVSceneContents` literals into one unusable
-"same three values" row — two of them are grid greys, not brand-derived. Review finding 11.)
+CSS variables are unreadable from a WebGL material, so these are JS-side constants. (The previous
+revision said "5 occurrences / 3 files" and folded the three `EVSceneContents` literals into one
+unusable "same three values" row — two of them are grid greys, not brand-derived. Review finding 11.)
 
-| File:line                                          | Found       | Replacement | Role                                                                                                                               |
-| -------------------------------------------------- | ----------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `programs/ev-challenge/FatLine.svelte:32`          | `'#3e8fc7'` | `'#5FC3C4'` | teal-300 — **default prop value only**; every caller passes `color={line.color}`, so this is a safety net, not a rendered material |
-| `programs/ev-challenge/trike-geometry.ts:19`       | `'#3e8fc7'` | `'#5FC3C4'` | teal-300 — brand line                                                                                                              |
-| `programs/ev-challenge/trike-geometry.ts:20`       | `'#4a6a88'` | `'#2B4C7E'` | navy-500 — the neutral body                                                                                                        |
-| `programs/ev-challenge/trike-geometry.ts:21`       | `'#9cc4e8'` | `'#D9F1F1'` | teal-100 — the highlight                                                                                                           |
-| `programs/ev-challenge/EVSceneContents.svelte:94`  | `"#5aa6db"` | `'#5FC3C4'` | `<T.PointLight>` key light — was `--brand-bright`; teal-300 (`--band-brand`)                                                       |
-| `programs/ev-challenge/EVSceneContents.svelte:101` | `"#1c1f26"` | `'#14325C'` | `<Grid cellColor>` — the fine grid. navy-700 (`--band-soft`), 1.29:1 against the band: present, not assertive                      |
-| `programs/ev-challenge/EVSceneContents.svelte:104` | `"#252830"` | `'#7089A8'` | `<Grid sectionColor>` — the major grid. `--band-rule-strong`, 4.59:1. **Not** teal-100: the section lines are structure, not brand |
+**EV → LIGHT.** This table shipped a band column because the EV 3D stretch was going to stay navy.
+The 2026-09-29 amendment moved it to the light ladder, so the **Shipped** column below is what is
+in the tree; the struck column is what the band-era revision of this section prescribed.
 
-While you are in `EVSceneContents.svelte`, rename the misleading `ACCENT*` constants to `BRAND*`.
-The scene's lights, environment and tone-mapping were tuned against a near-black page — retuning
-them is §8 human-decision item 4, not a lookup.
+The **hierarchy** is what carries over, not the hues. On navy the cage highlight was the _lightest_
+tone and the structural body the darkest; on mist that inverts — the highlight is the _darkest_
+teal and the body a mid slate. Ordering is preserved, so the render reads the same way:
+**GLOW > BRAND > DIM**, and the ground grid sits below all three.
+
+| File:line                                          | Band-era (struck) | Shipped (light) | Role + contrast on mist                                                                                                                                |
+| -------------------------------------------------- | ----------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `programs/ev-challenge/FatLine.svelte:32`          | ~~`'#5FC3C4'`~~   | `'#0B6E70'`     | teal-600 — **default prop value only**; every caller passes `color={line.color}`, so this is a safety net, not a rendered material                     |
+| `programs/ev-challenge/trike-geometry.ts:35`       | ~~`'#5FC3C4'`~~   | `'#0B6E70'`     | `BRAND` — teal-600 (`--brand`), the brand line. 5.63:1                                                                                                 |
+| `programs/ev-challenge/trike-geometry.ts:36`       | ~~`'#2B4C7E'`~~   | `'#5B6575'`     | `BRAND_DIM` — `--ink-3`, the neutral body. 5.49:1. **Not** `--rule-strong`: over half the DIM lines carry `opacity: 0.3–0.5` and vanish at 3.74        |
+| `programs/ev-challenge/trike-geometry.ts:37`       | ~~`'#D9F1F1'`~~   | `'#075355'`     | `BRAND_GLOW` — teal-700 (`--brand-bright`), the cage highlight. 8.23:1, the strongest tone in the scene                                                |
+| `programs/ev-challenge/EVSceneContents.svelte:102` | ~~`'#5FC3C4'`~~   | `'#0B6E70'`     | `<T.PointLight>` key light. **Inert** — every material in this scene (Line2, Points, Grid) draws through its own shader and is unlit                   |
+| `programs/ev-challenge/EVSceneContents.svelte:115` | ~~`'#14325C'`~~   | `'#E5E7EB'`     | `<Grid cellColor>` — the fine grid. `--line`, 1.15:1: present, not assertive (it was 1.29:1 on navy)                                                   |
+| `programs/ev-challenge/EVSceneContents.svelte:118` | ~~`'#7089A8'`~~   | `'#7B8593'`     | `<Grid sectionColor>` — the major grid. `--rule-strong`, 3.48:1. One rung lighter than `BRAND_DIM`, so the floor stays separable from the frame filler |
+
+`EVSceneContents.svelte`'s `PointsMaterial` opacity also moved, `0.2` → `0.45`: teal dust at 0.2
+composites to ~1.1:1 on mist and simply is not there.
+
+The `ACCENT*` → `BRAND*` rename this section used to ask for is done. The scene's lights,
+environment and tone-mapping were tuned against a near-black page — that retune was §8 human-decision
+item 4 and is now **resolved**; see §8.
 
 ### 3.9 Colour inside inline `style=` attributes and the EV `bg-background` contradiction — **new**
 
 #### 3.9a `bg-background` inside the EV Challenge stretch (6 rows: **3** bare `bg-background` + **3** gradient attributes carrying 10 stops)
 
-`src/app.css` and §3.1 both assert the whole EV 3D stretch stays an inverted band, yet the section
+> **EV → LIGHT, 2026-09-29. The contradiction this subsection existed to resolve is gone.** It was
+> written because `src/app.css` and §3.1 asserted the EV 3D stretch stayed navy while its section
+> wrappers said `bg-background` (now `#FFFFFF`). The owner resolved it the other way: the stretch
+> is **light**, `bg-background` is **correct as written**, and `src/app.css`'s `.ev-*` /
+> `.dissolve-panel-*` rules were rewritten to light surfaces to match. The **Replacement** column
+> below is therefore **struck** except for its three scrim rows, which were always right and are
+> what shipped. The Shipped column records the tree as it stands.
+
+`src/app.css` and §3.1 both asserted the whole EV 3D stretch stays an inverted band, yet the section
 wrappers are `bg-background` — which now resolves to `#FFFFFF`. Left as "no edit" the section
 renders white with semi-transparent navy glass panels and a WebGL grid floating on it; changed to
 `bg-band` without the rest of §3.7's BAND column, the two files' **18** bare `text-foreground`
@@ -893,16 +962,18 @@ three are gradient attributes belonging to §3.7's `from/via/to-background` row,
 they carry **10** of that row's 14 stops. §3.7's `bg-background` note therefore says "3", not "6".
 (Round-2 findings R2-6, R2-8, R2-23.)
 
-| File:line                       | Found                                                                                                          | Replacement                                                                                          |
-| ------------------------------- | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `EVModel3DSection.svelte:206`   | `border-t border-border bg-background`                                                                         | `border-t border-band-border bg-band`                                                                |
-| `EVModel3DSection.svelte:217`   | `from-background via-background/60 to-background/30` (over an `opacity-40` photo)                              | `from-overlay/95 via-overlay/70 to-overlay/55` — this is a photo scrim, §3.5 + §5                    |
-| `EVModel3DSection.svelte:307`   | `border-t border-border bg-background`                                                                         | `border-t border-band-border bg-band`                                                                |
-| `ev-challenge/+page.svelte:146` | `min-h-screen bg-background` (the page wrapper)                                                                | `min-h-screen bg-band`                                                                               |
-| `ev-challenge/+page.svelte:161` | `from-background via-background/50 to-transparent` (hero photo scrim)                                          | `from-overlay/95 via-overlay/70 to-transparent`                                                      |
-| `ev-challenge/+page.svelte:342` | `from-background via-background/80 to-background/40 md:from-background md:via-background/80 md:to-transparent` | `from-overlay/95 via-overlay/70 to-overlay/55 md:from-overlay/90 md:via-overlay/70 md:to-overlay/55` |
+| Pre-wave file:line              | Found                                                                                                          | Band-era replacement (struck)                                                                            | **Shipped**                                                                                                        |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `EVModel3DSection.svelte:206`   | `border-t border-border bg-background`                                                                         | ~~`border-t border-band-border bg-band`~~                                                                | `border-t border-border bg-surface-2` (now `:206`)                                                                 |
+| `EVModel3DSection.svelte:217`   | `from-background via-background/60 to-background/30` (over an `opacity-40` photo)                              | `from-overlay/95 via-overlay/70 to-overlay/55` — a photo scrim, §3.5 + §5. **Correct; this is shipped.** | unchanged (now `:221`); its wrapper `:213` gained `bg-overlay` so the `opacity-40` composite still has a dark base |
+| `EVModel3DSection.svelte:307`   | `border-t border-border bg-background`                                                                         | ~~`border-t border-band-border bg-band`~~                                                                | `relative min-h-[100dvh] … border-t border-border bg-surface-2` (now `:317`)                                       |
+| `ev-challenge/+page.svelte:146` | `min-h-screen bg-background` (the page wrapper)                                                                | ~~`min-h-screen bg-band`~~                                                                               | `min-h-screen bg-background` — **no edit**, which is what §3.7's LIGHT column said all along                       |
+| `ev-challenge/+page.svelte:161` | `from-background via-background/50 to-transparent` (hero photo scrim)                                          | `from-overlay/95 via-overlay/70 to-transparent`. **Correct; this is shipped.**                           | unchanged (`:161`)                                                                                                 |
+| `ev-challenge/+page.svelte:342` | `from-background via-background/80 to-background/40 md:from-background md:via-background/80 md:to-transparent` | `from-overlay/95 via-overlay/70 to-overlay/55 md:…`. **Correct; this is shipped.**                       | unchanged (now `:344`)                                                                                             |
 
-Then apply §3.7's BAND column to the text in those two files, plus `WorkshopToRoles.svelte`.
+Then apply §3.7's **LIGHT** column to the text in those two files, plus `WorkshopToRoles.svelte` —
+except inside the three scrims, where R-SCRIM's three-token set applies. That is the whole
+amendment: 3 scrims stay BAND, everything else in the EV stretch is LIGHT.
 
 #### 3.9b Inline `style=` colour literals (3 attributes / 6 values)
 
@@ -1233,10 +1304,11 @@ have absorbed an invented hex.
 
 **Already known to need a human decision** (do not resolve these yourself):
 
-1. **Which sections become inverted navy bands.** §3.1's default puts everything on the light
-   ladder except the EV 3D stretch. The _rhythm_ — whether the homepage hero, the mission block, or
-   the contact CTA should be navy — is editorial, and §8.1 ("photography-led, generous whitespace")
-   pulls toward fewer bands than the dark site had. Needs the owner.
+1. ~~**Which sections become inverted navy bands.**~~ **RESOLVED 2026-09-29 — none of them.**
+   §3.1's default used to carve out the EV 3D stretch; the owner then chose to convert that too, so
+   the public site is light everywhere and navy survives only as the photo-scrim base
+   (`--overlay`). §8.1's "photography-led, generous whitespace" is the reasoning of record. The
+   `--band-*` set stays in the token layer because the 11 scrim files depend on it.
 2. **The homepage hero — layout only.** It is a full-bleed poster with `from-black/*`. §3.5 + §5
    make the scrim correct, but whether the hero stays a full-bleed dark block or becomes a light
    hero with a contained image is a **layout** decision, not a substitution. **The colour is not
@@ -1245,9 +1317,13 @@ have absorbed an invented hex.
 3. **Where amber belongs.** The ramp is defined and measured, and the tree currently has **zero**
    amber utilities. §8.2 lists amber as a palette member without assigning it a role. Season badges
    / registration-status chips are the obvious candidates; nobody has decided.
-4. **Threlte scene re-tuning.** §3.8 gives exact material colours, but the scene's lights,
-   environment and tone-mapping were tuned against a near-black page. Those need eyes on a render,
-   not a lookup table.
+4. ~~**Threlte scene re-tuning.**~~ **RESOLVED 2026-09-29, with eyes on a render.** §3.8's
+   Shipped column carries the values; they were judged against screenshots of the built page at
+   nine scroll positions, not derived. Two findings worth keeping: (a) the scene has **no lit
+   materials** — `LineMaterial`, `PointsMaterial` and `<Grid>` all draw through their own shaders —
+   so the `<T.AmbientLight>` / `<T.PointLight>` rig is inert and no light/environment retune was
+   needed or possible; (b) the only value that had to move off its first pick was `BRAND_DIM`,
+   because most DIM lines carry `opacity: 0.3–0.5` and a 3.74:1 base disappears at that alpha.
 5. **The admin panel** (§3.2, and the 42 deferred status utilities in §3.6) — deferred by
    `docs/DECISIONS.md`, mappings recorded, **not** to be applied in this wave.
 6. **`text-white/[0.05]`** in `home/StudentHighlights.svelte` — a 5 %-white watermark. On a light
@@ -1267,12 +1343,14 @@ make the BAND-scoped rows readable; export them first:
 # every BAND-scoped row below passes with 0 hits for the wrong reason.
 # Arrays + "${X[@]}" behave identically in bash and zsh.
 
-# The three files that are BAND end-to-end (§2)
-EV=(src/routes/programs/ev-challenge/+page.svelte
-    src/lib/components/programs/ev-challenge/EVModel3DSection.svelte
-    src/lib/components/programs/ev-challenge/WorkshopToRoles.svelte)
+# RETIRED 2026-09-29 (EV amendment). There is no longer a file that is BAND
+# end-to-end; §9.3 is struck and this array with it. The two EV files that still
+# have BAND regions carry photo scrims and have moved into SCRIM below.
+# EV=(src/routes/programs/ev-challenge/+page.svelte
+#     src/lib/components/programs/ev-challenge/EVModel3DSection.svelte
+#     src/lib/components/programs/ev-challenge/WorkshopToRoles.svelte)
 
-# The 9 files that carry a photo scrim (§2, §3.0 R-SCRIM)
+# The 11 files that carry a photo scrim (§2, §3.0 R-SCRIM)
 SCRIM=(src/lib/components/home/HeroSection.svelte
        src/lib/components/home/ProgramsShowcase.svelte
        src/lib/components/home/StudentHighlights.svelte
@@ -1283,8 +1361,16 @@ SCRIM=(src/lib/components/home/HeroSection.svelte
        src/routes/programs/ai-entrepreneurship-camp/+page.svelte
        src/routes/programs/ithaca-dialogues/+page.svelte)
 
+# The 2 EV files added by the 2026-09-29 amendment. They are DELIBERATELY NOT in
+# SCRIM: every §9.4 row greps a whole file, and these two are scrim only inside
+# three regions (§2) and LIGHT everywhere else — so a whole-file `outline-brand`
+# or `bg-action` row would fire on their (correct) light CTAs. Use the
+# line-scoped rows at the end of §9.4 instead.
+EVSCRIM=(src/routes/programs/ev-challenge/+page.svelte
+         src/lib/components/programs/ev-challenge/EVModel3DSection.svelte)
+
 # Sanity-check the arrays before you trust a 0: each must print its own count.
-for f in "${EV[@]}" "${SCRIM[@]}"; do [ -f "$f" ] || echo "MISSING $f"; done
+for f in "${SCRIM[@]}" "${EVSCRIM[@]}"; do [ -f "$f" ] || echo "MISSING $f"; done
 ```
 
 **Suffix guards, not `\b`.** Several rows end a token with `([^-a-z]|$)` rather than `\b`. That is
@@ -1319,24 +1405,26 @@ contains none of the six prefixes); it is now its own row. (Round-2 findings R2-
 | `grep -rnoE 'text-brand(-bright)?/[0-9]+' src --include='*.svelte' \| grep -v /admin/`                       | 2 hits, both `text-brand/70` on a **lucide `<Icon>`** in `home/ContactSection.svelte:134,142`. R-OPACITY-3 permits `/70` **as a graphic** on `surface-0`…`-3` (3.24 → 3.03). That component maps to `bg-surface-0`, so it passes. **Any additional hit, or either of these landing on `bg-surface-4`, is a failure** — the floor on surface-4 is `/80`. |
 | `grep -rnoE 'placeholder(:text-foreground\|-foreground)/[0-9]+' src --include='*.svelte' \| grep -v /admin/` | 0 hits (§3.4b — placeholders are text)                                                                                                                                                                                                                                                                                                                  |
 
-### 9.3 R-OPACITY-2 / §3.7 BAND column — the three EV files
+### 9.3 ~~R-OPACITY-2 / §3.7 BAND column — the three EV files~~ — **STRUCK 2026-09-29**
 
-The previous revision had **no** row verifying §3.7's BAND column at all, and its R-OPACITY-1 regex
-stopped at `/65`, so `text-foreground/70` inside a band file — **1.05:1** on navy — shipped green.
-Three such sites existed (`ev-challenge/+page.svelte:170` (the hero subtitle), `:187`, `:266`).
-(Round-2 finding R2-3.)
+This whole subsection existed to police the one whole-file BAND population. **There isn't one any
+more** (§2, EV amendment), and every row below greps `"${EV[@]}"`, an array §9's preamble has now
+retired — so run as written they all fail with "no such file" and go green for the wrong reason.
 
-| Check                                                                                                    | Expected                                                                                                                               |
-| -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `grep -nE 'text-foreground(/[0-9]+)?([^-a-z/]\|$)' "${EV[@]}"`                                           | 0 hits — **every** alpha, not just `/65` and below                                                                                     |
-| `grep -nE '(text\|outline\|border\|from\|via\|bg)-brand(-bright)?(/[0-9.[]+\])?([^-a-z]\|$)' "${EV[@]}"` | 0 hits (all → `*-band-brand*`)                                                                                                         |
-| `grep -nE 'border-border([^-]\|$)\|bg-border([^-]\|$)\|bg-card-bg([^-]\|$)' "${EV[@]}"`                  | 0 hits (all → `*-band-border` / `bg-band-soft`)                                                                                        |
-| `grep -nE 'bg-background([^-/a-z]\|$)\|(from\|via\|to)-background' "${EV[@]}"`                           | 0 hits (§3.9a — `bg-band` / `*-overlay/N`)                                                                                             |
-| `grep -nE 'bg-action(-hover)?([^-a-z]\|$)' "${EV[@]}"`                                                   | 0 hits (→ `bg-band-action*`)                                                                                                           |
-| `grep -nE 'bg-foreground\|border-foreground' "${EV[@]}"`                                                 | 0 hits — and **not** rewritten to `*-band-foreground`; §3.4a sends them to `bg-band-border` / `border-band-border` / `bg-white/[0.03]` |
-| `grep -rnE 'bg-band-foreground\|border-band-foreground' src --include='*.svelte'`                        | 0 hits — solid white as a **fill or border** is never correct in this wave (§3.7, R2-5)                                                |
+The two rows that were not EV-specific are kept live and moved here:
 
-### 9.4 R-SCRIM — the 9 scrim files
+| Check                                                                              | Expected                                                                                                                        |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `grep -rnE 'bg-band-foreground\|border-band-foreground' src --include='*.svelte'`  | 0 hits — solid white as a **fill or border** is never correct in this wave (§3.7, R2-5)                                         |
+| `grep -rn 'band-' src/lib/components/programs/ev-challenge/WorkshopToRoles.svelte` | **0 hits** — this file is LIGHT end to end; it has no photo scrim and no BAND region                                            |
+| `grep -nE 'var\(--band' src/app.css`                                               | hits only inside the `:root` / `@theme inline` token layers — **0** inside any `.ev-*` or `.dissolve-panel-*` rule body (§3.9a) |
+
+The historical note is kept because the defect it describes is generic: R-OPACITY-1's regex stops
+at `/65`, so **`text-foreground/70` and above inside any BAND region passes it** while measuring
+1.05:1 on navy. On the EV page that used to be three sites; today it is covered by §9.4's
+scrim rows instead. (Round-2 finding R2-3.)
+
+### 9.4 R-SCRIM — the 9 scrim files, plus the 2 EV scrim files
 
 | Check                                                                                                                 | Expected                                                                                                                                                                     |
 | --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1345,6 +1433,22 @@ Three such sites existed (`ev-challenge/+page.svelte:170` (the hero subtitle), `
 | `grep -nE 'text-band-foreground/(100\|9[0-9]\|8[1-9]\|[0-7]?[0-9])([^0-9]\|$)' "${SCRIM[@]}"`                         | 0 hits — the only permitted alpha on white scrim text is `/80` (5.12 at the `/70` floor)                                                                                     |
 | `grep -nE 'border-band-border([^-]\|$)' "${SCRIM[@]}" \| grep -E 'inline-flex\|<button\|<a '`                         | 0 hits — a control edge on a scrim is `border-band-border-strong` (§3.4, R2-4)                                                                                               |
 | `grep -nE 'bg-action(-hover)?([^-a-z]\|$)\|outline-brand([^-]\|$)' "${SCRIM[@]}"`                                     | 0 hits — the 4 scrim CTAs take `bg-band-action*` + `outline-band-brand` (R-FILL rows 3, 6, 9, 13)                                                                            |
+
+#### The 2 EV scrim files — line-scoped, because these files are only PARTLY scrim
+
+`"${EVSCRIM[@]}"` is not folded into `"${SCRIM[@]}"` on purpose: every row above greps a whole
+file, and these two are BAND only inside three regions (§2) and LIGHT everywhere else — so a
+whole-file `outline-brand` / `bg-action` row would fire on their _correct_ light CTAs. The
+invariant is a **partition**: every `band-*` utility in these files is inside a scrim, and no
+utility inside a scrim is a light one.
+
+| Check                                                                                           | Expected                                                                                                                                                                                                                                                                                                                                                              |
+| ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `grep -n 'band-' "${EVSCRIM[@]}"`                                                               | exactly **15** matching lines (21 utility occurrences — `:175` alone carries 4), all inside the three scrim regions: `+page.svelte` `:166 :170 :175 :181 :184 :187` (hero) and `:349 :352 :357 :362 :369` (competition), `EVModel3DSection.svelte` `:228 :232 :239 :242` (reduced-motion poster). **A hit outside those ranges is the bug this row exists to catch.** |
+| `grep -nE 'text-band-foreground-(muted\|subtle)\|text-band-brand([^-]\|$)' "${EVSCRIM[@]}"`     | **0 hits** — same three banned tokens as above                                                                                                                                                                                                                                                                                                                        |
+| `grep -nE 'text-band-foreground/(100\|9[0-9]\|8[1-9]\|[0-7]?[0-9])([^0-9]\|$)' "${EVSCRIM[@]}"` | 0 hits — all 8 alpha forms are `/80`                                                                                                                                                                                                                                                                                                                                  |
+| `grep -n 'bg-overlay' src/lib/components/programs/ev-challenge/EVModel3DSection.svelte`         | exactly **1** hit, at `:213` — the wrapper the `opacity-40` poster composites against. Removing it silently lightens the photo under a navy scrim (§2)                                                                                                                                                                                                                |
+| `grep -rn 'from-overlay' "${EVSCRIM[@]}"`                                                       | exactly **3** hits (`:161`, `:344`, `:221`) — the three scrims. Each must keep its §5 R-OVERLAY alphas                                                                                                                                                                                                                                                                |
 
 ### 9.5 R-FILL
 

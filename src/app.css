@@ -565,21 +565,24 @@ body::before {
 }
 
 /* EV Challenge: Two Tracks dissolve panels (glass over a 3D background).
-   The whole EV 3D stretch stays an INVERTED BAND — a 3D scene reads best on a
-   dark ground, and §8.2 explicitly keeps navy for dark section blocks. So these
-   panels stay dark glass; they are now expressed in band tokens rather than
-   eight hand-mixed rgba() literals. */
+   2026-09-29 — the EV stretch was the one region left on the inverted band by
+   the §8.2 conversion; the owner then decided it should be LIGHT like the rest
+   of the site, so these are now light glass. The two tracks still read as two
+   distinct planes, but by TEMPERATURE rather than by lightness: engineering =
+   the cool mist ladder, business = the warm amber-200 chip fill (ink 14.15:1).
+   `--band-warm` was the old business-track surface and now has no consumer; it
+   stays in :root (the token layer is frozen) for the scrim/band population. */
 .dissolve-panel-eng {
-	/* Fallback floor: the opaque band surface — exactly what the
+	/* Fallback floor: the opaque light surface — exactly what the
 	   prefers-reduced-transparency branch below already ships, so the degraded
-	   render is a designed state, not an accident. White panel copy stays at
-	   18.47:1 (on band-deep) instead of landing on the white body. */
-	background: var(--band-deep);
+	   render is a designed state, not an accident. Ink panel copy stays at
+	   16.53:1 (on mist) instead of landing on a dark ground. */
+	background: var(--surface-2);
 	backdrop-filter: blur(16px) saturate(140%);
 	-webkit-backdrop-filter: blur(16px) saturate(140%);
 }
 .dissolve-panel-biz {
-	background: var(--band-warm); /* white 14.77:1 */
+	background: var(--amber-200); /* ink 14.15:1 */
 	backdrop-filter: blur(16px) saturate(140%);
 	-webkit-backdrop-filter: blur(16px) saturate(140%);
 }
@@ -588,17 +591,17 @@ body::before {
 	.dissolve-panel-eng {
 		background: linear-gradient(
 			to right,
-			color-mix(in srgb, var(--band-deep) 72%, transparent) 0%,
-			color-mix(in srgb, var(--band) 46%, transparent) 50%,
-			color-mix(in srgb, var(--band) 20%, transparent) 100%
+			color-mix(in srgb, var(--surface-2) 88%, transparent) 0%,
+			color-mix(in srgb, var(--surface-3) 60%, transparent) 50%,
+			color-mix(in srgb, var(--surface-3) 25%, transparent) 100%
 		);
 	}
 	.dissolve-panel-biz {
 		background: linear-gradient(
 			to left,
-			color-mix(in srgb, var(--band-warm) 72%, transparent) 0%,
-			color-mix(in srgb, var(--band-warm) 46%, transparent) 50%,
-			color-mix(in srgb, var(--band) 20%, transparent) 100%
+			color-mix(in srgb, var(--amber-200) 88%, transparent) 0%,
+			color-mix(in srgb, var(--amber-200) 60%, transparent) 50%,
+			color-mix(in srgb, var(--surface-3) 25%, transparent) 100%
 		);
 	}
 }
@@ -620,17 +623,17 @@ body::before {
 		.dissolve-panel-eng {
 			background: linear-gradient(
 				135deg,
-				color-mix(in srgb, var(--band-deep) 74%, transparent) 0%,
-				color-mix(in srgb, var(--band) 50%, transparent) 50%,
-				color-mix(in srgb, var(--band-deep) 15%, transparent) 100%
+				color-mix(in srgb, var(--surface-2) 90%, transparent) 0%,
+				color-mix(in srgb, var(--surface-3) 64%, transparent) 50%,
+				color-mix(in srgb, var(--surface-2) 20%, transparent) 100%
 			);
 		}
 		.dissolve-panel-biz {
 			background: linear-gradient(
 				225deg,
-				color-mix(in srgb, var(--band-warm) 74%, transparent) 0%,
-				color-mix(in srgb, var(--band-warm) 50%, transparent) 50%,
-				color-mix(in srgb, var(--band-warm) 15%, transparent) 100%
+				color-mix(in srgb, var(--amber-200) 90%, transparent) 0%,
+				color-mix(in srgb, var(--amber-200) 64%, transparent) 50%,
+				color-mix(in srgb, var(--amber-200) 20%, transparent) 100%
 			);
 		}
 	}
@@ -643,10 +646,10 @@ body::before {
 		-webkit-backdrop-filter: none;
 	}
 	.dissolve-panel-eng {
-		background: var(--band-deep);
+		background: var(--surface-2);
 	}
 	.dissolve-panel-biz {
-		background: var(--band-warm);
+		background: var(--amber-200);
 	}
 }
 
@@ -662,14 +665,17 @@ body::before {
    -------------------------------------------------------------------------- */
 
 /* :327 — scene vignette. GSAP animates `opacity` on this element, so it must
-   keep its inline `style="opacity: 0"`; only the background moves here. */
+   keep its inline `style="opacity: 0"`; only the background moves here. On the
+   light EV stretch its job is inverted: it used to DARKEN the 3D scene so the
+   Two Tracks panels could sit over it, and now it VEILS the scene in page
+   white so the same panels read. Same gesture, opposite end of the ladder. */
 .ev-scene-vignette {
 	background: none; /* no color-mix: the vignette simply does not paint */
 }
 
 /* :444 — the 1px vertical seam between the two tracks. */
 .ev-seam-line {
-	background: linear-gradient(to bottom, transparent 15%, var(--band-brand) 50%, transparent 85%);
+	background: linear-gradient(to bottom, transparent 15%, var(--brand) 50%, transparent 85%);
 }
 
 /* :454 — the wider glow aura around that seam. Pure ornament. */
@@ -681,37 +687,39 @@ body::before {
 	.ev-scene-vignette {
 		background: radial-gradient(
 			ellipse at center,
-			color-mix(in srgb, var(--overlay) 15%, transparent),
-			color-mix(in srgb, var(--overlay) 40%, transparent) 60%
+			color-mix(in srgb, var(--background) 25%, transparent),
+			color-mix(in srgb, var(--background) 62%, transparent) 60%
 		);
 	}
 	.ev-seam-line {
 		background: linear-gradient(
 			to bottom,
 			transparent 15%,
-			color-mix(in srgb, var(--band-brand) 20%, transparent) 35%,
-			color-mix(in srgb, var(--band-brand) 35%, transparent) 50%,
-			color-mix(in srgb, var(--band-brand) 20%, transparent) 65%,
+			color-mix(in srgb, var(--brand) 25%, transparent) 35%,
+			color-mix(in srgb, var(--brand) 45%, transparent) 50%,
+			color-mix(in srgb, var(--brand) 25%, transparent) 65%,
 			transparent 85%
 		);
 	}
 	.ev-seam-glow {
 		background: radial-gradient(
 			ellipse at center,
-			color-mix(in srgb, var(--band-brand) 4%, transparent),
+			color-mix(in srgb, var(--brand) 7%, transparent),
 			transparent 70%
 		);
 	}
 }
 
-/* EV Challenge: Team Roles ambient background. Inverted band; brand glow now
-   reads from --band-brand (teal-300) instead of rgba(62,143,199,…). */
+/* EV Challenge: Team Roles ambient background. LIGHT since 2026-09-29 — a
+   tinted mist ground so the white role cards on it read as lifted planes, plus
+   the same two decorative teal glows, now mixed from --brand / --brand-bright
+   (teal-600 / teal-700) instead of the band teals. */
 .ev-roles-bg {
-	/* Fallback floor: the navy ground WITHOUT the two teal glows. This is the
+	/* Fallback floor: the tinted ground WITHOUT the two teal glows. This is the
 	   layer that matters — it is the only background on an `absolute inset-0`
 	   ground element (WorkshopToRoles.svelte), so losing it drops the whole
-	   section onto the white body with white text on it. The glows are decorative. */
-	background: radial-gradient(ellipse at 50% 50%, var(--band) 0%, var(--band-deep) 100%);
+	   section onto the flat body surface. The glows are decorative. */
+	background: radial-gradient(ellipse at 50% 50%, var(--surface-2) 0%, var(--surface-4) 100%);
 }
 
 @supports (color: color-mix(in lab, red, red)) {
@@ -719,22 +727,22 @@ body::before {
 		background:
 			radial-gradient(
 				ellipse 800px 600px at 15% 30%,
-				color-mix(in srgb, var(--band-brand) 16%, transparent) 0%,
+				color-mix(in srgb, var(--brand) 10%, transparent) 0%,
 				transparent 65%
 			),
 			radial-gradient(
 				ellipse 600px 500px at 85% 70%,
-				color-mix(in srgb, var(--band-brand-strong) 10%, transparent) 0%,
+				color-mix(in srgb, var(--brand-bright) 7%, transparent) 0%,
 				transparent 60%
 			),
-			radial-gradient(ellipse at 50% 50%, var(--band) 0%, var(--band-deep) 100%);
+			radial-gradient(ellipse at 50% 50%, var(--surface-2) 0%, var(--surface-4) 100%);
 	}
 }
 
 .ev-roles-grid {
-	/* Fallback floor: solid --band-soft dots (1.29:1 against the band — the same
+	/* Fallback floor: solid --line dots (1.15:1 against the mist ground — the same
 	   decorative weight the 20%-teal dots read at). Purely ornamental either way. */
-	background-image: radial-gradient(circle 1.5px, var(--band-soft) 0%, transparent 100%);
+	background-image: radial-gradient(circle 1.5px, var(--line) 0%, transparent 100%);
 	background-size: 32px 32px;
 	mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 10%, transparent 65%);
 	-webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 10%, transparent 65%);
@@ -744,7 +752,7 @@ body::before {
 	.ev-roles-grid {
 		background-image: radial-gradient(
 			circle 1.5px,
-			color-mix(in srgb, var(--band-brand) 20%, transparent) 0%,
+			color-mix(in srgb, var(--brand) 25%, transparent) 0%,
 			transparent 100%
 		);
 	}
@@ -795,18 +803,20 @@ html {
 }
 
 /* EV Challenge: ambient section backgrounds. Referenced by
-   routes/programs/ev-challenge/+page.svelte. Same inverted-band treatment as
-   .ev-roles-bg — navy ground, teal glow, all of it token-driven. */
-/* Fallback floor for all four: the navy ground alone. These four classes ARE the
+   routes/programs/ev-challenge/+page.svelte. Same treatment as .ev-roles-bg —
+   a white-to-mist ground under two soft teal glows, all of it token-driven.
+   LIGHT since 2026-09-29: these four were the last inverted-band sections on
+   the public site and the owner moved the EV stretch onto the light system. */
+/* Fallback floor for all four: the light ground alone. These four classes ARE the
    only background on their sections (routes/programs/ev-challenge/+page.svelte),
-   and everything inside them is band-context text — so this is the declaration
+   and everything inside them is now light-context ink — so this is the declaration
    that has to survive a browser without color-mix(). The teal glows on top are
    decorative and are gated in the @supports block below. */
 .ev-ambient-a,
 .ev-ambient-b,
 .ev-ambient-c,
 .ev-ambient-close {
-	background: radial-gradient(ellipse at 50% 50%, var(--band) 0%, var(--band-deep) 100%);
+	background: radial-gradient(ellipse at 50% 50%, var(--surface-0) 0%, var(--surface-2) 100%);
 }
 
 @supports (color: color-mix(in lab, red, red)) {
@@ -814,56 +824,56 @@ html {
 		background:
 			radial-gradient(
 				ellipse 700px 500px at 20% 15%,
-				color-mix(in srgb, var(--band-brand) 12%, transparent) 0%,
+				color-mix(in srgb, var(--brand) 9%, transparent) 0%,
 				transparent 60%
 			),
 			radial-gradient(
 				ellipse 600px 500px at 90% 85%,
-				color-mix(in srgb, var(--band-brand-strong) 8%, transparent) 0%,
+				color-mix(in srgb, var(--brand-bright) 6%, transparent) 0%,
 				transparent 60%
 			),
-			radial-gradient(ellipse at 50% 50%, var(--band) 0%, var(--band-deep) 100%);
+			radial-gradient(ellipse at 50% 50%, var(--surface-0) 0%, var(--surface-2) 100%);
 	}
 
 	.ev-ambient-b {
 		background:
 			radial-gradient(
 				ellipse 750px 550px at 85% 20%,
-				color-mix(in srgb, var(--band-brand) 13%, transparent) 0%,
+				color-mix(in srgb, var(--brand) 10%, transparent) 0%,
 				transparent 62%
 			),
 			radial-gradient(
 				ellipse 600px 480px at 12% 78%,
-				color-mix(in srgb, var(--band-brand-strong) 9%, transparent) 0%,
+				color-mix(in srgb, var(--brand-bright) 6%, transparent) 0%,
 				transparent 60%
 			),
-			radial-gradient(ellipse at 50% 50%, var(--band) 0%, var(--band-deep) 100%);
+			radial-gradient(ellipse at 50% 50%, var(--surface-0) 0%, var(--surface-2) 100%);
 	}
 
 	.ev-ambient-c {
 		background:
 			radial-gradient(
 				ellipse 900px 650px at 50% 25%,
-				color-mix(in srgb, var(--band-brand) 14%, transparent) 0%,
+				color-mix(in srgb, var(--brand) 10%, transparent) 0%,
 				transparent 65%
 			),
 			radial-gradient(
 				ellipse 620px 520px at 50% 90%,
-				color-mix(in srgb, var(--band-brand-strong) 8%, transparent) 0%,
+				color-mix(in srgb, var(--brand-bright) 6%, transparent) 0%,
 				transparent 58%
 			),
-			radial-gradient(ellipse at 50% 50%, var(--band) 0%, var(--band-deep) 100%);
+			radial-gradient(ellipse at 50% 50%, var(--surface-0) 0%, var(--surface-2) 100%);
 	}
 
-	/* The closing band, which hands back to the light page below it. */
+	/* The closing section, which hands back to the page below it. */
 	.ev-ambient-close {
 		background:
 			radial-gradient(
 				ellipse 800px 400px at 50% 100%,
-				color-mix(in srgb, var(--band-brand) 8%, transparent) 0%,
+				color-mix(in srgb, var(--brand) 7%, transparent) 0%,
 				transparent 60%
 			),
-			radial-gradient(ellipse at 50% 50%, var(--band) 0%, var(--band-deep) 100%);
+			radial-gradient(ellipse at 50% 50%, var(--surface-0) 0%, var(--surface-2) 100%);
 	}
 }
 

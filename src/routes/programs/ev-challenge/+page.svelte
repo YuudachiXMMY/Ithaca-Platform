@@ -143,7 +143,7 @@
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
-<div class="min-h-screen bg-band">
+<div class="min-h-screen bg-background">
 	<!-- 1. Hero: Full-bleed race photo with overlay (GSAP parallax; reduce = static) -->
 	<section bind:this={heroSectionEl} class="relative flex min-h-[85dvh] items-end overflow-hidden">
 		<div
@@ -192,33 +192,33 @@
 	</section>
 
 	<!-- 2. Mission Statement -->
-	<section class="ev-ambient-a border-t border-band-border py-14 md:py-20">
+	<section class="ev-ambient-a border-t border-border py-14 md:py-20">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
 				<div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
 					<div>
-						<p class="font-mono text-[11px] tracking-[0.28em] text-band-brand-strong uppercase">
+						<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
 							{m.home_mission_eyebrow()}
 						</p>
 						<div
-							class="mt-6 h-px w-24 bg-gradient-to-r from-band-brand via-band-brand/40 to-transparent"
+							class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 							aria-hidden="true"
 						></div>
 						<h2
-							class="mt-6 mb-6 text-3xl leading-[1.1] font-light tracking-tight text-band-foreground md:text-4xl lg:text-5xl"
+							class="mt-6 mb-6 text-3xl leading-[1.1] font-light tracking-tight text-foreground md:text-4xl lg:text-5xl"
 						>
 							{m.programs_evChallenge_mission_title()}
 						</h2>
 						<p
-							class="mb-8 max-w-[48ch] text-base leading-relaxed text-band-foreground-subtle md:text-lg"
+							class="mb-8 max-w-[48ch] text-base leading-relaxed text-foreground-subtle md:text-lg"
 						>
 							{m.programs_evChallenge_mission_description()}
 						</p>
-						<blockquote class="border-l-2 border-band-brand/30 pl-4">
-							<p class="max-w-[40ch] text-sm leading-relaxed text-band-foreground-subtle italic">
+						<blockquote class="border-l-2 border-brand/30 pl-4">
+							<p class="max-w-[40ch] text-sm leading-relaxed text-foreground-subtle italic">
 								{m.programs_evChallenge_mission_quote()}
 							</p>
-							<cite class="mt-2 block text-xs text-band-foreground-subtle not-italic">
+							<cite class="mt-2 block text-xs text-foreground-subtle not-italic">
 								{m.programs_evChallenge_mission_quoteAuthor()}
 							</cite>
 						</blockquote>
@@ -243,33 +243,29 @@
 	<WorkshopToRoles />
 
 	<!-- 6. Program Details -->
-	<section class="ev-ambient-b border-t border-band-border py-14 md:py-20">
+	<section class="ev-ambient-b border-t border-border py-14 md:py-20">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
 				<div class="grid grid-cols-1 items-start gap-16 lg:grid-cols-[2fr_3fr] lg:gap-24">
 					<div>
-						<p class="font-mono text-[11px] tracking-[0.28em] text-band-brand-strong uppercase">
+						<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
 							{m.programs_evChallenge_programDetails_eyebrow()}
 						</p>
 						<div
-							class="mt-4 h-px w-24 bg-gradient-to-r from-band-brand via-band-brand/40 to-transparent"
+							class="mt-4 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 							aria-hidden="true"
 						></div>
-						<h2
-							class="mt-6 mb-12 text-2xl font-bold tracking-tight text-band-foreground md:text-3xl"
-						>
+						<h2 class="mt-6 mb-12 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
 							{m.programs_evChallenge_programDetails_title()}
 						</h2>
 						<div class="space-y-6">
 							{#each DETAILS as detail, i (i)}
 								<div>
 									<span
-										class="mb-1 block font-mono text-[11px] tracking-[0.28em] text-band-brand-strong uppercase"
+										class="mb-1 block font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase"
 										>{detail.label()}</span
 									>
-									<span class="font-mono text-base text-band-foreground-muted"
-										>{detail.value()}</span
-									>
+									<span class="font-mono text-base text-foreground-muted">{detail.value()}</span>
 								</div>
 							{/each}
 						</div>
@@ -289,33 +285,33 @@
 
 	<!-- 7. What You Walk Away With -->
 	<section
-		class="border-t border-band-border lg:flex lg:min-h-[calc(100dvh-var(--nav-h))] lg:items-center"
+		class="border-t border-border lg:flex lg:min-h-[calc(100dvh-var(--nav-h))] lg:items-center"
 	>
 		<div class="mx-auto w-full max-w-[1400px] px-5 py-14 sm:px-8 md:px-[6vw] md:py-20">
 			<Reveal y={24}>
 				<div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-[3fr_2fr] lg:gap-20">
 					<div>
-						<p class="font-mono text-[11px] tracking-[0.28em] text-band-brand-strong uppercase">
+						<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
 							{m.programs_evChallenge_gains_eyebrow()}
 						</p>
 						<div
-							class="mt-4 h-px w-24 bg-gradient-to-r from-band-brand via-band-brand/40 to-transparent"
+							class="mt-4 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 							aria-hidden="true"
 						></div>
 						<h2
-							class="mt-6 mb-14 text-2xl font-bold tracking-tight text-band-foreground md:text-3xl lg:text-4xl"
+							class="mt-6 mb-14 text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl"
 						>
 							{m.programs_evChallenge_gains_title()}
 						</h2>
 						<div class="space-y-10">
 							{#each GAINS as gain, i (i)}
 								<div
-									class="relative border-l-2 border-band-brand/30 pl-6 transition-colors hover:border-band-brand/60"
+									class="relative border-l-2 border-brand/30 pl-6 transition-colors hover:border-brand/60"
 								>
-									<h3 class="mb-2 text-base font-bold text-band-foreground md:text-lg">
+									<h3 class="mb-2 text-base font-bold text-foreground md:text-lg">
 										{gain.title()}
 									</h3>
-									<p class="max-w-[48ch] text-sm leading-relaxed text-band-foreground-subtle">
+									<p class="max-w-[48ch] text-sm leading-relaxed text-foreground-subtle">
 										{gain.description()}
 									</p>
 								</div>
@@ -381,19 +377,19 @@
 	</section>
 
 	<!-- Past Seasons (Vimeo embeds verbatim) -->
-	<section class="ev-ambient-c border-t border-band-border py-14 md:py-20">
+	<section class="ev-ambient-c border-t border-border py-14 md:py-20">
 		<Reveal y={24}>
 			<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 				<h2
-					class="text-3xl leading-[1.05] font-light tracking-tight text-band-foreground md:text-4xl lg:text-5xl"
+					class="text-3xl leading-[1.05] font-light tracking-tight text-foreground md:text-4xl lg:text-5xl"
 				>
 					{m.programs_evChallenge_pastSeasons_title()}
 				</h2>
 				<div
-					class="mt-6 h-px w-24 bg-gradient-to-r from-band-brand via-band-brand/40 to-transparent"
+					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 					aria-hidden="true"
 				></div>
-				<p class="mt-6 mb-14 max-w-[50ch] text-sm text-band-foreground-subtle md:mb-20">
+				<p class="mt-6 mb-14 max-w-[50ch] text-sm text-foreground-subtle md:mb-20">
 					{m.programs_evChallenge_pastSeasons_subtitle()}
 				</p>
 			</div>
@@ -402,21 +398,16 @@
 		<!-- Featured video -->
 		<Reveal y={24}>
 			<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
-				<VimeoEmbed
-					band
-					videoId="1202133392"
-					title="EV 2026 Season Highlights"
-					aspectPadding="56.25%"
-				/>
+				<VimeoEmbed videoId="1202133392" title="EV 2026 Season Highlights" aspectPadding="56.25%" />
 				<div class="mt-4 flex items-center gap-3">
 					<div
-						class="h-px w-10 bg-gradient-to-r from-band-brand via-band-brand/40 to-transparent"
+						class="h-px w-10 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 						aria-hidden="true"
 					></div>
-					<span class="font-mono text-[11px] tracking-[0.28em] text-band-brand-strong uppercase">
+					<span class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
 						{m.programs_evChallenge_pastSeasons_season2()}
 					</span>
-					<span class="text-[11px] text-band-foreground-subtle">
+					<span class="text-[11px] text-foreground-subtle">
 						{m.programs_evChallenge_pastSeasons_season1Label()}
 					</span>
 				</div>
@@ -430,14 +421,13 @@
 			>
 				<div class="lg:max-w-[62%]">
 					<VimeoEmbed
-						band
 						videoId="1202133393"
 						title="EV 2025 Season Highlights"
 						aspectPadding="56.25%"
 					/>
 					<div class="mt-3 flex items-center gap-2">
-						<div class="h-px w-6 bg-band-border"></div>
-						<span class="font-mono text-[10px] tracking-wider text-band-foreground-subtle">
+						<div class="h-px w-6 bg-border"></div>
+						<span class="font-mono text-[10px] tracking-wider text-foreground-subtle">
 							{m.programs_evChallenge_pastSeasons_season1()}
 						</span>
 					</div>
@@ -445,7 +435,7 @@
 
 				<div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:ml-auto lg:max-w-[52%] lg:gap-3">
 					{#each CLIP_IDS as videoId (videoId)}
-						<VimeoEmbed band {videoId} title="EV team clip" aspectPadding="177.78%" />
+						<VimeoEmbed {videoId} title="EV team clip" aspectPadding="177.78%" />
 					{/each}
 				</div>
 			</div>
@@ -453,21 +443,21 @@
 	</section>
 
 	<!-- 9. FAQ + CTA: Combined closer -->
-	<section class="ev-ambient-close border-t border-band-border py-14 md:py-20">
+	<section class="ev-ambient-close border-t border-border py-14 md:py-20">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
 				<div class="grid grid-cols-1 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16">
 					<div class="flex flex-col justify-between">
 						<div>
-							<h2 class="mb-4 text-2xl font-bold tracking-tight text-band-foreground md:text-3xl">
+							<h2 class="mb-4 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
 								{m.programs_evChallenge_cta_title()}
 							</h2>
-							<p class="mb-6 max-w-[34ch] text-sm text-band-foreground-subtle">
+							<p class="mb-6 max-w-[34ch] text-sm text-foreground-subtle">
 								{m.programs_evChallenge_cta_subtitle()}
 							</p>
 							<a
 								href={localizeHref('/contact-us')}
-								class="inline-flex h-12 items-center justify-center gap-2 bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
+								class="inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 							>
 								{m.programs_evChallenge_cta_registerNow()}
 								<ArrowRight class="h-4 w-4" />
@@ -483,36 +473,34 @@
 						</div>
 					</div>
 					<div>
-						<h3 class="mb-2 text-lg font-bold text-band-foreground">
+						<h3 class="mb-2 text-lg font-bold text-foreground">
 							{m.programs_evChallenge_faq_title()}
 						</h3>
-						<p class="mb-5 text-xs text-band-foreground-subtle">
+						<p class="mb-5 text-xs text-foreground-subtle">
 							{m.programs_evChallenge_faq_contactPrompt()}
 							<a
 								href={localizeHref('/contact-us')}
-								class="text-band-brand-strong underline underline-offset-2 transition-colors hover:text-band-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand"
+								class="text-brand-bright underline underline-offset-2 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 							>
 								{m.programs_evChallenge_faq_contactLink()}
 							</a>.
 						</p>
 						<div>
 							{#each FAQ as item, i (i)}
-								<details class="group border-b border-band-border">
+								<details class="group border-b border-border">
 									<summary
 										class="flex cursor-pointer list-none items-center justify-between py-5 [&::-webkit-details-marker]:hidden"
 									>
 										<span
-											class="pr-4 text-sm font-medium text-band-foreground transition-colors group-hover:text-band-brand-strong"
+											class="pr-4 text-sm font-medium text-foreground transition-colors group-hover:text-brand-bright"
 										>
 											{item.question()}
 										</span>
 										<ChevronDown
-											class="h-4 w-4 shrink-0 text-band-foreground-subtle transition-transform duration-200 group-open:rotate-180"
+											class="h-4 w-4 shrink-0 text-foreground-subtle transition-transform duration-200 group-open:rotate-180"
 										/>
 									</summary>
-									<div
-										class="max-w-[60ch] pb-5 text-sm leading-relaxed text-band-foreground-subtle"
-									>
+									<div class="max-w-[60ch] pb-5 text-sm leading-relaxed text-foreground-subtle">
 										<p>{item.answer()}</p>
 									</div>
 								</details>
