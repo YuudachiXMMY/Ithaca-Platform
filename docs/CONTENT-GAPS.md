@@ -29,6 +29,25 @@ For comparison, the three real pages are 512–548 lines each. Each placeholder 
 **Needed from owner**: for each of the three — who it is for (grade band), when it runs,
 what students do, what they walk away with, 3–5 FAQ entries, and photographs.
 
+### ~~C-2 · Season dates conflict in three places~~ — 🟢 resolved 2026-09-29
+
+**Owner ruling:** cohort 3 is the current AI Camp cohort, and exact dates are not forthcoming.
+So the published month-level window stands: `2026-09-01` → `2026-12-31`, pitch day December 2026,
+taken from `programs_aiCamp_overview_p2`. Day-of-month is not published anywhere, so the window is
+anchored to the first and last day of the stated months rather than invented —
+`formatSeasonWindow()` renders month-level anyway, so no page shows a day the owner never gave.
+
+Cohort 2 (closed, historical) takes the overview's version too — `2026-06-30`, pitch day
+`2026-06-13`. Safe in a way it would not be for cohort 3: nothing renders a past cohort's dates,
+so a wrong value propagates nowhere.
+
+**One new copy defect falls out of this**, listed in the table below: the FAQ answer
+`programs_aiCamp_faq_items_when_answer` still tells visitors the camp runs January to March 2026.
+That is cohort 2's window on a live page describing the current programme.
+
+<details>
+<summary>Original finding</summary>
+
 ### C-2 · Season dates conflict in three places
 
 `prd.md` Appendix A already flags the AI Camp inconsistency; the audit confirms it and finds
@@ -48,6 +67,8 @@ start / end / pitch-day dates.
 
 EV Season 03 is internally consistent (`Sep 2026 – May 2027`, grades 8–11, 9 months,
 bi-weekly Saturdays 10:00–12:00 and 13:00–15:00) and can be encoded as-is.
+
+</details>
 
 ### C-3 · Tuition and policy text (Q3)
 
@@ -83,22 +104,20 @@ Also needed: the instructor list (currently absent entirely).
 Related defect: `src/lib/data/team.ts:15,20,25,30` hardcodes the English honorifics
 `Mr.` / `Ms.`, which render untranslated on the Chinese site.
 
-### C-5 · Real stat values and sources (Q2) — 🔴 two rules are in direct conflict
+### C-5 · Stat provenance (Q2) — 🟡 counters render; a precise source is still owed
 
-`ImpactStats` currently hardcodes 200+ / 6 / 10+ / 50+ with no provenance.
+**Owner ruling (2026-09-29):** keep the existing figures, they should display.
 
-**The conflict.** `prd.md` R-CONTENT-3 says a `Stat` must carry a `source`, and that an unsourced
-stat is omitted rather than rendered. `DECISIONS.md` Q2 says to keep the four existing figures. Both
-cannot hold: the four figures have no recorded provenance, so obeying R-CONTENT-3 means the homepage
-proof band renders **no counters at all**.
+`src/lib/content/stats.ts` therefore records what is actually true of them — they are the values
+the organisation has been publishing on ithacateens.com — rather than a `TODO` sentinel that would
+suppress them, or an invented "internal roster, September 2026" that would name a document which
+does not exist. That is weak provenance, but real and checkable, so `isSourced()` passes and all
+four counters render. R-CONTENT-3's target is an _unbacked_ number (the previous build shipped a
+server-rendered `0+`), not an imprecisely-backed one.
 
-`src/lib/content/stats.ts` models this the way the PRD requires — every `source` is a
-`TODO(content)` sentinel and the file exports an `isSourced()` render gate — rather than inventing
-provenance to make the numbers appear. That is deliberate: a fabricated source is worse than a
-missing counter, and the whole point of R-CONTENT-3 is that the previous build shipped a
-server-rendered `0+`.
+`programs` is genuinely self-sourced: `/programs` lists six.
 
-**Needed from owner — one line each, then the counters come back:**
+**Still owed — one line each, and it is a string swap in `stats.ts`, nothing more:**
 
 | Stat     | Current figure | Where does this number come from? |
 | -------- | -------------- | --------------------------------- |
@@ -132,6 +151,7 @@ translation errors — the Chinese is human-authored (see `DECISIONS.md` Q12).
 | 2   | `home_highlights_item3Tag` / `item3Title` / `item3Description`     | The tag says `Interview` but the title and description describe a visit to the Sedra Student Design Centre. An EN-side authoring error, faithfully mirrored into ZH. ZH also drops the space before `Sedra`, breaking the Latin-spacing convention used everywhere else. |
 | 3   | Brand name in ZH                                                   | Two renderings coexist: `伊萨卡家族学院` (12 occurrences, including `metadata_title` and `metadata_ogTitle`) and `伊萨卡家庭学院` (4: `common_logoAlt`, `common_nav_homeLink`, `common_footerHomeAriaLabel`, `about_hero_imageAlt`). **Owner to pick one.**              |
 | 4   | `page_hello_body`                                                  | The ZH value asserts the opposite of the EN one (EN: "this is the English site"; ZH: "这是中文站点").                                                                                                                                                                    |
+| 6   | `programs_aiCamp_faq_items_when_answer`                            | Tells visitors the camp runs **January 10 to March 28, 2026** with Pitch Day in April. That is cohort 2's window; cohort 3 is current and runs September to December 2026. Surfaced by encoding the Season records (C-2).                                                |
 | 5   | `programs_index_cards_eliteInterview_title`, `nav_eliteInterviews` | ZH still carries the pre-rename brand `菁英访谈`. Depends on C-8.                                                                                                                                                                                                        |
 
 ### C-8 · Is "Elite Interviews" still an outward-facing name?
