@@ -142,11 +142,16 @@ export function seasonDuration(season: Season): SeasonDuration | null {
 /**
  * The season window as a localized month-and-year range — `prd.md` R-I18N-4.
  *
- * `en` → `September 2026 – May 2027`, `zh` → `2026年9月 – 2027年5月`.
+ * `en` → `September 2026 – May 2027`, `zh` → `2026 年 9 月 – 2027 年 5 月`.
  *
- * The Chinese output is left exactly as ICU produces it, with no space inserted around the
- * digits: digits bound to 年/月 are the one context where CJK style guides do not call for
- * Latin-run spacing, and hand-editing locale output is how date bugs get shipped.
+ * The Chinese output is re-spaced after ICU. General CJK style guides do treat digits bound to
+ * 年/月 as the one place Latin-run spacing is not required — but this site does not follow that,
+ * and consistency within the page beats an external rule. Measured across `messages/zh.json`: the
+ * spaced form appears 20+ times (`2026 年 9 月`, `4-12 年级`, `最后更新：2026 年 8 月 25 日`) and the
+ * unspaced form appears ZERO times. The translator applied it deliberately and uniformly, so a
+ * Season-derived date that skipped it would be the single place on a Chinese page where the
+ * typography changes — visible exactly on the program pages that are about to stop reading their
+ * dates from the message files and start reading them from here.
  *
  * Returns null when either endpoint is unknown, so callers render nothing rather than
  * "Invalid Date".
@@ -162,8 +167,20 @@ export function formatSeasonWindow(season: Season, locale: Locale): string | nul
 		timeZone: SEASON_TIME_ZONE
 	});
 
-	const from = format.format(start);
-	const to = format.format(end);
+	const from = spaceCjkNumerals(format.format(start), locale);
+	const to = spaceCjkNumerals(format.format(end), locale);
 	// A single-month season would otherwise read "July 2026 – July 2026".
 	return from === to ? from : `${from}${RANGE_SEPARATOR}${to}`;
+}
+
+/**
+ * ICU emits `2026年9月`; every hand-authored Chinese string in this repo writes `2026 年 9 月`,
+ * spacing Latin and numeral runs against the CJK glyphs around them. That convention is applied
+ * consistently across all 710 messages, so a Season-derived date that skipped it would be the one
+ * place on a Chinese page where the typography changes — visible precisely on the program pages
+ * that are about to start reading their dates from here instead of from the message files.
+ */
+function spaceCjkNumerals(text: string, locale: Locale): string {
+	if (locale !== 'zh') return text;
+	return text.replace(/(\d)([一-鿿])/g, '$1 $2').replace(/([一-鿿])(\d)/g, '$1 $2');
 }

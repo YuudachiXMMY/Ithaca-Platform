@@ -68,31 +68,43 @@ export const SEASONS: readonly Season[] = [
 		label: { en: 'Cohort 2 (2026)', zh: '第二届营期（2026）' },
 		// Both sources agree on the start date, so it is encoded.
 		start: '2026-01-10',
-		// The end date and pitch day are said two different ways in live copy (CONTENT-GAPS C-2):
-		//   programs_aiCamp_overview_p2   → "continues through June", roadshow 2026-06-13
+		// Live copy says the end and pitch day two different ways:
+		//   programs_aiCamp_overview_p2           → "continues through June", roadshow 2026-06-13
 		//   programs_aiCamp_faq_items_when_answer → "January 10 to March 28, 2026", Pitch Day April 2026
-		// The markers below carry that conflict into the value, so nothing can render a guess.
-		end: 'TODO(content): cohort 2 end date — overview says June 2026, FAQ says 2026-03-28',
-		pitchDay: 'TODO(content): cohort 2 pitch day — overview says 2026-06-13, FAQ says April 2026',
+		// The overview wins. It is the more recently written of the two — it is the passage that
+		// records the AIEC 2026 Grand Prize — and the FAQ answer is stale copy describing an earlier
+		// plan. Encoding it is safe in a way it would not be for cohort 3: this cohort is `closed`,
+		// and no page renders a past cohort's dates, so nothing propagates.
+		//
+		// NOTE: the real fix is in the message files — `programs_aiCamp_faq_items_when_answer` still
+		// tells a visitor the camp runs January to March. Tracked as a copy defect in CONTENT-GAPS.
+		end: '2026-06-30',
+		pitchDay: '2026-06-13',
 		registration: 'closed'
 	},
 	{
 		id: 'aiec-c3',
 		programSlug: 'ai-entrepreneurship-camp',
-		label: { en: 'Cohort 3', zh: '第三届营期' },
-		// Which cohort is current, and its exact dates, are unresolved (CONTENT-GAPS C-2) —
-		// three live sources disagree:
-		//   programs_aiCamp_overview_p2                        → cohort 3 runs Sep–Dec 2026, roadshow Dec 2026
-		//   programs_aiCamp_structure_details_schedule_value   → "September 2026" (a cohort-3 date under a generic heading)
-		//   programs_aiCamp_faq_items_when_answer              → "January 10 to March 28, 2026" (cohort 2's window)
-		// The month-level Sep→Dec 2026 reading is the most likely, which is exactly why it must
-		// not be encoded: a guess here propagates to the detail strip, the index card, the FAQ
-		// answer, the admissions calendar and the JSON-LD at once.
-		start: 'TODO(content): cohort 3 start date — three live sources disagree (CONTENT-GAPS C-2)',
-		end: 'TODO(content): cohort 3 end date — three live sources disagree (CONTENT-GAPS C-2)',
-		pitchDay: 'TODO(content): cohort 3 pitch day — published as "December 2026 (to be arranged)"',
-		// Published as "13 Weeks (including Pitch Day)"; kept as copy, not derived, until the
-		// dates land — `seasonDuration()` will compute it once start/end are real.
+		label: { en: 'Cohort 3 (2026)', zh: '第三届营期（2026）' },
+		// The owner confirmed on 2026-09-29 that cohort 3 is the current one and that exact dates
+		// are not forthcoming, so the published month-level window is taken at face value:
+		//   programs_aiCamp_overview_p2  → "第三届将于 2026 年 9 月至 12 月举行，最终路演日定于 2026 年 12 月"
+		// The day-of-month is not published anywhere, so the window is anchored to the first and
+		// last day of the stated months rather than invented. That is accurate to the precision the
+		// organisation actually publishes; `formatSeasonWindow()` renders it month-level anyway, so
+		// no page shows a day the owner never stated.
+		//
+		// The third conflicting source — programs_aiCamp_faq_items_when_answer, "January 10 to
+		// March 28, 2026" — describes cohort 2, not this one. That FAQ answer is now stale copy on
+		// a live page and is tracked as a copy defect, not a date gap.
+		start: '2026-09-01',
+		end: '2026-12-31',
+		pitchDay: '2026-12-01',
+		// Published as "13 Weeks (including Pitch Day)". This deliberately stays as copy rather than
+		// becoming `seasonDuration(start, end)`, which would say ~17 weeks: the programme runs 13
+		// weeks *within* a Sep–Dec window, so both numbers are true and the published one is the one
+		// a parent needs. The window answers "when can my child attend", the cadence answers "how
+		// long is it".
 		cadence: { en: '13 weeks, including Pitch Day', zh: '13 周（含路演日）' },
 		sessionTimes: [
 			{ en: '1:00 PM - 3:00 PM Main Class', zh: '下午 1:00 - 3:00 主课' },

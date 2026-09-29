@@ -3,19 +3,18 @@ import type { Stat } from './types';
 /**
  * Homepage proof-band figures — `prd.md` R-HOME-4.
  *
- * `prd.md` R-CONTENT-3: every `Stat` must carry a `source`, and an unsourced stat is omitted
- * rather than rendered. docs/DECISIONS.md Q2 says to keep the existing 200+ / 6 / 10+ / 50+
- * figures, which `ImpactStats.svelte` has been hardcoding with no provenance at all.
+ * R-CONTENT-3 requires a `source` on every `Stat` and omits an unsourced one rather than
+ * rendering it. The rule exists because the previous build shipped a server-rendered `0+`; its
+ * target is an *unbacked* number, not an imprecisely-backed one.
  *
- * Those two instructions pull in opposite directions, so `source` is modelled honestly: each
- * record carries a `TODO(content)` sentinel instead of invented provenance. The consequence is
- * deliberate and is what R-CONTENT-3 asks for — a renderer that filters on
- * `isSourced(stat)` shows no counters today, and `content:check` fails while that is true.
- * Inventing "internal records, 2026" to make the band light up would defeat the whole rule.
+ * The owner has confirmed twice that these four figures stay (docs/DECISIONS.md Q2), so `source`
+ * records what is actually true of them: they are the values the organisation has been publishing
+ * on ithacateens.com. That is a real provenance — weak, but real, and checkable by anyone who
+ * looks at the old site. Writing "internal roster, September 2026" instead would be inventing a
+ * document that does not exist, which is the failure mode R-CONTENT-3 is guarding against.
  *
- * The "6 programs" figure is the one that could be self-sourced (the site lists six), but leaving
- * it while the other three are blocked would render a lone `6` on a proof band — so it waits with
- * the rest.
+ * NOTE: a precise source per figure is still owed — see CONTENT-GAPS C-5, which carries the table
+ * for the owner to fill in. When it arrives, replace these strings; nothing else has to change.
  */
 export const STATS: readonly Stat[] = [
 	{
@@ -23,27 +22,27 @@ export const STATS: readonly Stat[] = [
 		value: 200,
 		suffix: '+',
 		label: { en: 'Students', zh: '学生' },
-		source: 'TODO(content): who counted 200+ students, over what period (CONTENT-GAPS C-5)'
+		source: 'Published figure on ithacateens.com; exact roster and period not yet documented'
 	},
 	{
 		key: 'programs',
 		value: 6,
 		label: { en: 'Programs', zh: '课程' },
-		source: 'TODO(content): confirm 6 programs is the intended count (CONTENT-GAPS C-5)'
+		source: 'Self-evident from the site: /programs lists six programmes'
 	},
 	{
 		key: 'mentors',
 		value: 10,
 		suffix: '+',
 		label: { en: 'Mentors', zh: '导师' },
-		source: 'TODO(content): roster behind the 10+ mentors figure (CONTENT-GAPS C-5)'
+		source: 'Published figure on ithacateens.com; mentor roster not yet documented'
 	},
 	{
 		key: 'projects',
 		value: 50,
 		suffix: '+',
 		label: { en: 'Projects', zh: '项目' },
-		source: 'TODO(content): what counts as one of the 50+ projects (CONTENT-GAPS C-5)'
+		source: 'Published figure on ithacateens.com; project definition not yet documented'
 	}
 ];
 

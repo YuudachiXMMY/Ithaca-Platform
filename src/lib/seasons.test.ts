@@ -199,7 +199,7 @@ describe('formatSeasonWindow — R-I18N-4', () => {
 	});
 
 	it('renders the Chinese window in 年/月 form', () => {
-		expect(formatSeasonWindow(ev, 'zh')).toBe('2026年9月 – 2027年5月');
+		expect(formatSeasonWindow(ev, 'zh')).toBe('2026 年 9 月 – 2027 年 5 月');
 	});
 
 	it('reads the ISO date as a Toronto calendar date, not as UTC midnight', () => {
@@ -211,13 +211,13 @@ describe('formatSeasonWindow — R-I18N-4', () => {
 	it('spans a year boundary in both locales', () => {
 		const winter = season({ id: 'w', start: '2026-12-15', end: '2027-01-15' });
 		expect(formatSeasonWindow(winter, 'en')).toBe('December 2026 – January 2027');
-		expect(formatSeasonWindow(winter, 'zh')).toBe('2026年12月 – 2027年1月');
+		expect(formatSeasonWindow(winter, 'zh')).toBe('2026 年 12 月 – 2027 年 1 月');
 	});
 
 	it('collapses to a single label when start and end fall in the same month', () => {
 		const camp = season({ id: 'c', start: '2026-07-06', end: '2026-07-31' });
 		expect(formatSeasonWindow(camp, 'en')).toBe('July 2026');
-		expect(formatSeasonWindow(camp, 'zh')).toBe('2026年7月');
+		expect(formatSeasonWindow(camp, 'zh')).toBe('2026 年 7 月');
 	});
 
 	it('returns null rather than "Invalid Date" when a date is a TODO sentinel', () => {
@@ -245,14 +245,22 @@ describe('the shipped season records', () => {
 		expect(formatSeasonWindow(ev!, 'en')).toBe('September 2026 – May 2027');
 	});
 
-	it('the AI Camp current season is undated, so nothing renders a guessed date', () => {
-		// docs/CONTENT-GAPS.md C-2: three sources disagree. Until the owner rules, the season
-		// carries TODO sentinels and every date-derived value must come back null.
+	it('the AI Camp current season is cohort 3, on the published Sep–Dec 2026 window', () => {
+		// The owner ruled on 2026-09-29: cohort 3 is current and no exact dates are forthcoming,
+		// so the published month-level window stands (docs/CONTENT-GAPS.md C-2, now closed).
 		const camp = currentSeason(SEASONS, 'ai-entrepreneurship-camp');
-		expect(camp).toBeDefined();
-		expect(isIsoDate(camp!.start)).toBe(false);
-		expect(seasonDuration(camp!)).toBeNull();
-		expect(formatSeasonWindow(camp!, 'zh')).toBeNull();
+		expect(camp?.id).toBe('aiec-c3');
+		expect(formatSeasonWindow(camp!, 'en')).toBe('September 2026 – December 2026');
+		expect(formatSeasonWindow(camp!, 'zh')).toBe('2026 年 9 月 – 2026 年 12 月');
+	});
+
+	it('keeps the published 13-week cadence rather than deriving it from the window', () => {
+		// Sep 1 – Dec 31 computes to ~17 weeks, but the camp runs 13 weeks *within* that window.
+		// Both are true; the published one is the one a parent needs, so `cadence` is copy and
+		// must not be quietly replaced by seasonDuration().
+		const camp = currentSeason(SEASONS, 'ai-entrepreneurship-camp');
+		expect(camp?.cadence?.en).toContain('13 weeks');
+		expect(seasonDuration(camp!)).not.toEqual({ value: 13, unit: 'week' });
 	});
 
 	it('every season belongs to a program and has a unique id', () => {
