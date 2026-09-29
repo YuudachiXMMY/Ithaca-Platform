@@ -63,7 +63,7 @@
 			<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
 				{m.home_mission_approachEyebrow()}
 			</p>
-			<p class="mt-3 mx-auto max-w-md text-lg font-medium text-white/80">
+			<p class="mx-auto mt-3 max-w-md text-lg font-medium text-white/80">
 				{m.home_mission_approachIntro()}
 			</p>
 		</Reveal>

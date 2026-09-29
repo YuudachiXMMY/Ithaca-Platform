@@ -19,7 +19,7 @@ const VIMEO_QS =
 
 function expected(videoId: string, title: string, aspectPadding: string) {
 	const inner =
-		`<div class="relative overflow-hidden rounded-sm border border-border bg-card-bg transition-colors hover:border-accent/15" style="padding-top: ${aspectPadding}">` +
+		`<div class="relative overflow-hidden border border-border bg-card-bg transition-colors hover:border-brand/15" style="padding-top: ${aspectPadding}">` +
 		`<iframe src="https://player.vimeo.com/video/${videoId}?${VIMEO_QS}" ` +
 		`class="absolute inset-0 h-full w-full" ` +
 		`allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" ` +

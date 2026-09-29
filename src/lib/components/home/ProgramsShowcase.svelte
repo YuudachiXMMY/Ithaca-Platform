@@ -92,7 +92,7 @@
 		<Reveal y={24}>
 			<div class="mb-6 text-center">
 				<h2 class="text-2xl font-bold text-white md:text-4xl">{m.home_programs_heading()}</h2>
-				<p class="mt-2 mx-auto max-w-lg text-sm leading-relaxed text-white/45">
+				<p class="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-white/45">
 					{m.home_programs_subheading()}
 				</p>
 			</div>
