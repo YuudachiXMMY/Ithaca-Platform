@@ -35,6 +35,7 @@ older Svelte/SvelteKit and from most training data — verify against the versio
 - Read `prisma/schema.prisma` before any DB work.
 - Read `vite.config.ts` — the SvelteKit / Paraglide / adapter / prerender config is **inline** there (there is **no** `svelte.config.js`).
 - `docs/CUTOVER.md` + `docs/DEPLOYMENT.md` document the production / ops story.
-- Do **not** author a `DROP admin_users` migration. The legacy `AdminUser` model and the `20260827140000_backfill_admins_to_betterauth` migration are intentionally retained until prod admin login is verified — see `docs/CUTOVER.md` §7.
+- `docs/DECISIONS.md` records every deviation from the PRD; `docs/CONTENT-GAPS.md` lists what the site still needs from the owner. Update both as you go.
+- The legacy `AdminUser` model is **gone** — dropped by `prisma/migrations/20260926162933_drop_legacy_admin_users`. The old "do not author a DROP admin_users migration" instruction no longer has an object and has been removed.
 
 <!-- END:sveltekit-agent-rules -->

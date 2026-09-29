@@ -174,18 +174,29 @@ build-args (`Dockerfile` + `.github/workflows/deploy.yml`).
 
 ## Testing Strategy
 
-**Vitest is wired** (`vitest` ^4, config inline in `vite.config.ts` under `test:`). A small unit
-suite exists (`src/lib/utils.test.ts`, `src/lib/server/rate-limit.test.ts`,
-`src/routes/api/admin/popups/schema.test.ts`); coverage is still partial, so validation stays
-predominantly build/type/lint/smoke-based:
+**Vitest is wired** (`vitest` ^4, config inline in `vite.config.ts` under `test:`) with **15
+test files**. Note `environment: 'node'` -- there is no jsdom and no `@testing-library/svelte`,
+so every `*.test.ts` is a pure-logic test, including the ones under `src/lib/components/`.
+UI-level verification is Playwright's job (`e2e/`), not Vitest's.
 
 - `npm test` -- `vitest run` (unit tests; `npm run test:watch` for the watcher)
 - `npm run check` -- Paraglide compile + `svelte-kit sync` + `svelte-check` (types + a11y)
 - `npm run lint` -- ESLint + Prettier
+- `npm run i18n:check` -- en/zh message-key parity (`scripts/check-i18n.ts`)
 - `npm run build` -- production build must emit `build/index.js`
+- `npm run test:e2e` -- Playwright against the **production build**, not `vite dev`. Requires
+  `npm run build` first. Boots `node build/index.js` on port 4321 (NOT 3000, which is commonly
+  squatted by local daemons; `reuseExistingServer` is off so a busy port fails loudly instead
+  of silently testing someone else's server).
+  - `e2e/smoke.spec.ts` -- route coverage **derived from `/sitemap.xml`**, so a new page joins
+    the suite automatically; plus locale switch, keyboard nav, form validation, redirects
+  - `e2e/a11y.spec.ts` -- axe, zero serious/critical on every `prd.md` §6.4 page in both locales
 - `bash scripts/docker-smoke.sh` -- production-image smoke test (build + migrate + routes +
   Better Auth login) against an isolated, disposable Postgres
-- `.github/workflows/lighthouse.yml` -- mobile performance gate on every PR
+- `.github/workflows/ci.yml` -- **the PR gate**: lint, check, i18n parity, unit tests, build,
+  Playwright smoke, axe
+- `.github/workflows/lighthouse.yml` -- mobile performance gate. The thresholds that actually
+  block are in `lighthouserc.json` and are only two: LCP <= 4500ms and CLS <= 0.05
 
 ## Coding Conventions
 
@@ -254,10 +265,11 @@ The site uses **Paraglide** (`@inlang/paraglide-js`) for bilingual English/Chine
 - **Server-only** modules live in `src/lib/server/**` and must never be imported into client code.
 - **GSAP / Threlte**: register/clean up GSAP contexts and check reduced-motion; load Threlte/three
   only where needed (they are bundled for SSR via `ssr.noExternal: ['three']`).
-- **Do NOT** author a `DROP admin_users` migration. The legacy `AdminUser` model and the
-  `20260827140000_backfill_admins_to_betterauth` migration are intentionally retained until
-  prod admin login is verified -- the DROP is a separate, later, forward-only migration
-  (`docs/CUTOVER.md` §7). The container CMD runs `migrate deploy` on boot, so any committed
-  migration auto-applies on the next `-kit` rollout.
+- The container CMD runs `prisma migrate deploy` on boot, so **any committed migration
+  auto-applies on the next `-kit` rollout**. Keep migrations additive (new columns nullable or
+  defaulted) and take `npm run prod:backup` first. The legacy `AdminUser` model no longer
+  exists -- it was dropped by `20260926162933_drop_legacy_admin_users`.
+- `docs/DECISIONS.md` records every deviation from the PRD, `docs/CONTENT-GAPS.md` tracks what
+  is still owed by the owner, and `docs/LAUNCH-CHECKLIST.md` is the release gate.
 - Vitest is set up (`npm test` = `vitest run`; config inline in `vite.config.ts`). Put unit tests
   next to their target as `*.test.ts` (see `src/lib/utils.test.ts` for the pattern).
