@@ -3,11 +3,21 @@
 		"collect": {
 			"startServerCommand": "node build/index.js",
 			"startServerReadyPattern": "Listening on",
+			"//url": [
+				"The three PRD reference routes are /, /programs/ev-challenge and /contact-us.",
+				"/programs/ev-challenge was missing until now — the heaviest public page (Threlte",
+				"3D canvas + the largest image set) was the one route never measured.",
+				"The /zh mirrors are included because only they load Noto Sans SC; an English-only",
+				"URL list cannot see a CJK font regression."
+			],
 			"url": [
 				"http://localhost:3000/",
 				"http://localhost:3000/about-us",
 				"http://localhost:3000/programs",
-				"http://localhost:3000/contact-us"
+				"http://localhost:3000/programs/ev-challenge",
+				"http://localhost:3000/contact-us",
+				"http://localhost:3000/zh",
+				"http://localhost:3000/zh/programs/ev-challenge"
 			],
 			"numberOfRuns": 3,
 			"settings": {
@@ -22,6 +32,20 @@
 				"throttlingMethod": "simulate"
 			}
 		},
+		"//assert": [
+			"Staged tightening (plan D-3). The PRD target is LCP <= 2500ms at error level, but",
+			"production currently sits near 4.0s, so a blanket 2500 error would leave CI red from",
+			"day one and destroy the signal value of the gate.",
+			"",
+			"LHCI keys assertions by audit id in `level | [level, options]` form, so one audit",
+			"cannot carry both a 2500 warn and a 4500 error in the same set. Rather than a global",
+			"warn nobody reads, the ratchet is per-route via assertMatrix: once a route is measured",
+			"under 2500 (see .claude/PRPs/baselines/), move its pattern into a tighter matrix entry",
+			"so that route can never regress, while slower routes keep the 4500 ceiling.",
+			"",
+			"Note the previous config's header comment in lighthouse.yml claimed 'Performance >=",
+			"0.95, LCP < 2.0s' while asserting 0.85/4500 — that drift is corrected here and there."
+		],
 		"assert": {
 			"assertions": {
 				"categories:performance": ["warn", { "minScore": 0.85 }],

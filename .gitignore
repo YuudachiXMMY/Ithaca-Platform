@@ -34,3 +34,9 @@ project.inlang/cache/
 # Local agent / tooling scratch (worktrees + code-graph index)
 .claude/worktrees/
 .codegraph/
+
+# Playwright (reports, traces, screenshots, downloaded browsers)
+/playwright-report/
+/test-results/
+/blob-report/
+/playwright/.cache/

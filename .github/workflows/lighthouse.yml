@@ -1,7 +1,13 @@
 # ── Lighthouse CI — mobile perf gate ────────────
 # Builds the SvelteKit app (adapter-node) and runs `lhci autorun` against the
-# built site, asserting the PRD's headline metrics (Performance ≥ 0.95,
-# LCP < 2.0s, CLS < 0.05). PUBLIC_* env is inlined at build time.
+# built site. The thresholds that actually block a merge live in lighthouserc.json
+# and are, today, exactly two: LCP <= 4500ms and CLS <= 0.05. Everything else
+# (performance 0.85, a11y 0.9, seo 0.9, FCP, TBT) is warn-level and cannot fail
+# the job. The PRD's 2500ms LCP target is being reached by a staged per-route
+# ratchet — see the "//assert" note in lighthouserc.json.
+#
+# Correctness, types, lint and unit tests are NOT checked here; that is ci.yml.
+# PUBLIC_* env is inlined at build time.
 
 name: Lighthouse CI
 

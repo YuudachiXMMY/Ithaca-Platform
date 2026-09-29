@@ -1,0 +1,99 @@
+# PR quality gate — the safety net the repo was missing.
+#
+# Until this workflow existed, NOTHING in CI ran `npm test`, `npm run lint` or
+# `npm run check`: `deploy.yml` only builds an image on `prod`, and `lighthouse.yml`
+# only measures performance. The 15 Vitest suites were effectively unexecuted, which
+# is how three stale assertions in VimeoEmbed.test.ts and two Prettier drifts in
+# src/lib/components/home/ survived into `main`.
+#
+# Ordered cheapest-to-most-expensive so a trivial break fails fast.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, prod]
+
+# A newer push to the same ref makes the in-flight run pointless.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: lint · typecheck · test · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      # `npm run check` (svelte-kit sync) and `npm run build` load the app's modules,
+      # which reach $env/dynamic/private through src/lib/server/*. Placeholders only —
+      # nothing here connects to a real database or signs a real session.
+      DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+      BETTER_AUTH_SECRET: ci-placeholder-secret-not-used-for-anything
+      BETTER_AUTH_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # engine-strict=false: camera-controls (a @threlte/extras dep) declares an engines
+      # range that node 20 fails, and .npmrc sets engine-strict=true for local dev.
+      - name: Install dependencies
+        run: npm ci --engine-strict=false
+
+      # ESLint + `prettier --check`. Catches the formatting drift that reached main.
+      - name: Lint
+        run: npm run lint
+
+      # paraglide-js compile + svelte-kit sync + svelte-check (types AND a11y).
+      - name: Typecheck
+        run: npm run check
+
+      # en/zh message-key parity. Previously a manual-only script, wired up here.
+      - name: i18n key parity
+        run: npm run i18n:check
+
+      - name: Unit tests
+        run: npm test
+
+      # Last because it is the slowest. PUBLIC_* are inlined by Vite at build time, so
+      # they must be present BEFORE the build (same contract as Dockerfile/deploy.yml).
+      - name: Build
+        run: npm run build
+        env:
+          PUBLIC_GA_TRACKING_ID: G-675W5PPJEJ
+          PUBLIC_SITE_URL: https://ithacateens.com
+
+      - name: Assert the adapter-node entrypoint was emitted
+        run: test -f build/index.js
+
+      # Playwright is the only UI-level verification this repo has: Vitest runs with
+      # `environment: 'node'` and no jsdom, so nothing else asserts that a page renders.
+      # It reuses the build above and boots `node build/index.js` itself (see
+      # playwright.config.ts), on port 4321 rather than the commonly-squatted 3000.
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      # Route coverage (derived from sitemap.xml), locale switch, keyboard nav, form validation.
+      - name: E2E smoke
+        run: npx playwright test e2e/smoke.spec.ts
+
+      # R-A11Y-2: zero serious/critical axe issues on every §6.4 page, in both locales.
+      - name: Accessibility (axe)
+        run: npx playwright test e2e/a11y.spec.ts
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
