@@ -53,6 +53,45 @@
 		closeTimeout = setTimeout(() => (openDropdown = null), 150);
 	}
 
+	// The dropdown used to be mouse-only — openMenu was reachable from `onmouseenter` and
+	// nowhere else, while the trigger still advertised aria-haspopup="true" + aria-expanded.
+	// Keyboard users were told a menu existed and had no way to open it (WCAG 2.1.1), and the
+	// role="menu" panel never entered the DOM for them at all.
+	//
+	// Focus now opens it: focusin/focusout are placed on the WRAPPER so they cover both the
+	// trigger and the panel links, and the existing 150ms close grace makes the
+	// focusout -> focusin hop between the two a no-op.
+	function handleDropdownKeydown(
+		event: KeyboardEvent & { currentTarget: HTMLElement },
+		href: string
+	) {
+		if (openDropdown !== href) return;
+		const wrapper = event.currentTarget;
+		const trigger = wrapper.querySelector<HTMLAnchorElement>('a[aria-haspopup]');
+
+		if (event.key === 'Escape') {
+			// Don't let this also close the mobile drawer.
+			event.stopPropagation();
+			// Order matters: move focus back BEFORE unmounting the panel. Focusing the trigger
+			// from inside the panel fires focusin on the wrapper, which would re-open the menu;
+			// focus events dispatch synchronously, so letting that happen first and clearing
+			// afterwards leaves the menu closed with focus where the user expects it.
+			trigger?.focus();
+			if (closeTimeout) {
+				clearTimeout(closeTimeout);
+				closeTimeout = null;
+			}
+			openDropdown = null;
+			return;
+		}
+
+		if (event.key === 'ArrowDown') {
+			// role="menu" implies arrow-key traversal; without this the roles are a lie.
+			event.preventDefault();
+			wrapper.querySelector<HTMLAnchorElement>('[role="menuitem"]')?.focus();
+		}
+	}
+
 	// Mobile accordion: single expanded item at a time.
 	let expandedItem = $state<string | null>(null);
 
@@ -120,7 +159,14 @@
 					{#if item.children}
 						{@const open = openDropdown === item.href}
 						<!-- svelte-ignore a11y_no_static_element_interactions -->
-						<div class="relative" onmouseenter={() => openMenu(item.href)} onmouseleave={closeMenu}>
+						<div
+							class="relative"
+							onmouseenter={() => openMenu(item.href)}
+							onmouseleave={closeMenu}
+							onfocusin={() => openMenu(item.href)}
+							onfocusout={closeMenu}
+							onkeydown={(e) => handleDropdownKeydown(e, item.href)}
+						>
 							<a
 								href={localizeHref(item.href)}
 								class={cn(
