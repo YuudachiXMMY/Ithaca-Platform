@@ -20,15 +20,15 @@
 	import { page } from '$app/state';
 	import { untrack } from 'svelte';
 	import * as publicEnv from '$env/static/public';
-	import { Phone, QrCode } from 'lucide-svelte';
+	import { Phone } from 'lucide-svelte';
 	import { getLocale } from '$lib/paraglide/runtime';
 	import { getCsrfToken } from '$lib/csrf-client';
 	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
 	import { PROGRAMS, LIVE_PROGRAM_SLUGS } from '$lib/content/programs';
 	import { resolveProgramParam, resolveTopicParam, type Topic } from '$lib/admissions';
-	import { inview } from '$lib/actions/inview';
-	import { trackInquirySubmit, trackPhoneTap, trackWechatQrView } from '$lib/analytics';
+	import { trackInquirySubmit, trackPhoneTap } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
+	import WeChatQr from '$lib/components/contact/WeChatQr.svelte';
 
 	interface Props {
 		/** Accessible name for the <form>. Each page supplies its own visible heading. */
@@ -480,32 +480,7 @@
 						<Phone class="h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
 						{CONTACT_INFO.phone}
 					</a>
-					<div class="flex items-start gap-3">
-						<!-- `wechat_qr_view` — R-SEO-5. IntersectionObserver via use:inview, NOT the
-						     `offerFallback` flip: WeChat is this site's primary arrival path, so the
-						     number that matters is how often the QR was actually SEEN. This block is the
-						     site's only QR today and it appears below a failed submit, so the event is
-						     rare by construction; counting the render instead would quietly overstate it.
-						     `once` (the action's default) keeps one scroll past from firing repeatedly. -->
-						<img
-							src="/media/images/qrcode/Joshua-WeChat.jpg"
-							alt={m.contact_form_fallbackQrAlt()}
-							width="1080"
-							height="1051"
-							loading="lazy"
-							decoding="async"
-							use:inview={{ threshold: 0.5 }}
-							oninview={() => trackWechatQrView({ location: 'contact_form_fallback', locale })}
-							class="h-28 w-28 shrink-0 border border-border object-cover"
-						/>
-						<p class="flex items-center gap-2 text-xs leading-relaxed text-foreground-muted">
-							<QrCode class="h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
-							<span>
-								{m.contact_form_fallbackWechat()}
-								<span class="mt-1 block font-mono text-foreground">{CONTACT_INFO.wechat}</span>
-							</span>
-						</p>
-					</div>
+					<WeChatQr location="contact_form_fallback" {locale} showId />
 				</div>
 			</div>
 		{/if}

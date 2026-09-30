@@ -228,7 +228,7 @@ describe('resultsTimeline', () => {
 
 describe('dialoguesInterviews', () => {
 	const withVideos: Program = {
-		...program('ithaca-dialogues', 'Ithaca Dialogues', '菁英访谈'),
+		...program('ithaca-dialogues', 'Ithaca Dialogues', '伊萨卡菁英访谈'),
 		videos: [{ id: '123', title: { en: 'A conversation', zh: '一场对话' } }]
 	};
 

@@ -105,7 +105,7 @@ export const AI_CAMP_FAQ: readonly FAQ[] = [
 
 export const DIALOGUES_FAQ: readonly FAQ[] = [
 	{
-		q: { en: 'What is the Ithaca Dialogues program?', zh: '菁英访谈项目是什么？' },
+		q: { en: 'What is the Ithaca Dialogues program?', zh: '伊萨卡菁英访谈项目是什么？' },
 		a: {
 			en: 'A research and documentary program where students investigate a major societal question through real interviews with experts in academia, industry, and policy. Each student claims one research track and contributes to a team documentary.',
 			zh: '这是一个研究与纪录片项目，学生通过对学术界、行业和政策领域专家进行真实采访，调查一个重大社会问题。每位学生认领一条研究轨道，并为团队纪录片做出贡献。'

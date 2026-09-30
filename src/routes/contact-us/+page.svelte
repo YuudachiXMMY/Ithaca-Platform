@@ -5,6 +5,7 @@
 	import { trackPhoneTap } from '$lib/analytics';
 	import Seo from '$lib/components/Seo.svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
+	import WeChatQr from '$lib/components/contact/WeChatQr.svelte';
 	import EnquiryForm from '$lib/components/contact/EnquiryForm.svelte';
 	import * as m from '$lib/paraglide/messages';
 
@@ -147,6 +148,14 @@
 						{@render card()}
 					{/if}
 				{/each}
+			</div>
+
+			<!-- The WeChat card above carries the ID; this is the code itself. Separate rather than
+			     inside that card because the grid is four uniform tiles and a QR is not a one-line
+			     value — and because on this page the visitor has already decided to get in touch,
+			     which is the moment the code is worth the space. `size="md"` for the same reason. -->
+			<div class="mx-auto mt-3 max-w-[1400px] border border-border-strong p-4 sm:max-w-md">
+				<WeChatQr location="contact_page" locale={getLocale()} size="md" showId />
 			</div>
 		</Reveal>
 	</section>

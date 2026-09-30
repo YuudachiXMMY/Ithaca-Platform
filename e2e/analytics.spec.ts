@@ -130,28 +130,74 @@ test.describe('GA4 events — R-SEO-5', () => {
 		expect((await sent(page)).filter((event) => event.name === 'inquiry_submit')).toEqual([]);
 	});
 
-	test('wechat_qr_view fires when the QR is actually visible, not when the page loads', async ({
-		page
-	}) => {
+	test('wechat_qr_view counts impressions, not renders', async ({ page }) => {
+		// The invariant has to be checked somewhere the QR is genuinely off-screen at load. The
+		// contact page is NOT that place any more: its code sits directly under the four channel
+		// cards, inside the first viewport on desktop, so it fires immediately and correctly.
+		// The homepage's footer code is metres down the page.
+		await page.goto('/');
+		expect((await sent(page)).filter((e) => e.name === 'wechat_qr_view')).toEqual([]);
+
+		await page.locator('footer img[src*="Joshua-WeChat"]').scrollIntoViewIfNeeded();
+		await expect
+			.poll(async () => (await sent(page)).filter((e) => e.name === 'wechat_qr_view').length)
+			.toBe(1);
+		expect((await sent(page)).find((e) => e.name === 'wechat_qr_view')?.params).toEqual({
+			location: 'footer',
+			locale: 'en'
+		});
+
+		// `once` is the action's default: scrolling back past a code already counted must not
+		// inflate it, or a long page would read as repeat engagement.
+		await page.evaluate(() => window.scrollTo(0, 0));
+		await page.locator('footer img[src*="Joshua-WeChat"]').scrollIntoViewIfNeeded();
+		await page.waitForTimeout(300);
+		expect((await sent(page)).filter((e) => e.name === 'wechat_qr_view').length).toBe(1);
+	});
+
+	test('wechat_qr_view tells the three placements apart', async ({ page }) => {
+		// The QR used to exist in exactly one place — below a FAILED submit — which made this event
+		// near-unmeasurable by construction. It is now in the footer of every page and on the contact
+		// page itself, so what matters is that a passive footer impression and a deliberate look on
+		// /contact-us do not collapse into one number.
+		//
+		// No ordering is asserted: on a desktop viewport several codes can enter view on one scroll
+		// and observer firing order is undefined.
 		await page.route('**/api/contact', (route) => route.fulfill({ status: 500, body: '{}' }));
-
 		await page.goto('/zh/contact-us');
-		// Nothing has been seen yet.
-		expect((await sent(page)).filter((event) => event.name === 'wechat_qr_view')).toEqual([]);
 
+		const seen = async () =>
+			(await sent(page))
+				.filter((event) => event.name === 'wechat_qr_view')
+				.map((event) => (event.params as { location?: string }).location)
+				.sort();
+
+		// Scroll to each explicitly. `scrollIntoViewIfNeeded` jumps instantly, so a single jump from
+		// the top to the footer sails straight past the contact-page code without it ever being
+		// rendered in an intersecting frame — which is real on a 390px viewport, where the two are
+		// far apart, and invisible on desktop, where both fit in one screen. Assertions stay
+		// order-independent because observer firing order across two elements is undefined.
+		await page.locator('img[src*="Joshua-WeChat"]').first().scrollIntoViewIfNeeded();
+		await page.locator('footer img[src*="Joshua-WeChat"]').scrollIntoViewIfNeeded();
+		await expect.poll(async () => (await seen()).length).toBe(2);
+		expect(await seen()).toEqual(['contact_page', 'footer']);
+
+		// The fallback only exists once the server has refused the enquiry.
 		await page.locator('#contact-name').fill(PII.name);
 		await page.locator('#contact-email').fill(PII.email);
 		await page.getByRole('button', { name: /提交|发送|send|submit/i }).click();
 
-		const qr = page.locator('img[src*="Joshua-WeChat"]');
-		await expect(qr).toBeVisible();
-		await qr.scrollIntoViewIfNeeded();
+		const fallback = page.locator('img[src*="Joshua-WeChat"]').first();
+		await expect(fallback).toBeVisible();
+		await fallback.scrollIntoViewIfNeeded();
 
-		await expect
-			.poll(async () => (await sent(page)).filter((e) => e.name === 'wechat_qr_view').length)
-			.toBe(1);
-		const view = (await sent(page)).find((event) => event.name === 'wechat_qr_view');
-		expect(view?.params).toEqual({ location: 'contact_form_fallback', locale: 'zh' });
+		await expect.poll(async () => (await seen()).length).toBe(3);
+		expect(await seen()).toEqual(['contact_form_fallback', 'contact_page', 'footer']);
+
+		const locales = (await sent(page))
+			.filter((event) => event.name === 'wechat_qr_view')
+			.map((event) => (event.params as { locale?: string }).locale);
+		expect(new Set(locales)).toEqual(new Set(['zh']));
 	});
 
 	test('phone_tap fires from the footer number', async ({ page }) => {

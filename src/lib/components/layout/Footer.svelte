@@ -6,6 +6,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import { trackPhoneTap } from '$lib/analytics';
 	import NewsletterForm from '$lib/components/NewsletterForm.svelte';
+	import WeChatQr from '$lib/components/contact/WeChatQr.svelte';
 	import logo from '$lib/assets/site/logo-ink.png?enhanced';
 
 	// R-GLB-2. The list (and the reasoning for what is and is not in it — notably `/results`, which
@@ -96,6 +97,19 @@
 						{CONTACT_INFO.address}
 					</li>
 				</ul>
+
+				<!-- The WeChat QR lives on every page because WeChat is this site's primary arrival
+				     path: a parent reading a programme page inside WeChat's own browser can long-press
+				     the code without navigating anywhere. It was previously reachable only after a
+				     FAILED form submit, which made `wechat_qr_view` a near-unmeasurable event. -->
+				<div class="mt-5">
+					<h3 class="text-sm font-semibold tracking-wider text-foreground uppercase">
+						{m.wechat_footerHeading()}
+					</h3>
+					<div class="mt-3">
+						<WeChatQr location="footer" locale={getLocale()} showId />
+					</div>
+				</div>
 			</div>
 		</div>
 

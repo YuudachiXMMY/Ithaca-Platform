@@ -282,7 +282,7 @@ export const PROGRAMS: readonly Program[] = [
 	// ── Ithaca Dialogues ─────────────────────────────────────────────────────────────────────
 	{
 		slug: 'ithaca-dialogues',
-		name: { en: 'Ithaca Dialogues', zh: '菁英访谈' },
+		name: { en: 'Ithaca Dialogues', zh: '伊萨卡菁英访谈' },
 		tagline: { en: 'Conversations that broaden horizons.', zh: '拓宽视野的对话。' },
 		summary: {
 			en: 'A 10-week research and documentary program where students investigate AI and Canada’s future through interviews with experts in academia, industry, and policy.',
@@ -303,7 +303,7 @@ export const PROGRAMS: readonly Program[] = [
 		gallery: [
 			{
 				src: '$lib/assets/programs/ai-interview/carmi-levy.png',
-				alt: { en: 'An Ithaca Dialogues interview session', zh: '一场菁英访谈' },
+				alt: { en: 'An Ithaca Dialogues interview session', zh: '伊萨卡菁英访谈的访谈现场' },
 				width: 1920,
 				height: 1092
 			},
