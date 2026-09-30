@@ -8,11 +8,16 @@ import type { FAQ } from './types';
  * quotes a date has to be reviewed against the `Season` record it duplicates — easier when they
  * are all in one place.
  *
- * NOTE: several answers below restate a date that also lives in `season-data.ts`
- * (`EV_FAQ` "What does the schedule look like?", `AI_CAMP_FAQ` "When does it run?"). R-CONTENT-1
- * wants those rendered from the `Season` instead. Rewriting them is workstream H's job — it
- * changes what the pages render — so the copy is migrated as-is here and flagged, not silently
- * reworded.
+ * NOTE: two answers below restate a date that also lives in `season-data.ts` (`EV_FAQ` "What does
+ * the schedule look like?", `AI_CAMP_FAQ` "When does it run?"). Workstream H fixed that WHERE IT IS
+ * RENDERED: both pages now fill a parameterized Paraglide template from the `Season`, so a visitor
+ * can no longer be told a date the detail strip contradicts.
+ *
+ * These two records still carry the pre-H prose, because a `FAQ.a` is a plain `Localized` string
+ * with nowhere to put `{window}`. Nothing renders them yet — the pages read the message catalogue,
+ * not `Program.faq` — so the copy is stale but not published. Whoever migrates the pages onto
+ * `Program.faq` has to give `FAQ` a way to express a derived value first; until then, editing these
+ * two strings changes nothing a visitor sees.
  */
 
 export const EV_FAQ: readonly FAQ[] = [
@@ -38,8 +43,9 @@ export const EV_FAQ: readonly FAQ[] = [
 		}
 	},
 	{
-		// NOTE: duplicates ev-s03's start/end/cadence/sessionTimes. Workstream H replaces the
-		// dates here with values read from the Season (R-CONTENT-1).
+		// NOTE: duplicates ev-s03's start/end/cadence/sessionTimes. The RENDERED answer
+		// (`programs_evChallenge_faq_items_schedule_answer`) now reads all four from the Season; this
+		// record is unrendered prose awaiting the `Program.faq` migration. See the file header.
 		q: { en: 'What does the schedule look like?', zh: '课程安排是怎样的？' },
 		a: {
 			en: 'Sessions run bi-weekly on Saturdays from September 2026 through May 2027. Morning session covers 10:00 AM to 12:00 PM, afternoon session runs 1:00 PM to 3:00 PM.',
@@ -72,8 +78,9 @@ export const AI_CAMP_FAQ: readonly FAQ[] = [
 	},
 	{
 		// NOTE: this answer is one of the three conflicting date sources catalogued in
-		// season-data.ts / CONTENT-GAPS C-2. It is migrated as published, not corrected —
-		// picking a winner is the owner's call.
+		// season-data.ts / CONTENT-GAPS C-2. The RENDERED answer
+		// (`programs_aiCamp_faq_items_when_answer`) now comes from `aiec-c3`, which retired the
+		// defect on the live page; this record is unrendered prose. See the file header.
 		q: { en: 'When does it run?', zh: '项目什么时候进行？' },
 		a: {
 			en: 'The program runs from January 10 to March 28, 2026. Main classes are held from 1:00 PM to 3:00 PM, with an optional contest coaching session from 3:00 PM to 4:00 PM. Pitch Day is scheduled for April 2026 (date TBD).',

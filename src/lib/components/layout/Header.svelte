@@ -3,7 +3,7 @@
 	import { fly, fade, slide } from 'svelte/transition';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { Menu, X, ChevronDown } from 'lucide-svelte';
-	import { NAV_ITEMS, navLabel } from '$lib/data/nav';
+	import { NAV_ITEMS, navLabel, navSeasonStatus } from '$lib/data/nav';
 	import { cn } from '$lib/utils';
 	import { localizeHref, deLocalizeUrl } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
@@ -204,17 +204,27 @@
 
 							{#if open}
 								<div
-									class="absolute top-full left-0 z-50 mt-2 min-w-[220px] overflow-hidden rounded-sm border border-border bg-surface-4/90 py-2 shadow-2xl backdrop-blur-xl"
+									class="absolute top-full left-0 z-50 mt-2 w-max max-w-[340px] min-w-[240px] overflow-hidden rounded-sm border border-border bg-surface-4/90 py-2 shadow-2xl backdrop-blur-xl"
 									role="menu"
 									transition:fly={{ y: 8, duration: dropdownDuration }}
 								>
 									{#each item.children as child (child.href)}
+										{@const status = navSeasonStatus(child)}
 										<a
 											href={localizeHref(child.href)}
-											class="block px-4 py-2.5 text-sm text-foreground-muted transition-colors hover:bg-surface-2 hover:text-foreground"
+											class="flex items-center justify-between gap-4 px-4 py-2.5 text-sm text-foreground-muted transition-colors hover:bg-surface-2 hover:text-foreground"
 											role="menuitem"
 										>
-											{navLabel(child.label)}
+											<span>{navLabel(child.label)}</span>
+											<!-- R-GLB-1: every entry carries its season status. A programme with no
+											     Season record yet renders no badge, never an empty one. -->
+											{#if status}
+												<span
+													class="shrink-0 border border-brand/30 px-1.5 py-0.5 font-mono text-[10px] tracking-[0.12em] text-brand-bright uppercase"
+												>
+													{status}
+												</span>
+											{/if}
 										</a>
 									{/each}
 								</div>
@@ -376,12 +386,20 @@
 							transition:slide={{ duration: submenuDuration }}
 						>
 							{#each item.children as child (child.href)}
+								{@const status = navSeasonStatus(child)}
 								<li>
 									<a
 										href={localizeHref(child.href)}
-										class="block rounded-sm px-3 py-2 text-sm text-foreground-subtle transition-colors hover:bg-surface-2 hover:text-foreground"
+										class="flex items-center justify-between gap-3 rounded-sm px-3 py-2 text-sm text-foreground-subtle transition-colors hover:bg-surface-2 hover:text-foreground"
 									>
-										{navLabel(child.label)}
+										<span>{navLabel(child.label)}</span>
+										{#if status}
+											<span
+												class="shrink-0 border border-brand/30 px-1.5 py-0.5 font-mono text-[10px] tracking-[0.12em] text-brand-bright uppercase"
+											>
+												{status}
+											</span>
+										{/if}
 									</a>
 								</li>
 							{/each}

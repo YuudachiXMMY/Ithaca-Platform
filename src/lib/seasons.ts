@@ -177,6 +177,30 @@ export function formatSeasonWindow(season: Season, locale: Locale): string | nul
 }
 
 /**
+ * A single Season date as a localized month + year — `prd.md` R-I18N-4, same convention as
+ * `formatSeasonWindow` but for a lone endpoint rather than a range.
+ *
+ * Month precision, not day, because that is the precision the organisation actually publishes:
+ * `Season.pitchDay` is anchored to the first of the stated month (see `season-data.ts`), and
+ * `Season.start` reaches the AI Camp hero as "Start Date: September 2026". Rendering a day would
+ * put a date on a public page that nobody wrote.
+ *
+ * Returns null for an undated value, so a caller omits the field rather than printing "Invalid Date".
+ */
+export function formatSeasonMonth(iso: string, locale: Locale): string | null {
+	const date = torontoDate(iso);
+	if (!date) return null;
+
+	const text = new Intl.DateTimeFormat(INTL_LOCALE[locale], {
+		year: 'numeric',
+		month: 'long',
+		timeZone: SEASON_TIME_ZONE
+	}).format(date);
+
+	return spaceCjkNumerals(text, locale);
+}
+
+/**
  * ICU emits `2026年9月`; every hand-authored Chinese string in this repo writes `2026 年 9 月`,
  * spacing Latin and numeral runs against the CJK glyphs around them. That convention is applied
  * consistently across all 710 messages, so a Season-derived date that skipped it would be the one

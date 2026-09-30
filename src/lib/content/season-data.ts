@@ -23,10 +23,14 @@ import type { Season } from './types';
  */
 export const SEASONS: readonly Season[] = [
 	// ── EV Team ──────────────────────────────────────────────────────────────────────────────
-	// The one program whose dates agree everywhere: the hero strip literal `Sep 2026 - May 2027`
-	// (ev-challenge/+page.svelte STATS), the details strip message
-	// `programs_evChallenge_programDetails_details_duration_value` ("September 2026 - May 2027
-	// (9 months)") and the schedule FAQ answer all say the same thing.
+	// The one program whose dates agreed everywhere before they were encoded: the hero strip
+	// literal `Sep 2026 - May 2027`, the details strip message ("September 2026 - May 2027
+	// (9 months)") and the schedule FAQ answer all said the same thing.
+	//
+	// Workstream H removed all three copies. This record is now the only place those dates exist:
+	// the hero strip, the details strip, the schedule FAQ answer, the /programs card and the
+	// CourseInstance JSON-LD are all derived from it — see `src/lib/season-contract.test.ts`, which
+	// shifts `start` below and requires every one of them to move.
 	{
 		id: 'ev-s03',
 		programSlug: 'ev-challenge',

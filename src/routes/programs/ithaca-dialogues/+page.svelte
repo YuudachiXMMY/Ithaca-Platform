@@ -1,149 +1,180 @@
 <script lang="ts">
 	import { ArrowRight, ChevronDown } from 'lucide-svelte';
-	import { localizeHref } from '$lib/paraglide/runtime';
+	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 	import Seo from '$lib/components/Seo.svelte';
+	import JsonLd from '$lib/components/JsonLd.svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
+	import { SEASON_STATUS } from '$lib/data/nav';
+	import { courseJsonLd, programSeason } from '$lib/program-season';
+	import { PROGRAMS } from '$lib/content/programs';
+	import { SEASONS } from '$lib/content/season-data';
+	import { SITE } from '$lib/seo';
+	import { seasonGrades, seasonWindowWithLength } from '$lib/season-copy';
 
 	import heroImg from '$lib/assets/site/about-hero.jpg?enhanced';
 	import tracksImg from '$lib/assets/pillars/pillar-explore.png?enhanced';
 	import sectorsImg from '$lib/assets/programs/ai-camp/ai-camp-HB8A5242.jpg?enhanced';
 	import ctaImg from '$lib/assets/programs/ai-camp/ai-camp-HB8A5465.jpg?enhanced';
 
-	const HERO_PILLS = [
-		m.programs_eliteInterview_hero_pills_fall,
-		m.programs_eliteInterview_hero_pills_grades,
-		m.programs_eliteInterview_hero_pills_cohort,
-		m.programs_eliteInterview_hero_pills_duration
-	];
+	/**
+	 * `prd.md` R-PT-1 / R-CONTENT-1 — the hero pills read `dialogues-f26` from
+	 * `src/lib/content/season-data.ts`. Three of the four used to be Season data copied into both
+	 * message catalogues: the season name, the grade band and the length.
+	 *
+	 * This record is the one whose `start` and `end` are still `TODO(content)` (CONTENT-GAPS C-2),
+	 * which is exactly why the derivation returns nulls and the pills are filtered: `window` and
+	 * `duration` are null here, so no pill claims a date nobody published. That is the live proof
+	 * that the undated path renders nothing rather than "Invalid Date".
+	 */
+	const locale = getLocale();
+	const season = programSeason(SEASONS, PROGRAMS, 'ithaca-dialogues', locale);
+	const program = PROGRAMS.find((candidate) => candidate.slug === 'ithaca-dialogues');
+
+	const HERO_PILLS = season
+		? [
+				season.seasonLabel,
+				seasonGrades(season.grades),
+				// "Small Cohort" is NOT season data: `Season.capacity` is unset on every record, and a
+				// cohort size the owner never published cannot be derived from one that does not exist.
+				m.programs_ithacaDialogues_hero_pills_cohort(),
+				season.cadence,
+				seasonWindowWithLength(season),
+				SEASON_STATUS[season.registration]()
+			].filter((pill): pill is string => Boolean(pill))
+		: [m.programs_ithacaDialogues_hero_pills_cohort()];
+
+	/** R-SEO-3 / §7.4 acceptance — the fourth surface, built from the same record. */
+	const jsonLd = courseJsonLd(season, program, locale, SITE.url, SITE.name);
 
 	const TRACKS = [
 		{
 			id: '01',
-			name: m.programs_eliteInterview_tracks_items_talent_name,
-			question: m.programs_eliteInterview_tracks_items_talent_question
+			name: m.programs_ithacaDialogues_tracks_items_talent_name,
+			question: m.programs_ithacaDialogues_tracks_items_talent_question
 		},
 		{
 			id: '02',
-			name: m.programs_eliteInterview_tracks_items_capital_name,
-			question: m.programs_eliteInterview_tracks_items_capital_question
+			name: m.programs_ithacaDialogues_tracks_items_capital_name,
+			question: m.programs_ithacaDialogues_tracks_items_capital_question
 		},
 		{
 			id: '03',
-			name: m.programs_eliteInterview_tracks_items_policy_name,
-			question: m.programs_eliteInterview_tracks_items_policy_question
+			name: m.programs_ithacaDialogues_tracks_items_policy_name,
+			question: m.programs_ithacaDialogues_tracks_items_policy_question
 		},
 		{
 			id: '04',
-			name: m.programs_eliteInterview_tracks_items_industry_name,
-			question: m.programs_eliteInterview_tracks_items_industry_question
+			name: m.programs_ithacaDialogues_tracks_items_industry_name,
+			question: m.programs_ithacaDialogues_tracks_items_industry_question
 		},
 		{
 			id: '05',
-			name: m.programs_eliteInterview_tracks_items_education_name,
-			question: m.programs_eliteInterview_tracks_items_education_question
+			name: m.programs_ithacaDialogues_tracks_items_education_name,
+			question: m.programs_ithacaDialogues_tracks_items_education_question
 		}
 	];
 
 	const SECTORS = [
 		{
-			title: m.programs_eliteInterview_interviewSectors_sectors_academia_title,
+			title: m.programs_ithacaDialogues_interviewSectors_sectors_academia_title,
 			roles: [
-				m.programs_eliteInterview_interviewSectors_sectors_academia_roles_0,
-				m.programs_eliteInterview_interviewSectors_sectors_academia_roles_1,
-				m.programs_eliteInterview_interviewSectors_sectors_academia_roles_2
+				m.programs_ithacaDialogues_interviewSectors_sectors_academia_roles_0,
+				m.programs_ithacaDialogues_interviewSectors_sectors_academia_roles_1,
+				m.programs_ithacaDialogues_interviewSectors_sectors_academia_roles_2
 			]
 		},
 		{
-			title: m.programs_eliteInterview_interviewSectors_sectors_industry_title,
+			title: m.programs_ithacaDialogues_interviewSectors_sectors_industry_title,
 			roles: [
-				m.programs_eliteInterview_interviewSectors_sectors_industry_roles_0,
-				m.programs_eliteInterview_interviewSectors_sectors_industry_roles_1,
-				m.programs_eliteInterview_interviewSectors_sectors_industry_roles_2
+				m.programs_ithacaDialogues_interviewSectors_sectors_industry_roles_0,
+				m.programs_ithacaDialogues_interviewSectors_sectors_industry_roles_1,
+				m.programs_ithacaDialogues_interviewSectors_sectors_industry_roles_2
 			]
 		},
 		{
-			title: m.programs_eliteInterview_interviewSectors_sectors_policy_title,
+			title: m.programs_ithacaDialogues_interviewSectors_sectors_policy_title,
 			roles: [
-				m.programs_eliteInterview_interviewSectors_sectors_policy_roles_0,
-				m.programs_eliteInterview_interviewSectors_sectors_policy_roles_1,
-				m.programs_eliteInterview_interviewSectors_sectors_policy_roles_2
+				m.programs_ithacaDialogues_interviewSectors_sectors_policy_roles_0,
+				m.programs_ithacaDialogues_interviewSectors_sectors_policy_roles_1,
+				m.programs_ithacaDialogues_interviewSectors_sectors_policy_roles_2
 			]
 		}
 	];
 
 	const PHASES = [
 		{
-			phase: m.programs_eliteInterview_journey_phases_research_phase,
-			title: m.programs_eliteInterview_journey_phases_research_title,
-			duration: m.programs_eliteInterview_journey_phases_research_duration,
+			phase: m.programs_ithacaDialogues_journey_phases_research_phase,
+			title: m.programs_ithacaDialogues_journey_phases_research_title,
+			duration: m.programs_ithacaDialogues_journey_phases_research_duration,
 			tasks: [
-				m.programs_eliteInterview_journey_phases_research_tasks_0,
-				m.programs_eliteInterview_journey_phases_research_tasks_1,
-				m.programs_eliteInterview_journey_phases_research_tasks_2
+				m.programs_ithacaDialogues_journey_phases_research_tasks_0,
+				m.programs_ithacaDialogues_journey_phases_research_tasks_1,
+				m.programs_ithacaDialogues_journey_phases_research_tasks_2
 			]
 		},
 		{
-			phase: m.programs_eliteInterview_journey_phases_fieldwork_phase,
-			title: m.programs_eliteInterview_journey_phases_fieldwork_title,
-			duration: m.programs_eliteInterview_journey_phases_fieldwork_duration,
+			phase: m.programs_ithacaDialogues_journey_phases_fieldwork_phase,
+			title: m.programs_ithacaDialogues_journey_phases_fieldwork_title,
+			duration: m.programs_ithacaDialogues_journey_phases_fieldwork_duration,
 			tasks: [
-				m.programs_eliteInterview_journey_phases_fieldwork_tasks_0,
-				m.programs_eliteInterview_journey_phases_fieldwork_tasks_1,
-				m.programs_eliteInterview_journey_phases_fieldwork_tasks_2
+				m.programs_ithacaDialogues_journey_phases_fieldwork_tasks_0,
+				m.programs_ithacaDialogues_journey_phases_fieldwork_tasks_1,
+				m.programs_ithacaDialogues_journey_phases_fieldwork_tasks_2
 			]
 		},
 		{
-			phase: m.programs_eliteInterview_journey_phases_production_phase,
-			title: m.programs_eliteInterview_journey_phases_production_title,
-			duration: m.programs_eliteInterview_journey_phases_production_duration,
+			phase: m.programs_ithacaDialogues_journey_phases_production_phase,
+			title: m.programs_ithacaDialogues_journey_phases_production_title,
+			duration: m.programs_ithacaDialogues_journey_phases_production_duration,
 			tasks: [
-				m.programs_eliteInterview_journey_phases_production_tasks_0,
-				m.programs_eliteInterview_journey_phases_production_tasks_1,
-				m.programs_eliteInterview_journey_phases_production_tasks_2
+				m.programs_ithacaDialogues_journey_phases_production_tasks_0,
+				m.programs_ithacaDialogues_journey_phases_production_tasks_1,
+				m.programs_ithacaDialogues_journey_phases_production_tasks_2
 			]
 		}
 	];
 
 	const REPORT_TAGS = [
-		m.programs_eliteInterview_produce_report_tags_0,
-		m.programs_eliteInterview_produce_report_tags_1,
-		m.programs_eliteInterview_produce_report_tags_2
+		m.programs_ithacaDialogues_produce_report_tags_0,
+		m.programs_ithacaDialogues_produce_report_tags_1,
+		m.programs_ithacaDialogues_produce_report_tags_2
 	];
 	const DOC_TAGS = [
-		m.programs_eliteInterview_produce_documentary_tags_0,
-		m.programs_eliteInterview_produce_documentary_tags_1,
-		m.programs_eliteInterview_produce_documentary_tags_2
+		m.programs_ithacaDialogues_produce_documentary_tags_0,
+		m.programs_ithacaDialogues_produce_documentary_tags_1,
+		m.programs_ithacaDialogues_produce_documentary_tags_2
 	];
 
 	const FAQ = [
 		{
-			question: m.programs_eliteInterview_faq_items_whatIsProgram_question,
-			answer: m.programs_eliteInterview_faq_items_whatIsProgram_answer
+			question: m.programs_ithacaDialogues_faq_items_whatIsProgram_question,
+			answer: m.programs_ithacaDialogues_faq_items_whatIsProgram_answer
 		},
 		{
-			question: m.programs_eliteInterview_faq_items_experience_question,
-			answer: m.programs_eliteInterview_faq_items_experience_answer
+			question: m.programs_ithacaDialogues_faq_items_experience_question,
+			answer: m.programs_ithacaDialogues_faq_items_experience_answer
 		},
 		{
-			question: m.programs_eliteInterview_faq_items_takeaway_question,
-			answer: m.programs_eliteInterview_faq_items_takeaway_answer
+			question: m.programs_ithacaDialogues_faq_items_takeaway_question,
+			answer: m.programs_ithacaDialogues_faq_items_takeaway_answer
 		},
 		{
-			question: m.programs_eliteInterview_faq_items_contacts_question,
-			answer: m.programs_eliteInterview_faq_items_contacts_answer
+			question: m.programs_ithacaDialogues_faq_items_contacts_question,
+			answer: m.programs_ithacaDialogues_faq_items_contacts_answer
 		},
 		{
-			question: m.programs_eliteInterview_faq_items_language_question,
-			answer: m.programs_eliteInterview_faq_items_language_answer
+			question: m.programs_ithacaDialogues_faq_items_language_question,
+			answer: m.programs_ithacaDialogues_faq_items_language_answer
 		}
 	];
 </script>
 
 <Seo
-	title={m.programs_eliteInterview_meta_title()}
-	description={m.programs_eliteInterview_meta_description()}
+	title={m.programs_ithacaDialogues_meta_title()}
+	description={m.programs_ithacaDialogues_meta_description()}
 />
+<JsonLd data={jsonLd} />
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
@@ -156,18 +187,18 @@
 			<h1
 				class="mb-3 text-4xl leading-[1.05] font-light tracking-tight text-foreground md:text-5xl lg:text-6xl"
 			>
-				{m.programs_eliteInterview_hero_title()}
+				{m.programs_ithacaDialogues_hero_title()}
 			</h1>
 			<p class="mb-8 text-xl font-light tracking-tight text-foreground-muted md:text-2xl">
-				{m.programs_eliteInterview_hero_subtitle()}
+				{m.programs_ithacaDialogues_hero_subtitle()}
 			</p>
 			<p class="mb-10 max-w-[44ch] text-lg leading-relaxed text-foreground-muted">
-				{m.programs_eliteInterview_hero_description()}
+				{m.programs_ithacaDialogues_hero_description()}
 			</p>
 			<div class="mb-10 flex flex-wrap gap-3">
-				{#each HERO_PILLS as pill, i (i)}
+				{#each HERO_PILLS as pill (pill)}
 					<span class="border border-border px-4 py-2 text-xs font-medium text-foreground-muted">
-						{pill()}
+						{pill}
 					</span>
 				{/each}
 			</div>
@@ -175,7 +206,7 @@
 				href={localizeHref('/contact-us')}
 				class="inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 			>
-				{m.programs_eliteInterview_hero_applyNow()}
+				{m.programs_ithacaDialogues_hero_applyNow()}
 				<ArrowRight class="h-5 w-5" />
 			</a>
 		</div>
@@ -211,11 +242,11 @@
 				<blockquote
 					class="mb-12 max-w-[22ch] text-2xl leading-snug font-light tracking-tight text-foreground/80 md:text-3xl lg:text-4xl"
 				>
-					{m.programs_eliteInterview_question_quote()}
+					{m.programs_ithacaDialogues_question_quote()}
 				</blockquote>
 				<div class="lg:pl-[20vw]">
 					<p class="max-w-[55ch] leading-relaxed text-foreground-muted">
-						{m.programs_eliteInterview_question_body()}
+						{m.programs_ithacaDialogues_question_body()}
 					</p>
 				</div>
 			</Reveal>
@@ -228,14 +259,14 @@
 			<Reveal y={24}>
 				<div class="mb-16 max-w-[55ch]">
 					<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-						{m.programs_eliteInterview_whyNow_title()}
+						{m.programs_ithacaDialogues_whyNow_title()}
 					</h2>
 					<div
 						class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 						aria-hidden="true"
 					></div>
 					<p class="mt-6 leading-relaxed text-foreground-muted">
-						{m.programs_eliteInterview_whyNow_description()}
+						{m.programs_ithacaDialogues_whyNow_description()}
 					</p>
 				</div>
 			</Reveal>
@@ -246,10 +277,10 @@
 						<span
 							class="mb-3 block text-5xl font-light tracking-tight text-foreground tabular-nums md:text-6xl lg:text-7xl"
 						>
-							{m.programs_eliteInterview_whyNow_stats_gdp_value()}
+							{m.programs_ithacaDialogues_whyNow_stats_gdp_value()}
 						</span>
 						<span class="text-sm tracking-wide text-foreground-subtle uppercase">
-							{m.programs_eliteInterview_whyNow_stats_gdp_label()}
+							{m.programs_ithacaDialogues_whyNow_stats_gdp_label()}
 						</span>
 					</div>
 				</Reveal>
@@ -258,10 +289,10 @@
 						<span
 							class="mb-3 block text-4xl font-light tracking-tight text-foreground tabular-nums md:text-5xl"
 						>
-							{m.programs_eliteInterview_whyNow_stats_jobs_value()}
+							{m.programs_ithacaDialogues_whyNow_stats_jobs_value()}
 						</span>
 						<span class="text-sm tracking-wide text-foreground-subtle uppercase">
-							{m.programs_eliteInterview_whyNow_stats_jobs_label()}
+							{m.programs_ithacaDialogues_whyNow_stats_jobs_label()}
 						</span>
 					</div>
 				</Reveal>
@@ -270,10 +301,10 @@
 						<span
 							class="mb-3 block text-4xl font-light tracking-tight text-brand tabular-nums md:text-5xl"
 						>
-							{m.programs_eliteInterview_whyNow_stats_adoption_value()}
+							{m.programs_ithacaDialogues_whyNow_stats_adoption_value()}
 						</span>
 						<span class="text-sm tracking-wide text-foreground-subtle uppercase">
-							{m.programs_eliteInterview_whyNow_stats_adoption_label()}
+							{m.programs_ithacaDialogues_whyNow_stats_adoption_label()}
 						</span>
 					</div>
 				</Reveal>
@@ -288,14 +319,14 @@
 				<div>
 					<Reveal y={24}>
 						<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-							{m.programs_eliteInterview_tracks_title()}
+							{m.programs_ithacaDialogues_tracks_title()}
 						</h2>
 						<div
 							class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 							aria-hidden="true"
 						></div>
 						<p class="mt-6 mb-12 max-w-[50ch] leading-relaxed text-foreground-muted">
-							{m.programs_eliteInterview_tracks_subtitle()}
+							{m.programs_ithacaDialogues_tracks_subtitle()}
 						</p>
 					</Reveal>
 					<div>
@@ -336,7 +367,7 @@
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
 				<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-					{m.programs_eliteInterview_interviewSectors_title()}
+					{m.programs_ithacaDialogues_interviewSectors_title()}
 				</h2>
 				<div
 					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
@@ -375,7 +406,7 @@
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
 				<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-					{m.programs_eliteInterview_journey_title()}
+					{m.programs_ithacaDialogues_journey_title()}
 				</h2>
 				<div
 					class="mt-6 mb-12 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
@@ -388,7 +419,7 @@
 					<Reveal y={24} delay={i * 80}>
 						<div class="h-full bg-background p-8 md:p-10">
 							<span class="mb-4 block font-mono text-[11px] tracking-[0.2em] text-brand uppercase">
-								{m.programs_eliteInterview_journey_phaseLabel()}
+								{m.programs_ithacaDialogues_journey_phaseLabel()}
 								{phase.phase()}
 							</span>
 							<h3 class="mb-2 text-2xl font-bold text-foreground">{phase.title()}</h3>
@@ -410,7 +441,7 @@
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
 				<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-					{m.programs_eliteInterview_produce_title()}
+					{m.programs_ithacaDialogues_produce_title()}
 				</h2>
 				<div
 					class="mt-6 mb-12 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
@@ -422,14 +453,14 @@
 				<Reveal y={24}>
 					<div class="h-full bg-card-bg p-8 md:p-12">
 						<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
-							{m.programs_eliteInterview_produce_report_badge()}
+							{m.programs_ithacaDialogues_produce_report_badge()}
 						</p>
 						<div class="mt-4 h-px w-10 bg-brand/30" aria-hidden="true"></div>
 						<h3 class="mt-4 mb-4 text-2xl font-bold text-foreground">
-							{m.programs_eliteInterview_produce_report_title()}
+							{m.programs_ithacaDialogues_produce_report_title()}
 						</h3>
 						<p class="mb-6 max-w-[50ch] leading-relaxed text-foreground-muted">
-							{m.programs_eliteInterview_produce_report_description()}
+							{m.programs_ithacaDialogues_produce_report_description()}
 						</p>
 						<div class="flex flex-wrap gap-3">
 							{#each REPORT_TAGS as tag, i (i)}
@@ -444,14 +475,14 @@
 				<Reveal y={24} delay={80}>
 					<div class="flex h-full flex-col bg-card-bg p-8 md:p-12">
 						<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
-							{m.programs_eliteInterview_produce_documentary_badge()}
+							{m.programs_ithacaDialogues_produce_documentary_badge()}
 						</p>
 						<div class="mt-4 h-px w-10 bg-brand/30" aria-hidden="true"></div>
 						<h3 class="mt-4 mb-4 text-2xl font-bold text-foreground">
-							{m.programs_eliteInterview_produce_documentary_title()}
+							{m.programs_ithacaDialogues_produce_documentary_title()}
 						</h3>
 						<p class="mb-6 max-w-[50ch] leading-relaxed text-foreground-muted">
-							{m.programs_eliteInterview_produce_documentary_description()}
+							{m.programs_ithacaDialogues_produce_documentary_description()}
 						</p>
 						<div class="mt-auto flex flex-wrap gap-3">
 							{#each DOC_TAGS as tag, i (i)}
@@ -466,7 +497,7 @@
 
 			<div class="mt-8 max-w-[60ch] border-l-2 border-brand/30 pl-6">
 				<p class="text-sm leading-relaxed text-foreground-subtle">
-					{m.programs_eliteInterview_produce_disclaimer()}
+					{m.programs_ithacaDialogues_produce_disclaimer()}
 				</p>
 			</div>
 		</div>
@@ -477,21 +508,21 @@
 		<div class="mx-auto max-w-3xl px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
 				<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-					{m.programs_eliteInterview_faq_title()}
+					{m.programs_ithacaDialogues_faq_title()}
 				</h2>
 				<div
 					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 					aria-hidden="true"
 				></div>
 				<p class="mt-6 mb-12 text-foreground-muted">
-					{m.programs_eliteInterview_faq_reachUsPrefix()}
+					{m.programs_ithacaDialogues_faq_reachUsPrefix()}
 					<a
-						href="mailto:{m.programs_eliteInterview_faq_contactEmail()}"
+						href="mailto:{m.programs_ithacaDialogues_faq_contactEmail()}"
 						class="text-brand-bright underline underline-offset-2 transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 					>
-						{m.programs_eliteInterview_faq_contactEmail()}
+						{m.programs_ithacaDialogues_faq_contactEmail()}
 					</a>
-					{m.programs_eliteInterview_faq_reachUsSuffix()}
+					{m.programs_ithacaDialogues_faq_reachUsSuffix()}
 				</p>
 			</Reveal>
 			<div>
@@ -530,16 +561,16 @@
 		<div class="relative z-10 mx-auto max-w-[1100px] px-5 text-center sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
 				<h2 class="mb-6 text-3xl font-bold text-band-foreground md:text-4xl">
-					{m.programs_eliteInterview_cta_title()}
+					{m.programs_ithacaDialogues_cta_title()}
 				</h2>
 				<p class="mx-auto mb-10 max-w-xl text-band-foreground/80">
-					{m.programs_eliteInterview_cta_subtitle()}
+					{m.programs_ithacaDialogues_cta_subtitle()}
 				</p>
 				<a
 					href={localizeHref('/contact-us')}
 					class="inline-flex h-12 items-center justify-center gap-2 bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
 				>
-					{m.programs_eliteInterview_cta_applyNow()}
+					{m.programs_ithacaDialogues_cta_applyNow()}
 					<ArrowRight class="h-5 w-5" />
 				</a>
 			</Reveal>

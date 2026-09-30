@@ -2,10 +2,23 @@
 	import { onMount } from 'svelte';
 	import { ArrowRight, ChevronDown } from 'lucide-svelte';
 	import { prefersReducedMotion } from 'svelte/motion';
-	import { localizeHref } from '$lib/paraglide/runtime';
+	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
 	import { runGsapOnMount } from '$lib/motion/gsap-lifecycle';
 	import * as m from '$lib/paraglide/messages';
 	import Seo from '$lib/components/Seo.svelte';
+	import JsonLd from '$lib/components/JsonLd.svelte';
+	import { SEASON_STATUS } from '$lib/data/nav';
+	import { courseJsonLd, programSeason } from '$lib/program-season';
+	import { PROGRAMS } from '$lib/content/programs';
+	import { SEASONS } from '$lib/content/season-data';
+	import { SITE } from '$lib/seo';
+	import {
+		seasonGrades,
+		seasonGradesWithLocation,
+		seasonLengthShort,
+		seasonSessions,
+		seasonWindowWithLength
+	} from '$lib/season-copy';
 
 	import EVModel3DSection from '$lib/components/programs/ev-challenge/EVModel3DSection.svelte';
 	import WorkshopToRoles from '$lib/components/programs/ev-challenge/WorkshopToRoles.svelte';
@@ -19,40 +32,83 @@
 	import competitionImg from '$lib/assets/programs/ev-challenge/EV26-2.jpg?enhanced';
 	import ctaImg from '$lib/assets/programs/ev-challenge/EV26-5.jpg?enhanced';
 
-	const STATS = [
-		{ label: m.programs_evChallenge_stats_season, value: '03' },
-		{ label: m.programs_evChallenge_stats_grades, value: '8 - 11' },
-		{ label: m.programs_evChallenge_stats_duration, value: '9 mo' },
-		{ label: m.programs_evChallenge_stats_cadence, value: 'Bi-weekly Sat' },
-		{ label: m.programs_evChallenge_stats_window, value: 'Sep 2026 - May 2027' }
-	];
+	/**
+	 * `prd.md` R-PT-1 / R-CONTENT-1 — every date, grade band, cadence and session time below is read
+	 * from the `ev-s03` record in `src/lib/content/season-data.ts`.
+	 *
+	 * Before workstream H this page stated the same five facts THREE times: bare string literals in
+	 * `STATS` (`'03'`, `'8 - 11'`, `'9 mo'`, `'Bi-weekly Sat'`, `'Sep 2026 - May 2027'`), the same
+	 * facts again as message values in `DETAILS`, and a third copy of those values duplicated across
+	 * `messages/en.json` and `messages/zh.json`. Changing a date meant finding all five places.
+	 *
+	 * The two strips remain — the hero strip is a glance, the details section is the reference — but
+	 * they are two renderings of one record, not two records.
+	 */
+	const locale = getLocale();
+	const season = programSeason(SEASONS, PROGRAMS, 'ev-challenge', locale);
+	const program = PROGRAMS.find((candidate) => candidate.slug === 'ev-challenge');
 
-	const DETAILS = [
-		{
-			label: m.programs_evChallenge_programDetails_details_target_label,
-			value: m.programs_evChallenge_programDetails_details_target_value
-		},
-		{
-			label: m.programs_evChallenge_programDetails_details_duration_label,
-			value: m.programs_evChallenge_programDetails_details_duration_value
-		},
-		{
-			label: m.programs_evChallenge_programDetails_details_schedule_label,
-			value: m.programs_evChallenge_programDetails_details_schedule_value
-		},
-		{
-			label: m.programs_evChallenge_programDetails_details_morning_label,
-			value: m.programs_evChallenge_programDetails_details_morning_value
-		},
-		{
-			label: m.programs_evChallenge_programDetails_details_afternoon_label,
-			value: m.programs_evChallenge_programDetails_details_afternoon_value
-		},
-		{
-			label: m.programs_evChallenge_programDetails_details_season_label,
-			value: m.programs_evChallenge_programDetails_details_season_value
-		}
-	];
+	/**
+	 * The hero strip: label/value pairs, compact forms. `null` values are filtered out, so a record
+	 * whose dates are still `TODO(content)` loses the row instead of printing "Invalid Date".
+	 *
+	 * `9 mo` and the `(9 months)` in the details section below are the SAME computed figure rendered
+	 * two ways — `seasonDuration()` returns `{value, unit}` and each call site picks the message.
+	 * Neither number is typed anywhere.
+	 */
+	const STATS = season
+		? [
+				{ label: m.programs_evChallenge_stats_season(), value: season.seasonLabel },
+				{ label: m.programs_evChallenge_stats_grades(), value: seasonGrades(season.grades) },
+				{
+					label: m.programs_evChallenge_stats_duration(),
+					value: seasonLengthShort(season.duration)
+				},
+				{ label: m.programs_evChallenge_stats_cadence(), value: season.cadence },
+				{ label: m.programs_evChallenge_stats_window(), value: season.window },
+				{ label: m.season_labelRegistration(), value: SEASON_STATUS[season.registration]() }
+			].filter((stat) => stat.value !== null)
+		: [];
+
+	/**
+	 * The details section. `Season` has no location — a programme's location outlives any one season
+	 * — so the grade band (from `Program.grades`) and the location (from `Program.location`) are
+	 * composed rather than the location being dropped.
+	 *
+	 * Session times are one row, not the old hard-coded "Morning" / "Afternoon" pair: those two
+	 * labels asserted that the record holds exactly two sessions and that the first is in the
+	 * morning, which is a claim about the data, not a field name. `Season.sessionTimes` is a list.
+	 */
+	const DETAILS = season
+		? [
+				{
+					label: m.programs_evChallenge_programDetails_details_target_label(),
+					values: [seasonGradesWithLocation(season.grades, season.location)]
+				},
+				{
+					label: m.programs_evChallenge_programDetails_details_duration_label(),
+					values: [seasonWindowWithLength(season)]
+				},
+				{
+					label: m.programs_evChallenge_programDetails_details_schedule_label(),
+					values: [season.cadence]
+				},
+				{ label: m.season_labelSessions(), values: [...season.sessionTimes] },
+				{
+					label: m.programs_evChallenge_programDetails_details_season_label(),
+					values: [season.seasonLabel]
+				}
+			]
+				.map((row) => ({ ...row, values: row.values.filter((v): v is string => Boolean(v)) }))
+				.filter((row) => row.values.length > 0)
+		: [];
+
+	/**
+	 * R-SEO-3 / §7.4 acceptance — the fourth surface. `startDate` / `endDate` are the raw ISO strings
+	 * straight off the record, so the JSON-LD is an independent rendering of the same field rather
+	 * than a re-parse of the visible copy.
+	 */
+	const jsonLd = courseJsonLd(season, program, locale, SITE.url, SITE.name);
 
 	const GAINS = [
 		{
@@ -90,7 +146,15 @@
 		},
 		{
 			question: m.programs_evChallenge_faq_items_schedule_question,
-			answer: m.programs_evChallenge_faq_items_schedule_answer
+			// §7.4 acceptance — the schedule answer is the third surface, and it used to hold its own
+			// hard copy of the window, the cadence and both session times. The message is now a
+			// template; every value in it comes from `ev-s03`.
+			answer: () =>
+				m.programs_evChallenge_faq_items_schedule_answer({
+					cadence: season?.cadence ?? m.season_tbc(),
+					window: season?.window ?? m.season_tbc(),
+					sessions: seasonSessions(season?.sessionTimes ?? []) ?? m.season_tbc()
+				})
 		},
 		{
 			question: m.programs_evChallenge_faq_items_takeaway_question,
@@ -141,6 +205,8 @@
 	description={m.programs_evChallenge_hero_subtitle()}
 />
 
+<JsonLd data={jsonLd} />
+
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
 <div class="min-h-screen bg-background">
@@ -179,10 +245,10 @@
 				</a>
 			</div>
 			<div class="flex flex-wrap gap-x-4 gap-y-1.5 border-t border-band-border py-3 sm:gap-x-6">
-				{#each STATS as stat, i (i)}
+				{#each STATS as stat (stat.label)}
 					<div class="flex items-baseline gap-2">
 						<span class="text-[10px] tracking-wider text-band-foreground/80 uppercase"
-							>{stat.label()}</span
+							>{stat.label}</span
 						>
 						<span class="font-mono text-xs text-band-foreground/80">{stat.value}</span>
 					</div>
@@ -259,13 +325,15 @@
 							{m.programs_evChallenge_programDetails_title()}
 						</h2>
 						<div class="space-y-6">
-							{#each DETAILS as detail, i (i)}
+							{#each DETAILS as detail (detail.label)}
 								<div>
 									<span
 										class="mb-1 block font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase"
-										>{detail.label()}</span
+										>{detail.label}</span
 									>
-									<span class="font-mono text-base text-foreground-muted">{detail.value()}</span>
+									{#each detail.values as value (value)}
+										<span class="block font-mono text-base text-foreground-muted">{value}</span>
+									{/each}
 								</div>
 							{/each}
 						</div>
