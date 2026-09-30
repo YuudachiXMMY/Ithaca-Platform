@@ -171,25 +171,37 @@ PRD 要求 LCP ≤ 2500ms 作为 error 级门禁。生产站当前 LCP 约 **4.0
 
 ---
 
-## 1.5 进度（2026-09-30）
+## 1.5 进度（2026-09-30 收盘）
 
 | 工作流 | 状态 | 落地内容 |
 |---|---|---|
-| A CI 门禁 | ✅ | `ci.yml`（lint/check/i18n/test/build/Playwright/axe）、`playwright.config.ts`、`e2e/{smoke,a11y}.spec.ts`、Lighthouse 按路由棘轮 |
-| B 基线与文档 | ✅ | `docs/{DECISIONS,CONTENT-GAPS,LAUNCH-CHECKLIST,THIRD-PARTY}.md`、SvelteKit 生产基线 6 条 |
-| C 内容模型 | ✅ | `src/lib/content/` 九文件 + `src/lib/seasons.ts` + 34 单测；5 条 Season 记录 |
-| D 设计系统 | ✅ | §8.2 浅色全站铺开（35 组件）+ EV 页浅色化（D-4）+ ink logo 变体 |
-| E 首页缺陷 | ✅ | 统计数字 SSR 真值、highlights 单一 DOM、item3/item5 文案修正 |
-| F 招生路径 | ✅ | `/admissions` 五段 + 合格化表单 + Turnstile + `ContactMessage` 迁移 + 75×2 消息键 |
-| H Program 接 Season | ✅ | `program-season.ts`、导航补齐 6 项、验收测试（含变异测试） |
-| G `/results` | ⬜ | 未开始；部分内容为业主阻塞 |
-| I 中文验收 | 🟡 | 新页面中文已随 F/H 落地；CJK 排版规范已在 `app.css`；微信真机验收未做 |
-| J SEO 与埋点 | 🔄 | 进行中 |
-| K 上线验收 | ⬜ | 未开始 |
+| A CI 门禁 | ✅ | `ci.yml`、`playwright.config.ts`、`e2e/` 五个 spec、Lighthouse 按路由棘轮 |
+| B 基线与文档 | ✅ | `docs/{DECISIONS,CONTENT-GAPS,LAUNCH-CHECKLIST,THIRD-PARTY}.md` + 生产基线 |
+| C 内容模型 | ✅ | `src/lib/content/` + `src/lib/seasons.ts` + 5 条 Season |
+| D 设计系统 | ✅ | §8.2 浅色全站（35 组件）+ EV 页浅色化 + ink logo + **D6 字体换 Manrope/Inter** |
+| E 首页缺陷 | ✅ | 统计数字 SSR、highlights 单一 DOM、item3/item5 文案 |
+| F 招生路径 | ✅ | `/admissions` + 合格化表单 + Turnstile + `ContactMessage` 迁移 |
+| G 成果页 | ✅ | `/results` + 同意门禁（四个面断言 + 变异测试） |
+| H Program 接 Season | ✅ | `program-season.ts` + 导航六项 + 契约测试 |
+| J SEO 与埋点 | ✅ | 26 张预渲染 OG 卡 + 六个事件 + BreadcrumbList |
+| — 漏斗可达性 | ✅ | `/admissions` 进导航、六页 CTA、`e2e/admissions-funnel.spec.ts` |
+| I 中文验收 | 🟡 | 新页面中文已随各工作流落地；**微信真机验收需要人** |
+| K 上线验收 | ⬜ | 需要生产部署与业主签字 |
 
-**当前量化状态**：218 单测 / 24 文件 · 62 e2e · axe 双语零 serious/critical · 787 消息键 en/zh 对等 · `content:check` 15 项阻塞缺口（全部为业主待办内容，非代码缺陷）。
+**收盘状态**：298 单测 / 30 文件 · 105 e2e（双 project）· axe 双语零 serious/critical · 809 消息键对等 · 26 张独立 OG 卡 · CLS 全路由 0.000。
 
-**已验证的关键契约**：`src/lib/season-contract.test.ts` — 修改一条 `Season` 的 `start`，hero 详情条 / 排期 FAQ / 索引卡 / `CourseInstance` JSON-LD 四处同时变化，双语；该测试经过变异测试（塞回硬编码值会红）。
+**Lighthouse（localhost，mobile，中位数）**：`/` 83 · `/about-us` 87 · `/programs` 87 · `/contact-us` 91 · `/zh` 81 · `/programs/ev-challenge` 71 · `/zh/programs/ev-challenge` 73。
+
+**三个已验证的契约**（都经过变异测试，不是写了就算）：
+- `season-contract.test.ts` — 改一条 Season 的 `start`，详情条 / FAQ / 索引卡 / JSON-LD 四处同时变，双语
+- `results-consent.test.ts` — 翻掉 `consentVerified`，记录从正文 / 年份小标题 / 图片 `alt` / JSON-LD 计数四处同时消失
+- `admissions-funnel.spec.ts` — 中文项目页 → 报名 CTA → 预选到达 → 提交 → POST 体与埋点均正确且无 PII
+
+**等业主决定的事项**（均不阻塞代码，已记入 `docs/DECISIONS.md` / `CONTENT-GAPS.md`）：
+1. 中文字体是否真的启用（现状：自托管 Noto Sans SC 一直失效，中文用系统 PingFang；修复一行，代价 `/zh` LCP 4.4s→11.6s）
+2. `菁英访谈` 的中文译法（4 处）
+3. 微信二维码的常驻位置（现仅在表单失败兜底里，`wechat_qr_view` 几乎量不到）
+4. 统计数字的精确出处、AI Camp 之外的招生流程与政策文本、三个占位项目页的内容
 
 ## 2. 工作流与任务清单
 
