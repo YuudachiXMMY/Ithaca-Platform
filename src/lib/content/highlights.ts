@@ -7,17 +7,14 @@ import type { Highlight } from './types';
  * `Highlight.caption` is optional in §6.1 and the live copy has exactly one description per item,
  * so the published description becomes the caption and the shorter label becomes the title.
  *
- * NOTE (not a `TODO(content)` — the copy exists, it is in the wrong slot, and fixing it means
- * editing `messages/{en,zh}.json`, which belongs to the homepage workstream; recorded in
- * CONTENT-GAPS "Known copy defects" 1–2):
- *   • item 3's tag reads "Interview" while its title and caption describe the Sedra Student
- *     Design Centre tour. Both locales carry the same mistake, so it is an authoring error in the
- *     English source, not a translation error.
- *   • item 5's title and alt are swapped between locales: the English title is the Hinton lecture
- *     and the Chinese title is 项目展示日, with the Hinton copy sitting in the Chinese *alt*. The
- *     Chinese alt also misspells 诺贝奖 (should be 诺贝尔奖).
- * Both are migrated exactly as published (R-CONTENT-4) so that this file and the message
- * catalogue cannot silently disagree while the fix is in flight.
+ * Items 3 and 5 were published with their copy in the wrong slots — item 3 tagged "Interview"
+ * over a Sedra Student Design Centre tour, item 5's title and alt swapped between locales with
+ * 诺贝奖 for 诺贝尔奖. Both were fixed in `messages/{en,zh}.json` (workstream E) after opening the
+ * source photographs: `wechat-img-187.jpg` shows the MIDNIGHT SUN and electrium mobility garage
+ * bays — Waterloo student design teams housed in the SDC — and `wechat-img-197.jpg` shows a
+ * Convocation Hall slide reading "Frontiers of AI: Insights from a Nobel Laureate". This file now
+ * mirrors the corrected catalogue; R-CONTENT-4's "migrate verbatim" applies to the published copy,
+ * not to a published mistake.
  *
  * No `consentVerified` field exists on `Highlight` in §6.1 — the consent gate for photographs of
  * minors lives on `Result` and `Testimonial`. Every image below is already published on the live
@@ -66,19 +63,21 @@ export const HIGHLIGHTS: readonly Highlight[] = [
 	},
 	{
 		id: 'sedra-design-centre',
-		// See the file header: the tag contradicts the title in the published copy.
-		tag: { en: 'Interview', zh: '访谈' },
+		tag: { en: 'Campus Visit', zh: '校园参访' },
 		title: {
 			en: "Visiting the Sedra Student Design Centre at the University of Waterloo's Department of Engineering",
-			zh: '参观滑铁卢大学工程学院的Sedra学生设计中心'
+			zh: '参观滑铁卢大学工程学院的 Sedra 学生设计中心'
 		},
 		caption: {
-			en: 'Professional interviews with industry leaders, developing communication skills and career insights.',
-			zh: '与行业领袖进行专业访谈，锻炼沟通能力，积累职业洞见。'
+			en: "Touring the student design teams' workshops, seeing how university engineering projects are built from the ground up.",
+			zh: '走访学生设计团队的工作间，了解大学工程项目如何从零搭建。'
 		},
 		media: {
 			src: '$lib/assets/highlights/wechat-img-187.jpg',
-			alt: { en: 'Student interviewing an industry expert', zh: '学生采访行业专家' },
+			alt: {
+				en: "Students touring the design-team workshops at the University of Waterloo's Sedra Student Design Centre",
+				zh: '学生参观滑铁卢大学 Sedra 学生设计中心的团队工作间'
+			},
 			width: 1279,
 			height: 1706
 		}
@@ -100,21 +99,20 @@ export const HIGHLIGHTS: readonly Highlight[] = [
 	},
 	{
 		id: 'hinton-lecture',
-		// See the file header: title and alt are swapped between locales in the published copy.
-		tag: { en: 'Showcase', zh: '成果展示' },
+		tag: { en: 'Guest Lecture', zh: '嘉宾讲座' },
 		title: {
 			en: 'Featuring University of Toronto Professor Geoffrey Hinton, a Nobel laureate, sharing insights on artificial intelligence',
-			zh: '项目展示日'
+			zh: '多伦多大学诺贝尔奖获得者辛顿教授分享人工智能洞见'
 		},
 		caption: {
-			en: 'Semester projects showcased to educators and industry mentors, building public speaking confidence.',
-			zh: '学期成果向教育者与行业导师展示，培养公众演讲自信心。'
+			en: 'Joining a packed University of Toronto lecture hall, hearing a Nobel laureate on the frontiers of artificial intelligence.',
+			zh: '走进座无虚席的多伦多大学讲堂，聆听诺贝尔奖获得者解读人工智能前沿。'
 		},
 		media: {
 			src: '$lib/assets/highlights/wechat-img-197.jpg',
 			alt: {
-				en: 'Student presenting their project on presentation day',
-				zh: '参与多伦多大学诺贝奖获得者辛顿教授关于人工智能的讲座'
+				en: "Attending Nobel laureate Professor Geoffrey Hinton's lecture on artificial intelligence at the University of Toronto",
+				zh: '参与多伦多大学诺贝尔奖获得者辛顿教授关于人工智能的讲座'
 			},
 			width: 1706,
 			height: 1279
