@@ -46,7 +46,7 @@
 						     hydration, so the largest quote line (the LCP text) is never gated behind
 						     hydration. Reduced-motion falls back to the static visible rest state. -->
 						<p
-							class="quote-line text-[clamp(1.75rem,5vw,3.75rem)] leading-[1.12] font-light tracking-tight text-band-foreground"
+							class="quote-line font-display text-[clamp(1.75rem,5vw,3.75rem)] leading-[1.12] font-light tracking-tight text-band-foreground"
 							style:animation-delay="{i === 0 ? 0 : 150 + i * 110}ms"
 						>
 							{line}

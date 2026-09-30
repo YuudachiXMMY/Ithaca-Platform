@@ -42,7 +42,7 @@
 					{m.home_mission_eyebrow()}
 				</p>
 				<h1
-					class="mt-6 max-w-[28ch] text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-foreground"
+					class="mt-6 max-w-[28ch] text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-light tracking-tight text-foreground"
 				>
 					{m.home_hero_empowerment()}
 				</h1>

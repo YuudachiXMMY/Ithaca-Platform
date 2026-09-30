@@ -313,11 +313,61 @@
 	                                      writes the arbitrary value var(--nav-h)
 	   ====================================================================== */
 
-	/* Font families — sourced from Fontsource (@fontsource/outfit). Untouched in
-	   this pass: the Manrope/Inter swap (§8.2 typography, plan task D6) is a
-	   separate change and must be measured against LCP on its own. */
-	--font-outfit: 'Outfit', sans-serif;
-	--font-noto-sans-sc: 'Noto Sans SC', sans-serif;
+	/* ======================================================================
+	   FONT FAMILIES — prd.md §8.2, docs/DECISIONS.md Q9 (plan task D6).
+	   Two roles, not one: Manrope carries display/headings, Inter carries
+	   body. Both self-hosted from Fontsource VARIABLE packages, which is why
+	   the family names read 'Manrope Variable' / 'Inter Variable' — that is
+	   the family the @font-face blocks in those packages actually declare,
+	   and naming the static 'Manrope' here would silently match nothing.
+
+	   NO GENERIC INSIDE THESE THREE — see --font-cjk-deferred below for the
+	   one generic that IS deliberately mid-stack, and why.
+	   ====================================================================== */
+	--font-manrope: 'Manrope Variable';
+	--font-inter: 'Inter Variable';
+	--font-noto-sans-sc: 'Noto Sans SC';
+
+	/* ======================================================================
+	   --font-cjk-deferred — a KNOWN DEFECT, held in place ON PURPOSE.
+	   Deleting this token (and its two references below) is the whole fix.
+	   Do not "tidy" it away without reading this and re-running `npm run lhci`.
+
+	   The pre-D6 stack was `--font-outfit: 'Outfit', sans-serif`, which
+	   composed into `Outfit, sans-serif, 'Noto Sans SC', …` — a generic family
+	   SECOND. CSS font matching therefore resolved every Han glyph against the
+	   system sans and never reached Noto Sans SC at all. Measured on the
+	   pre-D6 build: /zh fetched the 19 KB stylesheet and ZERO of the 505
+	   subset files. The entire self-hosted CJK face has been inert in
+	   production, and Chinese pages have been rendering in PingFang/system sans.
+
+	   D6 first corrected the order. That is the RIGHT stack and it is also a
+	   2.6× blowout of the CI gate, because the correction switches 1.58 MB of
+	   CJK subsets on (52 files: ~11 subsets × the five weights the site uses).
+	   Measured, mobile lighthouserc profile, median of 3:
+
+	       /zh                         LCP 4374ms -> 11581ms   (gate: 4500)
+	       /zh/programs/ev-challenge   LCP 6244ms -> 11066ms   (gate: 7800)
+	       /zh font payload            69.6 KB -> 1655.8 KB
+
+	   So the generic is put back, restoring today's exact rendering, and the
+	   defect is left visible here instead of inside a font-swap change. Turning
+	   real Noto Sans SC on is its own piece of work with its own budget: it
+	   needs per-page glyph subsetting (or a smaller CJK face), a cut from five
+	   weights to two, and preload hints. Tracked for the owner in the D6 report.
+	   ====================================================================== */
+	--font-cjk-deferred: sans-serif;
+
+	/* The two composed role stacks — the VALUE layer for typography, aliased
+	   onto Tailwind's `font-sans` / `font-display` in @theme inline below.
+	   Noto Sans SC sits in BOTH because §8.2 gives it both roles in Chinese;
+	   on English pages its @font-face never loads (gated in +layout.svelte),
+	   so the stack falls through to system-ui at zero cost — English pages ship
+	   0 CJK bytes either way, which e2e/smoke.spec.ts pins. */
+	--font-stack-body:
+		var(--font-inter), var(--font-cjk-deferred), var(--font-noto-sans-sc), system-ui, sans-serif;
+	--font-stack-display:
+		var(--font-manrope), var(--font-cjk-deferred), var(--font-noto-sans-sc), system-ui, sans-serif;
 }
 
 /* --band-warm, re-derived from its two source tokens wherever color-mix() is
@@ -425,13 +475,20 @@
 	   declaration is safe and `max-w-md` etc. keep their defaults. */
 	--container-page: var(--container);
 
-	--font-sans: var(--font-outfit), var(--font-noto-sans-sc);
+	/* §8.2's two type roles. `font-sans` is the body face (Inter) and stays the
+	   default for everything via <body class="font-sans">; `font-display` is
+	   the new one (Manrope) and is applied to h1/h2/h3 in @layer base plus the
+	   handful of display-scale non-headings that are not headings. Tailwind has
+	   no built-in `--font-display` key, so this adds a utility rather than
+	   resizing an existing one — unlike the --radius-* case documented above. */
+	--font-sans: var(--font-stack-body);
+	--font-display: var(--font-stack-display);
 }
 
 body {
 	background: var(--background);
 	color: var(--foreground);
-	font-family: var(--font-outfit), var(--font-noto-sans-sc), Arial, Helvetica, sans-serif;
+	font-family: var(--font-stack-body);
 }
 
 /* Balanced text wrapping for headings. Latin only — see the :lang(zh) block. */
@@ -439,6 +496,23 @@ h1,
 h2,
 h3 {
 	text-wrap: balance;
+}
+
+/* §8.2's display face on the heading levels. Deliberately inside @layer base,
+   NOT unlayered like the rules around it: base loses to @layer utilities, so a
+   `font-mono` or `font-sans` utility written on a heading still wins. (Nothing
+   does that today — no h1–h6 in src/ carries a font-* utility — but the eyebrow
+   /numeral idiom right next to these headings is font-mono, and an unlayered
+   rule here would be a trap the first time someone moves one onto an <h3>.)
+   h4–h6 are left on the body face on purpose: the only h4 in the tree is a
+   14px team-member name, which is body copy wearing a heading tag for outline
+   reasons, and Manrope at that size buys nothing. */
+@layer base {
+	h1,
+	h2,
+	h3 {
+		font-family: var(--font-stack-display);
+	}
 }
 
 /* ==========================================================================

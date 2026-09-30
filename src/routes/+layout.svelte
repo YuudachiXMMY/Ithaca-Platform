@@ -1,12 +1,13 @@
 <script lang="ts">
 	import '../app.css';
-	// Fontsource: Outfit only in Phase 0. Noto Sans SC is gated to /zh in Phase 1
-	// (do NOT import the heavy CJK family globally — English pages must ship 0 CJK bytes).
-	import '@fontsource/outfit/300.css';
-	import '@fontsource/outfit/400.css';
-	import '@fontsource/outfit/500.css';
-	import '@fontsource/outfit/600.css';
-	import '@fontsource/outfit/700.css';
+	// Fontsource, self-hosted — prd.md §8.2 / docs/DECISIONS.md Q9: Manrope display, Inter body.
+	// VARIABLE cuts, so each family is ONE file covering the whole 200–800 / 100–900 weight axis
+	// instead of the five static Outfit weights this replaced (300/400/500/600/700, all five of
+	// which every route was fetching). Same bytes, three fewer requests — see the D6 report.
+	// Noto Sans SC is still gated to /zh below (do NOT import the heavy CJK family here —
+	// English pages must ship 0 CJK bytes, and e2e/smoke.spec.ts asserts exactly that).
+	import '@fontsource-variable/manrope';
+	import '@fontsource-variable/inter';
 	import favicon from '$lib/assets/favicon.png';
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';

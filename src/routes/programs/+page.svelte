@@ -224,7 +224,7 @@
 					aria-hidden="true"
 				></div>
 				<h1
-					class="mt-6 max-w-[16ch] text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-foreground"
+					class="mt-6 max-w-[16ch] text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-light tracking-tight text-foreground"
 				>
 					{m.programs_index_title()}
 				</h1>

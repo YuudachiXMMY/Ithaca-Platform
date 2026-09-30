@@ -196,7 +196,7 @@
 			class="order-2 px-5 py-16 sm:px-8 md:px-[6vw] md:py-20 lg:order-1 lg:py-0 lg:pr-12 lg:pl-[12vw]"
 		>
 			<h1
-				class="mb-3 text-4xl leading-[1.05] font-light tracking-tight text-foreground md:text-5xl lg:text-6xl"
+				class="mb-3 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.05] font-light tracking-tight text-foreground"
 			>
 				{m.programs_ithacaDialogues_hero_title()}
 			</h1>
@@ -253,7 +253,7 @@
 		<div class="mx-auto max-w-[1100px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
 				<blockquote
-					class="mb-12 max-w-[22ch] text-2xl leading-snug font-light tracking-tight text-foreground/80 md:text-3xl lg:text-4xl"
+					class="mb-12 max-w-[22ch] font-display text-2xl leading-snug font-light tracking-tight text-foreground/80 md:text-3xl lg:text-4xl"
 				>
 					{m.programs_ithacaDialogues_question_quote()}
 				</blockquote>
@@ -288,7 +288,7 @@
 				<Reveal y={24}>
 					<div class="bg-card-bg p-8 md:p-12 lg:max-w-[70%]">
 						<span
-							class="mb-3 block text-5xl font-light tracking-tight text-foreground tabular-nums md:text-6xl lg:text-7xl"
+							class="mb-3 block font-display text-5xl font-light tracking-tight text-foreground tabular-nums md:text-6xl lg:text-7xl"
 						>
 							{m.programs_ithacaDialogues_whyNow_stats_gdp_value()}
 						</span>
@@ -300,7 +300,7 @@
 				<Reveal y={24} delay={80}>
 					<div class="bg-card-bg p-8 md:p-12 lg:ml-auto lg:max-w-[50%]">
 						<span
-							class="mb-3 block text-4xl font-light tracking-tight text-foreground tabular-nums md:text-5xl"
+							class="mb-3 block font-display text-4xl font-light tracking-tight text-foreground tabular-nums md:text-5xl"
 						>
 							{m.programs_ithacaDialogues_whyNow_stats_jobs_value()}
 						</span>
@@ -312,7 +312,7 @@
 				<Reveal y={24} delay={160}>
 					<div class="bg-card-bg p-8 md:p-12 lg:ml-[25%] lg:max-w-[55%]">
 						<span
-							class="mb-3 block text-4xl font-light tracking-tight text-brand tabular-nums md:text-5xl"
+							class="mb-3 block font-display text-4xl font-light tracking-tight text-brand tabular-nums md:text-5xl"
 						>
 							{m.programs_ithacaDialogues_whyNow_stats_adoption_value()}
 						</span>

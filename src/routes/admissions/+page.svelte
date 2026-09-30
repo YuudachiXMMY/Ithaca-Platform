@@ -105,7 +105,7 @@
 				aria-hidden="true"
 			></div>
 			<h1
-				class="mt-8 text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-foreground"
+				class="mt-8 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-light tracking-tight text-foreground"
 			>
 				{m.admissions_hero_title()}
 			</h1>

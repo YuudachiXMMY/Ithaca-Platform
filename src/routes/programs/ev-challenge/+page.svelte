@@ -240,7 +240,7 @@
 		<div class="relative z-10 w-full px-6 pb-0 md:px-12 lg:px-[8vw]">
 			<div class="mb-6 max-w-[540px]">
 				<h1
-					class="mb-4 text-4xl leading-[1.05] font-light tracking-tight text-band-foreground md:text-5xl lg:text-6xl"
+					class="mb-4 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.05] font-light tracking-tight text-band-foreground"
 				>
 					{m.programs_evChallenge_hero_title()}
 				</h1>

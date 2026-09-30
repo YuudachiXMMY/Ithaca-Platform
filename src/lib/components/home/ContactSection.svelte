@@ -118,7 +118,12 @@
 
 	<div class="relative z-10 mx-auto max-w-2xl text-center">
 		<Reveal delay={0}>
-			<h2 class="text-3xl font-bold text-foreground md:text-5xl">{m.home_contact_heading()}</h2>
+			<!-- md:text-[2.75rem], not md:text-5xl: 48px overran §8.2's 28–44px h2 band and was the only
+		     h2 in the tree that did. 2.75rem IS the band ceiling, so this stays the largest h2 on the
+		     site (which is the intent — it is the homepage's closing CTA) without leaving the ladder. -->
+			<h2 class="text-3xl font-bold text-foreground md:text-[2.75rem]">
+				{m.home_contact_heading()}
+			</h2>
 		</Reveal>
 
 		<Reveal delay={80}>

@@ -96,13 +96,20 @@ export async function renderOgCard({
 
 	// The exact glyph set this card needs, and nothing else — see fonts.ts.
 	const fonts = fontsFor(`${brand}${eyebrow}${title}${domain}`, [400, 700]);
-	const fontFamily = fontFamilyFor(fonts);
+	// Two chains, matching the page's own two type roles (prd.md §8.2): the headline is set in
+	// Manrope, everything smaller in Inter. Both end in the same CJK subsets, so a Chinese card
+	// falls back identically whichever role asked for the glyph.
+	const displayFamily = fontFamilyFor(fonts, 'display');
+	const bodyFamily = fontFamilyFor(fonts, 'body');
 
-	const svg = await satori(layout({ card, locale, brand, domain, eyebrow, title, fontFamily }), {
-		width: OG_WIDTH,
-		height: OG_HEIGHT,
-		fonts
-	});
+	const svg = await satori(
+		layout({ card, locale, brand, domain, eyebrow, title, displayFamily, bodyFamily }),
+		{
+			width: OG_WIDTH,
+			height: OG_HEIGHT,
+			fonts
+		}
+	);
 
 	// satori embeds glyphs as paths (`embedFont` defaults to true), so resvg needs no font access
 	// of its own. Disabling system fonts makes the output byte-identical on any machine.
@@ -123,9 +130,10 @@ function layout(input: {
 	domain: string;
 	eyebrow: string;
 	title: string;
-	fontFamily: string;
+	displayFamily: string;
+	bodyFamily: string;
 }): Node {
-	const { card, locale, brand, domain, eyebrow, title, fontFamily } = input;
+	const { card, locale, brand, domain, eyebrow, title, displayFamily, bodyFamily } = input;
 	const accent = card.template === 'program' ? TEAL_500 : AMBER_500;
 
 	return el(
@@ -135,7 +143,8 @@ function layout(input: {
 			display: 'flex',
 			flexDirection: 'column',
 			backgroundColor: WHITE,
-			fontFamily
+			// The card's DEFAULT face is the body one; only the headline opts up into display.
+			fontFamily: bodyFamily
 		},
 		[
 			// Full-bleed brand rule. Survives the square crop because it is horizontal.
@@ -158,8 +167,8 @@ function layout(input: {
 					backgroundColor: card.template === 'home' ? MIST : WHITE
 				},
 				card.template === 'home'
-					? homeBody({ locale, brand, domain, eyebrow, accent })
-					: innerBody({ card, locale, brand, domain, eyebrow, title, accent })
+					? homeBody({ locale, brand, domain, eyebrow, accent, displayFamily })
+					: innerBody({ card, locale, brand, domain, eyebrow, title, accent, displayFamily })
 			),
 			el({ display: 'flex', width: '100%', height: 16, backgroundColor: NAVY_900 })
 		]
@@ -173,10 +182,11 @@ function homeBody(input: {
 	domain: string;
 	eyebrow: string;
 	accent: string;
+	displayFamily: string;
 }): Node[] {
-	const { locale, brand, domain, eyebrow, accent } = input;
+	const { locale, brand, domain, eyebrow, accent, displayFamily } = input;
 	return [
-		heading(brand, locale, 76),
+		heading(brand, locale, displayFamily, 76),
 		rule(accent, 34),
 		el(
 			{
@@ -204,8 +214,9 @@ function innerBody(input: {
 	eyebrow: string;
 	title: string;
 	accent: string;
+	displayFamily: string;
 }): Node[] {
-	const { card, locale, brand, domain, eyebrow, title, accent } = input;
+	const { card, locale, brand, domain, eyebrow, title, accent, displayFamily } = input;
 	return [
 		el(
 			{
@@ -250,17 +261,25 @@ function innerBody(input: {
 					},
 					eyebrow
 				),
-		heading(title, locale, 60, 26),
+		heading(title, locale, displayFamily, 60, 26),
 		rule(accent, 32),
 		domainLine(domain, locale, 30)
 	];
 }
 
-function heading(text: string, locale: Locale, base: number, marginTop = 0): Node {
+/** The one element on a card set in the DISPLAY face — everything else inherits the body face. */
+function heading(
+	text: string,
+	locale: Locale,
+	displayFamily: string,
+	base: number,
+	marginTop = 0
+): Node {
 	return el(
 		{
 			display: 'flex',
 			marginTop,
+			fontFamily: displayFamily,
 			fontSize: headingSize(text, base),
 			fontWeight: 700,
 			color: INK,
@@ -305,9 +324,15 @@ function tracking(locale: Locale, em: number): Record<string, unknown> {
  * Pick a headline size that fills the 620 px column without overflowing it.
  *
  * Measured in "units", where a full-width CJK character counts 2 and a Latin one counts 1: at a
- * given size a Han glyph advances ~1em and Outfit averages ~0.5em, so one unit is ~0.5em either
- * way and a single ladder serves both scripts. `1240 / size` units fit on a 620 px line; the
+ * given size a Han glyph advances ~1em and the display face averages ~0.5em, so one unit is ~0.5em
+ * either way and a single ladder serves both scripts. `1240 / size` units fit on a 620 px line; the
  * ladder keeps every live headline at three lines or fewer.
+ *
+ * The 1240 constant was calibrated against Outfit and is UNCHANGED for Manrope, because the two
+ * measure the same: "Ithaca Family Academy" at 100 px is 1039.3 px in Outfit and 1042.8 px in
+ * Manrope, +0.3%. (Manrope's lowercase-only advance is ~5% wider, but real headlines carry caps
+ * and spaces, which cancels it. Inter, by contrast, is +5.6% — another reason the headline is the
+ * Manrope element and not the Inter one.)
  *
  * The base sizes are set so the longest headline the site actually has ("Build. Race. Lead." in
  * English, `伊萨卡家族学院` in Chinese) lands ~40 px inside the crop rather than flush against it.

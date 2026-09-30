@@ -166,7 +166,7 @@
 	<section class="grid min-h-[85dvh] grid-cols-1 items-center gap-0 lg:grid-cols-2">
 		<div class="order-2 px-5 py-16 sm:px-8 md:px-[6vw] lg:order-1 lg:py-0 lg:pr-12 lg:pl-[6vw]">
 			<h1
-				class="mb-6 text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-foreground"
+				class="mb-6 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-light tracking-tight text-foreground"
 			>
 				{m.programs_aiCamp_hero_title()}
 			</h1>

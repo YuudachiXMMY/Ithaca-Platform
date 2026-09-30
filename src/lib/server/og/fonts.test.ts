@@ -19,17 +19,17 @@ import { fontBytes, fontFamilyFor, fontsFor } from './fonts';
 const ONE_FULL_FACE_BYTES = 1_600_000;
 
 describe('fontsFor — R-SEO-2', () => {
-	it('loads only Outfit for a Latin-only card', () => {
+	it('loads only the two Latin faces for a Latin-only card', () => {
 		const fonts = fontsFor('Build. Race. Lead. / ithacateens.com', [400, 700]);
-		expect(fonts.map((f) => f.name)).toEqual(['Outfit', 'Outfit']);
-		expect(fonts.map((f) => f.weight)).toEqual([400, 700]);
+		expect(fonts.map((f) => f.name)).toEqual(['Manrope', 'Manrope', 'Inter', 'Inter']);
+		expect(fonts.map((f) => f.weight)).toEqual([400, 700, 400, 700]);
 	});
 
 	it('adds CJK subsets for Chinese copy', () => {
 		const fonts = fontsFor('伊萨卡家族学院', [700]);
-		expect(fonts[0].name).toBe('Outfit');
-		expect(fonts.length).toBeGreaterThan(1);
-		expect(fonts.slice(1).every((f) => f.name.startsWith('NotoSC-'))).toBe(true);
+		expect(fonts.slice(0, 2).map((f) => f.name)).toEqual(['Manrope', 'Inter']);
+		expect(fonts.length).toBeGreaterThan(2);
+		expect(fonts.slice(2).every((f) => f.name.startsWith('NotoSC-'))).toBe(true);
 	});
 
 	it('names a subset family WITHOUT its weight, so 400 and 700 share one family', () => {
@@ -50,22 +50,45 @@ describe('fontsFor — R-SEO-2', () => {
 		expect(fontBytes(fonts)).toBeLessThan(ONE_FULL_FACE_BYTES);
 	});
 
-	it('does not pull a CJK subset for punctuation Outfit already has', () => {
+	it('does not pull a CJK subset for punctuation the Latin faces already have', () => {
 		const plain = fontsFor('Admissions', [700]);
-		// An em dash, a curly quote and an ellipsis all sit above U+00FF and are all inside Outfit's
-		// own `latin` unicode-range. A naive `cp > 0xFF` cutoff would load ~40 KB of Chinese subset
-		// to draw them, and draw them in the wrong face.
+		// An em dash, a curly quote and an ellipsis all sit above U+00FF and are all inside the
+		// `latin` unicode-range of BOTH Latin faces. A naive `cp > 0xFF` cutoff would load ~40 KB of
+		// Chinese subset to draw them, and draw them in the wrong face.
 		const punctuated = fontsFor('Summer & Winter Camps — “now”…', [700]);
-		expect(punctuated.map((font) => font.name)).toEqual(['Outfit']);
+		expect(punctuated.map((font) => font.name)).toEqual(['Manrope', 'Inter']);
 		expect(fontBytes(punctuated)).toBe(fontBytes(plain));
 	});
 });
 
 describe('fontFamilyFor', () => {
-	it('puts Outfit first and lists each family once', () => {
-		const family = fontFamilyFor(fontsFor('AI 创业营', [400, 700]));
-		const names = family.split(', ');
-		expect(names[0]).toBe('Outfit');
-		expect(new Set(names).size).toBe(names.length);
+	it('leads with the requested role and lists each family once', () => {
+		const fonts = fontsFor('AI 创业营', [400, 700]);
+		for (const [role, lead] of [
+			['display', 'Manrope'],
+			['body', 'Inter']
+		] as const) {
+			const names = fontFamilyFor(fonts, role).split(', ');
+			expect(names[0]).toBe(lead);
+			expect(new Set(names).size).toBe(names.length);
+		}
+	});
+
+	it('never lets the other Latin face into a chain', () => {
+		// Both cuts cover an identical unicode-range, so a stray second Latin entry would be an
+		// invisible way for a headline to come back set in the body face.
+		const fonts = fontsFor('AI 创业营', [400, 700]);
+		expect(fontFamilyFor(fonts, 'display').split(', ')).not.toContain('Inter');
+		expect(fontFamilyFor(fonts, 'body').split(', ')).not.toContain('Manrope');
+	});
+
+	it('gives both roles the same CJK fallbacks, so neither can tofu where the other does not', () => {
+		const fonts = fontsFor('伊萨卡家族学院', [400, 700]);
+		const cjk = (role: 'display' | 'body') =>
+			fontFamilyFor(fonts, role)
+				.split(', ')
+				.filter((n) => n.startsWith('NotoSC-'));
+		expect(cjk('display')).toEqual(cjk('body'));
+		expect(cjk('display').length).toBeGreaterThan(0);
 	});
 });

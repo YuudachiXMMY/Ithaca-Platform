@@ -35,8 +35,27 @@ import { createRequire } from 'node:module';
 
 const require_ = createRequire(import.meta.url);
 
-/** Latin display + body face. The site's own `--font-outfit`, so a card matches the page. */
-const LATIN_FAMILY = 'Outfit';
+/**
+ * The two Latin faces, matching the page's own `--font-stack-display` / `--font-stack-body`
+ * (prd.md §8.2: Manrope display, Inter body) so a card reads as the same system as the site.
+ *
+ * These resolve to the **static** `@fontsource/*` packages, not the `@fontsource-variable/*`
+ * ones the browser gets. That is not an oversight: satori parses `ttf`/`otf`/`woff` and NOT
+ * `woff2`, and the variable packages ship woff2 ONLY (42 files for Inter, 6 for Manrope, zero
+ * `.woff` among them). The static twins ship a `.woff` next to every `.woff2`, so the browser
+ * loads one variable file per family and the build reads a static cut per weight — exactly the
+ * split already in use for Noto Sans SC.
+ */
+const DISPLAY_FAMILY = 'Manrope';
+const BODY_FAMILY = 'Inter';
+
+/** Which of the two Latin faces a given card element is set in. */
+export type FontRole = 'display' | 'body';
+
+const LATIN_FILE: Record<FontRole, { family: string; pkg: string; slug: string }> = {
+	display: { family: DISPLAY_FAMILY, pkg: '@fontsource/manrope', slug: 'manrope' },
+	body: { family: BODY_FAMILY, pkg: '@fontsource/inter', slug: 'inter' }
+};
 
 export type FontWeight = 400 | 700;
 
@@ -114,24 +133,52 @@ function parseSubsets(weight: FontWeight): readonly Subset[] {
 }
 
 /**
- * The code points Outfit's own `latin` cut covers, read from its stylesheet.
+ * The code points BOTH Latin faces cover, read from their own stylesheets.
  *
  * Replaces a `cp > 0xFF` guess. The difference is not academic: an em dash, a curly quote, the €
- * sign and `…` all live above U+00FF and are all IN Outfit — guessing would have pulled ~40 KB of
- * Chinese subset to draw a dash on an English card, and drawn it in the wrong face.
+ * sign and `…` all live above U+00FF and are all inside the Latin cut — guessing would have pulled
+ * ~40 KB of Chinese subset to draw a dash on an English card, and drawn it in the wrong face.
+ *
+ * INTERSECTED, not unioned, now that there are two faces. A card sets its headline in Manrope and
+ * its eyebrow in Inter, so a code point is only safe to withhold the CJK subset from if EVERY
+ * Latin face has it — a union would let a glyph Manrope lacks render as tofu in the headline
+ * because Inter happened to cover it. The two ranges are byte-identical in Fontsource 5.3.0 (and
+ * identical to the Outfit range this replaced, which is why no CJK subset selection changes), so
+ * the intersection is a no-op today and a guard if Fontsource ever diverges them.
  */
 function latinCoverage(): readonly (readonly [number, number])[] {
 	if (latinRanges) return latinRanges;
-	const cssPath = require_.resolve(`@fontsource/outfit/400.css`);
-	const css = readFileSync(cssPath, 'utf8');
-	const match =
-		/url\(\.\/files\/outfit-latin-400-normal\.woff\)[^;]*;\s*unicode-range:\s*([^;]+);/.exec(css);
-	if (!match)
-		throw new Error(`[og] no latin unicode-range in ${cssPath} — fontsource layout changed`);
-	latinRanges = match[1]
-		.split(',')
-		.map((raw) => parseRange(raw.trim()))
-		.filter((range): range is readonly [number, number] => range !== null);
+	const perFace = (Object.keys(LATIN_FILE) as FontRole[]).map((role) => {
+		const { pkg, slug } = LATIN_FILE[role];
+		const cssPath = require_.resolve(`${pkg}/400.css`);
+		const css = readFileSync(cssPath, 'utf8');
+		const pattern = new RegExp(
+			`url\\(\\./files/${slug}-latin-400-normal\\.woff\\)[^;]*;\\s*unicode-range:\\s*([^;]+);`
+		);
+		const match = pattern.exec(css);
+		if (!match)
+			throw new Error(`[og] no latin unicode-range in ${cssPath} — fontsource layout changed`);
+		return match[1]
+			.split(',')
+			.map((raw) => parseRange(raw.trim()))
+			.filter((range): range is readonly [number, number] => range !== null);
+	});
+
+	// Keep a range only where every face agrees. Cheap because each list is ~20 entries.
+	const [first, ...rest] = perFace;
+	latinRanges = first.flatMap(([start, end]) => {
+		let pieces: (readonly [number, number])[] = [[start, end]];
+		for (const other of rest) {
+			pieces = pieces.flatMap((piece) =>
+				other
+					.map(
+						([s, e]) => [Math.max(piece[0], s), Math.min(piece[1], e)] as readonly [number, number]
+					)
+					.filter(([s, e]) => s <= e)
+			);
+		}
+		return pieces;
+	});
 	return latinRanges;
 }
 let latinRanges: readonly (readonly [number, number])[] | null = null;
@@ -166,18 +213,21 @@ function parseRange(raw: string): readonly [number, number] | null {
 export function fontsFor(text: string, weights: readonly FontWeight[]): SatoriFont[] {
 	const fonts: SatoriFont[] = [];
 
-	for (const weight of weights) {
-		fonts.push({
-			name: LATIN_FAMILY,
-			data: read(require_.resolve(`@fontsource/outfit/files/outfit-latin-${weight}-normal.woff`)),
-			weight,
-			style: 'normal'
-		});
+	for (const role of ['display', 'body'] as const) {
+		const { family, pkg, slug } = LATIN_FILE[role];
+		for (const weight of weights) {
+			fonts.push({
+				name: family,
+				data: read(require_.resolve(`${pkg}/files/${slug}-latin-${weight}-normal.woff`)),
+				weight,
+				style: 'normal'
+			});
+		}
 	}
 
-	// Only the code points Outfit does NOT cover can need the CJK face. An English card is then
-	// exactly two files; asking for a subset to draw a comma would cost ~37 KB and render it in
-	// the wrong typeface.
+	// Only the code points the Latin faces do NOT cover can need the CJK face. An English card is
+	// then exactly four small files; asking for a subset to draw a comma would cost ~37 KB and
+	// render it in the wrong typeface.
 	const latin = latinCoverage();
 	const uncovered = new Set<number>();
 	for (const char of text) {
@@ -199,17 +249,23 @@ export function fontsFor(text: string, weights: readonly FontWeight[]): SatoriFo
 }
 
 /**
- * The `font-family` value for a card, as a comma-separated fallback chain.
+ * The `font-family` value for one ROLE on a card, as a comma-separated fallback chain.
  *
- * Latin first so ASCII digits and the domain name render in Outfit even on a Chinese card; the
- * subsets follow in the order satori should try them.
+ * Its Latin face first, so ASCII digits and the domain name render in Manrope/Inter even on a
+ * Chinese card; the CJK subsets follow in the order satori should try them.
+ *
+ * The OTHER role's Latin face is deliberately excluded rather than appended. satori resolves a
+ * glyph to the first family in the list that owns it, and the two Latin cuts cover an identical
+ * `unicode-range` — so listing both would only create a silent way for a headline to come back set
+ * in the body face if the leading entry were ever reordered. One Latin face per chain, then CJK.
  */
-export function fontFamilyFor(fonts: readonly SatoriFont[]): string {
-	const seen = new Set<string>();
-	const names: string[] = [];
+export function fontFamilyFor(fonts: readonly SatoriFont[], role: FontRole = 'display'): string {
+	const latin = LATIN_FILE[role].family;
+	const names = [latin];
 	for (const font of fonts) {
-		if (seen.has(font.name)) continue;
-		seen.add(font.name);
+		if (names.includes(font.name)) continue;
+		// Skip the other role's Latin face; keep every CJK subset, in order.
+		if (font.name === DISPLAY_FAMILY || font.name === BODY_FAMILY) continue;
 		names.push(font.name);
 	}
 	return names.join(', ');
