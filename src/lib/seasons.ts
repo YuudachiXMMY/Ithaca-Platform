@@ -19,8 +19,11 @@ export const SEASON_TIME_ZONE = 'America/Toronto';
 /**
  * Intl locale tags for the site's two locales. `en-CA` (not `en-US`) because the audience is
  * Ontarian; `zh-CN` because the Chinese copy in `messages/zh.json` uses simplified forms.
+ *
+ * Exported so that `$lib/admissions`'s currency formatting resolves the same two tags — a second
+ * copy of this table is exactly how `en-US` dates and `en-CA` prices end up on the same page.
  */
-const INTL_LOCALE: Record<Locale, string> = { en: 'en-CA', zh: 'zh-CN' };
+export const INTL_LOCALE: Record<Locale, string> = { en: 'en-CA', zh: 'zh-CN' };
 
 /**
  * Range separator. `Intl.DateTimeFormat.prototype.formatRange` is deliberately NOT used: for

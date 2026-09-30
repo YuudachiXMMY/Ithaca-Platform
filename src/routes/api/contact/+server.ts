@@ -8,6 +8,7 @@ import { sendMail } from '$lib/server/mail';
 import { verifyTurnstile } from '$lib/server/turnstile';
 import { LIVE_PROGRAM_SLUGS } from '$lib/content/programs';
 import { escapeHtml } from '$lib/utils';
+import * as m from '$lib/paraglide/messages';
 import type { ApiResponse } from '$lib/types';
 
 export const prerender = false;
@@ -129,25 +130,25 @@ export const POST: RequestHandler = async (event) => {
 		// Confirmation to the submitter, in their own language — `prd.md` R-BE-1. Also best-effort:
 		// a Chinese parent who gets no confirmation has still had their enquiry recorded, and a
 		// 500 here would make them submit again.
+		//
+		// The copy lives in `messages/{en,zh}.json` like every other user-facing string; the two
+		// language branches that used to be inline here are now one message per paragraph. Paraglide v2
+		// takes an explicit locale — `m.key({}, { locale })` — which is what a server-rendered email
+		// needs: there is no ambient request locale for `getLocale()` to inherit, and the language is
+		// the submitter's stated preference, not the endpoint's. The `<p>` wrappers stay HERE on
+		// purpose, so the catalogue holds prose a translator cannot break by mis-nesting a tag, and
+		// `name` is still escaped before it is interpolated.
+		const mailLocale = locale === 'zh' ? 'zh' : 'en';
 		try {
 			await sendMail({
 				to: email,
-				subject: locale === 'zh' ? '我们已收到您的咨询' : 'We received your enquiry',
-				html:
-					locale === 'zh'
-						? `
-					<p>${escapeHtml(name)} 您好，</p>
-					<p>感谢您联系伊萨卡家族学院。我们已收到您的咨询，团队会尽快与您联系。</p>
-					<p>如需更快回复，也可以直接致电 +1 (437) 226-8407。</p>
-					<p>伊萨卡家族学院</p>
-				`
-						: `
-					<p>Hi ${escapeHtml(name)},</p>
-					<p>Thank you for contacting Ithaca Family Academy. We have received your enquiry and
-					someone will be in touch shortly.</p>
-					<p>If you would like a faster reply, you can also call us on +1 (437) 226-8407.</p>
-					<p>Ithaca Family Academy</p>
-				`
+				subject: m.email_enquiry_subject({}, { locale: mailLocale }),
+				html: `
+						<p>${m.email_enquiry_greeting({ name: escapeHtml(name) }, { locale: mailLocale })}</p>
+						<p>${m.email_enquiry_body({}, { locale: mailLocale })}</p>
+						<p>${m.email_enquiry_phone({}, { locale: mailLocale })}</p>
+						<p>${m.email_enquiry_signoff({}, { locale: mailLocale })}</p>
+					`
 			});
 		} catch (mailError) {
 			console.error('[contact] submitter confirmation email failed (enquiry saved)', mailError);

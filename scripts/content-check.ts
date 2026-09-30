@@ -51,6 +51,10 @@ const CONTENT_FILES: { path: string; pages: string[] }[] = [
 		path: 'src/lib/content/faq.ts',
 		pages: [...PROGRAMS.map((p) => `/programs/${p.slug}`), '/admissions']
 	},
+	// Carries no copy — the five step names and three policy topics are Paraglide messages. It is
+	// listed because it is where the two outstanding R-ADM-1 / R-ADM-4 gaps are recorded, and a
+	// marker in a `.svelte` file would be invisible to this gate.
+	{ path: 'src/lib/content/admissions.ts', pages: ['/admissions'] },
 	{ path: 'src/lib/content/stats.ts', pages: ['/'] },
 	{ path: 'src/lib/content/highlights.ts', pages: ['/'] },
 	{ path: 'src/lib/content/people.ts', pages: ['/about-us'] },

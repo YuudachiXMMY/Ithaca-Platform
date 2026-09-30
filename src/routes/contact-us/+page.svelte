@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { MapPin, Mail, Phone, MessageCircle } from 'lucide-svelte';
 	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
-	import { getCsrfToken } from '$lib/csrf-client';
 	import Seo from '$lib/components/Seo.svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
+	import EnquiryForm from '$lib/components/contact/EnquiryForm.svelte';
 	import * as m from '$lib/paraglide/messages';
 
 	// Google Maps embed for the IFA location (lazy-mounted on scroll).
@@ -46,39 +46,10 @@
 		}
 	] as const;
 
-	// Contact form (Phase 3): posts to /api/contact (Zod-validated, rate-limited server-side).
-	let cf = $state({ name: '', email: '', phone: '', message: '', subscribe: true });
-	let cfStatus = $state<'idle' | 'submitting' | 'success' | 'error'>('idle');
-	let cfMessage = $state('');
-
-	async function submitContact(e: SubmitEvent) {
-		e.preventDefault();
-		cfMessage = '';
-		if (!cf.name.trim() || !cf.email.trim()) {
-			cfStatus = 'error';
-			cfMessage = m.contact_invalid();
-			return;
-		}
-		cfStatus = 'submitting';
-		try {
-			const res = await fetch('/api/contact', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json', 'x-csrf-token': getCsrfToken() },
-				body: JSON.stringify(cf)
-			});
-			const data = await res.json();
-			if (!data.success) {
-				cfStatus = 'error';
-				cfMessage = data.error ?? m.contact_error();
-				return;
-			}
-			cfStatus = 'success';
-			cf = { name: '', email: '', phone: '', message: '', subscribe: true };
-		} catch {
-			cfStatus = 'error';
-			cfMessage = m.contact_error();
-		}
-	}
+	// The form itself moved to $lib/components/contact/EnquiryForm.svelte — /admissions#book renders
+	// the same component when no booking provider is configured (prd.md R-ADM-6), and the qualification
+	// fields, the Turnstile wiring and the per-status error copy have to behave identically on both
+	// pages. A second copy is how they stop doing so.
 
 	// LazyMap: IntersectionObserver-gated Google Maps iframe (mirror LAZY_VIDEO_INTERSECTION).
 	let mapContainer = $state<HTMLDivElement | null>(null);
@@ -184,136 +155,7 @@
 						{m.contact_page_sendMessage()}
 					</h2>
 
-					{#if cfStatus === 'success'}
-						<div
-							class="border border-brand/30 bg-brand/5 p-8 text-center"
-							role="status"
-							aria-live="polite"
-						>
-							<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
-								{m.contact_form_successTitle()}
-							</p>
-							<p class="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-foreground-muted">
-								{m.contact_form_successMessage()}
-							</p>
-							<button
-								type="button"
-								onclick={() => {
-									cfStatus = 'idle';
-									cfMessage = '';
-								}}
-								class="mt-6 inline-flex h-11 items-center justify-center border border-border-strong px-6 text-sm font-semibold tracking-wide text-foreground transition-all duration-200 hover:border-border-strong hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
-							>
-								{m.contact_form_sendAnother()}
-							</button>
-						</div>
-					{:else}
-						<form
-							class="flex flex-col gap-4"
-							onsubmit={submitContact}
-							aria-label={m.contact_page_sendMessage()}
-						>
-							<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-								<div>
-									<label
-										for="contact-name"
-										class="mb-1.5 block text-xs font-medium text-foreground-muted"
-									>
-										{m.contact_form_nameLabel()} <span class="text-danger">*</span>
-									</label>
-									<input
-										id="contact-name"
-										type="text"
-										autocomplete="name"
-										bind:value={cf.name}
-										aria-invalid={cfStatus === 'error' && !cf.name.trim()}
-										placeholder={m.contact_form_namePlaceholder()}
-										class="w-full border border-border-strong bg-background px-3 py-2.5 text-sm text-foreground placeholder-foreground-subtle transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-									/>
-								</div>
-
-								<div>
-									<label
-										for="contact-email"
-										class="mb-1.5 block text-xs font-medium text-foreground-muted"
-									>
-										{m.contact_form_emailLabel()} <span class="text-danger">*</span>
-									</label>
-									<input
-										id="contact-email"
-										type="email"
-										autocomplete="email"
-										bind:value={cf.email}
-										aria-invalid={cfStatus === 'error' && !cf.email.trim()}
-										placeholder={m.contact_form_emailPlaceholder()}
-										class="w-full border border-border-strong bg-background px-3 py-2.5 text-sm text-foreground placeholder-foreground-subtle transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-									/>
-								</div>
-							</div>
-
-							<div>
-								<label
-									for="contact-phone"
-									class="mb-1.5 block text-xs font-medium text-foreground-muted"
-								>
-									{m.contact_form_phoneLabel()}
-								</label>
-								<input
-									id="contact-phone"
-									type="tel"
-									autocomplete="tel"
-									bind:value={cf.phone}
-									placeholder={m.contact_form_phonePlaceholder()}
-									class="w-full border border-border-strong bg-background px-3 py-2.5 font-mono text-sm text-foreground placeholder-foreground-subtle transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-								/>
-							</div>
-
-							<div>
-								<label
-									for="contact-message"
-									class="mb-1.5 block text-xs font-medium text-foreground-muted"
-								>
-									{m.contact_form_messageLabel()}
-								</label>
-								<textarea
-									id="contact-message"
-									rows="4"
-									bind:value={cf.message}
-									placeholder={m.contact_form_messagePlaceholder()}
-									class="w-full resize-y border border-border-strong bg-background px-3 py-2.5 text-sm text-foreground placeholder-foreground-subtle transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-								></textarea>
-							</div>
-
-							<div class="flex flex-wrap items-center justify-between gap-3 pt-1">
-								<label class="flex cursor-pointer items-center gap-2 select-none">
-									<input
-										type="checkbox"
-										bind:checked={cf.subscribe}
-										class="h-3.5 w-3.5 border-border-strong bg-background accent-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-									/>
-									<span class="text-xs text-foreground-muted"
-										>{m.contact_form_subscribeLabel()}</span
-									>
-								</label>
-
-								<button
-									type="submit"
-									disabled={cfStatus === 'submitting'}
-									class="inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97] disabled:opacity-60"
-								>
-									{cfStatus === 'submitting'
-										? m.contact_form_submittingButton()
-										: m.contact_form_submitButton()}
-								</button>
-							</div>
-
-							{#if cfStatus === 'error'}
-								<p class="text-sm text-danger" role="alert" aria-live="polite">
-									{cfMessage}
-								</p>
-							{/if}
-						</form>
-					{/if}
+					<EnquiryForm formLabel={m.contact_page_sendMessage()} idPrefix="contact" />
 				</div>
 			</Reveal>
 
