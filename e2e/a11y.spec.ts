@@ -4,9 +4,14 @@ import AxeBuilder from '@axe-core/playwright';
 // R-A11Y-2: zero serious/critical axe issues on every PRD §6.4 page, in BOTH locales.
 // §6.4 = /, /programs, each program page, /admissions, /contact-us and their /zh mirrors.
 //
-// /admissions and /results do not exist yet. They are listed anyway and skipped with an
-// explicit reason, so the day the route lands it is already under the gate instead of
-// waiting for someone to remember to add it.
+// A route that does not exist yet is listed anyway and skipped with an explicit reason, so the
+// day it lands it is already under the gate instead of waiting for someone to remember it.
+//
+// /results is on this list although §6.4 does not name it (§6.4 is the "must ship complete"
+// content set, which is a different question from "must be accessible"). It carries a photograph
+// with alt text, three third-party <iframe> players and a nested heading hierarchy — all three
+// are where serious violations come from — so exempting it would leave the page with the most
+// axe surface area as the one page nothing checks.
 const SECTION_6_4 = [
 	'/',
 	'/programs',
@@ -17,6 +22,7 @@ const SECTION_6_4 = [
 	'/programs/summer-winter-camps',
 	'/programs/ithaca-night',
 	'/admissions',
+	'/results',
 	'/contact-us'
 ] as const;
 

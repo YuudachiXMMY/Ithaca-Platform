@@ -70,7 +70,13 @@ export type EventLocation =
 	| 'home_showcase'
 	| 'program_page'
 	| 'admissions_tuition'
-	| 'admissions_booking';
+	| 'admissions_booking'
+	// `/results` — the "read about the programme that produced this" link on a timeline entry.
+	// A new LOCATION, not a seventh event: the question it answers ("does published proof send
+	// anyone to a programme page?") is the same question `program_cta_click` already measures
+	// everywhere else, and splitting it into its own event would put the same intent in two
+	// GA reports that then have to be added up by hand.
+	| 'results_timeline';
 
 type Locale = 'en' | 'zh';
 

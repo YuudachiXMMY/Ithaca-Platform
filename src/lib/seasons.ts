@@ -206,8 +206,13 @@ export function formatSeasonMonth(iso: string, locale: Locale): string | null {
  * consistently across all 710 messages, so a Season-derived date that skipped it would be the one
  * place on a Chinese page where the typography changes — visible precisely on the program pages
  * that are about to start reading their dates from here instead of from the message files.
+ *
+ * Exported because `$lib/results` formats `Result.date`, which carries *reduced* precision
+ * (`2026`, `2025-09`) and therefore cannot go through `formatSeasonMonth`. Re-implementing the
+ * spacing there would be a second copy of a typographic convention that has to stay uniform across
+ * every Chinese page — the one thing this comment argues against.
  */
-function spaceCjkNumerals(text: string, locale: Locale): string {
+export function spaceCjkNumerals(text: string, locale: Locale): string {
 	if (locale !== 'zh') return text;
 	return text.replace(/(\d)([一-鿿])/g, '$1 $2').replace(/([一-鿿])(\d)/g, '$1 $2');
 }

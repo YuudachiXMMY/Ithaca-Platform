@@ -67,6 +67,12 @@ export const OG_CARDS: Readonly<Record<string, OgCard>> = {
 		title: m.admissions_hero_title,
 		crumb: m.admissions_hero_title
 	},
+	'/results': {
+		template: 'default',
+		eyebrow: m.results_hero_eyebrow,
+		title: m.results_hero_title,
+		crumb: m.results_hero_title
+	},
 	'/contact-us': {
 		template: 'default',
 		eyebrow: m.contact_page_eyebrow,
