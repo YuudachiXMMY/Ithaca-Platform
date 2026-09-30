@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ArrowRight, ChevronDown } from 'lucide-svelte';
 	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
+	import { brochureHref, registerHref } from '$lib/program-cta';
 	import { trackProgramCtaClick } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
 	import Seo from '$lib/components/Seo.svelte';
@@ -176,8 +177,13 @@
 				     read, rendered at the month precision the organisation actually publishes. -->
 				{m.programs_aiCamp_hero_startDate({ date: season?.startMonth ?? m.season_tbc() })}
 			</p>
+			<!-- R-PT-1's primary, re-pointed from a bare `/contact-us` to
+			     `/admissions?program=ai-entrepreneurship-camp` (R-ADM-7 reads the slug and preselects).
+			     No brochure link beside it: unlike the other two programme pages, this one ALREADY
+			     carries "Request Brochure" in its closing CTA, and a second copy in the hero would be
+			     the same offer twice on one page. -->
 			<a
-				href={localizeHref('/contact-us')}
+				href={registerHref('ai-entrepreneurship-camp')}
 				onclick={() =>
 					trackProgramCtaClick({
 						program: 'ai-entrepreneurship-camp',
@@ -569,9 +575,20 @@
 				<p class="mx-auto mb-10 max-w-xl leading-relaxed text-band-foreground/80">
 					{m.programs_aiCamp_cta_subtitle()}
 				</p>
+				<!-- This block already had R-PT-1's shape — a primary and a "Request Brochure"
+				     secondary — but both pointed at the same bare `/contact-us`, so the two offers were
+				     literally the same link with different labels, and neither was instrumented. They
+				     now go to their respective R-PT-1 targets, both carrying `?program=`, and both fire
+				     `program_cta_click`: either one is a "Program page → enquiry" click. -->
 				<div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
 					<a
-						href={localizeHref('/contact-us')}
+						href={registerHref('ai-entrepreneurship-camp')}
+						onclick={() =>
+							trackProgramCtaClick({
+								program: 'ai-entrepreneurship-camp',
+								location: 'program_page',
+								locale
+							})}
 						class="group inline-flex h-12 items-center justify-center gap-2 bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
 					>
 						{m.programs_aiCamp_cta_registerNow()}
@@ -580,7 +597,13 @@
 						/>
 					</a>
 					<a
-						href={localizeHref('/contact-us')}
+						href={brochureHref('ai-entrepreneurship-camp')}
+						onclick={() =>
+							trackProgramCtaClick({
+								program: 'ai-entrepreneurship-camp',
+								location: 'program_page',
+								locale
+							})}
 						class="group inline-flex items-center gap-2 text-sm font-medium text-band-foreground/80 transition-colors duration-200 hover:text-band-brand-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand"
 					>
 						{m.programs_aiCamp_cta_requestBrochure()}

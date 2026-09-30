@@ -4,6 +4,7 @@
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
 	import { runGsapOnMount } from '$lib/motion/gsap-lifecycle';
+	import { brochureHref, registerHref } from '$lib/program-cta';
 	import { trackProgramCtaClick } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
 	import Seo from '$lib/components/Seo.svelte';
@@ -247,15 +248,36 @@
 				<p class="mb-6 max-w-[38ch] leading-relaxed text-band-foreground/80">
 					{m.programs_evChallenge_hero_subtitle()}
 				</p>
-				<a
-					href={localizeHref('/contact-us')}
-					onclick={() =>
-						trackProgramCtaClick({ program: 'ev-challenge', location: 'program_page', locale })}
-					class="inline-flex h-12 items-center justify-center gap-2 bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
-				>
-					{m.programs_evChallenge_hero_registerNow()}
-					<ArrowRight class="h-4 w-4" />
-				</a>
+				<!-- R-PT-1's CTA pair. "Register Now" used to land on the bare `/contact-us`, i.e. on a
+				     blank four-field form: the parent who had just read this page arrived at
+				     `/admissions` — the page built for exactly that moment — never, and arrived at the
+				     enquiry form with nothing filled in. Both links now carry `?program=ev-challenge`,
+				     which is what `/admissions` and the enquiry form read to preselect (R-ADM-7).
+
+				     The brochure link is new. This hero had one button and no lower-commitment option,
+				     and "send me the details" is the step most WeChat arrivals actually want first. -->
+				<div class="flex flex-wrap items-center gap-x-6 gap-y-4">
+					<a
+						href={registerHref('ev-challenge')}
+						onclick={() =>
+							trackProgramCtaClick({ program: 'ev-challenge', location: 'program_page', locale })}
+						class="inline-flex h-12 items-center justify-center gap-2 bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
+					>
+						{m.programs_evChallenge_hero_registerNow()}
+						<ArrowRight class="h-4 w-4" />
+					</a>
+					<a
+						href={brochureHref('ev-challenge')}
+						onclick={() =>
+							trackProgramCtaClick({ program: 'ev-challenge', location: 'program_page', locale })}
+						class="group inline-flex items-center gap-2 text-sm font-medium text-band-foreground/80 transition-colors duration-200 hover:text-band-brand-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand"
+					>
+						{m.programs_evChallenge_hero_requestBrochure()}
+						<ArrowRight
+							class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
+						/>
+					</a>
+				</div>
 			</div>
 			<div class="flex flex-wrap gap-x-4 gap-y-1.5 border-t border-band-border py-3 sm:gap-x-6">
 				{#each STATS as stat (stat.label)}
@@ -536,8 +558,19 @@
 							<p class="mb-6 max-w-[34ch] text-sm text-foreground-subtle">
 								{m.programs_evChallenge_cta_subtitle()}
 							</p>
+							<!-- The closing "Register Now": re-pointed to the same `/admissions?program=`
+							     target as the hero, and instrumented, which it never was — half this
+							     page's registration intent was invisible to `program_cta_click`. No
+							     brochure link here; the hero already offers one, and the FAQ column
+							     beside this button is itself a "get in touch" route. -->
 							<a
-								href={localizeHref('/contact-us')}
+								href={registerHref('ev-challenge')}
+								onclick={() =>
+									trackProgramCtaClick({
+										program: 'ev-challenge',
+										location: 'program_page',
+										locale
+									})}
 								class="inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 							>
 								{m.programs_evChallenge_cta_registerNow()}

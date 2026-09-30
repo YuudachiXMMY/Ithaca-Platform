@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Mail, Phone, MapPin } from 'lucide-svelte';
-	import { NAV_ITEMS, navLabel } from '$lib/data/nav';
+	import { FOOTER_LINKS, navLabel } from '$lib/data/nav';
 	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
 	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
@@ -8,7 +8,9 @@
 	import NewsletterForm from '$lib/components/NewsletterForm.svelte';
 	import logo from '$lib/assets/site/logo-ink.png?enhanced';
 
-	const QUICK_LINKS = NAV_ITEMS.filter((item) => item.href !== '/');
+	// R-GLB-2. The list (and the reasoning for what is and is not in it — notably `/results`, which
+	// lives here and nowhere else) is `FOOTER_LINKS` in $lib/data/nav.
+	const QUICK_LINKS = FOOTER_LINKS;
 
 	const currentYear = new Date().getFullYear();
 </script>

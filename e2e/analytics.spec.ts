@@ -187,9 +187,12 @@ test.describe('GA4 events — R-SEO-5', () => {
 			}
 		]);
 
+		// R-PT-1: the programme CTA now carries `?program=<slug>` so the destination can preselect.
+		// Asserting on the full href is the point — a link that drops the query still navigates, and
+		// the preselection it was built for just silently never fires.
 		await page.goto('/programs/ithaca-night');
 		await pinNavigation(page);
-		await page.locator('main a[href="/contact-us"]').first().click();
+		await page.locator('main a[href="/admissions?program=ithaca-night"]').first().click();
 		expect((await sent(page)).filter((event) => event.name === 'program_cta_click')).toEqual([
 			{
 				name: 'program_cta_click',

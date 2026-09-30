@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ArrowRight, ChevronDown } from 'lucide-svelte';
-	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
+	import { getLocale } from '$lib/paraglide/runtime';
+	import { brochureHref, registerHref } from '$lib/program-cta';
 	import { trackProgramCtaClick } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
 	import Seo from '$lib/components/Seo.svelte';
@@ -213,15 +214,32 @@
 					</span>
 				{/each}
 			</div>
-			<a
-				href={localizeHref('/contact-us')}
-				onclick={() =>
-					trackProgramCtaClick({ program: 'ithaca-dialogues', location: 'program_page', locale })}
-				class="inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
-			>
-				{m.programs_ithacaDialogues_hero_applyNow()}
-				<ArrowRight class="h-5 w-5" />
-			</a>
+			<!-- R-PT-1's CTA pair. Both carry `?program=ithaca-dialogues`, which `/admissions` and the
+			     enquiry form read to preselect (R-ADM-7); "Apply Now" previously landed on a bare
+			     `/contact-us` and the parent had to find and tick the programme again. The brochure
+			     link is new — this hero offered no lower-commitment option at all. -->
+			<div class="flex flex-wrap items-center gap-x-6 gap-y-4">
+				<a
+					href={registerHref('ithaca-dialogues')}
+					onclick={() =>
+						trackProgramCtaClick({ program: 'ithaca-dialogues', location: 'program_page', locale })}
+					class="inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
+				>
+					{m.programs_ithacaDialogues_hero_applyNow()}
+					<ArrowRight class="h-5 w-5" />
+				</a>
+				<a
+					href={brochureHref('ithaca-dialogues')}
+					onclick={() =>
+						trackProgramCtaClick({ program: 'ithaca-dialogues', location: 'program_page', locale })}
+					class="group inline-flex items-center gap-2 text-sm font-medium text-foreground-muted transition-colors duration-200 hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+				>
+					{m.programs_ithacaDialogues_hero_requestBrochure()}
+					<ArrowRight
+						class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
+					/>
+				</a>
+			</div>
 		</div>
 
 		<!-- Desktop image -->
@@ -579,8 +597,12 @@
 				<p class="mx-auto mb-10 max-w-xl text-band-foreground/80">
 					{m.programs_ithacaDialogues_cta_subtitle()}
 				</p>
+				<!-- The closing "Apply Now": re-pointed to the same `/admissions?program=` target as
+				     the hero, and instrumented, which it never was. -->
 				<a
-					href={localizeHref('/contact-us')}
+					href={registerHref('ithaca-dialogues')}
+					onclick={() =>
+						trackProgramCtaClick({ program: 'ithaca-dialogues', location: 'program_page', locale })}
 					class="inline-flex h-12 items-center justify-center gap-2 bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
 				>
 					{m.programs_ithacaDialogues_cta_applyNow()}

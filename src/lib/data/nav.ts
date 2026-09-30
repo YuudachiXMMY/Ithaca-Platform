@@ -56,7 +56,50 @@ export const NAV_ITEMS: NavItem[] = [
 			{ label: 'ithacaNight', href: '/programs/ithaca-night', programSlug: 'ithaca-night' }
 		]
 	},
+	// `/admissions` is the page this whole redesign exists to reach (prd.md §5, R-ADM-1…7). It
+	// shipped reachable by URL only — not in this array, not in the footer, not linked from a single
+	// programme page — which made the funnel the PRD's hypothesis is about unreachable in practice.
+	// Placed AFTER Programs so the mobile drawer (which renders NAV_ITEMS in order) reads in funnel
+	// order: what we run, then how to join, then how to reach a human.
+	{ label: 'admissions', href: '/admissions' },
 	{ label: 'contactUs', href: '/contact-us' }
+];
+
+/**
+ * The hrefs the header renders to the RIGHT of the centre logo (`Header.svelte` splits `NAV_ITEMS`
+ * around it); everything else goes left, in `NAV_ITEMS` order.
+ *
+ * Admissions joins Contact Us on the right rather than extending the left group, for two reasons:
+ *
+ *  1. They are the same kind of item. Home / About Us / Programs are *what we are*; Admissions and
+ *     Contact Us are *how you start*. Grouping them beside the locale switch gives the bar one
+ *     obvious action corner instead of a four-item ramp ending in an unrelated single item.
+ *  2. Width, measured rather than guessed. The desktop bar appears at `lg` (1024px) inside a
+ *     `1fr auto 1fr` grid, which gives each side a 416px column there (544px at 1280px). All four
+ *     English items on the left need 433px. At 1280px that fits; at 1024px it does not, and the
+ *     group wraps to two lines (the nav's height goes 36px → 55px). Split 3 + 2 it is 300px on the
+ *     left and 228px on the right at both widths, one line, with the logo pinned dead centre.
+ *
+ * Declared here rather than as a literal in the component so the split and the array it splits
+ * cannot drift — `nav.test.ts` pins every entry to a real `NAV_ITEMS` href.
+ */
+export const RIGHT_NAV_HREFS: readonly string[] = ['/admissions', '/contact-us'];
+
+/**
+ * Footer quick links — `prd.md` R-GLB-2 ("Footer: quick links, …").
+ *
+ * The header's items minus Home: the footer logo directly above this list is already the home link,
+ * and repeating it as the first quick link is the kind of filler that makes a footer read as
+ * boilerplate.
+ *
+ * `/results` is appended here and deliberately NOT added to `NAV_ITEMS`. It is a supporting page —
+ * proof a visitor reads on the way to a decision, not a destination they arrive looking for — and a
+ * sixth item in the header bar would cost the nav more than the page is worth. The footer is where
+ * it belongs, and until now it was in neither.
+ */
+export const FOOTER_LINKS: readonly NavItem[] = [
+	...NAV_ITEMS.filter((item) => item.href !== '/'),
+	{ label: 'results', href: '/results' }
 ];
 
 // Static key -> message map keeps Paraglide tree-shaking (no dynamic m['nav_'+x]()).
@@ -65,7 +108,9 @@ const NAV_LABEL: Record<string, () => string> = {
 	home: m.nav_home,
 	aboutUs: m.nav_aboutUs,
 	programs: m.nav_programs,
+	admissions: m.nav_admissions,
 	contactUs: m.nav_contactUs,
+	results: m.nav_results,
 	evTeam: m.nav_evTeam,
 	aiEntrepreneurshipCamp: m.nav_aiEntrepreneurshipCamp,
 	ithacaDialogues: m.nav_ithacaDialogues,

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { NAV_ITEMS, navLabel, navSeasonStatus, SEASON_STATUS } from './nav';
+import {
+	FOOTER_LINKS,
+	NAV_ITEMS,
+	RIGHT_NAV_HREFS,
+	navLabel,
+	navSeasonStatus,
+	SEASON_STATUS
+} from './nav';
 import { PROGRAM_CARDS } from './programs';
 import { PROGRAMS } from '$lib/content/programs';
 
@@ -47,6 +54,52 @@ describe('Programs dropdown — R-GLB-1', () => {
 		expect(Object.keys(SEASON_STATUS).sort()).toEqual(
 			['closed', 'open', 'upcoming', 'waitlist'].sort()
 		);
+	});
+});
+
+/**
+ * The admissions path has to be reachable without typing a URL.
+ *
+ * `/admissions` and `/results` both shipped in the sitemap and in NOTHING else — no header entry,
+ * no footer link, no programme-page CTA — so the page the redesign's hypothesis turns on could only
+ * be found by guessing its path. These assertions are the floor under that.
+ */
+describe('the funnel is reachable — R-GLB-1 / R-GLB-2', () => {
+	const hrefs = NAV_ITEMS.map((item) => item.href);
+
+	it('puts /admissions in the header', () => {
+		expect(hrefs).toContain('/admissions');
+	});
+
+	it('resolves a real label for every top-level entry, never the raw key', () => {
+		for (const item of NAV_ITEMS) {
+			expect(navLabel(item.label), item.label).not.toBe(item.label);
+		}
+	});
+
+	it('splits the bar around the logo using hrefs that actually exist', () => {
+		for (const href of RIGHT_NAV_HREFS) expect(hrefs, href).toContain(href);
+		// Both sides must be non-empty, or the `1fr auto 1fr` grid renders an empty column.
+		expect(RIGHT_NAV_HREFS.length).toBeGreaterThan(0);
+		expect(hrefs.filter((href) => !RIGHT_NAV_HREFS.includes(href)).length).toBeGreaterThan(0);
+	});
+
+	it('lists /results in the footer and only in the footer', () => {
+		const footer = FOOTER_LINKS.map((item) => item.href);
+		expect(footer).toContain('/results');
+		expect(hrefs).not.toContain('/results');
+	});
+
+	it('carries every header destination except Home into the footer', () => {
+		const footer = FOOTER_LINKS.map((item) => item.href);
+		for (const href of hrefs.filter((href) => href !== '/')) expect(footer, href).toContain(href);
+		expect(footer).not.toContain('/');
+	});
+
+	it('resolves a real label for every footer entry', () => {
+		for (const item of FOOTER_LINKS) {
+			expect(navLabel(item.label), item.label).not.toBe(item.label);
+		}
 	});
 });
 

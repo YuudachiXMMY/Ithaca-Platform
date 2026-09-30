@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { ArrowRight } from 'lucide-svelte';
 	import type { Picture } from '@sveltejs/enhanced-img';
-	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
+	import { getLocale } from '$lib/paraglide/runtime';
+	import { brochureHref, registerHref } from '$lib/program-cta';
 	import { trackProgramCtaClick } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
 
@@ -91,17 +92,47 @@
 				<p class="mt-3 max-w-2xl text-sm leading-relaxed text-band-foreground/80">
 					{note}
 				</p>
-				<a
-					href={localizeHref('/contact-us')}
-					onclick={() =>
-						trackProgramCtaClick({ program: slug, location: 'program_page', locale: getLocale() })}
-					class="group mt-10 inline-flex h-12 items-center justify-center gap-2 bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
-				>
-					{m.programs_placeholder_contactUs()}
-					<ArrowRight
-						class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
-					/>
-				</a>
+				<!-- R-PT-1's CTA pair, in the only shape that is honest on a stub: these three
+				     programmes have no `Season` record (CONTENT-GAPS C-1), so there is nothing to
+				     "Register" for and the primary says «了解报名流程» / "How to Join" instead. It still
+				     goes to `/admissions?program=<slug>` — the process, the calendar and the enquiry
+				     form there are exactly what a parent reading a stub needs, and the slug means the
+				     form arrives with this programme already ticked.
+
+				     Both CTAs fire `program_cta_click` with the same `location`: the PRD measures
+				     "Program page → enquiry CTR", and either button is that click. -->
+				<div class="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+					<a
+						href={registerHref(slug)}
+						onclick={() =>
+							trackProgramCtaClick({
+								program: slug,
+								location: 'program_page',
+								locale: getLocale()
+							})}
+						class="group inline-flex h-12 items-center justify-center gap-2 bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
+					>
+						{m.programs_placeholder_howToJoin()}
+						<ArrowRight
+							class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
+						/>
+					</a>
+					<a
+						href={brochureHref(slug)}
+						onclick={() =>
+							trackProgramCtaClick({
+								program: slug,
+								location: 'program_page',
+								locale: getLocale()
+							})}
+						class="group inline-flex items-center gap-2 text-sm font-medium text-band-foreground/80 transition-colors duration-200 hover:text-band-brand-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand"
+					>
+						{m.programs_placeholder_contactUs()}
+						<ArrowRight
+							class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
+						/>
+					</a>
+				</div>
 			</div>
 		</div>
 	</section>

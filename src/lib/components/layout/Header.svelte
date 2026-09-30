@@ -3,7 +3,7 @@
 	import { fly, fade, slide } from 'svelte/transition';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { Menu, X, ChevronDown } from 'lucide-svelte';
-	import { NAV_ITEMS, navLabel, navSeasonStatus } from '$lib/data/nav';
+	import { NAV_ITEMS, RIGHT_NAV_HREFS, navLabel, navSeasonStatus } from '$lib/data/nav';
 	import { cn } from '$lib/utils';
 	import { localizeHref, deLocalizeUrl } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
@@ -12,9 +12,12 @@
 	import logoOnDark from '$lib/assets/site/logo.png?enhanced';
 	import logoOnLight from '$lib/assets/site/logo-ink.png?enhanced';
 
-	// Split nav items: left group / center logo / right group.
-	const LEFT_NAV = NAV_ITEMS.filter((item) => item.href !== '/contact-us');
-	const RIGHT_NAV = NAV_ITEMS.filter((item) => item.href === '/contact-us');
+	// Split nav items: left group / center logo / right group. WHICH hrefs sit on the right, and
+	// why, is `RIGHT_NAV_HREFS` in $lib/data/nav — both groups keep NAV_ITEMS order, so the mobile
+	// drawer (which renders the array straight through) and the bar cannot disagree about sequence.
+	const RIGHT = new Set(RIGHT_NAV_HREFS);
+	const LEFT_NAV = NAV_ITEMS.filter((item) => !RIGHT.has(item.href));
+	const RIGHT_NAV = NAV_ITEMS.filter((item) => RIGHT.has(item.href));
 
 	let scrolled = $state(false);
 	let mobileOpen = $state(false);
