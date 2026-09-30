@@ -171,6 +171,26 @@ PRD 要求 LCP ≤ 2500ms 作为 error 级门禁。生产站当前 LCP 约 **4.0
 
 ---
 
+## 1.5 进度（2026-09-30）
+
+| 工作流 | 状态 | 落地内容 |
+|---|---|---|
+| A CI 门禁 | ✅ | `ci.yml`（lint/check/i18n/test/build/Playwright/axe）、`playwright.config.ts`、`e2e/{smoke,a11y}.spec.ts`、Lighthouse 按路由棘轮 |
+| B 基线与文档 | ✅ | `docs/{DECISIONS,CONTENT-GAPS,LAUNCH-CHECKLIST,THIRD-PARTY}.md`、SvelteKit 生产基线 6 条 |
+| C 内容模型 | ✅ | `src/lib/content/` 九文件 + `src/lib/seasons.ts` + 34 单测；5 条 Season 记录 |
+| D 设计系统 | ✅ | §8.2 浅色全站铺开（35 组件）+ EV 页浅色化（D-4）+ ink logo 变体 |
+| E 首页缺陷 | ✅ | 统计数字 SSR 真值、highlights 单一 DOM、item3/item5 文案修正 |
+| F 招生路径 | ✅ | `/admissions` 五段 + 合格化表单 + Turnstile + `ContactMessage` 迁移 + 75×2 消息键 |
+| H Program 接 Season | ✅ | `program-season.ts`、导航补齐 6 项、验收测试（含变异测试） |
+| G `/results` | ⬜ | 未开始；部分内容为业主阻塞 |
+| I 中文验收 | 🟡 | 新页面中文已随 F/H 落地；CJK 排版规范已在 `app.css`；微信真机验收未做 |
+| J SEO 与埋点 | 🔄 | 进行中 |
+| K 上线验收 | ⬜ | 未开始 |
+
+**当前量化状态**：218 单测 / 24 文件 · 62 e2e · axe 双语零 serious/critical · 787 消息键 en/zh 对等 · `content:check` 15 项阻塞缺口（全部为业主待办内容，非代码缺陷）。
+
+**已验证的关键契约**：`src/lib/season-contract.test.ts` — 修改一条 `Season` 的 `start`，hero 详情条 / 排期 FAQ / 索引卡 / `CourseInstance` JSON-LD 四处同时变化，双语；该测试经过变异测试（塞回硬编码值会红）。
+
 ## 2. 工作流与任务清单
 
 依赖关系：`A` 与 `B` 无依赖，最先并行；`C`、`D` 依赖 `B`（文档骨架）；`E`、`F`、`G`、`H` 依赖 `C` + `D`；`I` 依赖 `E`/`F`/`G`/`H`；`J` 依赖 `F`/`G`/`H`；`K` 依赖全部。
