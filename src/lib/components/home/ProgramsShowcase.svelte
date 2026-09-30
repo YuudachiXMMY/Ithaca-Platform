@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
-	import { localizeHref } from '$lib/paraglide/runtime';
+	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
+	import { trackProgramCtaClick } from '$lib/analytics';
 	import { ArrowRight } from 'lucide-svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 	import evImg from '$lib/assets/programs/ev-challenge/EV25-10.s.png?enhanced';
@@ -16,6 +17,7 @@
 		{
 			img: evImg,
 			href: '/programs/ev-challenge',
+			slug: 'ev-challenge' as string | null,
 			title: m.home_programs_ev_title,
 			description: m.home_programs_ev_description,
 			alt: m.home_programs_ev_alt
@@ -23,6 +25,7 @@
 		{
 			img: aiImg,
 			href: '/programs/ai-entrepreneurship-camp',
+			slug: 'ai-entrepreneurship-camp' as string | null,
 			title: m.home_programs_ai_title,
 			description: m.home_programs_ai_description,
 			alt: m.home_programs_ai_alt
@@ -30,6 +33,7 @@
 		{
 			img: eliteImg,
 			href: '/programs/ithaca-dialogues',
+			slug: 'ithaca-dialogues' as string | null,
 			title: m.home_programs_elite_title,
 			description: m.home_programs_elite_description,
 			alt: m.home_programs_elite_alt
@@ -37,11 +41,23 @@
 		{
 			img: otherImg,
 			href: '/programs',
+			// Not a programme — the "everything else" tile goes to the index. `program_cta_click`
+			// carries a Program.slug or it carries nothing; a synthetic 'all' value would sit in the
+			// same GA dimension as the real slugs and quietly corrupt every per-programme comparison.
+			// The click is already measured as a pageview on /programs.
+			slug: null as string | null,
+			// (see cell() below — the handler no-ops for a null slug)
 			title: m.home_programs_other_title,
 			description: m.home_programs_other_description,
 			alt: m.home_programs_other_alt
 		}
 	];
+
+	/** `program_cta_click` — R-SEO-5. No-ops for the index tile, which has no programme slug. */
+	function onProgramClick(slug: string | null) {
+		if (!slug) return;
+		trackProgramCtaClick({ program: slug, location: 'home_showcase', locale: getLocale() });
+	}
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
@@ -49,6 +65,7 @@
 {#snippet cell(program: (typeof PROGRAMS)[number], large: boolean)}
 	<a
 		href={localizeHref(program.href)}
+		onclick={() => onProgramClick(program.slug)}
 		class="group relative flex h-full min-h-[180px] flex-col justify-end overflow-hidden bg-surface-4 transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand sm:min-h-[220px] md:min-h-[240px]"
 	>
 		<enhanced:img

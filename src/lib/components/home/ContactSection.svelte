@@ -1,19 +1,28 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
-	import { localizeHref } from '$lib/paraglide/runtime';
+	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
 	import { MapPin, Phone, Mail, ArrowRight } from 'lucide-svelte';
 	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
+	import { trackPhoneTap } from '$lib/analytics';
 	import { Spring, prefersReducedMotion } from 'svelte/motion';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 
+	// `phone` flags the one row that is a tel: link, so the `phone_tap` handler below is attached
+	// by identity rather than by sniffing the href prefix at render time.
 	const CONTACT_ITEMS = [
-		{ icon: MapPin, value: CONTACT_INFO.address, href: undefined as string | undefined },
+		{
+			icon: MapPin,
+			value: CONTACT_INFO.address,
+			href: undefined as string | undefined,
+			phone: false
+		},
 		{
 			icon: Phone,
 			value: CONTACT_INFO.phone,
-			href: CONTACT_HREFS.tel
+			href: CONTACT_HREFS.tel,
+			phone: true
 		},
-		{ icon: Mail, value: CONTACT_INFO.email, href: CONTACT_HREFS.mailto }
+		{ icon: Mail, value: CONTACT_INFO.email, href: CONTACT_HREFS.mailto, phone: false }
 	];
 
 	/* OrbitalField — pure-CSS infinite loops (rings/glow/particles). The keyframes
@@ -126,6 +135,9 @@
 						{#if item.href}
 							<a
 								href={item.href}
+								onclick={item.phone
+									? () => trackPhoneTap({ location: 'home_contact', locale: getLocale() })
+									: undefined}
 								class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand [&_span]:hover:text-foreground"
 							>
 								<span

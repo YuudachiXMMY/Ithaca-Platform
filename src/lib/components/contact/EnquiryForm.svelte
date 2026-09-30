@@ -26,6 +26,8 @@
 	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
 	import { PROGRAMS, LIVE_PROGRAM_SLUGS } from '$lib/content/programs';
 	import { resolveProgramParam, resolveTopicParam, type Topic } from '$lib/admissions';
+	import { inview } from '$lib/actions/inview';
+	import { trackInquirySubmit, trackPhoneTap, trackWechatQrView } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
 
 	interface Props {
@@ -33,8 +35,14 @@
 		formLabel?: string;
 		/** `id` for the name field, so two forms can never collide on one document. */
 		idPrefix?: string;
+		/** Which page hosts this form — the `form` dimension on the `inquiry_submit` event. */
+		analyticsForm?: 'contact' | 'admissions';
 	}
-	let { formLabel = m.contact_page_sendMessage(), idPrefix = 'enquiry' }: Props = $props();
+	let {
+		formLabel = m.contact_page_sendMessage(),
+		idPrefix = 'enquiry',
+		analyticsForm = 'contact'
+	}: Props = $props();
 
 	const locale = getLocale();
 
@@ -209,6 +217,29 @@
 			}
 
 			status = 'success';
+
+			/**
+			 * `inquiry_submit` — `prd.md` R-SEO-5, and the conversion the PRD's hypothesis turns on.
+			 *
+			 * Fired ONLY on a confirmed 200 + `success: true`: an event on submit-intent would count
+			 * every rate-limited retry and every failed Turnstile as a conversion.
+			 *
+			 * Read what is sent against `prd.md` R-BE-5 ("no analytics on form field values"): the
+			 * programme slugs the visitor ticked, how many, WHETHER a grade was given, the reading
+			 * locale, and the `?topic=` enum. Not the name, not the email, not the phone, not the
+			 * message, not the free-text "how did you hear about us". `$lib/analytics` re-filters
+			 * this through a per-event key allowlist, so the guarantee does not rest on this call
+			 * site staying disciplined.
+			 */
+			trackInquirySubmit({
+				form: analyticsForm,
+				locale,
+				program: fields.programs[0] ?? 'none',
+				programCount: fields.programs.length,
+				hasGrade: fields.grade !== '',
+				topic: topic ?? undefined
+			});
+
 			fields = {
 				name: '',
 				email: '',
@@ -443,12 +474,19 @@
 				<div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
 					<a
 						href={CONTACT_HREFS.tel}
+						onclick={() => trackPhoneTap({ location: 'contact_form_fallback', locale })}
 						class="inline-flex items-center gap-2 font-mono text-sm text-foreground underline underline-offset-4 transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 					>
 						<Phone class="h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
 						{CONTACT_INFO.phone}
 					</a>
 					<div class="flex items-start gap-3">
+						<!-- `wechat_qr_view` — R-SEO-5. IntersectionObserver via use:inview, NOT the
+						     `offerFallback` flip: WeChat is this site's primary arrival path, so the
+						     number that matters is how often the QR was actually SEEN. This block is the
+						     site's only QR today and it appears below a failed submit, so the event is
+						     rare by construction; counting the render instead would quietly overstate it.
+						     `once` (the action's default) keeps one scroll past from firing repeatedly. -->
 						<img
 							src="/media/images/qrcode/Joshua-WeChat.jpg"
 							alt={m.contact_form_fallbackQrAlt()}
@@ -456,6 +494,8 @@
 							height="1051"
 							loading="lazy"
 							decoding="async"
+							use:inview={{ threshold: 0.5 }}
+							oninview={() => trackWechatQrView({ location: 'contact_form_fallback', locale })}
 							class="h-28 w-28 shrink-0 border border-border object-cover"
 						/>
 						<p class="flex items-center gap-2 text-xs leading-relaxed text-foreground-muted">

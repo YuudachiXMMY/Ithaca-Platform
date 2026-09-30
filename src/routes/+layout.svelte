@@ -16,7 +16,16 @@
 	import { page, navigating } from '$app/state';
 	import { onNavigate } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { buildSeo, SITE, orgJsonLd } from '$lib/seo';
+	import {
+		breadcrumbJsonLd,
+		buildSeo,
+		OG_IMAGE_SIZE,
+		ogLocale,
+		ogLocaleAlternate,
+		SITE,
+		orgJsonLd
+	} from '$lib/seo';
+	import JsonLd from '$lib/components/JsonLd.svelte';
 	import { getCsrfToken } from '$lib/csrf-client';
 
 	let { children } = $props();
@@ -29,6 +38,17 @@
 	// route. Per-page <title>/description/og:title come from each page's <Seo>; the layout adds
 	// the URL-level tags + site-wide JSON-LD once, for public routes only.
 	const seo = $derived(buildSeo(page.url, { title: '', description: '' }));
+
+	/**
+	 * `BreadcrumbList` for every public inner page — `prd.md` R-SEO-3.
+	 *
+	 * Emitted HERE rather than per page: the trail is a pure function of the URL and the page
+	 * registry, so a new route gets its breadcrumbs the moment it has a card, with nothing to
+	 * remember. Null on the home page, which has no trail. The programme pages keep their own
+	 * `Course` JSON-LD — two independent blocks in one head is valid and is how schema.org expects
+	 * unrelated entities to be published.
+	 */
+	const breadcrumbs = $derived(isAdmin ? null : breadcrumbJsonLd(page.url));
 
 	// Organization JSON-LD as a pre-built string. The closing tag is split with an empty
 	// interpolation (</${''}script>) so neither the Svelte parser nor the HTML tokenizer reads
@@ -82,10 +102,28 @@
 		{/each}
 		<meta property="og:site_name" content={SITE.name} />
 		<meta property="og:url" content={seo.ogUrl} />
+		<!-- og:locale is what tells WeChat and Facebook which of the two versions of a page they
+		     are previewing; without it a zh share was indistinguishable from the en one. -->
+		<meta property="og:locale" content={ogLocale(getLocale())} />
+		<meta property="og:locale:alternate" content={ogLocaleAlternate(getLocale())} />
+		<!-- The per-page share card (prd.md R-SEO-2). Derived from the URL like everything else in
+		     this block, and prerendered to a static PNG by src/routes/og/[...slug]/+server.ts.
+		     width/height let a crawler reserve the box before the bytes land; `alt` is the only
+		     accessible name a card ever gets, because the preview has no page around it. All four
+		     tags, plus twitter:image, were previously absent — `twitter:card` promised a large image
+		     and nothing supplied one, so X fell back to the summary layout. -->
+		<meta property="og:image" content={seo.image.url} />
+		<meta property="og:image:width" content={String(OG_IMAGE_SIZE.width)} />
+		<meta property="og:image:height" content={String(OG_IMAGE_SIZE.height)} />
+		<meta property="og:image:alt" content={seo.image.alt} />
+		<meta name="twitter:image" content={seo.image.url} />
+		<meta name="twitter:image:alt" content={seo.image.alt} />
 		<!-- eslint-disable-next-line svelte/no-at-html-tags -- static Organization JSON-LD, no user input -->
 		{@html orgJsonLdScript}
 	{/if}
 </svelte:head>
+
+<JsonLd data={breadcrumbs} />
 
 {#if navigating.to}
 	<div class="nav-progress" role="status" aria-label={m.common_loading()} aria-live="polite"></div>

@@ -2,8 +2,9 @@
 	import { Mail, Phone, MapPin } from 'lucide-svelte';
 	import { NAV_ITEMS, navLabel } from '$lib/data/nav';
 	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
-	import { localizeHref } from '$lib/paraglide/runtime';
+	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
+	import { trackPhoneTap } from '$lib/analytics';
 	import NewsletterForm from '$lib/components/NewsletterForm.svelte';
 	import logo from '$lib/assets/site/logo-ink.png?enhanced';
 
@@ -77,8 +78,11 @@
 						</a>
 					</li>
 					<li>
+						<!-- `phone_tap` (prd.md R-SEO-5): the footer number is on every page, so it is the
+						     site-wide baseline this event is measured against. -->
 						<a
 							href={CONTACT_HREFS.tel}
+							onclick={() => trackPhoneTap({ location: 'footer', locale: getLocale() })}
 							class="flex items-start gap-2.5 text-sm text-foreground-muted transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 						>
 							<Phone class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />

@@ -14,6 +14,7 @@
 	import { PROGRAMS, LIVE_PROGRAM_SLUGS } from '$lib/content/programs';
 	import { ADMISSIONS_FAQ } from '$lib/content/faq';
 	import { POLICY_TOPICS, type PolicyTopicId } from '$lib/content/admissions';
+	import { trackBookingClick } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
 
 	/**
@@ -201,8 +202,13 @@
 					</ul>
 				{/if}
 
+				<!-- `booking_click` — R-SEO-5. This anchor is the booking intent that EXISTS today:
+				     PUBLIC_BOOKING_URL is unset (docs/DECISIONS.md Q6), so the provider link inside
+				     BookingEmbed never renders, and an event fired only there would report zero for
+				     as long as the variable stays unset. `location` keeps the two distinguishable. -->
 				<a
 					href="#book"
+					onclick={() => trackBookingClick({ location: 'admissions_tuition', locale })}
 					class="mt-10 inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 				>
 					{m.admissions_tuition_cta()}
@@ -305,7 +311,11 @@
 						{m.admissions_book_formNote()}
 					</p>
 					<div class="mt-10 max-w-[720px]">
-						<EnquiryForm formLabel={m.admissions_book_title()} idPrefix="admissions" />
+						<EnquiryForm
+							formLabel={m.admissions_book_title()}
+							idPrefix="admissions"
+							analyticsForm="admissions"
+						/>
 					</div>
 				{/if}
 			</Reveal>

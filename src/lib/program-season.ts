@@ -118,7 +118,17 @@ export function courseJsonLd(
 	program: Program | undefined,
 	locale: Locale,
 	siteUrl: string,
-	organizationName: string
+	organizationName: string,
+	/**
+	 * Absolute URL of the programme's Open Graph card (`prd.md` R-SEO-2). Optional and last, so the
+	 * five-argument calls this function already had keep working.
+	 *
+	 * Worth wiring because it is the same asset twice: Google's Course rich result wants an image,
+	 * and the card is the only per-programme image the site renders that is guaranteed to exist for
+	 * every programme in both locales — the hero photographs are page-local imports and three of the
+	 * six programmes are photo-less placeholders.
+	 */
+	imageUrl?: string
 ): Record<string, unknown> | null {
 	if (!program) return null;
 
@@ -131,6 +141,8 @@ export function courseJsonLd(
 		url: `${siteUrl}/programs/${program.slug}`,
 		provider: { '@type': 'Organization', name: organizationName, url: siteUrl }
 	};
+
+	if (imageUrl) course.image = imageUrl;
 
 	if (view && isDated(view.season)) {
 		const instance: Record<string, unknown> = {

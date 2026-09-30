@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { MapPin, Mail, Phone, MessageCircle } from 'lucide-svelte';
 	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
+	import { getLocale } from '$lib/paraglide/runtime';
+	import { trackPhoneTap } from '$lib/analytics';
 	import Seo from '$lib/components/Seo.svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 	import EnquiryForm from '$lib/components/contact/EnquiryForm.svelte';
@@ -34,7 +36,10 @@
 			value: CONTACT_INFO.phone,
 			href: CONTACT_HREFS.tel,
 			external: false,
-			mono: true
+			mono: true,
+			// `phone_tap` (prd.md R-SEO-5). Flagged on the row rather than sniffed from the href so
+			// the handler cannot silently detach if the tel: builder in $lib/data/contact changes.
+			phone: true
 		},
 		{
 			icon: MessageCircle,
@@ -129,6 +134,9 @@
 					{#if ch.href}
 						<a
 							href={ch.href}
+							onclick={'phone' in ch && ch.phone
+								? () => trackPhoneTap({ location: 'contact_page', locale: getLocale() })
+								: undefined}
 							target={ch.external ? '_blank' : undefined}
 							rel={ch.external ? 'noopener noreferrer' : undefined}
 							class="block h-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"

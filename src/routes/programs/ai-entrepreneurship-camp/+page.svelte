@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { ArrowRight, ChevronDown } from 'lucide-svelte';
 	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
+	import { trackProgramCtaClick } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
 	import Seo from '$lib/components/Seo.svelte';
 	import JsonLd from '$lib/components/JsonLd.svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 	import { SEASON_STATUS } from '$lib/data/nav';
 	import { courseJsonLd, programSeason } from '$lib/program-season';
+	import { ogCardFile } from '$lib/og/cards';
 	import { PROGRAMS } from '$lib/content/programs';
 	import { SEASONS } from '$lib/content/season-data';
 	import { SITE } from '$lib/seo';
@@ -79,7 +81,16 @@
 		: [];
 
 	/** R-SEO-3 / §7.4 acceptance — the fourth surface, built from the same record. */
-	const jsonLd = courseJsonLd(season, program, locale, SITE.url, SITE.name);
+	// R-SEO-3 + R-SEO-2: the Course entity carries the same prerendered share card the
+	// page's og:image points at, so a rich result and a WeChat preview show one image.
+	const jsonLd = courseJsonLd(
+		season,
+		program,
+		locale,
+		SITE.url,
+		SITE.name,
+		SITE.url + ogCardFile('/programs/ai-entrepreneurship-camp', locale)
+	);
 
 	const MODULES = [
 		m.programs_aiCamp_contest_modules_0,
@@ -167,6 +178,12 @@
 			</p>
 			<a
 				href={localizeHref('/contact-us')}
+				onclick={() =>
+					trackProgramCtaClick({
+						program: 'ai-entrepreneurship-camp',
+						location: 'program_page',
+						locale
+					})}
 				class="group inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 			>
 				{m.programs_aiCamp_hero_registerNow()}

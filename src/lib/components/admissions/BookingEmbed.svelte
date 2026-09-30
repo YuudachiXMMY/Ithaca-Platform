@@ -14,6 +14,8 @@
 -->
 <script lang="ts">
 	import { CalendarClock, ExternalLink } from 'lucide-svelte';
+	import { getLocale } from '$lib/paraglide/runtime';
+	import { trackBookingClick } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
 
 	interface Props {
@@ -44,8 +46,12 @@
 <!-- eslint-disable svelte/no-navigation-without-resolve -- the booking provider is an external origin, not an internal route -->
 
 <div class="flex flex-col gap-4">
+	<!-- `booking_click` — R-SEO-5. Only the plain link is instrumented: the iframe belongs to the
+	     scheduler's origin, so a booking completed inside it is invisible from here, and claiming
+	     otherwise would be the worst kind of analytics. -->
 	<a
 		href={url}
+		onclick={() => trackBookingClick({ location: 'admissions_booking', locale: getLocale() })}
 		target="_blank"
 		rel="noopener noreferrer"
 		class="inline-flex h-12 w-fit items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"

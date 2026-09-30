@@ -4,11 +4,13 @@
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
 	import { runGsapOnMount } from '$lib/motion/gsap-lifecycle';
+	import { trackProgramCtaClick } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
 	import Seo from '$lib/components/Seo.svelte';
 	import JsonLd from '$lib/components/JsonLd.svelte';
 	import { SEASON_STATUS } from '$lib/data/nav';
 	import { courseJsonLd, programSeason } from '$lib/program-season';
+	import { ogCardFile } from '$lib/og/cards';
 	import { PROGRAMS } from '$lib/content/programs';
 	import { SEASONS } from '$lib/content/season-data';
 	import { SITE } from '$lib/seo';
@@ -108,7 +110,16 @@
 	 * straight off the record, so the JSON-LD is an independent rendering of the same field rather
 	 * than a re-parse of the visible copy.
 	 */
-	const jsonLd = courseJsonLd(season, program, locale, SITE.url, SITE.name);
+	// R-SEO-3 + R-SEO-2: the Course entity carries the same prerendered share card the
+	// page's og:image points at, so a rich result and a WeChat preview show one image.
+	const jsonLd = courseJsonLd(
+		season,
+		program,
+		locale,
+		SITE.url,
+		SITE.name,
+		SITE.url + ogCardFile('/programs/ev-challenge', locale)
+	);
 
 	const GAINS = [
 		{
@@ -238,6 +249,8 @@
 				</p>
 				<a
 					href={localizeHref('/contact-us')}
+					onclick={() =>
+						trackProgramCtaClick({ program: 'ev-challenge', location: 'program_page', locale })}
 					class="inline-flex h-12 items-center justify-center gap-2 bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
 				>
 					{m.programs_evChallenge_hero_registerNow()}

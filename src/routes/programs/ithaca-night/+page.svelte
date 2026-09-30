@@ -8,6 +8,7 @@
 <Seo title={m.metadata_ithacaNight_title()} description={m.metadata_ithacaNight_description()} />
 
 <PlaceholderProgram
+	slug="ithaca-night"
 	hero={heroImage}
 	heroAlt="Students showcasing projects at Ithaca Night event"
 	title={m.programs_index_cards_ithacaNight_title()}

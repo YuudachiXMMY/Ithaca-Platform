@@ -11,6 +11,7 @@
 />
 
 <PlaceholderProgram
+	slug="summer-winter-camps"
 	hero={heroImage}
 	heroAlt="Students engaged in summer camp activities"
 	title={m.programs_index_cards_summerWinter_title()}

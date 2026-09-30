@@ -10,6 +10,7 @@
 	import { PROGRAMS } from '$lib/content/programs';
 	import { SEASONS } from '$lib/content/season-data';
 	import { seasonGrades } from '$lib/season-copy';
+	import { trackProgramCtaClick } from '$lib/analytics';
 
 	// Build-time enhanced images for the program cards.
 	import evImg from '$lib/assets/programs/ev-challenge/EV26-5.jpg?enhanced';
@@ -99,8 +100,12 @@
 	{@const gridClass = stacked ? '' : (GRID_CLASSES[program.id] ?? '')}
 	{@const season = SEASON.get(program.id) ?? null}
 	<div class={stacked ? 'min-h-0 flex-1' : gridClass}>
+		<!-- `program_cta_click` (prd.md R-SEO-5) carries `program.slug`, the content-record key —
+		     never the localized card title, which would split one programme across two GA rows. -->
 		<a
 			href={localizeHref(program.href)}
+			onclick={() =>
+				trackProgramCtaClick({ program: program.slug, location: 'programs_index', locale })}
 			class="group flex h-full flex-col overflow-hidden border border-border-strong bg-card-bg transition-colors duration-300 hover:border-brand focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand"
 		>
 			<div

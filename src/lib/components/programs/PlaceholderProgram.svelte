@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { ArrowRight } from 'lucide-svelte';
 	import type { Picture } from '@sveltejs/enhanced-img';
-	import { localizeHref } from '$lib/paraglide/runtime';
+	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
+	import { trackProgramCtaClick } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
 
 	// Elevated "coming soon" program stub: a full-bleed hero photo under a cinematic legibility
@@ -21,10 +22,20 @@
 		tag?: string;
 		description?: string;
 		note?: string;
+		/**
+		 * `Program.slug` — the `program` dimension on `program_cta_click` (prd.md R-SEO-5).
+		 *
+		 * Required, not optional: this component is the whole page for three of the six programmes,
+		 * so a forgotten slug would leave half the programme funnel unmeasured with nothing to
+		 * notice it. Passing the slug is also why the CTA can be instrumented once here instead of
+		 * three times at the call sites.
+		 */
+		slug: string;
 	}
 	let {
 		hero,
 		heroAlt,
+		slug,
 		eyebrow = m.programs_comingSoon_eyebrow(),
 		title = m.programs_placeholder_title(),
 		tag,
@@ -82,6 +93,8 @@
 				</p>
 				<a
 					href={localizeHref('/contact-us')}
+					onclick={() =>
+						trackProgramCtaClick({ program: slug, location: 'program_page', locale: getLocale() })}
 					class="group mt-10 inline-flex h-12 items-center justify-center gap-2 bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
 				>
 					{m.programs_placeholder_contactUs()}
