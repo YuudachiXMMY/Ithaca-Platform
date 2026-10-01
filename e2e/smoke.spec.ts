@@ -78,12 +78,47 @@ test.describe('locale switch', () => {
 
 	test('only the zh document loads the CJK font stylesheet', async ({ page }) => {
 		// The whole point of the per-locale gate in +layout.svelte: an English visitor must
-		// not pay for ~485KB of Noto Sans SC @font-face declarations.
+		// not pay for the Noto Sans SC @font-face declarations, nor for the faces themselves.
 		await page.goto('/');
 		await expect(page.locator('link[href="/fonts/noto-sans-sc.css"]')).toHaveCount(0);
 
 		await page.goto('/zh');
 		await expect(page.locator('link[href="/fonts/noto-sans-sc.css"]')).toHaveCount(1);
+	});
+
+	// The assertion above is a proxy — it checks that the <link> is absent, not that no bytes
+	// were fetched, and a proxy is exactly what let the opposite defect run in production for
+	// months: the stylesheet WAS linked on /zh and the browser still downloaded zero of the 505
+	// subsets, because `--font-stack-body` carried a generic family in front of 'Noto Sans SC'
+	// and CSS font matching stops at a generic. Nothing in the suite noticed, because nothing
+	// looked at the network. These two tests look at the network.
+	test('English pages fetch zero CJK font bytes', async ({ page }) => {
+		const cjk: string[] = [];
+		page.on('request', (r) => {
+			if (r.url().includes('noto-sans-sc')) cjk.push(new URL(r.url()).pathname);
+		});
+		await page.goto('/', { waitUntil: 'networkidle' });
+		expect(cjk, 'an English page requested a CJK font resource').toEqual([]);
+	});
+
+	test('Chinese pages actually fetch the Noto Sans SC faces, one per weight', async ({ page }) => {
+		const faces = new Set<string>();
+		page.on('response', (r) => {
+			const p = new URL(r.url()).pathname;
+			if (p.startsWith('/fonts/noto-sans-sc/') && p.endsWith('.woff2')) faces.add(p);
+		});
+		await page.goto('/zh', { waitUntil: 'networkidle' });
+
+		// scripts/build-cjk-subset.ts emits one file per weight, site-wide. Two weights: 400 for
+		// body copy and 700 for headings and buttons. Light was dropped because all weights are
+		// fetched (there is no unicode-range to skip any) and 373 KB was competing with the LCP
+		// element. A count of 0 means the font stack regressed to a generic family again — the
+		// defect that ran in production for months; a count above 2 means either the stock
+		// Fontsource partitioning came back or a weight was added without re-measuring.
+		expect([...faces].sort(), 'CJK faces fetched on /zh').toEqual([
+			'/fonts/noto-sans-sc/noto-sans-sc-subset-400.woff2',
+			'/fonts/noto-sans-sc/noto-sans-sc-subset-700.woff2'
+		]);
 	});
 });
 

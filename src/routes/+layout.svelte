@@ -85,6 +85,13 @@
 	<!-- CJK font gating: Noto Sans SC subsets load ONLY on Chinese pages, so
 	     English pages ship 0 CJK font bytes. unicode-range keeps fetches on-demand. -->
 	{#if getLocale() === 'zh'}
+		<!-- Deliberately NOT preloaded. Measured: /zh's LCP element is the header logo, which already
+		     carries fetchpriority="high"; a preloaded 124 KB font sits at the same priority and wins
+		     bandwidth from it. With `font-display: optional` the font blocks nothing, so a preload
+		     buys only a chance that it lands inside the swap window — at the cost of the LCP element.
+		     The trade taken: first page view renders Chinese in the system face (which is what every
+		     visitor has had since launch), and every subsequent page in the session gets Noto Sans SC
+		     from cache. -->
 		<link rel="stylesheet" href="/fonts/noto-sans-sc.css" />
 	{/if}
 	{#if isAdmin}

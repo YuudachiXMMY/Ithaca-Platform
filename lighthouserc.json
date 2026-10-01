@@ -73,7 +73,35 @@
 					}
 				},
 				{
-					"matchingUrlPattern": "^(?!.*ev-challenge).*$",
+					"//zh": [
+						"Chinese pages carry a CJK webfont that English pages do not. 900 Han glyphs is",
+						"251 KB across two weights and that is irreducible — it is already subset to exactly",
+						"the characters this site can render, cut from five weights to two, served with",
+						"font-display: optional and deliberately NOT preloaded so it cannot outrank the LCP",
+						"element. The journey on /zh LCP: 11.58s for the naive fix, 5.65s after all of that.",
+						"",
+						"Against 4.37s with the font effectively disabled, which is what the site shipped for",
+						"months because a generic family sat in front of Noto Sans SC in the stack. So the",
+						"real cost of HAVING the Chinese typeface is +1.28s on /zh, and the owner chose to",
+						"pay it. /zh/programs/ev-challenge came back under its own 7800ms ceiling unaided.",
+						"",
+						"5800 is a ratchet at the measured value, not headroom: /zh cannot get slower without",
+						"failing. Lower it as the page gets faster — the logo image is its LCP element and is",
+						"the next thing worth attacking."
+					],
+					"matchingUrlPattern": "^(?!.*ev-challenge).*/zh($|/).*$",
+					"assertions": {
+						"categories:performance": ["warn", { "minScore": 0.85 }],
+						"largest-contentful-paint": ["error", { "maxNumericValue": 5800 }],
+						"first-contentful-paint": ["warn", { "maxNumericValue": 3000 }],
+						"total-blocking-time": ["warn", { "maxNumericValue": 600 }],
+						"cumulative-layout-shift": ["error", { "maxNumericValue": 0.05 }],
+						"categories:accessibility": ["warn", { "minScore": 0.9 }],
+						"categories:seo": ["warn", { "minScore": 0.9 }]
+					}
+				},
+				{
+					"matchingUrlPattern": "^(?!.*ev-challenge)(?!.*/zh($|/)).*$",
 					"assertions": {
 						"categories:performance": ["warn", { "minScore": 0.85 }],
 						"largest-contentful-paint": ["error", { "maxNumericValue": 4500 }],

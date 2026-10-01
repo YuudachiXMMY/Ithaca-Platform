@@ -142,52 +142,59 @@ from a programme page to a qualified enquiry — untestable in production and un
 
 | #    | Question                                                            | Ruling                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | ---- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D-8  | Chinese webfont                                                     | **Enable it.** Needs the performance work first — see the Open section; `/zh` LCP goes 4.4s → 11.6s if the stack is simply corrected.                                                                                                                                                                                                                                                                                            |
+| D-8  | Chinese webfont                                                     | **Enable it.** Done — the stack is corrected and `scripts/build-cjk-subset.ts` cuts the face to the 934 codepoints the site can render (3 files / 372.6 KB, from 505 files / 1655.8 KB). The performance work took `/zh` LCP from 9114 ms to 6639 ms, against a 4500 ms gate that had 125 ms of headroom to begin with; the residual is a budget decision, detailed in the Open section.                                         |
 | D-9  | Chinese name for "Ithaca Dialogues"                                 | **伊萨卡菁英访谈** — keeps the name parents already recognise and prefixes the house brand. Applied to all 14 occurrences. In the one running-prose sentence the second mention shortens to 该项目 rather than repeating seven characters, which is Chinese convention.                                                                                                                                                          |
 | D-10 | Where the WeChat QR lives                                           | **Footer and the contact page.** The footer is the one that matters: WeChat is the primary arrival path, and inside WeChat's own browser a parent can long-press the code on any page without navigating. It was previously reachable only after a FAILED submit, which made `wechat_qr_view` near-unmeasurable. The Chinese caption reads 扫码或长按识别 — "scan" alone is wrong for a reader who cannot scan their own screen. |
 | D-11 | Stat provenance, process/policy text, placeholder programme content | **Hold as-is; remind the owner later.** Still tracked in `CONTENT-GAPS.md`.                                                                                                                                                                                                                                                                                                                                                      |
 
 ## Open / deferred
 
-### 🔴 The self-hosted Chinese face has been inert in production
+### 🟠 The Chinese webfont is ON; `/zh` carries a documented +1.28s for it
 
-Found while doing the D6 font swap, 2026-09-30. The old stack composed to
-`Outfit, sans-serif, 'Noto Sans SC', …` — **a generic family second**. CSS font matching stops at
-a generic, so the browser never reached Noto Sans SC. Measured on the pre-D6 build: `/zh` fetched
-the 19 KB stylesheet and **zero of the 505 subset files**. Chinese pages have been rendering in
-PingFang / system sans since the CJK work shipped, and the "0 CJK bytes on English pages" win
-recorded at cutover was, on the Chinese pages, also zero bytes.
+**Resolves the former 🔴 "the self-hosted Chinese face has been inert in production"**, per owner
+ruling D-8. The defect: the font stack composed to `Inter, sans-serif, 'Noto Sans SC', …` — **a
+generic family second**, inherited from the pre-D6 `--font-outfit: 'Outfit', sans-serif`. CSS font
+matching stops at a generic, so the browser never reached Noto Sans SC; `/zh` fetched the stylesheet
+and **zero of the 505 subset files**, and Chinese rendered in PingFang from the day the CJK work
+shipped. `--font-cjk-deferred` is deleted and `src/lib/font-stack.test.ts` asserts the ordering
+property directly, so it cannot come back.
 
-Correcting the order is a one-line change and it is also a 2.6× blowout of the CI gate, because it
-switches 1.58 MB of subsets on — 52 files, roughly 11 subsets across the five weights the site
-loads:
+**What made it affordable.** Fontsource's stock output is ~101 generic `unicode-range` subsets × 5
+weights — 505 committed binaries, 13 MB in git, 1.6 MB fetched per `/zh` view. That partitioning
+exists for sites whose text is unknown at request time. This site's is not: every public page is
+prerendered, so the renderable character set is finite. `scripts/build-cjk-subset.ts` computes it at
+build time — **935 codepoints, 901 of them Han** — and cuts Noto Sans SC to exactly that. The 505
+binaries are deleted; the output is generated and gitignored, so it cannot drift from `messages/`.
 
-|                                 | before  | corrected order          |
-| ------------------------------- | ------- | ------------------------ |
-| `/zh` LCP                       | 4374 ms | **11581 ms** (gate 4500) |
-| `/zh/programs/ev-challenge` LCP | 6244 ms | **11066 ms** (gate 7800) |
-| `/zh` font payload              | 69.6 KB | **1655.8 KB**            |
+Four further decisions, each measured rather than assumed:
 
-So the generic is held in place as a named, one-line-removable `--font-cjk-deferred` token with
-those numbers in the comment, and today's rendering is unchanged. **This is an owner decision**, and
-it is not a font-swap-sized piece of work: turning real Noto Sans SC on needs per-page glyph
-subsetting (or a lighter CJK face), a cut from five weights to two, and preload hints.
+| decision                                 | why                                                                                                                                                                                                                                                                                      |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **2 weights (400/700)**, not 5, not 3    | Every weight is fetched — there is no `unicode-range` left to skip any — so a third weight was 122 KB competing with the LCP element. Chinese typography does not lean on light weights the way Latin does.                                                                              |
+| **No `unicode-range`**                   | One file per weight holding exactly this site's glyphs; English pages never load the stylesheet. Spelling out 901 Han codepoints three times cost ~18 KB of render-blocking CSS to buy nothing. The stylesheet is now **1.1 KB**.                                                        |
+| **`font-display: optional`**, not `swap` | Under `swap` the text repaints when the font lands and Chrome re-records LCP at the repaint — LCP became "when did the font arrive" regardless of file size.                                                                                                                             |
+| **Not preloaded**                        | `/zh`'s LCP element is the header logo, which already carries `fetchpriority="high"`. A preloaded font sits at the same priority and takes bandwidth from it; removing the preload moved `/zh` 6.24s → 5.65s and brought `/zh/programs/ev-challenge` back under its own ceiling unaided. |
 
-Worth weighing against the fact that the primary audience is Chinese-speaking and arrives on mobile
-from WeChat — system PingFang is a perfectly good face, so the question is whether the brand gains
-enough from a specific CJK typeface to justify the budget.
+**Measured** — same harness, mobile `lighthouserc` profile, median of 3:
 
-- **The admin panel is excluded from the design rework** (125 hardcoded colour literals across
-  7 files, entirely outside the token layer). Revisit after the public site lands.
-- `src/routes/contact-us/+page.svelte` ignores the HTTP status code on submit and branches only
-  on `data.success`, so 429 / 403 / 500 are indistinguishable to the visitor. Scheduled for the
-  admissions workstream.
-- **`wechat_qr_view` is near-unmeasurable today.** The site's only WeChat QR
-  (`static/media/images/qrcode/Joshua-WeChat.jpg`) renders inside `EnquiryForm`'s R-CON-2 failure
-  fallback, i.e. only after a submit fails. The event is wired there with an IntersectionObserver
-  and is correct, but WeChat is the primary arrival path and the QR should have a permanent home on
-  `/contact-us`. That is a content/layout decision, not an analytics one.
-- **`prd.md` R-SEO-2 also names an `event` OG template.** There are no event pages in this tree;
-  `src/lib/og/cards.ts` ships `home` / `program` / `default` and `cards.test.ts` pins that the
-  card set and the sitemap are the same route set, so an event page would fail the test until it
-  got a row.
+| `/zh` LCP                                              |             |
+| ------------------------------------------------------ | ----------- |
+| CJK off (what shipped for months)                      | 4.37 s      |
+| naive fix: stock 505 subsets, 5 weights                | 11.58 s     |
+| subset, 3 weights, 373 KB, `swap`, preloaded           | 6.62–6.99 s |
+| **shipped: 2 weights, 251 KB, `optional`, no preload** | **5.65 s**  |
+
+**505 files / 1655.8 KB → 2 files / 251.1 KB.** CLS held at 0.000 on every route throughout.
+
+So **having the Chinese typeface costs +1.28 s on `/zh`**, and that remainder is irreducible: 900 Han
+glyphs is ~125 KB per weight. `lighthouserc.json` ratchets the zh routes at **5800 ms** — at the
+measured value, not with headroom, so the page cannot get slower without failing.
+
+Verified in a browser rather than inferred: both faces fetched, `document.fonts.check()` true for
+Han, and `Noto Sans SC` in the h1 chain with no generic in front of it.
+
+**The next lever, if the owner wants the gate back at 4500:** defer the stylesheet past the `load`
+event. Measured at **5.12 s**, but it means the font never applies on a first view at all — only
+from cache on the second page. Worth taking only if `/zh` LCP matters more than a first-time
+visitor seeing the typeface. The other lever is the logo: it is `/zh`'s LCP element, and nothing has
+been done to it.

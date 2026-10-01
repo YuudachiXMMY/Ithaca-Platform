@@ -321,53 +321,42 @@
 	   the family the @font-face blocks in those packages actually declare,
 	   and naming the static 'Manrope' here would silently match nothing.
 
-	   NO GENERIC INSIDE THESE THREE — see --font-cjk-deferred below for the
-	   one generic that IS deliberately mid-stack, and why.
+	   NO GENERIC ANYWHERE BEFORE 'Noto Sans SC' in the composed stacks below.
+	   That is not a style preference, it is the bug that kept the Chinese face
+	   inert for the whole of production — see the note on the stacks.
 	   ====================================================================== */
 	--font-manrope: 'Manrope Variable';
 	--font-inter: 'Inter Variable';
 	--font-noto-sans-sc: 'Noto Sans SC';
 
-	/* ======================================================================
-	   --font-cjk-deferred — a KNOWN DEFECT, held in place ON PURPOSE.
-	   Deleting this token (and its two references below) is the whole fix.
-	   Do not "tidy" it away without reading this and re-running `npm run lhci`.
-
-	   The pre-D6 stack was `--font-outfit: 'Outfit', sans-serif`, which
-	   composed into `Outfit, sans-serif, 'Noto Sans SC', …` — a generic family
-	   SECOND. CSS font matching therefore resolved every Han glyph against the
-	   system sans and never reached Noto Sans SC at all. Measured on the
-	   pre-D6 build: /zh fetched the 19 KB stylesheet and ZERO of the 505
-	   subset files. The entire self-hosted CJK face has been inert in
-	   production, and Chinese pages have been rendering in PingFang/system sans.
-
-	   D6 first corrected the order. That is the RIGHT stack and it is also a
-	   2.6× blowout of the CI gate, because the correction switches 1.58 MB of
-	   CJK subsets on (52 files: ~11 subsets × the five weights the site uses).
-	   Measured, mobile lighthouserc profile, median of 3:
-
-	       /zh                         LCP 4374ms -> 11581ms   (gate: 4500)
-	       /zh/programs/ev-challenge   LCP 6244ms -> 11066ms   (gate: 7800)
-	       /zh font payload            69.6 KB -> 1655.8 KB
-
-	   So the generic is put back, restoring today's exact rendering, and the
-	   defect is left visible here instead of inside a font-swap change. Turning
-	   real Noto Sans SC on is its own piece of work with its own budget: it
-	   needs per-page glyph subsetting (or a smaller CJK face), a cut from five
-	   weights to two, and preload hints. Tracked for the owner in the D6 report.
-	   ====================================================================== */
-	--font-cjk-deferred: sans-serif;
-
 	/* The two composed role stacks — the VALUE layer for typography, aliased
 	   onto Tailwind's `font-sans` / `font-display` in @theme inline below.
-	   Noto Sans SC sits in BOTH because §8.2 gives it both roles in Chinese;
-	   on English pages its @font-face never loads (gated in +layout.svelte),
-	   so the stack falls through to system-ui at zero cost — English pages ship
-	   0 CJK bytes either way, which e2e/smoke.spec.ts pins. */
-	--font-stack-body:
-		var(--font-inter), var(--font-cjk-deferred), var(--font-noto-sans-sc), system-ui, sans-serif;
-	--font-stack-display:
-		var(--font-manrope), var(--font-cjk-deferred), var(--font-noto-sans-sc), system-ui, sans-serif;
+	   Noto Sans SC sits in BOTH because §8.2 gives it both roles in Chinese.
+
+	   ORDER IS LOAD-BEARING. Until 2026-09-30 these read
+	       var(--font-inter), sans-serif, var(--font-noto-sans-sc), …
+	   with a GENERIC FAMILY SECOND, inherited from the pre-D6
+	   `--font-outfit: 'Outfit', sans-serif`. CSS font matching stops at a
+	   generic, so the browser resolved every Han glyph against the system sans
+	   and never reached Noto Sans SC: /zh fetched the stylesheet and ZERO of
+	   the 505 subset files, and Chinese rendered in PingFang from the day the
+	   CJK work shipped. The generic is gone; owner ruling D-8 is to turn the
+	   real face on.
+
+	   What made that affordable is scripts/build-cjk-subset.ts, which cuts
+	   Noto Sans SC to the ~930 codepoints this prerendered site can actually
+	   render — 3 files / 372 KB, against 52 files / 1655.8 KB for the stock
+	   Fontsource partitioning that blew the CI gate to 11.6s.
+
+	   system-ui still anchors the end of both stacks: it is what draws a
+	   character the subset does not carry (admin-authored popup copy is the
+	   only source of those), so a gap degrades to PingFang, never to tofu.
+	   On English pages the @font-face is never served at all — the stylesheet
+	   is gated on locale in +layout.svelte — so the stack falls through to
+	   system-ui at zero cost and English ships 0 CJK bytes, which
+	   e2e/smoke.spec.ts pins. */
+	--font-stack-body: var(--font-inter), var(--font-noto-sans-sc), system-ui, sans-serif;
+	--font-stack-display: var(--font-manrope), var(--font-noto-sans-sc), system-ui, sans-serif;
 }
 
 /* --band-warm, re-derived from its two source tokens wherever color-mix() is
