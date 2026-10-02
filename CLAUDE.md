@@ -131,7 +131,13 @@ The production server (`node build/index.js`, and the Docker image) listens on *
 `build/client` through `sirv`, which indexes that directory **once at startup**, so every
 newly hashed chunk 404s after a rebuild. The page still renders -- the HTML is prerendered --
 but it never hydrates, so nothing is clickable, the header never leaves its initial state,
-and no error is shown. Use `npm run preview:prod`, which always starts from a fresh build.
+and no error is shown. Use `npm run preview:prod` (`scripts/preview-prod.sh`): it frees the
+port **before** building, so the server process is always younger than the assets it serves.
+It refuses to kill anything that is not a preview server.
+
+Note that prerendered HTML is served with `Last-Modified` and no `Cache-Control`, so a browser
+may hold a stale document that references chunk hashes the new build no longer has. If a local
+page looks dead after a rebuild, hard-reload it (Cmd+Shift+R) before suspecting the code.
 
 ### Key npm Scripts
 
