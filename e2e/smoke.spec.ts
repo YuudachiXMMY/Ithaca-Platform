@@ -185,6 +185,87 @@ test.describe('contact form', () => {
 	});
 });
 
+test.describe('header scroll state', () => {
+	/**
+	 * The bar is transparent over a dark hero and animates to a light, opaque bar past 20px.
+	 *
+	 * `header-contrast.spec.ts` asserts the colours are legible in each state, but it would pass
+	 * even if the transition never fired: band-* over a dark hero and ink over a light page both
+	 * clear 4.5:1, so "the header never changed" and "the header changed correctly" are the same
+	 * green. Nothing pinned the transition itself.
+	 *
+	 * It is also, incidentally, the only check in the suite that the header HYDRATES. `scrolled` is
+	 * client state; if the JS fails to load the header freezes in its server-rendered form, looks
+	 * plausible, and every other assertion in the suite still passes. That exact failure is easy to
+	 * produce by accident — a stale asset manifest will do it.
+	 */
+	const headerState = (page: import('@playwright/test').Page) =>
+		page.evaluate(() => {
+			const header = document.querySelector('header')!;
+			const scrim = header.children[0] as HTMLElement;
+			return {
+				painted: getComputedStyle(header).backgroundColor !== 'rgba(0, 0, 0, 0)',
+				blurred: getComputedStyle(header).backdropFilter.includes('blur'),
+				scrim: Number(getComputedStyle(scrim).opacity),
+				inkLogo: (header.querySelector('img') as HTMLImageElement).currentSrc.includes('logo-ink')
+			};
+		});
+
+	test('a dark-hero route flips to the light bar on scroll, and back', async ({ page }) => {
+		await page.goto('/programs/ev-challenge');
+		// The transition is 500ms; every read below waits it out rather than racing it.
+		await page.waitForTimeout(700);
+
+		expect(await headerState(page), 'at the top of a dark hero').toEqual({
+			painted: false,
+			blurred: false,
+			scrim: 1,
+			inkLogo: false
+		});
+
+		await page.evaluate(() => window.scrollTo(0, 500));
+		await page.waitForTimeout(700);
+		expect(await headerState(page), 'scrolled past the hero').toEqual({
+			painted: true,
+			blurred: true,
+			scrim: 0,
+			inkLogo: true
+		});
+
+		// Reversible. A one-way flip would look fine in every screenshot taken going down the page.
+		await page.evaluate(() => window.scrollTo(0, 0));
+		await page.waitForTimeout(700);
+		expect(await headerState(page), 'back at the top').toEqual({
+			painted: false,
+			blurred: false,
+			scrim: 1,
+			inkLogo: false
+		});
+	});
+
+	test('a light route is already ink, and only gains the bar', async ({ page }) => {
+		await page.goto('/admissions');
+		await page.waitForTimeout(700);
+
+		// No scrim and no white wordmark on a page that opens on white, scrolled or not.
+		expect(await headerState(page)).toEqual({
+			painted: false,
+			blurred: false,
+			scrim: 0,
+			inkLogo: true
+		});
+
+		await page.evaluate(() => window.scrollTo(0, 500));
+		await page.waitForTimeout(700);
+		expect(await headerState(page)).toEqual({
+			painted: true,
+			blurred: true,
+			scrim: 0,
+			inkLogo: true
+		});
+	});
+});
+
 test.describe('global chrome', () => {
 	test('the skip link is the first focusable element and targets main', async ({ page }) => {
 		await page.goto('/');
