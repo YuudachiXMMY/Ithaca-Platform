@@ -131,6 +131,28 @@ export const SEASON_STATUS: Record<Season['registration'], () => string> = {
 };
 
 /**
+ * Does this route open on a dark ground, so the transparent header must invert?
+ *
+ * The header is transparent until scrolled, which means its legibility depends on whatever the
+ * page happens to render in its first ~130px. That used to be decided twice — once for the logo,
+ * by a path test inside Header.svelte, and never for the nav text, which simply kept the light
+ * palette's ink tokens. The result was measured at 1.01:1 on /programs/ev-challenge: not "hard to
+ * read", invisible. One predicate now feeds every piece of chrome, so the wordmark and the links
+ * cannot disagree about the ground they are standing on.
+ *
+ * The prefix is a default with a net under it, not a guess: every programme DETAIL page is built
+ * from a full-bleed photo hero under an `overlay` scrim (PlaceholderProgram, and the three
+ * hand-built ones match), so a new programme page is dark until proven otherwise — and
+ * `e2e/header-contrast.spec.ts` samples the real pixels on every sitemap route, so a light one
+ * fails loudly instead of shipping. `/programs` itself is the index and opens on white; it is
+ * excluded by the trailing slash, which `nav.test.ts` pins precisely because that is a
+ * one-character edit away from flipping six pages at once.
+ */
+export function headerOnDark(path: string): boolean {
+	return path === '/' || path === '/about-us' || path.startsWith('/programs/');
+}
+
+/**
  * The season status to badge a nav entry with, or null when the programme has no `Season` yet —
  * engineering-projects, summer-winter-camps and ithaca-night today (CONTENT-GAPS C-1). A null
  * renders as no badge, never as an empty one.

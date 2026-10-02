@@ -3,9 +3,10 @@ import {
 	FOOTER_LINKS,
 	NAV_ITEMS,
 	RIGHT_NAV_HREFS,
+	SEASON_STATUS,
+	headerOnDark,
 	navLabel,
-	navSeasonStatus,
-	SEASON_STATUS
+	navSeasonStatus
 } from './nav';
 import { PROGRAM_CARDS } from './programs';
 import { PROGRAMS } from '$lib/content/programs';
@@ -114,5 +115,45 @@ describe('/programs index cards', () => {
 
 	it('shows one card per programme', () => {
 		expect(PROGRAM_CARDS).toHaveLength(PROGRAMS.length);
+	});
+});
+
+describe('headerOnDark', () => {
+	// The header is transparent until scrolled, so these are the routes whose first section decides
+	// whether the nav is readable. Getting this wrong is not cosmetic: before the predicate existed,
+	// the nav links kept the light palette's ink on every one of them and measured 1.01:1.
+	it('claims every route that opens on a photo or navy hero', () => {
+		for (const path of [
+			'/',
+			'/about-us',
+			'/programs/ev-challenge',
+			'/programs/engineering-projects',
+			'/programs/summer-winter-camps',
+			'/programs/ithaca-night',
+			'/programs/ithaca-dialogues',
+			'/programs/ai-entrepreneurship-camp'
+		]) {
+			expect(headerOnDark(path), path).toBe(true);
+		}
+	});
+
+	// `/programs` is the index and opens on white. It is excluded ONLY by the trailing slash in
+	// `startsWith('/programs/')` — delete that one character and six pages flip to white-on-white
+	// at once, with nothing else in the suite noticing. This is the test that notices.
+	it('does not claim the /programs index, which opens on white', () => {
+		expect(headerOnDark('/programs')).toBe(false);
+	});
+
+	it('leaves every light route alone', () => {
+		for (const path of ['/admissions', '/results', '/contact-us', '/privacy', '/terms']) {
+			expect(headerOnDark(path), path).toBe(false);
+		}
+	});
+
+	// Header.svelte feeds this the de-localized path, so /zh must never reach it as a prefix. If
+	// that ever regresses, every Chinese page silently falls back to the light chrome.
+	it('is given canonical paths, not localized ones', () => {
+		expect(headerOnDark('/zh/programs/ev-challenge')).toBe(false);
+		expect(headerOnDark('/zh')).toBe(false);
 	});
 });

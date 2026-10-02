@@ -3,7 +3,13 @@
 	import { fly, fade, slide } from 'svelte/transition';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { Menu, X, ChevronDown } from 'lucide-svelte';
-	import { NAV_ITEMS, RIGHT_NAV_HREFS, navLabel, navSeasonStatus } from '$lib/data/nav';
+	import {
+		NAV_ITEMS,
+		RIGHT_NAV_HREFS,
+		headerOnDark,
+		navLabel,
+		navSeasonStatus
+	} from '$lib/data/nav';
 	import { cn } from '$lib/utils';
 	import { localizeHref, deLocalizeUrl } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
@@ -106,19 +112,40 @@
 	// Canonical (de-localized) path so active-link detection works for /zh too.
 	const path = $derived(deLocalizeUrl(page.url).pathname);
 
+	// ONE signal for the whole header. `headerOnDark` (in $lib/data/nav) says whether the route opens
+	// on a dark ground; scrolling always wins, because from 20px down the header paints its own
+	// `bg-surface-4/70` on every route and the ground underneath stops mattering.
+	//
+	// This used to be two decisions. The logo had a path test; the nav text, the hamburger and the
+	// language switcher had none at all and kept the light palette's ink on every route — measured
+	// at 1.01:1 over the EV Challenge hero. Deriving both from one boolean is the actual fix: the
+	// wordmark and the links can no longer be told different things about the same background.
+	//
+	// `page.status` is the third term and not an afterthought: an unmatched `/programs/<typo>` —
+	// a stale WeChat share, a bookmark, a slug renamed later — renders +error.svelte, which is a
+	// plain WHITE page, while the path still satisfies the `/programs/` prefix. Keying on the
+	// status rather than allowlisting slugs fixes it for every error page at once, including ones
+	// under routes that do not exist yet.
+	const onDark = $derived(!scrolled && page.status < 400 && headerOnDark(path));
+
 	// The stock logo's wordmark is ~50%-opacity WHITE (verified: its alpha channel peaks at 128),
 	// which the §8.2 light migration turned invisible on every light page. logo-ink.png recolours
-	// only the wordmark and leaves the blue mark alone, so the header picks whichever suits the
-	// ground it is actually sitting on.
-	//
-	// The header is transparent until scrolled, so before scroll the ground is the page's first
-	// section. Every route with a full-bleed photo hero — home, about, and each program DETAIL page
-	// (but not the /programs index, which opens on white) — still puts the logo on a dark scrim.
-	// Once scrolled the header paints `bg-surface-4/70` on every route, so the ink mark always wins.
-	const hasDarkHero = $derived(
-		path === '/' || path === '/about-us' || path.startsWith('/programs/')
+	// only the wordmark and leaves the blue mark alone.
+	const logo = $derived(onDark ? logoOnDark : logoOnLight);
+
+	// On dark the chrome switches to the design system's existing on-band scale rather than ad-hoc
+	// whites: app.css already publishes band-foreground-muted at 10.37:1 and band-brand at 7.94:1
+	// *on navy-900*. Those figures are what the scrim below exists to make true — composited over a
+	// raw hero photo they hold only where the photo happens to be dark, and the EV Challenge hero
+	// has a patch of bright green that drops even pure white to 3.2:1. A scrim turns the ground into
+	// a known quantity, so the contrast stops depending on which image the owner swaps in.
+	const linkIdle = $derived(
+		onDark
+			? 'text-band-foreground-muted hover:text-band-foreground'
+			: 'text-foreground-muted hover:text-foreground'
 	);
-	const logo = $derived(!scrolled && hasDarkHero ? logoOnDark : logoOnLight);
+	const linkActive = $derived(onDark ? 'text-band-brand' : 'text-brand-bright');
+	const activeRule = $derived(onDark ? 'bg-band-brand' : 'bg-brand');
 
 	function checkActive(href: string): boolean {
 		return href === '/' ? path === '/' : path === href || path.startsWith(href + '/');
@@ -160,12 +187,28 @@
 <header
 	class={cn(
 		'fixed inset-x-0 top-0 z-40 transition-all duration-500 ease-out',
-		scrolled ? 'border-b border-border bg-surface-4/70 backdrop-blur-xl' : 'bg-transparent'
+		scrolled ? 'border-b border-border bg-surface-4/90 backdrop-blur-xl' : 'bg-transparent'
 	)}
 >
+	<!-- The scrim. Without it "white text on a dark hero" is a hope, not a property: the two split
+	     heroes (ithaca-dialogues, ai-entrepreneurship-camp) put a white panel under half the bar,
+	     and the EV Challenge photo has a bright green patch that leaves pure white at 3.2:1. A
+	     gradient makes the ground a known quantity across the full width, so the band-* tokens'
+	     published ratios hold and a future hero photo cannot quietly break them.
+	     Taller than the header (h-44/lg:h-56 vs h-24/lg:h-32) so it fades out below the bar instead
+	     of ending on a visible edge. Opacity rather than {#if} so it cross-fades with the header's
+	     own 500ms transition when the visitor scrolls, instead of popping. -->
 	<div
 		class={cn(
-			'mx-auto grid max-w-[1400px] grid-cols-[1fr_auto_1fr] px-6 transition-all duration-500 ease-out sm:px-8 lg:px-12',
+			'pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-overlay/92 via-overlay/72 to-transparent transition-opacity duration-500 ease-out lg:h-48',
+			onDark ? 'opacity-100' : 'opacity-0'
+		)}
+		aria-hidden="true"
+	></div>
+
+	<div
+		class={cn(
+			'relative mx-auto grid max-w-[1400px] grid-cols-[1fr_auto_1fr] px-6 transition-all duration-500 ease-out sm:px-8 lg:px-12',
 			scrolled ? 'h-18 items-center' : 'h-24 items-start pt-5 lg:h-32 lg:pt-7'
 		)}
 	>
@@ -189,13 +232,15 @@
 								href={localizeHref(item.href)}
 								class={cn(
 									'relative flex items-center gap-1.5 py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
-									active ? 'text-brand-bright' : 'text-foreground-muted hover:text-foreground'
+									active ? linkActive : linkIdle
 								)}
 								aria-expanded={open}
 								aria-haspopup="true"
 							>
 								{#if active}
-									<span class="absolute -bottom-px left-0 h-px w-4 bg-brand" aria-hidden="true"
+									<span
+										class={cn('absolute -bottom-px left-0 h-px w-4', activeRule)}
+										aria-hidden="true"
 									></span>
 								{/if}
 								{navLabel(item.label)}
@@ -238,11 +283,13 @@
 							href={localizeHref(item.href)}
 							class={cn(
 								'relative py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
-								active ? 'text-brand-bright' : 'text-foreground-muted hover:text-foreground'
+								active ? linkActive : linkIdle
 							)}
 						>
 							{#if active}
-								<span class="absolute -bottom-px left-0 h-px w-4 bg-brand" aria-hidden="true"
+								<span
+									class={cn('absolute -bottom-px left-0 h-px w-4', activeRule)}
+									aria-hidden="true"
 								></span>
 							{/if}
 							{navLabel(item.label)}
@@ -283,11 +330,12 @@
 						href={localizeHref(item.href)}
 						class={cn(
 							'relative py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
-							active ? 'text-brand-bright' : 'text-foreground-muted hover:text-foreground'
+							active ? linkActive : linkIdle
 						)}
 					>
 						{#if active}
-							<span class="absolute -bottom-px left-0 h-px w-4 bg-brand" aria-hidden="true"></span>
+							<span class={cn('absolute -bottom-px left-0 h-px w-4', activeRule)} aria-hidden="true"
+							></span>
 						{/if}
 						{navLabel(item.label)}
 					</a>
@@ -295,13 +343,16 @@
 			</nav>
 
 			<div class="ml-6 hidden items-center lg:flex">
-				<LanguageSwitcher />
+				<LanguageSwitcher {onDark} />
 			</div>
 
 			<button
 				bind:this={toggleEl}
 				onclick={() => (mobileOpen = !mobileOpen)}
-				class="rounded-sm p-2 text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand lg:hidden"
+				class={cn(
+					'rounded-sm p-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand lg:hidden',
+					linkIdle
+				)}
 				aria-label={mobileOpen ? m.common_nav_closeMenu() : m.common_nav_openMenu()}
 				aria-expanded={mobileOpen}
 			>

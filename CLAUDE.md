@@ -191,6 +191,9 @@ UI-level verification is Playwright's job (`e2e/`), not Vitest's.
   - `e2e/smoke.spec.ts` -- route coverage **derived from `/sitemap.xml`**, so a new page joins
     the suite automatically; plus locale switch, keyboard nav, form validation, redirects
   - `e2e/a11y.spec.ts` -- axe, zero serious/critical on every `prd.md` §6.4 page in both locales
+  - `e2e/header-contrast.spec.ts` -- samples the pixels BEHIND the header on every sitemap route
+    and asserts 4.5:1 for each nav link / hamburger / switcher. axe cannot do this: it reports
+    text-over-image contrast as `incomplete`, which is how 40 of 84 elements shipped below AA
 - `bash scripts/docker-smoke.sh` -- production-image smoke test (build + migrate + routes +
   Better Auth login) against an isolated, disposable Postgres
 - `.github/workflows/ci.yml` -- **the PR gate**: lint, check, i18n parity, unit tests, build,

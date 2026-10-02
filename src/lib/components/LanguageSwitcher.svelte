@@ -3,12 +3,28 @@
 	import { localizeHref, deLocalizeUrl, getLocale } from '$lib/paraglide/runtime';
 	import { trackLocaleSwitch } from '$lib/analytics';
 
+	/**
+	 * Whether this switcher is sitting on a dark ground. The header bar passes the route's own
+	 * answer; the mobile drawer leaves it false, because the drawer is always a light panel.
+	 *
+	 * It has to be a prop rather than a path test of its own: the switcher renders in two places
+	 * with different grounds on the same route, so "which page am I on" is not enough information.
+	 */
+	let { onDark = false }: { onDark?: boolean } = $props();
+
 	// Canonical (locale-stripped) path, re-localized to each target locale. Full reload
 	// on switch keeps server render + <html lang> authoritative (no cookie strategy).
 	const canonical = $derived(deLocalizeUrl(page.url).pathname);
 	const enHref = $derived(localizeHref(canonical, { locale: 'en' }));
 	const zhHref = $derived(localizeHref(canonical, { locale: 'zh' }));
 	const locale = $derived(getLocale());
+
+	const idle = $derived(
+		onDark
+			? 'text-band-foreground-muted transition-colors hover:text-band-foreground'
+			: 'text-foreground-muted transition-colors hover:text-foreground'
+	);
+	const current = $derived(onDark ? 'text-band-brand' : 'text-brand-bright');
 
 	/**
 	 * `locale_switch` — `prd.md` R-SEO-5. The direct measure of whether the bilingual path is
@@ -33,21 +49,23 @@
 		data-sveltekit-reload
 		class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand {locale ===
 		'en'
-			? 'text-brand-bright'
-			: 'text-foreground-muted transition-colors hover:text-foreground'}"
+			? current
+			: idle}"
 		aria-label="Switch to English"
 	>
 		EN
 	</a>
-	<span class="text-foreground-subtle" aria-hidden="true">|</span>
+	<span class={onDark ? 'text-band-foreground-subtle' : 'text-foreground-subtle'} aria-hidden="true"
+		>|</span
+	>
 	<a
 		href={zhHref}
 		onclick={() => onSwitch('zh')}
 		data-sveltekit-reload
 		class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand {locale ===
 		'zh'
-			? 'text-brand-bright'
-			: 'text-foreground-muted transition-colors hover:text-foreground'}"
+			? current
+			: idle}"
 		aria-label="切换为中文"
 	>
 		中文

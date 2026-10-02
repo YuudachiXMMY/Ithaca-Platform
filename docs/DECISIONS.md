@@ -198,3 +198,57 @@ event. Measured at **5.12 s**, but it means the font never applies on a first vi
 from cache on the second page. Worth taking only if `/zh` LCP matters more than a first-time
 visitor seeing the typeface. The other lever is the logo: it is `/zh`'s LCP element, and nothing has
 been done to it.
+
+---
+
+### Header chrome: one ground signal, and a scrim to make it true
+
+**Reported as** "the top menu's text is hard to see on home / about-us / EV / Ithaca Dialogues /
+Engineering Projects / Summer & Winter Camps; some pages may need `logo-ink.png`".
+
+**Measured before the change**, by sampling the actual rendered pixels behind every piece of header
+chrome on all 28 sitemap routes at desktop and mobile: **40 of 84 elements below 4.5:1**, the worst
+at **1.01:1** — not "hard to read", invisible.
+
+| route                                                                            | nav links, unscrolled | mobile hamburger |
+| -------------------------------------------------------------------------------- | --------------------- | ---------------- |
+| `/`, `/about-us`                                                                 | 1.0–1.7               | 1.16–1.57        |
+| `/programs/{ev-challenge,engineering-projects,summer-winter-camps,ithaca-night}` | **1.01**–1.88         | 1.26–1.88        |
+| `/programs/{ithaca-dialogues,ai-entrepreneurship-camp}` (split heroes)           | 1.62–3.57             | 1.42             |
+| `/programs`, `/admissions`, `/results`, `/contact-us`, `/privacy`, `/terms`      | 7.4–8.9 ✓             | 9.3 ✓            |
+
+**Root cause.** The ground was decided _twice_. `Header.svelte` had a path test that chose between
+`logo.png` and `logo-ink.png`; the nav links, the hamburger and the language switcher had no test at
+all and kept the §8.2 light palette's ink tokens on every route. The logo was right and everything
+beside it was wrong, which is why the report reads as two separate problems.
+
+| decision                                                           | why                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **One predicate**, `headerOnDark()` in `$lib/data/nav`             | The wordmark and the links can no longer be told different things about the same background. The logo swap is now a _consequence_ of the ground, not a parallel opinion about it.                                                                                                                                                                        |
+| **Dark state uses the existing `band-*` scale**, not ad-hoc whites | `app.css` already publishes `band-foreground-muted` at 10.37:1 and `band-brand` at 7.94:1 _on navy-900_. Reusing them means the header inherits numbers that were already argued for.                                                                                                                                                                    |
+| **A gradient scrim under the transparent header**                  | Without it, "white text on a dark hero" is a hope, not a property. The EV Challenge photo has a bright green patch that leaves even **pure white at 3.2:1**, and the two split heroes put a white panel under half the bar. The scrim makes the ground a known quantity across the full width, so a future hero photo cannot quietly break the contract. |
+| **Scrolled bar 70% → 90% opaque**                                  | At 70% the bar's contrast still depended on the page content scrolling under it: the hamburger measured **4.29:1** on `/`. This was pre-existing and nothing had ever looked at it.                                                                                                                                                                      |
+
+**Split heroes — provisional.** `/programs/ithaca-dialogues` and `/programs/ai-entrepreneurship-camp`
+put a photo under one half of the bar and a white panel under the other, so no single text colour
+works. The owner chose the full-width scrim for consistency with the other six dark pages, knowing
+it washes the white half (2026-10-01: _"先尝试使用这个方案，后续如果效果不佳再尝试其他方案"_). **If it reads
+badly, the fallback is to drop those two routes out of `headerOnDark()` and let them use the solid
+scrolled-style bar instead** — the predicate is one function and the contrast spec will confirm the
+result either way.
+
+**Why nothing caught this.** `a11y.spec.ts` runs axe on every page in both locales and was green
+throughout. axe reports text-over-image contrast as **incomplete**, never as a violation, so it is
+structurally blind to this entire defect class. `e2e/header-contrast.spec.ts` now samples the real
+pixels — hiding the header's _content_ while keeping its _decoration_, since the scrim and the
+scrolled background are painted by the header itself and are part of the ground.
+
+**One more, found in review.** `headerOnDark` is a path prefix, so an unmatched
+`/programs/<typo>` — a stale WeChat share, a bookmark, a slug renamed later — satisfied it while
+rendering `+error.svelte`, which is a plain **white** page. The old code got this subtly wrong (the
+white wordmark on white); the scrim made it conspicuous, painting a navy band across the 404. Fixed
+by keying on `page.status < 400` rather than by allowlisting slugs, which covers every error page at
+once including routes that do not exist yet. The sitemap cannot list a 404, so the sweep above was
+structurally blind to it and the spec now checks that route by name.
+
+**After:** 0 of 84 below 4.5:1, both viewports, unscrolled and scrolled. `lhci` still exits 0.
