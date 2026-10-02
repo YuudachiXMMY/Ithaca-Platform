@@ -127,6 +127,12 @@ npm run dev                                         # Vite dev server -> http://
 
 The production server (`node build/index.js`, and the Docker image) listens on **:3000**.
 
+**Never rebuild underneath a running `node build/index.js`.** adapter-node serves
+`build/client` through `sirv`, which indexes that directory **once at startup**, so every
+newly hashed chunk 404s after a rebuild. The page still renders -- the HTML is prerendered --
+but it never hydrates, so nothing is clickable, the header never leaves its initial state,
+and no error is shown. Use `npm run preview:prod`, which always starts from a fresh build.
+
 ### Key npm Scripts
 
 | Command                     | Description                                                 |
@@ -134,6 +140,7 @@ The production server (`node build/index.js`, and the Docker image) listens on *
 | `npm run dev`               | Vite dev server (default `:5173`)                           |
 | `npm run build`             | Production build (adapter-node -> `build/index.js`)         |
 | `npm run preview`           | Preview the production build                                |
+| `npm run preview:prod`      | Build, then serve it on `:4399` (override with `PORT`)      |
 | `npm run start`             | Run the built server (`node build/index.js`)                |
 | `npm run check`             | `paraglide-js compile` + `svelte-kit sync` + `svelte-check` |
 | `npm run lint`              | `eslint .` + `prettier --check .`                           |
