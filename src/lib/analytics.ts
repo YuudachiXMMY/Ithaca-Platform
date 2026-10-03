@@ -69,6 +69,11 @@ export type EventLocation =
 	| 'programs_index'
 	| 'home_showcase'
 	| 'program_page'
+	// Two anchors on `/admissions` reach `#book`: the hero's primary button ("Talk to us") and the
+	// tuition section's text link ("Ask about tuition"). Same destination, two different questions —
+	// one asked before reading anything, one asked after seeing that no price is published. They are
+	// worth telling apart, and `location` is the dimension that does it.
+	| 'admissions_hero'
 	| 'admissions_tuition'
 	| 'admissions_booking'
 	// `/results` — the "read about the programme that produced this" link on a timeline entry.
@@ -171,7 +176,7 @@ export function trackInquirySubmit(input: {
 
 /** A click on the path to booking a consultation (`prd.md` R-ADM-6). */
 export function trackBookingClick(input: {
-	location: Extract<EventLocation, 'admissions_tuition' | 'admissions_booking'>;
+	location: Extract<EventLocation, 'admissions_hero' | 'admissions_tuition' | 'admissions_booking'>;
 	locale: Locale;
 }): void {
 	track('booking_click', { location: input.location, locale: input.locale });

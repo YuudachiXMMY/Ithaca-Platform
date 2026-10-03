@@ -6,6 +6,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import { trackPhoneTap } from '$lib/analytics';
 	import NewsletterForm from '$lib/components/NewsletterForm.svelte';
+	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
 	import WeChatQr from '$lib/components/contact/WeChatQr.svelte';
 	import logo from '$lib/assets/site/logo-ink.png?enhanced';
 
@@ -44,6 +45,27 @@
 				<p class="mt-3 max-w-xs text-sm leading-relaxed text-foreground-muted">
 					{m.common_footer_tagline()}
 				</p>
+
+				<!-- The locale switch. It used to sit in the header bar beside Contact Us; it moved here
+				     when the bar grew to seven top-level items, because the two together needed 459.5px
+				     of a 412px column at 1024px (the arithmetic is in `RIGHT_NAV_HREFS`).
+
+				     This is a real cost, not a free rearrangement: the PRD's central hypothesis is that
+				     a native-language admissions path converts Chinese-speaking parents, and the switch
+				     is how they get onto it. Two things carry the discoverability the header gave up:
+				     `LocaleSuggestion.svelte` offers /zh unprompted to a browser that asks for Chinese,
+				     and this copy sits in the FIRST footer column under the logo — visually at the top
+				     of the footer and early in reading order — at body size with a real label, rather
+				     than tucked into the 12px legal bar where it would technically still exist.
+				     `locale_switch` is unchanged, so the measurement survives the move. -->
+				<div class="mt-5">
+					<h3 class="text-sm font-semibold tracking-wider text-foreground uppercase">
+						{m.common_footer_language()}
+					</h3>
+					<div class="mt-2">
+						<LanguageSwitcher />
+					</div>
+				</div>
 			</div>
 
 			<!-- Quick Links column -->

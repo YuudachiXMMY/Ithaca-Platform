@@ -1,11 +1,14 @@
 <script lang="ts">
+	import { ArrowRight } from 'lucide-svelte';
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
 	import * as publicEnv from '$env/static/public';
 	import { getLocale } from '$lib/paraglide/runtime';
 	import Seo from '$lib/components/Seo.svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
+	import PageHero from '$lib/components/shared/PageHero.svelte';
 	import AdmissionsSteps from '$lib/components/admissions/AdmissionsSteps.svelte';
+	import AdmissionsGlance from '$lib/components/admissions/AdmissionsGlance.svelte';
 	import SeasonCalendar from '$lib/components/admissions/SeasonCalendar.svelte';
 	import BookingEmbed from '$lib/components/admissions/BookingEmbed.svelte';
 	import EnquiryForm from '$lib/components/contact/EnquiryForm.svelte';
@@ -16,6 +19,18 @@
 	import { POLICY_TOPICS, type PolicyTopicId } from '$lib/content/admissions';
 	import { trackBookingClick } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
+
+	/**
+	 * The hero photograph.
+	 *
+	 * Chosen against a specific failure: the first candidate here was a student mid-pitch with the
+	 * presentation screen filling the frame, and at hero scale the slide's own headline ("Product")
+	 * sat beside this page's `<h1>` at comparable size and weight. A photograph with large legible
+	 * type in it competes with the headline instead of carrying it. This one has no text in frame —
+	 * it is the EV team with the vehicle they built, which is also the most concrete answer the site
+	 * has to the question a parent opens `/admissions` asking.
+	 */
+	import heroImage from '$lib/assets/programs/ev-challenge/EV26-4.jpg?enhanced';
 
 	/**
 	 * `/admissions` — `prd.md` §7.5 (R-ADM-1…7).
@@ -75,67 +90,92 @@
 		PROGRAMS.find((program) => program.slug === paramProgram)?.name[locale] ?? null
 	);
 
-	const sectionClass = 'border-t border-border';
+	/**
+	 * SECTION GROUNDS — the surface ladder, not a hairline.
+	 *
+	 * Every section used to be `border-t border-border` on one background, which is why the page
+	 * scrolled as one undifferentiated column: eight sections, one ground, one layout. The rest of
+	 * the site separates sections by SURFACE (`about-us` alternates surface-0 / surface-3, the
+	 * homepage drops to surface-4 for its data band) and reserves dark ground for photography. These
+	 * alternate the same way, so a reader can see where one answer ends and the next begins.
+	 */
 	const containerClass = 'mx-auto w-full max-w-[1400px] px-5 py-14 sm:px-8 md:px-[6vw] md:py-20';
 	const eyebrowClass = 'font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase';
-	const headingClass = 'mt-6 text-2xl font-bold tracking-tight text-foreground md:text-3xl';
+	const headingClass = 'text-2xl font-bold tracking-tight text-foreground md:text-4xl';
 </script>
 
 <Seo title={m.admissions_hero_title()} description={m.admissions_meta_description()} />
 
-{#snippet sectionHead(eyebrow: string, heading: string, description?: string)}
-	<p class={eyebrowClass}>{eyebrow}</p>
+<!--
+  SECTION HEADS — eyebrow optional, and rationed.
+
+  Every section on this page carried one, so all seven read as interchangeable slots in a template.
+  Three remain (hero, the process, the policies) and the rest lead with the heading, which is what
+  the about-us and programme pages do. The eyebrow is now opt-IN rather than a required argument,
+  so adding one back is a visible decision in the markup rather than a default.
+-->
+{#snippet sectionHead(heading: string, description?: string, eyebrow?: string)}
+	{#if eyebrow}
+		<p class={eyebrowClass}>{eyebrow}</p>
+	{/if}
+	<h2 class="{headingClass} {eyebrow ? 'mt-6' : ''}">{heading}</h2>
 	<div
-		class="mt-4 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+		class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 		aria-hidden="true"
 	></div>
-	<h2 class={headingClass}>{heading}</h2>
 	{#if description}
-		<p class="mt-4 max-w-[60ch] text-base leading-relaxed text-foreground-muted">{description}</p>
+		<p class="mt-6 max-w-[60ch] text-base leading-relaxed text-foreground-muted">{description}</p>
 	{/if}
 {/snippet}
 
-<div class="min-h-screen bg-background">
-	<!-- 1. Hero — the page's single <h1>. SSR-visible (no Reveal above the fold). -->
-	<section class="px-5 pt-28 pb-12 sm:px-8 md:px-[6vw] md:pt-32 md:pb-14">
-		<div class="mx-auto max-w-[1400px] text-center">
-			<p class={eyebrowClass}>{m.admissions_hero_eyebrow()}</p>
-			<div
-				class="mx-auto mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-				aria-hidden="true"
-			></div>
-			<h1
-				class="mt-8 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-light tracking-tight text-foreground"
+<div class="bg-background">
+	<!-- 1. Hero — the page's single <h1>, over a photograph, in the idiom every other top-level page
+	     already uses. SSR-visible (no Reveal above the fold). `/admissions` is registered in
+	     `headerOnDark()` so the bar switches to its band palette over this ground. -->
+	<PageHero
+		hero={heroImage}
+		heroAlt={m.admissions_hero_imageAlt()}
+		eyebrow={m.admissions_hero_eyebrow()}
+		title={m.admissions_hero_title()}
+		description={m.admissions_hero_description()}
+		headingId="admissions-heading"
+	>
+		{#snippet actions()}
+			<!-- `booking_click` — R-SEO-5, fired from `admissions_hero`.
+			     ONE primary action on this page, and it is this one. The tuition section links to the
+			     same `#book` but as a text link with its own narrower label, so the page has a single
+			     filled button rather than two competing for the same colour. -->
+			<a
+				href="#book"
+				onclick={() => trackBookingClick({ location: 'admissions_hero', locale })}
+				class="inline-flex h-12 items-center justify-center bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
 			>
-				{m.admissions_hero_title()}
-			</h1>
-			<p class="mx-auto mt-4 max-w-xl text-base leading-relaxed text-foreground-muted md:text-lg">
-				{m.admissions_hero_description()}
-			</p>
-		</div>
-	</section>
+				{m.admissions_book_title()}
+			</a>
+		{/snippet}
+	</PageHero>
 
-	<!-- 2. R-ADM-1 — the five steps. -->
-	<section class={sectionClass}>
+	<!-- 2. The three figures the hero deliberately does not carry, derived from the same rows the
+	     calendar below renders. -->
+	<AdmissionsGlance rows={calendar} />
+
+	<!-- 3. R-ADM-1 — the five steps, as a photo/rail split. -->
+	<section class="bg-surface-0">
 		<div class={containerClass}>
 			<Reveal y={24}>
-				{@render sectionHead(m.admissions_steps_eyebrow(), m.admissions_steps_title())}
-				<div class="mt-10">
+				{@render sectionHead(m.admissions_steps_title(), undefined, m.admissions_steps_eyebrow())}
+				<div class="mt-12">
 					<AdmissionsSteps />
 				</div>
 			</Reveal>
 		</div>
 	</section>
 
-	<!-- 3. R-ADM-2 — season calendar, generated from every non-closed Season. -->
-	<section class={sectionClass}>
+	<!-- 4. R-ADM-2 — season calendar, generated from every non-closed Season. -->
+	<section class="bg-surface-3">
 		<div class={containerClass}>
 			<Reveal y={24}>
-				{@render sectionHead(
-					m.admissions_calendar_eyebrow(),
-					m.admissions_calendar_title(),
-					m.admissions_calendar_description()
-				)}
+				{@render sectionHead(m.admissions_calendar_title(), m.admissions_calendar_description())}
 				<div class="mt-10">
 					<SeasonCalendar rows={calendar} />
 				</div>
@@ -143,11 +183,11 @@
 		</div>
 	</section>
 
-	<!-- 4. R-ADM-3 — tuition, obeying each current season's `tuition.display`. -->
-	<section class={sectionClass}>
+	<!-- 5. R-ADM-3 — tuition, obeying each current season's `tuition.display`. -->
+	<section class="bg-surface-0">
 		<div class={containerClass}>
 			<Reveal y={24}>
-				{@render sectionHead(m.admissions_tuition_eyebrow(), m.admissions_tuition_title())}
+				{@render sectionHead(m.admissions_tuition_title())}
 
 				{#if anyByEnquiry}
 					<p class="mt-6 max-w-[70ch] text-base leading-relaxed text-foreground-muted">
@@ -205,25 +245,39 @@
 				<!-- `booking_click` — R-SEO-5. This anchor is the booking intent that EXISTS today:
 				     PUBLIC_BOOKING_URL is unset (docs/DECISIONS.md Q6), so the provider link inside
 				     BookingEmbed never renders, and an event fired only there would report zero for
-				     as long as the variable stays unset. `location` keeps the two distinguishable. -->
+				     as long as the variable stays unset. `location` keeps the two distinguishable.
+
+				     A text link, not a second filled button. The hero already carries this page's one
+				     primary action; a second slab of the same colour halfway down competes with it
+				     rather than reinforcing it. The label stays specific to the question this section
+				     raises ("what does it cost") — a different question from the hero's, asked in the
+				     place a reader has just thought of it. -->
 				<a
 					href="#book"
 					onclick={() => trackBookingClick({ location: 'admissions_tuition', locale })}
-					class="mt-10 inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
+					class="group mt-10 inline-flex w-fit items-center gap-2 text-sm font-semibold text-brand-bright underline underline-offset-4 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 				>
 					{m.admissions_tuition_cta()}
+					<ArrowRight
+						class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
+						aria-hidden="true"
+					/>
 				</a>
 			</Reveal>
 		</div>
 	</section>
 
-	<!-- 5. R-ADM-4 — policies. The three headings are the requirement; the terms themselves are a
+	<!-- 6. R-ADM-4 — policies. The three headings are the requirement; the terms themselves are a
 	     CONTENT-GAPS C-3 blocker, so the page says how to get the current version rather than
 	     paraphrasing a refund policy nobody has written. A family would rely on that paraphrase. -->
-	<section class={sectionClass}>
+	<section class="bg-surface-2">
 		<div class={containerClass}>
 			<Reveal y={24}>
-				{@render sectionHead(m.admissions_policies_eyebrow(), m.admissions_policies_title())}
+				{@render sectionHead(
+					m.admissions_policies_title(),
+					undefined,
+					m.admissions_policies_eyebrow()
+				)}
 				<!-- The three topics are LABELS, not sections: there is no text under them yet, and three
 				     bordered cards each containing only a heading read as a rendering fault. One panel
 				     naming the three and saying how to get the current terms is the honest shape. -->
@@ -243,14 +297,14 @@
 		</div>
 	</section>
 
-	<!-- 6. R-ADM-5 — FAQ. ADMISSIONS_FAQ is empty today (faq.ts carries the TODO(content)), and an
+	<!-- 7. R-ADM-5 — FAQ. ADMISSIONS_FAQ is empty today (faq.ts carries the TODO(content)), and an
 	     empty disclosure list is worse than no section: placeholder questions would read as answers.
 	     The section appears the moment the owner supplies entries. -->
 	{#if ADMISSIONS_FAQ.length > 0}
-		<section class={sectionClass}>
+		<section class="bg-surface-0">
 			<div class={containerClass}>
 				<Reveal y={24}>
-					{@render sectionHead(m.admissions_faq_eyebrow(), m.admissions_faq_title())}
+					{@render sectionHead(m.admissions_faq_title())}
 					<div class="mt-10 max-w-[80ch]">
 						{#each ADMISSIONS_FAQ as item (item.q.en)}
 							<details class="group border-b border-border">
@@ -280,20 +334,16 @@
 		</section>
 	{/if}
 
-	<!-- 7. R-ADM-6 / R-ADM-7 — #book. With BOOKING_URL configured this is a lazily-mounted embed
+	<!-- 8. R-ADM-6 / R-ADM-7 — #book. With BOOKING_URL configured this is a lazily-mounted embed
 	     beside a plain link; unset (today) it degrades to the enquiry form, which is the same form
 	     /contact-us posts, so the two paths cannot drift. -->
 	<!-- scroll-margin so the sticky header does not cover the heading when /admissions#book lands.
 	     `--spacing-nav` was removed with the design-system pass (it had zero consumers); every call
 	     site writes the arbitrary value instead. -->
-	<section id="book" class="scroll-mt-[var(--nav-h)] {sectionClass}">
+	<section id="book" class="scroll-mt-[var(--nav-h)] bg-surface-3">
 		<div class={containerClass}>
 			<Reveal y={24}>
-				{@render sectionHead(
-					m.admissions_book_eyebrow(),
-					m.admissions_book_title(),
-					m.admissions_book_description()
-				)}
+				{@render sectionHead(m.admissions_book_title(), m.admissions_book_description())}
 
 				{#if BOOKING_URL}
 					{#if paramProgramName}

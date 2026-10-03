@@ -183,16 +183,39 @@
 		<!-- Community gallery - horizontal scroll -->
 		<Reveal y={24} duration={500}>
 			<div class="mt-10">
-				<h3 class="mb-4 text-xl font-bold text-foreground">
+				<h3 id="about-community-gallery" class="mb-4 text-xl font-bold text-foreground">
 					{m.about_highlights_community_heading()}
 				</h3>
 
 				<div class="relative overflow-hidden">
+					<!-- `tabindex="0"` + a role + a name, because this track scrolls horizontally and
+					     contains nothing focusable — the cards are images in plain divs, and the dot
+					     buttons that page it sit OUTSIDE the scroller. A keyboard user therefore had no
+					     way to reach the images past the first screenful (WCAG 2.1.1 / 2.1.3; axe
+					     `scrollable-region-focusable`, serious). This was a live defect for as long as
+					     the gallery has existed and nothing caught it, because `/about-us` was not in
+					     `e2e/a11y.spec.ts` until the Our Team page put it there.
+
+					     Named by the <h3> above rather than a new message: the heading already says what
+					     this is, and a second string would be a second thing to translate and keep.
+
+					     The two linters disagree about this and axe is the one that is right. Svelte's
+					     `a11y_no_noninteractive_tabindex` says a `role="group"` must not be in the tab
+					     order; axe's `scrollable-region-focusable` (WCAG 2.1.1) says a scroller with no
+					     focusable content must be. A scrollable region is the documented exception —
+					     the tab stop IS the only way to operate it — so the Svelte rule is suppressed
+					     here rather than the WCAG failure left in place. The `svelte-ignore` below
+					     carries no prose because such a comment parses every trailing word as another
+					     rule name and then fails `svelte/no-unused-svelte-ignore`. -->
+					<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 					<div
 						bind:this={scrollRef}
 						onscroll={handleScroll}
 						data-gallery-track
-						class="flex snap-x snap-mandatory gap-3 overflow-x-auto"
+						tabindex="0"
+						role="group"
+						aria-labelledby="about-community-gallery"
+						class="flex snap-x snap-mandatory gap-3 overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 						style="scrollbar-width: none; -ms-overflow-style: none;"
 					>
 						{#each communityImages as img, i (i)}
