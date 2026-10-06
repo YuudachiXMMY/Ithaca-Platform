@@ -30,21 +30,24 @@
 	};
 </script>
 
-<section class="bg-[#0c0e12] py-14 md:py-20" aria-labelledby="team-heading">
+<section class="bg-surface-3 py-14 md:py-20" aria-labelledby="team-heading">
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={20} duration={500}>
 			<div>
 				<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
 					{m.about_team_eyebrow()}
 				</p>
-				<h2 id="team-heading" class="mt-4 text-2xl font-bold tracking-tight text-white md:text-4xl">
+				<h2
+					id="team-heading"
+					class="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-4xl"
+				>
 					{m.about_team_heading()}
 				</h2>
 				<div
 					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 					aria-hidden="true"
 				></div>
-				<p class="mt-6 max-w-md text-base leading-relaxed text-white/60">
+				<p class="mt-6 max-w-md text-base leading-relaxed text-foreground-muted">
 					{m.about_team_subtitle()}
 				</p>
 			</div>
@@ -55,7 +58,7 @@
 			{#each TEAM_MEMBERS as member, i (member.name)}
 				<Reveal y={20} duration={400} delay={i * 50}>
 					<div>
-						<div class="relative aspect-[3/4] overflow-hidden bg-[#111318]">
+						<div class="relative aspect-[3/4] overflow-hidden bg-surface-0">
 							{#if TEAM_IMAGE[member.name]}
 								<enhanced:img
 									src={TEAM_IMAGE[member.name]}
@@ -66,9 +69,9 @@
 								/>
 							{/if}
 						</div>
-						<h4 class="mt-3 text-sm font-bold text-white">{member.name}</h4>
+						<h4 class="mt-3 text-sm font-bold text-foreground">{member.name}</h4>
 						<p class="text-xs font-medium text-brand-bright">{teamMsg(member.title)}</p>
-						<p class="mt-1 text-xs leading-relaxed text-white/60">
+						<p class="mt-1 text-xs leading-relaxed text-foreground-muted">
 							{teamMsg(member.description)}
 						</p>
 					</div>

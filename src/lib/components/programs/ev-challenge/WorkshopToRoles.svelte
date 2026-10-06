@@ -270,7 +270,7 @@
 					{#each ROLES_LEFT as role, i (i)}
 						{@const Icon = role.icon}
 						<div
-							class="group cursor-default border border-border p-8 transition-colors hover:border-brand/40 hover:bg-foreground/[0.02] lg:p-10"
+							class="group cursor-default border border-border bg-surface-0 p-8 transition-colors hover:border-brand/40 hover:bg-surface-1 lg:p-10"
 						>
 							<Icon
 								class="mb-6 h-8 w-8 text-brand transition-colors group-hover:text-brand-bright lg:h-10 lg:w-10"
@@ -279,7 +279,7 @@
 							<h3 class="mb-3 text-base font-semibold text-foreground lg:text-lg">
 								{role.title()}
 							</h3>
-							<p class="max-w-[36ch] text-sm leading-relaxed text-foreground/50">
+							<p class="max-w-[36ch] text-sm leading-relaxed text-foreground-subtle">
 								{role.description()}
 							</p>
 						</div>
@@ -289,7 +289,7 @@
 					{#each ROLES_RIGHT as role, i (i)}
 						{@const Icon = role.icon}
 						<div
-							class="group cursor-default border border-border p-8 transition-colors hover:border-brand/40 hover:bg-foreground/[0.02] lg:p-10"
+							class="group cursor-default border border-border bg-surface-0 p-8 transition-colors hover:border-brand/40 hover:bg-surface-1 lg:p-10"
 						>
 							<Icon
 								class="mb-6 h-8 w-8 text-brand transition-colors group-hover:text-brand-bright lg:h-10 lg:w-10"
@@ -298,7 +298,7 @@
 							<h3 class="mb-3 text-base font-semibold text-foreground lg:text-lg">
 								{role.title()}
 							</h3>
-							<p class="max-w-[36ch] text-sm leading-relaxed text-foreground/50">
+							<p class="max-w-[36ch] text-sm leading-relaxed text-foreground-subtle">
 								{role.description()}
 							</p>
 						</div>
@@ -356,7 +356,7 @@
 						{#each ROLES_LEFT as role, i (i)}
 							{@const Icon = role.icon}
 							<div
-								class="wtr-card group cursor-default border border-border p-3 transition-colors will-change-transform hover:border-brand/40 hover:bg-foreground/[0.02] md:p-8 lg:p-10"
+								class="wtr-card group cursor-default border border-border bg-surface-0 p-3 transition-colors will-change-transform hover:border-brand/40 hover:bg-surface-1 md:p-8 lg:p-10"
 							>
 								<Icon
 									class="mb-2 h-5 w-5 text-brand transition-colors group-hover:text-brand-bright md:mb-5 md:h-8 md:w-8 lg:mb-6 lg:h-10 lg:w-10"
@@ -368,7 +368,7 @@
 									{role.title()}
 								</h3>
 								<p
-									class="hidden max-w-[36ch] text-[11px] leading-relaxed text-foreground/50 sm:block md:text-sm"
+									class="hidden max-w-[36ch] text-[11px] leading-relaxed text-foreground-subtle sm:block md:text-sm"
 								>
 									{role.description()}
 								</p>
@@ -380,7 +380,7 @@
 						{#each ROLES_RIGHT as role, i (i)}
 							{@const Icon = role.icon}
 							<div
-								class="wtr-card group cursor-default border border-border p-3 transition-colors will-change-transform hover:border-brand/40 hover:bg-foreground/[0.02] md:p-8 lg:p-10"
+								class="wtr-card group cursor-default border border-border bg-surface-0 p-3 transition-colors will-change-transform hover:border-brand/40 hover:bg-surface-1 md:p-8 lg:p-10"
 							>
 								<Icon
 									class="mb-2 h-5 w-5 text-brand transition-colors group-hover:text-brand-bright md:mb-5 md:h-8 md:w-8 lg:mb-6 lg:h-10 lg:w-10"
@@ -392,7 +392,7 @@
 									{role.title()}
 								</h3>
 								<p
-									class="hidden max-w-[36ch] text-[11px] leading-relaxed text-foreground/50 sm:block md:text-sm"
+									class="hidden max-w-[36ch] text-[11px] leading-relaxed text-foreground-subtle sm:block md:text-sm"
 								>
 									{role.description()}
 								</p>

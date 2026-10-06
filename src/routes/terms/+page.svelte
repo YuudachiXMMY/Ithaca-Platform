@@ -9,7 +9,7 @@
 	<h1 class="mb-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
 		{m.legal_terms_title()}
 	</h1>
-	<p class="mb-8 text-sm text-foreground/50">{m.legal_terms_updated()}</p>
+	<p class="mb-8 text-sm text-foreground-subtle">{m.legal_terms_updated()}</p>
 	<div class="space-y-4 leading-relaxed text-foreground/70">
 		<p>{m.legal_terms_body_0()}</p>
 		<p>{m.legal_terms_body_1()}</p>

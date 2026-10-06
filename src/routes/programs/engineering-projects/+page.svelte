@@ -11,6 +11,7 @@
 />
 
 <PlaceholderProgram
+	slug="engineering-projects"
 	hero={heroImage}
 	heroAlt="Students collaborating on engineering projects"
 	title={m.programs_index_cards_engineering_title()}

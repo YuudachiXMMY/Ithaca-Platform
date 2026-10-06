@@ -108,7 +108,7 @@
 	}
 </script>
 
-<section class="bg-[#111318] py-14 md:py-20" aria-labelledby="highlights-heading">
+<section class="bg-surface-0 py-14 md:py-20" aria-labelledby="highlights-heading">
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={20} duration={500}>
 			<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
@@ -116,7 +116,7 @@
 			</p>
 			<h2
 				id="highlights-heading"
-				class="mt-4 text-2xl font-bold tracking-tight text-white md:text-4xl"
+				class="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-4xl"
 			>
 				{m.about_highlights_heading()}
 			</h2>
@@ -129,7 +129,7 @@
 		<!-- Featured spotlight: Andy Song - prominent display -->
 		<Reveal y={24} duration={500}>
 			<div class="mt-8 grid grid-cols-1 items-end gap-5 lg:grid-cols-[5fr_2fr] lg:gap-8">
-				<div bind:this={featuredRef} class="relative aspect-video overflow-hidden bg-[#0c0e12]">
+				<div bind:this={featuredRef} class="relative aspect-video overflow-hidden bg-surface-3">
 					{#if featuredVisible}
 						<iframe
 							class="absolute inset-0 h-full w-full"
@@ -141,7 +141,7 @@
 					{/if}
 				</div>
 				<div class="pb-1">
-					<p class="text-xl leading-tight font-bold tracking-tight text-white lg:text-2xl">
+					<p class="text-xl leading-tight font-bold tracking-tight text-foreground lg:text-2xl">
 						{m.about_highlights_andySong_name()}
 					</p>
 					<p class="mt-1.5 text-sm font-medium text-brand-bright">
@@ -151,7 +151,7 @@
 						class="my-4 h-px w-8 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 						aria-hidden="true"
 					></div>
-					<p class="text-sm leading-relaxed text-white/60">
+					<p class="text-sm leading-relaxed text-foreground-muted">
 						{m.about_highlights_andySong_description()}
 					</p>
 				</div>
@@ -163,7 +163,7 @@
 			<div bind:this={galleryRef} class="mt-8 grid max-w-[560px] grid-cols-3 gap-3">
 				{#each videos as video (video.src)}
 					<div>
-						<div class="relative aspect-[9/16] overflow-hidden bg-[#0c0e12]">
+						<div class="relative aspect-[9/16] overflow-hidden bg-surface-3">
 							{#if galleryVisible}
 								<iframe
 									class="absolute inset-0 h-full w-full"
@@ -174,7 +174,7 @@
 								></iframe>
 							{/if}
 						</div>
-						<p class="mt-1.5 line-clamp-2 text-xs text-white/50">{video.caption()}</p>
+						<p class="mt-1.5 line-clamp-2 text-xs text-foreground-subtle">{video.caption()}</p>
 					</div>
 				{/each}
 			</div>
@@ -183,16 +183,39 @@
 		<!-- Community gallery - horizontal scroll -->
 		<Reveal y={24} duration={500}>
 			<div class="mt-10">
-				<h3 class="mb-4 text-xl font-bold text-white">
+				<h3 id="about-community-gallery" class="mb-4 text-xl font-bold text-foreground">
 					{m.about_highlights_community_heading()}
 				</h3>
 
 				<div class="relative overflow-hidden">
+					<!-- `tabindex="0"` + a role + a name, because this track scrolls horizontally and
+					     contains nothing focusable — the cards are images in plain divs, and the dot
+					     buttons that page it sit OUTSIDE the scroller. A keyboard user therefore had no
+					     way to reach the images past the first screenful (WCAG 2.1.1 / 2.1.3; axe
+					     `scrollable-region-focusable`, serious). This was a live defect for as long as
+					     the gallery has existed and nothing caught it, because `/about-us` was not in
+					     `e2e/a11y.spec.ts` until the Our Team page put it there.
+
+					     Named by the <h3> above rather than a new message: the heading already says what
+					     this is, and a second string would be a second thing to translate and keep.
+
+					     The two linters disagree about this and axe is the one that is right. Svelte's
+					     `a11y_no_noninteractive_tabindex` says a `role="group"` must not be in the tab
+					     order; axe's `scrollable-region-focusable` (WCAG 2.1.1) says a scroller with no
+					     focusable content must be. A scrollable region is the documented exception —
+					     the tab stop IS the only way to operate it — so the Svelte rule is suppressed
+					     here rather than the WCAG failure left in place. The `svelte-ignore` below
+					     carries no prose because such a comment parses every trailing word as another
+					     rule name and then fails `svelte/no-unused-svelte-ignore`. -->
+					<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 					<div
 						bind:this={scrollRef}
 						onscroll={handleScroll}
 						data-gallery-track
-						class="flex snap-x snap-mandatory gap-3 overflow-x-auto"
+						tabindex="0"
+						role="group"
+						aria-labelledby="about-community-gallery"
+						class="flex snap-x snap-mandatory gap-3 overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 						style="scrollbar-width: none; -ms-overflow-style: none;"
 					>
 						{#each communityImages as img, i (i)}
@@ -214,7 +237,7 @@
 					<button
 						onclick={() => scrollToIndex(Math.max(0, activeIndex - 1))}
 						aria-label={m.about_highlights_community_prevAriaLabel()}
-						class="absolute top-1/2 left-2 flex h-8 w-8 -translate-y-1/2 items-center justify-center bg-black/60 transition-colors hover:bg-black/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+						class="absolute top-1/2 left-2 flex h-8 w-8 -translate-y-1/2 items-center justify-center bg-overlay/75 transition-colors hover:bg-overlay/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 					>
 						<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 							<path
@@ -229,7 +252,7 @@
 					<button
 						onclick={() => scrollToIndex(Math.min(communityImages.length - 1, activeIndex + 1))}
 						aria-label={m.about_highlights_community_nextAriaLabel()}
-						class="absolute top-1/2 right-2 flex h-8 w-8 -translate-y-1/2 items-center justify-center bg-black/60 transition-colors hover:bg-black/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+						class="absolute top-1/2 right-2 flex h-8 w-8 -translate-y-1/2 items-center justify-center bg-overlay/75 transition-colors hover:bg-overlay/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 					>
 						<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 							<path
@@ -243,7 +266,7 @@
 					</button>
 				</div>
 
-				<p class="mt-3 max-w-2xl text-xs text-white/60">
+				<p class="mt-3 max-w-2xl text-xs text-foreground-muted">
 					{m.about_highlights_community_caption()}
 				</p>
 
@@ -256,7 +279,7 @@
 							class="h-2 w-2 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand {activeIndex ===
 							i
 								? 'bg-brand'
-								: 'bg-white/20 hover:bg-white/40'}"
+								: 'bg-border-strong hover:bg-foreground-subtle'}"
 						></button>
 					{/each}
 				</div>

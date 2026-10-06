@@ -203,10 +203,14 @@
 {#if prefersReducedMotion.current}
 	<!-- Reduced motion: the Phase-1 static stacked layout (poster + Two Tracks). -->
 	<section
-		class="border-t border-border bg-background"
+		class="border-t border-border bg-surface-2"
 		aria-label={m.programs_evChallenge_model3d_sectionAriaLabel()}
 	>
-		<div class="relative min-h-[calc(80dvh_-_var(--nav-h))] overflow-hidden">
+		<!-- The poster block is a PHOTO SCRIM, not a section: the `opacity-40`
+		     image is composited against this wrapper, so the wrapper has to stay
+		     the scrim base (navy-950) or the gradient below would be laid over a
+		     washed-out photo on white and the display copy would lose its ground. -->
+		<div class="relative min-h-[calc(80dvh_-_var(--nav-h))] overflow-hidden bg-overlay">
 			<enhanced:img
 				src={machineImg}
 				alt="The custom-built Ithaca EV trike"
@@ -214,26 +218,28 @@
 				class="absolute inset-0 h-full w-full object-cover opacity-40"
 			/>
 			<div
-				class="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30"
+				class="absolute inset-0 bg-gradient-to-t from-overlay/95 via-overlay/70 to-overlay/55"
 			></div>
 			<div
 				class="relative z-10 flex min-h-[calc(80dvh_-_var(--nav-h))] flex-col justify-between px-6 pt-[calc(var(--nav-h)_+_1rem)] pb-8 md:px-12 md:pb-12 lg:px-[8vw]"
 			>
 				<div>
-					<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl">
+					<h2
+						class="text-3xl font-bold tracking-tight text-band-foreground md:text-4xl lg:text-5xl"
+					>
 						{m.programs_evChallenge_model3d_machineName()}
 					</h2>
-					<p class="mt-2 max-w-[30ch] text-sm text-foreground/40">
+					<p class="mt-2 max-w-[30ch] text-sm text-band-foreground/80">
 						{m.programs_evChallenge_model3d_machineDesc()}
 					</p>
 				</div>
 				<div class="flex flex-wrap gap-x-8 gap-y-2">
 					{#each SPECS as spec, i (i)}
 						<div>
-							<span class="block text-[10px] tracking-wider text-foreground/30 uppercase"
+							<span class="block text-[10px] tracking-wider text-band-foreground/80 uppercase"
 								>{spec.label()}</span
 							>
-							<span class="font-mono text-xs text-foreground/60">{spec.value()}</span>
+							<span class="font-mono text-xs text-band-foreground/80">{spec.value()}</span>
 						</div>
 					{/each}
 				</div>
@@ -258,7 +264,7 @@
 						<h3 class="mb-2 text-lg font-bold tracking-tight text-foreground md:text-xl">
 							{m.programs_evChallenge_model3d_engineering_title()}
 						</h3>
-						<p class="mb-4 max-w-[40ch] text-sm leading-relaxed text-foreground/50">
+						<p class="mb-4 max-w-[40ch] text-sm leading-relaxed text-foreground-subtle">
 							{m.programs_evChallenge_model3d_engineering_description()}
 						</p>
 						<div class="flex flex-wrap gap-1.5">
@@ -284,7 +290,7 @@
 							<h3 class="mb-2 text-lg font-bold tracking-tight text-foreground md:text-xl">
 								{m.programs_evChallenge_model3d_business_title()}
 							</h3>
-							<p class="mb-4 max-w-[40ch] text-sm leading-relaxed text-foreground/50">
+							<p class="mb-4 max-w-[40ch] text-sm leading-relaxed text-foreground-subtle">
 								{m.programs_evChallenge_model3d_business_description()}
 							</p>
 							<div class="flex flex-wrap gap-1.5">
@@ -304,7 +310,7 @@
 	<!-- Animated: scroll-pinned cinematic transition over the live 3D trike. -->
 	<section
 		bind:this={sectionEl}
-		class="relative min-h-[100dvh] overflow-hidden border-t border-border bg-background"
+		class="relative min-h-[100dvh] overflow-hidden border-t border-border bg-surface-2"
 		aria-label={m.programs_evChallenge_model3d_canvasAriaLabel()}
 	>
 		<!-- Layer 0: 3D canvas (lazy, client-only) — transforms via GSAP. -->
@@ -323,8 +329,8 @@
 		<!-- Layer 1: light scrim so the 3D trike stays visible as background. -->
 		<div
 			bind:this={overlayEl}
-			class="pointer-events-none absolute inset-0 z-[1]"
-			style="opacity: 0; background: radial-gradient(ellipse at center, rgba(17,19,24,0.15), rgba(17,19,24,0.4) 60%);"
+			class="ev-scene-vignette pointer-events-none absolute inset-0 z-[1]"
+			style="opacity: 0;"
 		></div>
 
 		<!-- Layer 2: "The Machine" text overlay. -->
@@ -335,7 +341,7 @@
 				<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl">
 					{m.programs_evChallenge_model3d_machineName()}
 				</h2>
-				<p class="mt-2 max-w-[30ch] text-sm text-foreground/40">
+				<p class="mt-2 max-w-[30ch] text-sm text-foreground-subtle">
 					{m.programs_evChallenge_model3d_machineDesc()}
 				</p>
 			</div>
@@ -343,10 +349,10 @@
 			<div bind:this={machineSpecEl} class="flex flex-wrap gap-x-8 gap-y-2">
 				{#each SPECS as spec, i (i)}
 					<div>
-						<span class="block text-[10px] tracking-wider text-foreground/30 uppercase"
+						<span class="block text-[10px] tracking-wider text-foreground-subtle uppercase"
 							>{spec.label()}</span
 						>
-						<span class="font-mono text-xs text-foreground/60">{spec.value()}</span>
+						<span class="font-mono text-xs text-foreground-subtle">{spec.value()}</span>
 					</div>
 				{/each}
 			</div>
@@ -354,7 +360,7 @@
 
 		<!-- Layer 3: drag hint. -->
 		<div bind:this={hintEl} class="absolute right-6 bottom-6 z-10 md:right-12 lg:right-[8vw]">
-			<p class="text-[10px] tracking-wider text-foreground/20 uppercase">
+			<p class="text-[10px] tracking-wider text-foreground-subtle uppercase">
 				{m.programs_evChallenge_model3d_dragToRotate()}
 			</p>
 		</div>
@@ -386,7 +392,7 @@
 							{m.programs_evChallenge_model3d_engineering_title()}
 						</h3>
 						<p
-							class="mb-3 max-w-[40ch] text-xs leading-relaxed text-foreground/50 md:mb-5 md:text-sm"
+							class="mb-3 max-w-[40ch] text-xs leading-relaxed text-foreground-subtle md:mb-5 md:text-sm"
 						>
 							{m.programs_evChallenge_model3d_engineering_description()}
 						</p>
@@ -418,7 +424,7 @@
 								{m.programs_evChallenge_model3d_business_title()}
 							</h3>
 							<p
-								class="mb-3 max-w-[40ch] text-xs leading-relaxed text-foreground/50 md:mb-5 md:text-sm"
+								class="mb-3 max-w-[40ch] text-xs leading-relaxed text-foreground-subtle md:mb-5 md:text-sm"
 							>
 								{m.programs_evChallenge_model3d_business_description()}
 							</p>
@@ -439,20 +445,14 @@
 				bind:this={seamEl}
 				class="pointer-events-none absolute inset-y-0 left-1/2 z-10 hidden origin-center -translate-x-1/2 flex-col items-center lg:flex"
 			>
-				<div
-					class="w-px flex-1"
-					style="background: linear-gradient(to bottom, transparent 15%, rgba(62,143,199,0.2) 35%, rgba(62,143,199,0.35) 50%, rgba(62,143,199,0.2) 65%, transparent 85%);"
-				></div>
+				<div class="ev-seam-line w-px flex-1"></div>
 			</div>
 
 			<!-- Wider glow aura around the seam. -->
 			<div
 				class="pointer-events-none absolute inset-y-0 left-1/2 z-[5] hidden w-[100px] -translate-x-1/2 lg:block"
 			>
-				<div
-					class="h-full w-full"
-					style="background: radial-gradient(ellipse at center, rgba(62,143,199,0.04), transparent 70%);"
-				></div>
+				<div class="ev-seam-glow h-full w-full"></div>
 			</div>
 		</div>
 	</section>

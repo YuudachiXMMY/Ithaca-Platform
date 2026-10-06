@@ -29,7 +29,7 @@
 
 	let {
 		points,
-		color = '#3e8fc7',
+		color = '#0B6E70',
 		lineWidth = 1,
 		opacity = 1,
 		transparent = false

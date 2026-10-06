@@ -1,20 +1,25 @@
 <script lang="ts">
 	import { Mail, Phone, MapPin } from 'lucide-svelte';
-	import { NAV_ITEMS, navLabel } from '$lib/data/nav';
+	import { FOOTER_LINKS, navLabel } from '$lib/data/nav';
 	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
-	import { localizeHref } from '$lib/paraglide/runtime';
+	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
+	import { trackPhoneTap } from '$lib/analytics';
 	import NewsletterForm from '$lib/components/NewsletterForm.svelte';
-	import logo from '$lib/assets/site/logo.png?enhanced';
+	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
+	import WeChatQr from '$lib/components/contact/WeChatQr.svelte';
+	import logo from '$lib/assets/site/logo-ink.png?enhanced';
 
-	const QUICK_LINKS = NAV_ITEMS.filter((item) => item.href !== '/');
+	// R-GLB-2. The list (and the reasoning for what is and is not in it — notably `/results`, which
+	// lives here and nowhere else) is `FOOTER_LINKS` in $lib/data/nav.
+	const QUICK_LINKS = FOOTER_LINKS;
 
 	const currentYear = new Date().getFullYear();
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
-<footer class="border-t border-border bg-[#0d0f14]">
+<footer class="border-t border-border bg-surface-2">
 	<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 		<!-- Top grid -->
 		<div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -25,8 +30,10 @@
 					aria-label={m.common_footerHomeAriaLabel()}
 					class="inline-block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 				>
-					<!-- Below the fold: lazy. enhanced:img serves a small variant instead of the
-					     128KB full-res PNG. Static PNG retained for seo.ts og:image / JSON-LD. -->
+					<!-- The ink variant: the stock logo's wordmark is ~50%-opacity WHITE, so it is
+					     invisible on the footer's light ground. logo-ink.png keeps the blue mark and
+					     recolours only the wordmark. Below the fold, so lazy; enhanced:img serves a
+					     small variant instead of the full-res PNG. -->
 					<enhanced:img
 						src={logo}
 						alt={m.common_logoAlt()}
@@ -35,9 +42,30 @@
 						class="h-10 w-auto"
 					/>
 				</a>
-				<p class="mt-3 max-w-xs text-sm leading-relaxed text-foreground/60">
+				<p class="mt-3 max-w-xs text-sm leading-relaxed text-foreground-muted">
 					{m.common_footer_tagline()}
 				</p>
+
+				<!-- The locale switch. It used to sit in the header bar beside Contact Us; it moved here
+				     when the bar grew to seven top-level items, because the two together needed 459.5px
+				     of a 412px column at 1024px (the arithmetic is in `RIGHT_NAV_HREFS`).
+
+				     This is a real cost, not a free rearrangement: the PRD's central hypothesis is that
+				     a native-language admissions path converts Chinese-speaking parents, and the switch
+				     is how they get onto it. Two things carry the discoverability the header gave up:
+				     `LocaleSuggestion.svelte` offers /zh unprompted to a browser that asks for Chinese,
+				     and this copy sits in the FIRST footer column under the logo — visually at the top
+				     of the footer and early in reading order — at body size with a real label, rather
+				     than tucked into the 12px legal bar where it would technically still exist.
+				     `locale_switch` is unchanged, so the measurement survives the move. -->
+				<div class="mt-5">
+					<h3 class="text-sm font-semibold tracking-wider text-foreground uppercase">
+						{m.common_footer_language()}
+					</h3>
+					<div class="mt-2">
+						<LanguageSwitcher />
+					</div>
+				</div>
 			</div>
 
 			<!-- Quick Links column -->
@@ -50,7 +78,7 @@
 						<li>
 							<a
 								href={localizeHref(item.href)}
-								class="text-sm text-foreground/60 transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+								class="text-sm text-foreground-muted transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 							>
 								{navLabel(item.label)}
 							</a>
@@ -68,26 +96,42 @@
 					<li>
 						<a
 							href={CONTACT_HREFS.mailto}
-							class="flex items-start gap-2.5 text-sm text-foreground/60 transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+							class="flex items-start gap-2.5 text-sm text-foreground-muted transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 						>
 							<Mail class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
 							{CONTACT_INFO.email}
 						</a>
 					</li>
 					<li>
+						<!-- `phone_tap` (prd.md R-SEO-5): the footer number is on every page, so it is the
+						     site-wide baseline this event is measured against. -->
 						<a
 							href={CONTACT_HREFS.tel}
-							class="flex items-start gap-2.5 text-sm text-foreground/60 transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+							onclick={() => trackPhoneTap({ location: 'footer', locale: getLocale() })}
+							class="flex items-start gap-2.5 text-sm text-foreground-muted transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 						>
 							<Phone class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
 							{CONTACT_INFO.phone}
 						</a>
 					</li>
-					<li class="flex items-start gap-2.5 text-sm text-foreground/60">
+					<li class="flex items-start gap-2.5 text-sm text-foreground-muted">
 						<MapPin class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
 						{CONTACT_INFO.address}
 					</li>
 				</ul>
+
+				<!-- The WeChat QR lives on every page because WeChat is this site's primary arrival
+				     path: a parent reading a programme page inside WeChat's own browser can long-press
+				     the code without navigating anywhere. It was previously reachable only after a
+				     FAILED form submit, which made `wechat_qr_view` a near-unmeasurable event. -->
+				<div class="mt-5">
+					<h3 class="text-sm font-semibold tracking-wider text-foreground uppercase">
+						{m.wechat_footerHeading()}
+					</h3>
+					<div class="mt-3">
+						<WeChatQr location="footer" locale={getLocale()} showId />
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -98,15 +142,17 @@
 				aria-hidden="true"
 			></div>
 			<div class="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
-				<p class="text-sm text-foreground/60">{m.common_footer_newsletter()}</p>
-				<NewsletterForm />
+				<p class="text-sm text-foreground-muted">{m.common_footer_newsletter()}</p>
+				<!-- The footer ground is `bg-surface-2` (mist), so the input fill flips to
+				     `bg-surface-0` per §3.7's `bg-card-bg` row — mist on mist is 1.00:1. -->
+				<NewsletterForm onMist />
 			</div>
 		</div>
 
 		<!-- Bottom bar -->
 		<div class="mt-4 border-t border-border pt-4">
 			<div
-				class="flex flex-col items-center gap-3 text-xs text-foreground/60 sm:flex-row sm:justify-between"
+				class="flex flex-col items-center gap-3 text-xs text-foreground-muted sm:flex-row sm:justify-between"
 			>
 				<p>&copy; {currentYear} Ithaca Family Academy. {m.common_footer_rights()}</p>
 				<div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">

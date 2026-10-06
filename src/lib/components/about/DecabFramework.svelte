@@ -32,7 +32,7 @@
 	];
 </script>
 
-<section class="bg-[#0c0e12] py-14 md:py-20" aria-labelledby="decab-heading">
+<section class="bg-surface-3 py-14 md:py-20" aria-labelledby="decab-heading">
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={20} duration={500}>
 			<div>
@@ -41,7 +41,7 @@
 				</p>
 				<h2
 					id="decab-heading"
-					class="mt-6 text-2xl leading-tight font-bold tracking-tight text-white md:text-4xl"
+					class="mt-6 text-2xl leading-tight font-bold tracking-tight text-foreground md:text-4xl"
 				>
 					{m.about_decab_heading()}
 				</h2>
@@ -49,7 +49,7 @@
 					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 					aria-hidden="true"
 				></div>
-				<p class="mt-6 max-w-xl text-base leading-relaxed text-white/60">
+				<p class="mt-6 max-w-xl text-base leading-relaxed text-foreground-muted">
 					{m.about_decab_subtitle()}
 				</p>
 			</div>
@@ -59,17 +59,17 @@
 			{#each competencies as comp, i (comp.letter)}
 				<Reveal y={14} duration={400} delay={i * 60}>
 					<div
-						class="border border-white/[0.06] bg-white/[0.02] p-6 transition-all duration-300 hover:border-brand/30 hover:bg-white/[0.04] lg:p-8"
+						class="border border-border bg-surface-2 p-6 transition-all duration-300 hover:border-brand/30 hover:bg-surface-2 lg:p-8"
 					>
 						<span
 							class="inline-block font-mono text-3xl leading-none font-bold tracking-[0.2em] text-brand"
 						>
 							{comp.letter}
 						</span>
-						<h3 class="mt-4 text-sm leading-tight font-semibold text-white">
+						<h3 class="mt-4 text-sm leading-tight font-semibold text-foreground">
 							{comp.name()}
 						</h3>
-						<p class="mt-2 text-sm leading-relaxed text-white/60">
+						<p class="mt-2 text-sm leading-relaxed text-foreground-muted">
 							{comp.description()}
 						</p>
 					</div>

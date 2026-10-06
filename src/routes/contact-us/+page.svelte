@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { MapPin, Mail, Phone, MessageCircle } from 'lucide-svelte';
 	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
-	import { getCsrfToken } from '$lib/csrf-client';
+	import { getLocale } from '$lib/paraglide/runtime';
+	import { trackPhoneTap } from '$lib/analytics';
 	import Seo from '$lib/components/Seo.svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
+	import WeChatQr from '$lib/components/contact/WeChatQr.svelte';
+	import EnquiryForm from '$lib/components/contact/EnquiryForm.svelte';
 	import * as m from '$lib/paraglide/messages';
 
 	// Google Maps embed for the IFA location (lazy-mounted on scroll).
@@ -34,7 +37,10 @@
 			value: CONTACT_INFO.phone,
 			href: CONTACT_HREFS.tel,
 			external: false,
-			mono: true
+			mono: true,
+			// `phone_tap` (prd.md R-SEO-5). Flagged on the row rather than sniffed from the href so
+			// the handler cannot silently detach if the tel: builder in $lib/data/contact changes.
+			phone: true
 		},
 		{
 			icon: MessageCircle,
@@ -46,39 +52,10 @@
 		}
 	] as const;
 
-	// Contact form (Phase 3): posts to /api/contact (Zod-validated, rate-limited server-side).
-	let cf = $state({ name: '', email: '', phone: '', message: '', subscribe: true });
-	let cfStatus = $state<'idle' | 'submitting' | 'success' | 'error'>('idle');
-	let cfMessage = $state('');
-
-	async function submitContact(e: SubmitEvent) {
-		e.preventDefault();
-		cfMessage = '';
-		if (!cf.name.trim() || !cf.email.trim()) {
-			cfStatus = 'error';
-			cfMessage = m.contact_invalid();
-			return;
-		}
-		cfStatus = 'submitting';
-		try {
-			const res = await fetch('/api/contact', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json', 'x-csrf-token': getCsrfToken() },
-				body: JSON.stringify(cf)
-			});
-			const data = await res.json();
-			if (!data.success) {
-				cfStatus = 'error';
-				cfMessage = data.error ?? m.contact_error();
-				return;
-			}
-			cfStatus = 'success';
-			cf = { name: '', email: '', phone: '', message: '', subscribe: true };
-		} catch {
-			cfStatus = 'error';
-			cfMessage = m.contact_error();
-		}
-	}
+	// The form itself moved to $lib/components/contact/EnquiryForm.svelte — /admissions#book renders
+	// the same component when no booking provider is configured (prd.md R-ADM-6), and the qualification
+	// fields, the Turnstile wiring and the per-status error copy have to behave identically on both
+	// pages. A second copy is how they stop doing so.
 
 	// LazyMap: IntersectionObserver-gated Google Maps iframe (mirror LAZY_VIDEO_INTERSECTION).
 	let mapContainer = $state<HTMLDivElement | null>(null);
@@ -118,11 +95,11 @@
 					aria-hidden="true"
 				></div>
 				<h1
-					class="mt-8 text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-white"
+					class="mt-8 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-light tracking-tight text-foreground"
 				>
 					{m.contact_page_title()}
 				</h1>
-				<p class="mx-auto mt-4 max-w-xl text-base leading-relaxed text-white/60 md:text-lg">
+				<p class="mx-auto mt-4 max-w-xl text-base leading-relaxed text-foreground-muted md:text-lg">
 					{m.contact_page_description()}
 				</p>
 			</div>
@@ -137,7 +114,7 @@
 					{@const Icon = ch.icon}
 					{#snippet card()}
 						<div
-							class="group h-full border border-border/60 p-4 transition-all duration-200 hover:border-brand/40"
+							class="group h-full border border-border-strong p-4 transition-all duration-200 hover:border-brand"
 						>
 							<div class="mb-2 flex items-center gap-3">
 								<Icon class="h-4 w-4 shrink-0 text-brand" />
@@ -146,7 +123,7 @@
 								</p>
 							</div>
 							<p
-								class="text-sm leading-snug text-white/80 transition-colors group-hover:text-white {ch.mono
+								class="text-sm leading-snug text-foreground/80 transition-colors group-hover:text-foreground {ch.mono
 									? 'font-mono'
 									: ''}"
 							>
@@ -158,6 +135,9 @@
 					{#if ch.href}
 						<a
 							href={ch.href}
+							onclick={'phone' in ch && ch.phone
+								? () => trackPhoneTap({ location: 'contact_page', locale: getLocale() })
+								: undefined}
 							target={ch.external ? '_blank' : undefined}
 							rel={ch.external ? 'noopener noreferrer' : undefined}
 							class="block h-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
@@ -169,6 +149,14 @@
 					{/if}
 				{/each}
 			</div>
+
+			<!-- The WeChat card above carries the ID; this is the code itself. Separate rather than
+			     inside that card because the grid is four uniform tiles and a QR is not a one-line
+			     value — and because on this page the visitor has already decided to get in touch,
+			     which is the moment the code is worth the space. `size="md"` for the same reason. -->
+			<div class="mx-auto mt-3 max-w-[1400px] border border-border-strong p-4 sm:max-w-md">
+				<WeChatQr location="contact_page" locale={getLocale()} size="md" showId />
+			</div>
 		</Reveal>
 	</section>
 
@@ -178,133 +166,22 @@
 			<!-- Contact form (posts to /api/contact) -->
 			<Reveal y={24} delay={160}>
 				<div>
-					<h2 class="mb-5 text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+					<h2
+						class="mb-5 text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl"
+					>
 						{m.contact_page_sendMessage()}
 					</h2>
 
-					{#if cfStatus === 'success'}
-						<div
-							class="border border-brand/30 bg-brand/5 p-8 text-center"
-							role="status"
-							aria-live="polite"
-						>
-							<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
-								{m.contact_form_successTitle()}
-							</p>
-							<p class="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-white/70">
-								{m.contact_form_successMessage()}
-							</p>
-							<button
-								type="button"
-								onclick={() => {
-									cfStatus = 'idle';
-									cfMessage = '';
-								}}
-								class="mt-6 inline-flex h-11 items-center justify-center border border-white/25 px-6 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:border-white/60 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:translate-y-px active:scale-[0.97]"
-							>
-								{m.contact_form_sendAnother()}
-							</button>
-						</div>
-					{:else}
-						<form
-							class="flex flex-col gap-4"
-							onsubmit={submitContact}
-							aria-label={m.contact_page_sendMessage()}
-						>
-							<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-								<div>
-									<label for="contact-name" class="mb-1.5 block text-xs font-medium text-white/70">
-										{m.contact_form_nameLabel()} <span class="text-red-400">*</span>
-									</label>
-									<input
-										id="contact-name"
-										type="text"
-										autocomplete="name"
-										bind:value={cf.name}
-										aria-invalid={cfStatus === 'error' && !cf.name.trim()}
-										placeholder={m.contact_form_namePlaceholder()}
-										class="w-full border border-border bg-background px-3 py-2.5 text-sm text-white placeholder-white/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-									/>
-								</div>
-
-								<div>
-									<label for="contact-email" class="mb-1.5 block text-xs font-medium text-white/70">
-										{m.contact_form_emailLabel()} <span class="text-red-400">*</span>
-									</label>
-									<input
-										id="contact-email"
-										type="email"
-										autocomplete="email"
-										bind:value={cf.email}
-										aria-invalid={cfStatus === 'error' && !cf.email.trim()}
-										placeholder={m.contact_form_emailPlaceholder()}
-										class="w-full border border-border bg-background px-3 py-2.5 text-sm text-white placeholder-white/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-									/>
-								</div>
-							</div>
-
-							<div>
-								<label for="contact-phone" class="mb-1.5 block text-xs font-medium text-white/70">
-									{m.contact_form_phoneLabel()}
-								</label>
-								<input
-									id="contact-phone"
-									type="tel"
-									autocomplete="tel"
-									bind:value={cf.phone}
-									placeholder={m.contact_form_phonePlaceholder()}
-									class="w-full border border-border bg-background px-3 py-2.5 font-mono text-sm text-white placeholder-white/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-								/>
-							</div>
-
-							<div>
-								<label for="contact-message" class="mb-1.5 block text-xs font-medium text-white/70">
-									{m.contact_form_messageLabel()}
-								</label>
-								<textarea
-									id="contact-message"
-									rows="4"
-									bind:value={cf.message}
-									placeholder={m.contact_form_messagePlaceholder()}
-									class="w-full resize-y border border-border bg-background px-3 py-2.5 text-sm text-white placeholder-white/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-								></textarea>
-							</div>
-
-							<div class="flex flex-wrap items-center justify-between gap-3 pt-1">
-								<label class="flex cursor-pointer items-center gap-2 select-none">
-									<input
-										type="checkbox"
-										bind:checked={cf.subscribe}
-										class="h-3.5 w-3.5 border-border bg-background accent-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-									/>
-									<span class="text-xs text-white/60">{m.contact_form_subscribeLabel()}</span>
-								</label>
-
-								<button
-									type="submit"
-									disabled={cfStatus === 'submitting'}
-									class="inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97] disabled:opacity-60"
-								>
-									{cfStatus === 'submitting'
-										? m.contact_form_submittingButton()
-										: m.contact_form_submitButton()}
-								</button>
-							</div>
-
-							{#if cfStatus === 'error'}
-								<p class="text-sm text-red-400" role="alert" aria-live="polite">
-									{cfMessage}
-								</p>
-							{/if}
-						</form>
-					{/if}
+					<EnquiryForm formLabel={m.contact_page_sendMessage()} idPrefix="contact" />
 				</div>
 			</Reveal>
 
 			<!-- Google Maps (lazy) -->
 			<Reveal y={24} delay={240}>
 				<div class="flex h-full flex-col">
-					<h2 class="mb-5 text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
+					<h2
+						class="mb-5 text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl"
+					>
 						{m.contact_page_findUs()}
 					</h2>
 					<div
@@ -325,8 +202,8 @@
 								class="h-full w-full"
 							></iframe>
 						{:else}
-							<div class="flex h-full w-full items-center justify-center bg-border/10">
-								<MapPin class="h-8 w-8 text-white/20" />
+							<div class="flex h-full w-full items-center justify-center bg-surface-2">
+								<MapPin class="h-8 w-8 text-foreground-subtle" />
 							</div>
 						{/if}
 					</div>

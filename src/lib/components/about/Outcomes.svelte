@@ -1,8 +1,8 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
-	import aiEntrep03 from '$lib/assets/programs/ai-entrepreneurship/AI-Entrep_03.jpg?enhanced';
-	import aiEntrep08 from '$lib/assets/programs/ai-entrepreneurship/AI-Entrep_08.jpg?enhanced';
+	import aiEntrep03 from '$lib/assets/programs/ai-camp/AI-Entrep_03.jpg?enhanced';
+	import aiEntrep08 from '$lib/assets/programs/ai-camp/AI-Entrep_08.jpg?enhanced';
 
 	const featured = [
 		{
@@ -41,7 +41,7 @@
 	];
 </script>
 
-<section class="bg-[#0c0e12] py-14 md:py-20" aria-labelledby="outcomes-heading">
+<section class="bg-surface-3 py-14 md:py-20" aria-labelledby="outcomes-heading">
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<!-- Section heading -->
 		<Reveal y={20} duration={500}>
@@ -51,7 +51,7 @@
 				</p>
 				<h2
 					id="outcomes-heading"
-					class="mt-4 text-2xl font-bold tracking-tight text-white md:text-4xl"
+					class="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-4xl"
 				>
 					{m.about_outcomes_heading()}
 				</h2>
@@ -59,7 +59,7 @@
 					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 					aria-hidden="true"
 				></div>
-				<p class="mt-6 max-w-[56ch] text-base leading-relaxed text-white/60">
+				<p class="mt-6 max-w-[56ch] text-base leading-relaxed text-foreground-muted">
 					{m.about_outcomes_subtitle()}
 				</p>
 			</div>
@@ -80,15 +80,15 @@
 							/>
 							<!-- Gradient overlay for text legibility -->
 							<div
-								class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"
+								class="absolute inset-0 bg-gradient-to-t from-overlay/95 via-overlay/70 to-transparent"
 							></div>
 
 							<!-- Text overlay -->
 							<div class="absolute right-0 bottom-0 left-0 p-5 md:p-6">
-								<h3 class="text-lg leading-tight font-bold text-white">
+								<h3 class="text-lg leading-tight font-bold text-band-foreground">
 									{outcome.title()}
 								</h3>
-								<p class="mt-1.5 max-w-[48ch] text-sm leading-relaxed text-white/70">
+								<p class="mt-1.5 max-w-[48ch] text-sm leading-relaxed text-band-foreground/80">
 									{outcome.description()}
 								</p>
 							</div>
@@ -102,13 +102,13 @@
 		<div class="mt-12 grid grid-cols-1 gap-x-10 gap-y-0 md:grid-cols-2">
 			{#each compact as outcome, i (outcome.num)}
 				<Reveal y={16} duration={400} delay={i * 60}>
-					<div class="flex gap-4 border-t border-white/[0.08] py-6">
+					<div class="flex gap-4 border-t border-border py-6">
 						<span class="shrink-0 pt-0.5 font-mono text-sm font-medium tracking-[0.2em] text-brand">
 							{outcome.num}
 						</span>
 						<div>
-							<h3 class="text-base font-semibold text-white">{outcome.title()}</h3>
-							<p class="mt-1.5 text-sm leading-relaxed text-white/60">
+							<h3 class="text-base font-semibold text-foreground">{outcome.title()}</h3>
+							<p class="mt-1.5 text-sm leading-relaxed text-foreground-muted">
 								{outcome.description()}
 							</p>
 						</div>

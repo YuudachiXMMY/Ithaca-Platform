@@ -38,7 +38,23 @@ const i18n: Handle = ({ event, resolve }) =>
 				html
 					.replace('%lang%', locale)
 					.replace('%dir%', getTextDirection(locale))
-					.replace('%ga%', gaSnippet)
+					.replace('%ga%', gaSnippet),
+			// Preload the two variable font files (plan task D6). SvelteKit preloads `js` and `css`
+			// by default and deliberately NOT fonts, because preloading a face a page may not use
+			// wastes bandwidth at the highest priority. Both faces ARE used on every page — Inter is
+			// the body copy, Manrope every h1/h2/h3 — and without the hint they are discovered only
+			// after the render-blocking CSS parses, which lands them after first paint and makes the
+			// swap a visible reflow. Measured on /contact-us: CLS 0.0000 -> 0.0028 (reproducible in
+			// all three runs, cause reported by Lighthouse as "Web font loaded") without this hint.
+			//
+			// The LATIN filter is the load-bearing half. Fontsource ships each variable family as
+			// one file PER SUBSET, so a bare `type === 'font'` made SvelteKit preload all 13 faces —
+			// cyrillic, greek, vietnamese and latin-ext included, ten of which this site can never
+			// render a glyph from. That is ~10× the bytes, at the highest priority, to fix a 0.0028
+			// shift. `unicode-range` already stops the browser FETCHING them; preload bypasses
+			// exactly that mechanism, which is the trap. Only the two `-latin-` cuts are hinted.
+			preload: ({ type, path }) =>
+				type === 'js' || type === 'css' || (type === 'font' && path.includes('-latin-wght-normal.'))
 		});
 	});
 

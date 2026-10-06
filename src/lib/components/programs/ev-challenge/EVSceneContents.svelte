@@ -12,7 +12,7 @@
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { Group, Points, BufferGeometry, BufferAttribute, PointsMaterial } from 'three';
 	import FatLine from './FatLine.svelte';
-	import { buildTrikeLines, buildParticlePositions, ACCENT } from './trike-geometry';
+	import { buildTrikeLines, buildParticlePositions, BRAND } from './trike-geometry';
 
 	interface Props {
 		/** Normalized scroll progress (0–1) from the parent GSAP pin. */
@@ -31,11 +31,14 @@
 	// Particle cloud built imperatively (only mounted when motion is allowed).
 	const particleGeometry = new BufferGeometry();
 	particleGeometry.setAttribute('position', new BufferAttribute(buildParticlePositions(), 3));
+	// Dust motes. Opacity was 0.2 when these teal points sat on a near-black
+	// ground; the same alpha against the light EV stretch composites to ~1.1:1
+	// and simply is not there, so it is raised to 0.45 (~2.4:1 on mist).
 	const particleMaterial = new PointsMaterial({
 		size: 0.01,
-		color: ACCENT,
+		color: BRAND,
 		transparent: true,
-		opacity: 0.2,
+		opacity: 0.45,
 		sizeAttenuation: true
 	});
 	const particles = new Points(particleGeometry, particleMaterial);
@@ -90,18 +93,29 @@
 	target={[0, 0.25, 0]}
 />
 
+<!-- Nothing in this scene is a lit material — Line2/LineMaterial, PointsMaterial
+     and <Grid> all draw through their own shaders — so these two lights are
+     inert and are kept only so the rig stays on-palette if a lit mesh is ever
+     added. Key light: --brand (teal-600). CSS variables are unreadable from a
+     WebGL material, so §3.8's values are inlined here as literals. -->
 <T.AmbientLight intensity={0.3} />
-<T.PointLight position={[5, 5, 5]} intensity={0.15} color="#5aa6db" />
+<T.PointLight position={[5, 5, 5]} intensity={0.15} color="#0B6E70" />
 
+<!-- Ground grid, inverted for the light stretch. The fine cell lines keep the
+     same "present, not assertive" weight they had on navy (--band-soft was
+     1.29:1 there): --line is 1.15:1 on mist. The major section lines keep their
+     structural role: --rule-strong is 3.48:1 on mist, where --band-rule-strong
+     was 4.59:1 on navy-900. Deliberately a NEUTRAL grey so the ground plane
+     stays distinct from the trike's slate-blue frame filler. -->
 <Grid
 	position={[0, -0.03, 0]}
 	gridSize={[20, 20]}
 	cellSize={0.4}
 	cellThickness={0.5}
-	cellColor="#1c1f26"
+	cellColor="#E5E7EB"
 	sectionSize={2}
 	sectionThickness={0.8}
-	sectionColor="#252830"
+	sectionColor="#7B8593"
 	fadeDistance={8}
 	infiniteGrid
 />

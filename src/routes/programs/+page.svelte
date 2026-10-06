@@ -1,23 +1,43 @@
 <script lang="ts">
 	import { ArrowRight } from 'lucide-svelte';
-	import { localizeHref } from '$lib/paraglide/runtime';
+	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 	import Seo from '$lib/components/Seo.svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 	import { PROGRAM_CARDS, type ProgramCard } from '$lib/data/programs';
+	import { SEASON_STATUS } from '$lib/data/nav';
+	import { programSeason } from '$lib/program-season';
+	import { PROGRAMS } from '$lib/content/programs';
+	import { SEASONS } from '$lib/content/season-data';
+	import { seasonGrades } from '$lib/season-copy';
+	import { trackProgramCtaClick } from '$lib/analytics';
 
 	// Build-time enhanced images for the program cards.
 	import evImg from '$lib/assets/programs/ev-challenge/EV26-5.jpg?enhanced';
-	import aiImg from '$lib/assets/programs/ai-entrepreneurship/AI-Entrep_81.jpg?enhanced';
+	import aiImg from '$lib/assets/programs/ai-camp/AI-Entrep_81.jpg?enhanced';
 	import eliteImg from '$lib/assets/programs/ai-interview/carmi-levy.png?enhanced';
 	import engineeringImg from '$lib/assets/programs/ev-challenge/EV26-3.jpg?enhanced';
 	import summerWinterImg from '$lib/assets/programs/ai-camp/ai-camp-HB8A5065.jpg?enhanced';
-	import ithacaNightImg from '$lib/assets/programs/ai-entrepreneurship/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg?enhanced';
+	import ithacaNightImg from '$lib/assets/programs/ai-camp/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg?enhanced';
+
+	const locale = getLocale();
+
+	/**
+	 * R-PROG-2 — the current season's label, registration status and grade band, per card.
+	 *
+	 * Derived once here rather than per render: `programSeason` is the same selector the programme
+	 * pages and `/admissions` use, so a card and the page it links to cannot disagree about which
+	 * season is current or what it says. A programme with no `Season` record yet (the three
+	 * placeholders) resolves to null and renders neither badge nor grade band.
+	 */
+	const SEASON = new Map(
+		PROGRAM_CARDS.map((card) => [card.id, programSeason(SEASONS, PROGRAMS, card.slug, locale)])
+	);
 
 	const IMAGES: Record<string, typeof evImg> = {
 		evTeam: evImg,
 		aiCamp: aiImg,
-		eliteInterview: eliteImg,
+		ithacaDialogues: eliteImg,
 		engineering: engineeringImg,
 		summerWinter: summerWinterImg,
 		ithacaNight: ithacaNightImg
@@ -27,7 +47,7 @@
 	const TITLE: Record<string, () => string> = {
 		evTeam: m.programs_index_cards_evTeam_title,
 		aiCamp: m.programs_index_cards_aiCamp_title,
-		eliteInterview: m.programs_index_cards_eliteInterview_title,
+		ithacaDialogues: m.programs_index_cards_ithacaDialogues_title,
 		engineering: m.programs_index_cards_engineering_title,
 		summerWinter: m.programs_index_cards_summerWinter_title,
 		ithacaNight: m.programs_index_cards_ithacaNight_title
@@ -35,7 +55,7 @@
 	const TAG: Record<string, () => string> = {
 		evTeam: m.programs_index_cards_evTeam_tag,
 		aiCamp: m.programs_index_cards_aiCamp_tag,
-		eliteInterview: m.programs_index_cards_eliteInterview_tag,
+		ithacaDialogues: m.programs_index_cards_ithacaDialogues_tag,
 		engineering: m.programs_index_cards_engineering_tag,
 		summerWinter: m.programs_index_cards_summerWinter_tag,
 		ithacaNight: m.programs_index_cards_ithacaNight_tag
@@ -43,7 +63,7 @@
 	const DESCRIPTION: Record<string, () => string> = {
 		evTeam: m.programs_index_cards_evTeam_description,
 		aiCamp: m.programs_index_cards_aiCamp_description,
-		eliteInterview: m.programs_index_cards_eliteInterview_description,
+		ithacaDialogues: m.programs_index_cards_ithacaDialogues_description,
 		engineering: m.programs_index_cards_engineering_description,
 		summerWinter: m.programs_index_cards_summerWinter_description,
 		ithacaNight: m.programs_index_cards_ithacaNight_description
@@ -78,10 +98,15 @@
 	{@const isFeatured = program.span === 'featured'}
 	{@const hasImage = Boolean(program.image)}
 	{@const gridClass = stacked ? '' : (GRID_CLASSES[program.id] ?? '')}
+	{@const season = SEASON.get(program.id) ?? null}
 	<div class={stacked ? 'min-h-0 flex-1' : gridClass}>
+		<!-- `program_cta_click` (prd.md R-SEO-5) carries `program.slug`, the content-record key —
+		     never the localized card title, which would split one programme across two GA rows. -->
 		<a
 			href={localizeHref(program.href)}
-			class="group flex h-full flex-col overflow-hidden border border-border bg-card-bg transition-colors duration-300 hover:border-brand/40 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand"
+			onclick={() =>
+				trackProgramCtaClick({ program: program.slug, location: 'programs_index', locale })}
+			class="group flex h-full flex-col overflow-hidden border border-border-strong bg-card-bg transition-colors duration-300 hover:border-brand focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand"
 		>
 			<div
 				class="relative shrink-0 overflow-hidden
@@ -91,7 +116,7 @@
 						? 'h-[240px] md:h-[300px]'
 						: 'h-[180px] md:h-[220px]'}
 					{isFeatured && !stacked ? 'lg:h-[360px]' : ''}
-					{!hasImage ? 'bg-[#0a0c10]' : ''}"
+					{!hasImage ? 'bg-surface-4' : ''}"
 			>
 				{#if hasImage}
 					<enhanced:img
@@ -114,7 +139,7 @@
 
 			<div class="flex grow flex-col {stacked ? 'p-4' : 'p-5 md:p-6'}">
 				<h2
-					class="leading-tight font-bold tracking-tight text-white
+					class="leading-tight font-bold tracking-tight text-foreground
 						{stacked
 						? 'mb-2 text-sm md:text-base'
 						: isFeatured
@@ -124,16 +149,49 @@
 					{TITLE[program.id]()}
 				</h2>
 
-				<span
-					class="inline-block w-fit border border-brand/30 px-3 py-1 font-mono tracking-[0.2em] text-brand-bright uppercase {stacked
-						? 'mb-2 text-[10px]'
-						: 'mb-3 text-[11px]'}"
-				>
-					{TAG[program.id]()}
-				</span>
+				<div class="flex flex-wrap items-center gap-2 {stacked ? 'mb-2' : 'mb-3'}">
+					<span
+						class="inline-block w-fit border border-brand/30 px-3 py-1 font-mono tracking-[0.2em] text-brand-bright uppercase {stacked
+							? 'text-[10px]'
+							: 'text-[11px]'}"
+					>
+						{TAG[program.id]()}
+					</span>
+
+					<!-- R-PROG-2: the current season's registration status. Derived, so a card cannot say
+					     "Open" while the programme page says otherwise. Absent for a programme with no
+					     Season record — an empty badge would read as a rendering fault. -->
+					{#if season}
+						<span
+							class="inline-block w-fit border border-border-strong bg-surface-2 px-3 py-1 font-mono tracking-[0.2em] text-foreground-muted uppercase {stacked
+								? 'text-[10px]'
+								: 'text-[11px]'}"
+						>
+							{SEASON_STATUS[season.registration]()}
+						</span>
+					{/if}
+				</div>
+
+				<!-- R-PROG-2: season label + grade band, from the same record the programme page's
+				     details strip reads. The window is here too, beyond what R-PROG-2 enumerates,
+				     because §7.4's acceptance names the index card as one of the four surfaces a date
+				     change has to move — and because "when does it run" is the question a parent
+				     scanning this grid is actually asking. Omitted when the record is undated. -->
+				{#if season}
+					{@const meta = [season.seasonLabel, seasonGrades(season.grades), season.window].filter(
+						(part): part is string => Boolean(part)
+					)}
+					<p
+						class="font-mono text-foreground-subtle {stacked
+							? 'mb-2 text-[10px]'
+							: 'mb-3 text-[11px]'}"
+					>
+						{meta.join(' · ')}
+					</p>
+				{/if}
 
 				<p
-					class="grow leading-relaxed text-white/60 {stacked
+					class="grow leading-relaxed text-foreground-muted {stacked
 						? 'mb-3 line-clamp-2 text-xs'
 						: 'mb-4 text-sm'}"
 				>
@@ -166,11 +224,11 @@
 					aria-hidden="true"
 				></div>
 				<h1
-					class="mt-6 max-w-[16ch] text-[clamp(2rem,6vw,4rem)] leading-[1.08] font-light tracking-tight text-white"
+					class="mt-6 max-w-[16ch] text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-light tracking-tight text-foreground"
 				>
 					{m.programs_index_title()}
 				</h1>
-				<p class="mt-6 max-w-[45ch] text-lg leading-relaxed text-white/60 md:text-xl">
+				<p class="mt-6 max-w-[45ch] text-lg leading-relaxed text-foreground-muted md:text-xl">
 					{m.programs_index_subtitle()}
 				</p>
 			</Reveal>

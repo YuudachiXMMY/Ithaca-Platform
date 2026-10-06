@@ -15,10 +15,26 @@
  * Coordinate frame: X = front(−) → rear(+), Y = up, Z = left(−) / right(+).
  */
 
-/* Colors — match globals.css theme (verbatim from EVModel3D.tsx:18-20). */
-export const ACCENT = '#3e8fc7';
-export const ACCENT_DIM = '#4a6a88';
-export const ACCENT_GLOW = '#9cc4e8';
+/* Colors — the LIGHT palette (docs/DESIGN-TOKENS.md §3.8). A WebGL material
+   cannot read a CSS variable, so these mirror the tokens as JS-side constants:
+   --brand (teal-600), --ink-3, --brand-bright (teal-700).
+
+   These were the band teals (#5FC3C4 / #2B4C7E / #D9F1F1) until 2026-09-29,
+   when the EV stretch moved onto the light system. The hierarchy is inverted
+   rather than recoloured: on navy the cage highlight was the LIGHTEST tone
+   (teal-100, 14.00:1) and the structural body the darkest (navy-500, 1.68:1);
+   on a mist ground the highlight is the DARKEST teal (teal-700, 8.83:1 on
+   white) and the structural body a mid slate (--ink-3, 5.89:1). Ordering is
+   preserved — GLOW 8.83 > BRAND 6.04 > DIM 5.89 — so the cage still reads as
+   the accent and the frame filler still recedes. DIM landed on --ink-3 rather
+   than --rule-strong (3.74) after looking at a render: more than half the DIM
+   lines carry `opacity: 0.3–0.5`, which drops --rule-strong to ~1.5:1 and the
+   tyre outlines and chassis triangulation simply vanished on white. It is also
+   one rung darker than the ground grid's --rule-strong in EVSceneContents, so
+   the frame stays separable from the floor. */
+export const BRAND = '#0B6E70';
+export const BRAND_DIM = '#5B6575';
+export const BRAND_GLOW = '#075355';
 
 type V3 = [number, number, number];
 
@@ -318,9 +334,9 @@ function wheelLines(pos: V3, r = 0.24): TrikeLine[] {
 	const rim = ringPoints(r, 48);
 	const hub = ringPoints(0.035, 12);
 
-	lines.push({ points: flat(tire, pos), color: ACCENT_DIM, lineWidth: 0.8 });
-	lines.push({ points: flat(rim, pos), color: ACCENT, lineWidth: 1.5 });
-	lines.push({ points: flat(hub, pos), color: ACCENT, lineWidth: 1 });
+	lines.push({ points: flat(tire, pos), color: BRAND_DIM, lineWidth: 0.8 });
+	lines.push({ points: flat(rim, pos), color: BRAND, lineWidth: 1.5 });
+	lines.push({ points: flat(hub, pos), color: BRAND, lineWidth: 1 });
 
 	const count = 16;
 	for (let i = 0; i < count; i++) {
@@ -331,7 +347,7 @@ function wheelLines(pos: V3, r = 0.24): TrikeLine[] {
 		];
 		lines.push({
 			points: flat(spoke, pos),
-			color: ACCENT_DIM,
+			color: BRAND_DIM,
 			lineWidth: 0.4,
 			transparent: true,
 			opacity: 0.35
@@ -350,53 +366,53 @@ export function buildTrikeLines(): TrikeLine[] {
 	const lines: TrikeLine[] = [];
 
 	// Rails
-	lines.push({ points: flat(F.leftRail), color: ACCENT, lineWidth: 1.5 });
-	lines.push({ points: flat(F.rightRail), color: ACCENT, lineWidth: 1.5 });
+	lines.push({ points: flat(F.leftRail), color: BRAND, lineWidth: 1.5 });
+	lines.push({ points: flat(F.rightRail), color: BRAND, lineWidth: 1.5 });
 
 	// Cross members
-	for (const pts of F.crosses) lines.push({ points: flat(pts), color: ACCENT_DIM, lineWidth: 1 });
+	for (const pts of F.crosses) lines.push({ points: flat(pts), color: BRAND_DIM, lineWidth: 1 });
 
 	// Upper rails
-	lines.push({ points: flat(F.leftUpper), color: ACCENT, lineWidth: 1.2 });
-	lines.push({ points: flat(F.rightUpper), color: ACCENT, lineWidth: 1.2 });
+	lines.push({ points: flat(F.leftUpper), color: BRAND, lineWidth: 1.2 });
+	lines.push({ points: flat(F.rightUpper), color: BRAND, lineWidth: 1.2 });
 	for (const pts of F.upperCrosses)
-		lines.push({ points: flat(pts), color: ACCENT_DIM, lineWidth: 0.8 });
+		lines.push({ points: flat(pts), color: BRAND_DIM, lineWidth: 0.8 });
 
 	// Diagonals
 	for (const pts of F.diagonals)
 		lines.push({
 			points: flat(pts),
-			color: ACCENT_DIM,
+			color: BRAND_DIM,
 			lineWidth: 0.6,
 			transparent: true,
 			opacity: 0.5
 		});
 
 	// Roll cage
-	for (const pts of F.cage) lines.push({ points: flat(pts), color: ACCENT_GLOW, lineWidth: 1.5 });
+	for (const pts of F.cage) lines.push({ points: flat(pts), color: BRAND_GLOW, lineWidth: 1.5 });
 
 	// Steering + handlebar
-	lines.push({ points: flat(F.steering), color: ACCENT, lineWidth: 1.2 });
-	lines.push({ points: flat(F.handlebar), color: ACCENT, lineWidth: 1.2 });
+	lines.push({ points: flat(F.steering), color: BRAND, lineWidth: 1.2 });
+	lines.push({ points: flat(F.handlebar), color: BRAND, lineWidth: 1.2 });
 
 	// Forks + front axle
-	for (const pts of F.forks) lines.push({ points: flat(pts), color: ACCENT_DIM, lineWidth: 1 });
-	lines.push({ points: flat(F.frontAxle), color: ACCENT_DIM, lineWidth: 0.8 });
+	for (const pts of F.forks) lines.push({ points: flat(pts), color: BRAND_DIM, lineWidth: 1 });
+	lines.push({ points: flat(F.frontAxle), color: BRAND_DIM, lineWidth: 0.8 });
 
 	// Rear fork
-	for (const pts of F.rearFork) lines.push({ points: flat(pts), color: ACCENT_DIM, lineWidth: 1 });
+	for (const pts of F.rearFork) lines.push({ points: flat(pts), color: BRAND_DIM, lineWidth: 1 });
 
 	// Body panels
 	lines.push({
 		points: flat(F.panelBottom),
-		color: ACCENT,
+		color: BRAND,
 		lineWidth: 1,
 		transparent: true,
 		opacity: 0.5
 	});
 	lines.push({
 		points: flat(F.panelTop),
-		color: ACCENT,
+		color: BRAND,
 		lineWidth: 1,
 		transparent: true,
 		opacity: 0.5
@@ -404,7 +420,7 @@ export function buildTrikeLines(): TrikeLine[] {
 	for (const pts of F.panelRibs)
 		lines.push({
 			points: flat(pts),
-			color: ACCENT_DIM,
+			color: BRAND_DIM,
 			lineWidth: 0.4,
 			transparent: true,
 			opacity: 0.3
@@ -413,14 +429,14 @@ export function buildTrikeLines(): TrikeLine[] {
 	// Seat
 	lines.push({
 		points: flat(F.seatL),
-		color: ACCENT_DIM,
+		color: BRAND_DIM,
 		lineWidth: 0.8,
 		transparent: true,
 		opacity: 0.4
 	});
 	lines.push({
 		points: flat(F.seatR),
-		color: ACCENT_DIM,
+		color: BRAND_DIM,
 		lineWidth: 0.8,
 		transparent: true,
 		opacity: 0.4
@@ -428,7 +444,7 @@ export function buildTrikeLines(): TrikeLine[] {
 	for (const pts of F.seatCrosses)
 		lines.push({
 			points: flat(pts),
-			color: ACCENT_DIM,
+			color: BRAND_DIM,
 			lineWidth: 0.5,
 			transparent: true,
 			opacity: 0.3

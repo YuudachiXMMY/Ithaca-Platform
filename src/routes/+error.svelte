@@ -25,12 +25,12 @@
 	<h1 class="mb-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
 		{title}
 	</h1>
-	<p class="mb-10 max-w-md text-foreground/60">
+	<p class="mb-10 max-w-md text-foreground-muted">
 		{body}
 	</p>
 	<a
 		href={localizeHref('/')}
-		class="group inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
+		class="group inline-flex h-12 items-center justify-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-all duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 	>
 		<ArrowLeft class="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
 		{m.error_notFound_back()}

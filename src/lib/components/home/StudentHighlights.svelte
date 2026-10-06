@@ -65,127 +65,128 @@
 		}
 	];
 
-	// Desktop mosaic columns: hero cells + asymmetric stacked pairs.
-	type Col =
-		| { type: 'hero'; index: number; width: number }
-		| { type: 'stack'; indices: [number, number]; width: number; split: [string, string] };
-
-	const COLUMNS: Col[] = [
-		{ type: 'hero', index: 0, width: 520 },
-		{ type: 'stack', indices: [1, 2], width: 360, split: ['45%', '55%'] },
-		{ type: 'hero', index: 3, width: 440 },
-		{ type: 'stack', indices: [4, 5], width: 380, split: ['58%', '42%'] }
+	// ─── One DOM, two layouts ───────────────────────────────────────────────────────────────────
+	// prd.md R-HOME-6: "one responsive carousel rendered once (no duplicated DOM)". The former
+	// build emitted the whole list TWICE — a `md:hidden` grid and a `hidden md:block` mosaic — so
+	// the page carried 12 `<enhanced:img>`, 6 duplicated `<h3>` and two `<h2>`, and the
+	// accessibility tree saw every heading twice. The single `{#each}` below now drives both
+	// breakpoints, with CSS alone switching the layout.
+	//
+	// Desktop is a 4-column horizontal scroll-snap mosaic: 520 / 360 / 440 / 380 px, with cells 0
+	// and 3 full-height "heroes" and the other four stacked in pairs that split 45/55 and 58/42.
+	// Two different splits in one grid look like they need a wrapper per pair — they don't. Three
+	// row tracks at `45fr 13fr 42fr` express both exactly:
+	//   column 2 → 45 | 13+42  = 45/55
+	//   column 4 → 45+13 | 42  = 58/42
+	// so each cell is placed directly on the track grid and no nesting element is required.
+	//
+	// Every class below is a whole literal string: Tailwind v4 scans source text, so a placement
+	// built by concatenation would never make it into the stylesheet.
+	const PLACEMENT = [
+		'md:col-start-1 md:row-start-1 md:row-span-3',
+		'md:col-start-2 md:row-start-1 md:row-span-1',
+		'md:col-start-2 md:row-start-2 md:row-span-2',
+		'md:col-start-3 md:row-start-1 md:row-span-3',
+		'md:col-start-4 md:row-start-1 md:row-span-2',
+		'md:col-start-4 md:row-start-3 md:row-span-1'
 	];
+
+	/** Rendered width of each cell at md+, i.e. the width of the column it is placed in. */
+	const COLUMN_WIDTH = [520, 360, 360, 440, 380, 380];
 </script>
 
-{#snippet cell(highlight: Highlight, index: number, showDescription: boolean, widthPx: number)}
-	<article class="group absolute inset-0 overflow-hidden">
-		<enhanced:img
-			src={highlight.img}
-			alt={highlight.alt()}
-			sizes="(min-width: 768px) {widthPx}px, 50vw"
-			loading="lazy"
-			class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-		/>
-
-		<div
-			class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
-			aria-hidden="true"
-		></div>
-
-		<span
-			class="absolute top-2 right-3 font-mono text-[48px] leading-none font-bold text-white/[0.05] select-none md:text-[64px]"
-			aria-hidden="true"
-		>
-			{String(index + 1).padStart(2, '0')}
-		</span>
-
-		<div class="absolute inset-x-0 bottom-0 p-3 md:p-4">
-			<span
-				class="font-mono text-[10px] tracking-[0.18em] text-brand-bright uppercase md:text-[9px]"
+<section class="bg-surface-1" aria-label={m.home_highlights_ariaLabel()}>
+	<div class="px-5 sm:px-8 md:px-[6vw]">
+		<div class="flex items-end justify-between border-b border-border pt-10 pb-4 md:pt-16 md:pb-3">
+			<h2 class="text-xl font-bold tracking-tight text-foreground md:text-3xl">
+				{m.home_highlights_heading()}
+			</h2>
+			<p
+				class="hidden max-w-xs text-right text-[11px] leading-relaxed text-foreground-subtle md:block"
 			>
-				{highlight.tag()}
-			</span>
-			<h3 class="mt-1 text-sm leading-tight font-bold text-white md:text-sm">
-				{highlight.title()}
-			</h3>
-			{#if showDescription}
-				<p class="mt-1.5 line-clamp-2 text-[11px] leading-snug text-white/40 md:text-[11px]">
-					{highlight.description()}
-				</p>
-			{/if}
+				{m.home_highlights_subheading()}
+			</p>
 		</div>
-	</article>
-{/snippet}
-
-<section aria-label={m.home_highlights_ariaLabel()}>
-	<!-- Mobile: header + 2-col grid (< md) -->
-	<div class="bg-[#0e1015] md:hidden">
-		<div class="px-5 sm:px-8">
-			<div class="flex items-end justify-between border-b border-white/[0.06] pt-10 pb-4">
-				<h2 class="text-xl font-bold tracking-tight text-white">{m.home_highlights_heading()}</h2>
-			</div>
-		</div>
-		<div class="grid grid-cols-2 gap-[2px] px-5 py-2 sm:px-8">
+		<!-- Desktop-only index strip. `aria-hidden` because every string in it is repeated verbatim
+		     by the cards below; exposing it would put the six tags in the a11y tree twice, which is
+		     the duplication R-HOME-6 is about. -->
+		<div class="hidden gap-6 overflow-x-auto py-2.5 md:flex" aria-hidden="true">
 			{#each HIGHLIGHTS as h, i (i)}
-				<div class="relative overflow-hidden {i < 2 ? 'aspect-[3/4]' : 'aspect-square'}">
-					{@render cell(h, i, i < 2, 260)}
-				</div>
+				<span
+					class="shrink-0 font-mono text-[9px] tracking-[0.15em] text-foreground-subtle uppercase"
+				>
+					{String(i + 1).padStart(2, '0')}
+					{h.tag()}
+				</span>
 			{/each}
 		</div>
 	</div>
 
-	<!-- Desktop: data-strip header + native horizontal scroll-snap mosaic (md+) -->
-	<div class="hidden bg-[#0e1015] md:block">
-		<!-- Compact data-strip header -->
-		<div class="px-5 sm:px-8 md:px-[6vw]">
-			<div class="flex items-end justify-between border-b border-white/[0.06] pt-16 pb-3">
-				<h2 class="text-xl font-bold tracking-tight text-white md:text-3xl">
-					{m.home_highlights_heading()}
-				</h2>
-				<p class="max-w-xs text-right text-[11px] leading-relaxed text-white/30">
-					{m.home_highlights_subheading()}
-				</p>
-			</div>
-			<div class="flex gap-6 overflow-x-auto py-2.5">
-				{#each HIGHLIGHTS as h, i (i)}
-					<span class="shrink-0 font-mono text-[9px] tracking-[0.15em] text-white/20 uppercase">
-						{String(i + 1).padStart(2, '0')}
+	<!-- At md+ this is a native horizontal scroll-snap track (no GSAP pin). tabindex+role make the
+	     overflow region keyboard-scrollable (WCAG 2.1.1 / axe scrollable-region-focusable) since the
+	     cells are non-interactive. -->
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	<div
+		role="group"
+		tabindex="0"
+		aria-label={m.home_highlights_heading()}
+		class="grid grid-cols-2 gap-[2px] px-5 py-2 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand sm:px-8 md:h-[min(70vh,560px)] md:snap-x md:snap-proximity md:grid-cols-[520px_360px_440px_380px] md:grid-rows-[45fr_13fr_42fr] md:overflow-x-auto md:px-[6vw] md:py-0 md:pb-6"
+	>
+		{#each HIGHLIGHTS as h, i (i)}
+			<article
+				class="group relative overflow-hidden {i < 2
+					? 'aspect-[3/4]'
+					: 'aspect-square'} md:aspect-auto md:snap-start {PLACEMENT[i]}"
+			>
+				<enhanced:img
+					src={h.img}
+					alt={h.alt()}
+					sizes="(min-width: 768px) {COLUMN_WIDTH[i]}px, 50vw"
+					loading="lazy"
+					class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+				/>
+
+				<div
+					class="absolute inset-0 bg-gradient-to-t from-overlay/95 via-overlay/70 to-transparent"
+					aria-hidden="true"
+				></div>
+
+				<span
+					class="absolute top-2 right-3 font-mono text-[48px] leading-none font-bold text-band-foreground/[0.05] select-none md:text-[64px]"
+					aria-hidden="true"
+				>
+					{String(i + 1).padStart(2, '0')}
+				</span>
+
+				<!-- R-HOME-6 wants tag, title AND caption on every item. The caption used to be passed
+				     `showDescription=false` for the four stacked desktop cells, so it never rendered at
+				     all there. The clamps keep a long title from pushing the caption out of the
+				     smallest cell (380 x 42%) — the full string stays in the DOM for AT and crawlers. -->
+				<div class="absolute inset-x-0 bottom-0 p-3 md:p-4">
+					<span
+						class="font-mono text-[10px] tracking-[0.18em] text-band-brand-strong uppercase md:text-[9px]"
+					>
 						{h.tag()}
 					</span>
-				{/each}
-			</div>
-		</div>
+					<h3
+						class="mt-1 line-clamp-3 text-sm leading-tight font-bold text-band-foreground md:text-sm"
+					>
+						{h.title()}
+					</h3>
+					<p
+						class="mt-1.5 line-clamp-2 text-[11px] leading-snug text-band-foreground/80 md:text-[11px]"
+					>
+						{h.description()}
+					</p>
+				</div>
+			</article>
+		{/each}
 
-		<!-- Native horizontal scroll-snap track (no GSAP pin). tabindex+role make the overflow
-		     region keyboard-scrollable (WCAG 2.1.1 / axe scrollable-region-focusable) since the
-		     cells are non-interactive. -->
-		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+		<!-- Trailing spacer so the last column can clear the right edge of the scroll region. Not a
+		     highlight: display:none below md, aria-hidden, and parked in an implicit 5th column. -->
 		<div
-			role="group"
-			tabindex="0"
-			aria-label={m.home_highlights_heading()}
-			class="flex h-[min(70vh,560px)] snap-x snap-proximity items-stretch gap-[2px] overflow-x-auto px-5 pb-6 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand sm:px-8 md:px-[6vw]"
-		>
-			{#each COLUMNS as col, ci (ci)}
-				{#if col.type === 'hero'}
-					<div class="relative shrink-0 snap-start" style="width: {col.width}px">
-						{@render cell(HIGHLIGHTS[col.index], col.index, true, col.width)}
-					</div>
-				{:else}
-					<div class="flex shrink-0 snap-start flex-col gap-[2px]" style="width: {col.width}px">
-						<div class="relative overflow-hidden" style="flex-basis: {col.split[0]}; flex-grow: 1">
-							{@render cell(HIGHLIGHTS[col.indices[0]], col.indices[0], false, col.width)}
-						</div>
-						<div class="relative overflow-hidden" style="flex-basis: {col.split[1]}; flex-grow: 1">
-							{@render cell(HIGHLIGHTS[col.indices[1]], col.indices[1], false, col.width)}
-						</div>
-					</div>
-				{/if}
-			{/each}
-
-			<!-- Trailing spacer so the last column can clear the right edge -->
-			<div class="w-[2vw] shrink-0" aria-hidden="true"></div>
-		</div>
+			class="hidden md:col-start-5 md:row-span-3 md:row-start-1 md:block md:w-[2vw]"
+			aria-hidden="true"
+		></div>
 	</div>
 </section>
