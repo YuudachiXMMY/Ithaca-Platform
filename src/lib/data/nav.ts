@@ -25,9 +25,36 @@ export interface NavItem {
 // All SIX programmes are listed (R-GLB-1). The previous three-plus-"Other Programs" shape left
 // engineering-projects, summer-winter-camps and ithaca-night reachable only from the /programs
 // index, and the catch-all pointed back at the page the dropdown already links from its trigger.
+//
+// ## Why two groups list their own page as the first child
+//
+// `about` and `studentLife` each repeat their own href as `children[0]`, which the Programs
+// dropdown deliberately does NOT do. The difference is arity, not taste: Programs has six
+// children, so the trigger's own destination is obviously the index. About has one other child.
+// A one-item dropdown reads as a mistake, and a hover panel that appears with a single link in it
+// is worse than no panel — so the group's own page is named explicitly ("About Us" under "About")
+// and the menu has two entries. The flaw the old "Other Programs" entry had was being *vague*
+// about where it went, not being a repeat.
 export const NAV_ITEMS: NavItem[] = [
 	{ label: 'home', href: '/' },
-	{ label: 'aboutUs', href: '/about-us' },
+	{
+		label: 'about',
+		href: '/about-us',
+		children: [
+			{ label: 'aboutUs', href: '/about-us' },
+			{ label: 'ourTeam', href: '/about-us/our-team' }
+		]
+	},
+	{
+		label: 'academics',
+		href: '/academics',
+		children: [
+			{ label: 'ap', href: '/academics/ap' },
+			{ label: 'ossd', href: '/academics/ossd' },
+			{ label: 'stem', href: '/academics/stem' },
+			{ label: 'tutoring', href: '/academics/tutoring' }
+		]
+	},
 	{
 		label: 'programs',
 		href: '/programs',
@@ -56,6 +83,18 @@ export const NAV_ITEMS: NavItem[] = [
 			{ label: 'ithacaNight', href: '/programs/ithaca-night', programSlug: 'ithaca-night' }
 		]
 	},
+	// Student Life's dropdown reaches `/success-stories`, which is NOT under `/student-life`. The
+	// nesting of a URL and the grouping of a menu are allowed to disagree: Success Stories is the
+	// one page here with real content and real search value, and burying it three segments deep
+	// under a stub costs more than the tidiness is worth.
+	{
+		label: 'studentLife',
+		href: '/student-life',
+		children: [
+			{ label: 'studentLife', href: '/student-life' },
+			{ label: 'successStories', href: '/success-stories' }
+		]
+	},
 	// `/admissions` is the page this whole redesign exists to reach (prd.md §5, R-ADM-1…7). It
 	// shipped reachable by URL only — not in this array, not in the footer, not linked from a single
 	// programme page — which made the funnel the PRD's hypothesis is about unreachable in practice.
@@ -69,21 +108,34 @@ export const NAV_ITEMS: NavItem[] = [
  * The hrefs the header renders to the RIGHT of the centre logo (`Header.svelte` splits `NAV_ITEMS`
  * around it); everything else goes left, in `NAV_ITEMS` order.
  *
- * Admissions joins Contact Us on the right rather than extending the left group, for two reasons:
+ * Student Life joins Admissions and Contact Us on the right, for two reasons:
  *
- *  1. They are the same kind of item. Home / About Us / Programs are *what we are*; Admissions and
- *     Contact Us are *how you start*. Grouping them beside the locale switch gives the bar one
- *     obvious action corner instead of a four-item ramp ending in an unrelated single item.
- *  2. Width, measured rather than guessed. The desktop bar appears at `lg` (1024px) inside a
- *     `1fr auto 1fr` grid, which gives each side a 416px column there (544px at 1280px). All four
- *     English items on the left need 433px. At 1280px that fits; at 1024px it does not, and the
- *     group wraps to two lines (the nav's height goes 36px → 55px). Split 3 + 2 it is 300px on the
- *     left and 228px on the right at both widths, one line, with the logo pinned dead centre.
+ *  1. They are the same kind of item. Home / About / Academics / Programs are *what we are*;
+ *     Student Life, Admissions and Contact Us are *what it is like and how you start*. Grouping
+ *     them gives the bar one obvious action corner instead of a six-item ramp.
+ *  2. Width, measured rather than guessed — in Chrome, at 13px / `tracking-[0.08em]` / uppercase,
+ *     which is what the bar actually renders. A `1fr auto 1fr` grid around a 104px logo inside
+ *     `max-w-[1400px] px-12` leaves each side **412px at 1024px** and **540px at 1280px**.
+ *
+ *       left  (Home · About+menu · Academics+menu · Programs+menu)        438.3px at gap-10
+ *       right (Student Life+menu · Admissions · Contact Us)       370.5px at gap-10
+ *       right, as it used to be, WITH the locale switcher      459.5px  (+24px ml-6, +65px switcher)
+ *
+ *     So the right column only fits because the locale switcher moved to the footer, and the left
+ *     column does not fit at gap-10 at all — which is why `Header.svelte` runs `gap-7 xl:gap-10`
+ *     (left 402.3px, right 346.5px). Chinese is nowhere near the limit: 304px and 228px, because
+ *     a four-character label is 52px. **English is the binding constraint on this bar.**
+ *
+ *     The margin on the left column is ~10px, so this is a real constraint and not a formality:
+ *     one more top-level item, or one longer English label, wraps the group to two lines (the
+ *     nav's height goes 36px → 55px). `e2e/nav-single-line.spec.ts` is the thing that notices —
+ *     nothing else in the suite does, because a wrapped nav is still perfectly legible and passes
+ *     every contrast and axe assertion.
  *
  * Declared here rather than as a literal in the component so the split and the array it splits
  * cannot drift — `nav.test.ts` pins every entry to a real `NAV_ITEMS` href.
  */
-export const RIGHT_NAV_HREFS: readonly string[] = ['/admissions', '/contact-us'];
+export const RIGHT_NAV_HREFS: readonly string[] = ['/student-life', '/admissions', '/contact-us'];
 
 /**
  * Footer quick links — `prd.md` R-GLB-2 ("Footer: quick links, …").
@@ -92,25 +144,39 @@ export const RIGHT_NAV_HREFS: readonly string[] = ['/admissions', '/contact-us']
  * and repeating it as the first quick link is the kind of filler that makes a footer read as
  * boilerplate.
  *
- * `/results` is appended here and deliberately NOT added to `NAV_ITEMS`. It is a supporting page —
- * proof a visitor reads on the way to a decision, not a destination they arrive looking for — and a
- * sixth item in the header bar would cost the nav more than the page is worth. The footer is where
- * it belongs, and until now it was in neither.
+ * `/success-stories` is appended because the footer is the one place a human-readable sitemap
+ * belongs, not because the page is unreachable: it is now also the second entry in the Student Life
+ * dropdown. That reverses `docs/DECISIONS.md` K-2, which made the page footer-ONLY on the argument
+ * that a header slot cost more than the page was worth. The owner has since asked for the Student
+ * Life group, and once that group exists the page is the only real content in it — so the slot is
+ * no longer being spent on it alone.
+ *
+ * Only TOP-LEVEL entries are carried over. The dropdown children (the four Academics tracks, Our
+ * Team, the six programmes) are deliberately absent: a footer that lists every leaf is a sitemap,
+ * and this one has three columns next to a newsletter form.
  */
 export const FOOTER_LINKS: readonly NavItem[] = [
 	...NAV_ITEMS.filter((item) => item.href !== '/'),
-	{ label: 'results', href: '/results' }
+	{ label: 'successStories', href: '/success-stories' }
 ];
 
 // Static key -> message map keeps Paraglide tree-shaking (no dynamic m['nav_'+x]()).
 // Shared by Header and Footer so the NavItem.label -> localized-string mapping lives once.
 const NAV_LABEL: Record<string, () => string> = {
 	home: m.nav_home,
+	about: m.nav_about,
 	aboutUs: m.nav_aboutUs,
+	ourTeam: m.nav_ourTeam,
+	academics: m.nav_academics,
+	ap: m.nav_ap,
+	ossd: m.nav_ossd,
+	stem: m.nav_stem,
+	tutoring: m.nav_tutoring,
 	programs: m.nav_programs,
+	studentLife: m.nav_studentLife,
+	successStories: m.nav_successStories,
 	admissions: m.nav_admissions,
 	contactUs: m.nav_contactUs,
-	results: m.nav_results,
 	evTeam: m.nav_evTeam,
 	aiEntrepreneurshipCamp: m.nav_aiEntrepreneurshipCamp,
 	ithacaDialogues: m.nav_ithacaDialogues,
@@ -149,7 +215,21 @@ export const SEASON_STATUS: Record<Season['registration'], () => string> = {
  * one-character edit away from flipping six pages at once.
  */
 export function headerOnDark(path: string): boolean {
-	return path === '/' || path === '/about-us' || path.startsWith('/programs/');
+	return (
+		path === '/' ||
+		// `/about-us` and `/about-us/our-team`; `/academics` and its four tracks; `/student-life`.
+		// A bare prefix is correct for these three in a way it is NOT for `/programs`: the
+		// `/programs` INDEX opens on white, so it has to be excluded by the trailing slash below,
+		// whereas each of these section indexes renders a full-bleed photo hero itself. Every page
+		// in these subtrees — index and leaf alike — is `shared/PageHero.svelte` or
+		// `programs/PlaceholderProgram.svelte` over a photograph.
+		path.startsWith('/about-us') ||
+		path.startsWith('/academics') ||
+		path.startsWith('/student-life') ||
+		path === '/admissions' ||
+		path === '/success-stories' ||
+		path.startsWith('/programs/')
+	);
 }
 
 /**

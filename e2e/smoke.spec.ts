@@ -20,10 +20,11 @@ test.describe('public routes', () => {
 	test('every sitemap route responds 200 in both locales', async ({ request }) => {
 		const paths = await sitemapPaths(request);
 
-		// 12 public pages x {en, zh}. Guards against the sitemap silently collapsing
-		// to a handful of entries, which would make the per-path loop vacuously pass.
-		expect(paths.length).toBeGreaterThanOrEqual(24);
-		expect(paths.filter((p) => p.startsWith('/zh')).length).toBeGreaterThanOrEqual(12);
+		// 20 public pages x {en, zh} — the original 12, plus the eight the Academics / Student
+		// Life / About groups added. Guards against the sitemap silently collapsing to a handful
+		// of entries, which would make the per-path loop vacuously pass.
+		expect(paths.length).toBeGreaterThanOrEqual(40);
+		expect(paths.filter((p) => p.startsWith('/zh')).length).toBeGreaterThanOrEqual(20);
 
 		const failures: string[] = [];
 		for (const path of paths) {
@@ -123,13 +124,47 @@ test.describe('locale switch', () => {
 });
 
 test.describe('programs dropdown', () => {
+	// Scoped by href, not `.first()`. There are now THREE dropdown triggers in the bar (About,
+	// Academics, Programs) and About is the first of them, so `.first()` quietly stopped testing
+	// the menu this block is named after — while still passing, because About also opens and also
+	// has menuitems. A selector for "a dropdown" is not a selector for "this dropdown".
+	const programsTrigger = (page: import('@playwright/test').Page) =>
+		page.locator('header a[aria-haspopup="true"][href="/programs"]');
+
+	/**
+	 * Every group that HAS children renders a trigger that offers them.
+	 *
+	 * This is a DOM assertion on purpose. `nav.test.ts` proves the data — that About, Academics and
+	 * Student Life each carry `children` — and the data was correct while Student Life rendered as a
+	 * plain link with no menu at all, because the header had two separate loops and only the
+	 * left-hand one had an `{#if item.children}` branch. Nothing failed: the bar looked right, the
+	 * mobile drawer rendered the submenu fine, and every existing test passed. Asserting the
+	 * rendered triggers is the only level at which that is visible.
+	 */
+	test('every dropdown group in the bar actually opens one', async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name === 'mobile-chrome', 'desktop nav is hidden on mobile');
+
+		await page.goto('/');
+		const GROUPS = ['/about-us', '/academics', '/programs', '/student-life'];
+
+		// The count matters as much as the members: it is what fails if a fifth group is added to
+		// NAV_ITEMS and only the data side is updated.
+		await expect(page.locator('header a[aria-haspopup="true"]')).toHaveCount(GROUPS.length);
+		for (const href of GROUPS) {
+			await expect(
+				page.locator(`header a[aria-haspopup="true"][href="${href}"]`),
+				`${href} should be a dropdown trigger`
+			).toHaveCount(1);
+		}
+	});
+
 	// WCAG 2.1.1. The trigger advertises aria-haspopup="true" + aria-expanded, so a
 	// keyboard user is told a menu exists; it must actually be openable without a mouse.
 	test('opens from the keyboard and exposes every program', async ({ page }, testInfo) => {
 		test.skip(testInfo.project.name === 'mobile-chrome', 'desktop nav is hidden on mobile');
 
 		await page.goto('/');
-		const trigger = page.locator('header a[aria-haspopup="true"]').first();
+		const trigger = programsTrigger(page);
 		await expect(trigger).toHaveAttribute('aria-expanded', 'false');
 
 		await trigger.focus();
@@ -138,14 +173,16 @@ test.describe('programs dropdown', () => {
 
 		const menu = page.locator('header [role="menu"]');
 		await expect(menu).toBeVisible();
-		await expect(menu.locator('[role="menuitem"]')).not.toHaveCount(0);
+		// R-GLB-1 is "every programme", so the count IS the requirement. `not.toHaveCount(0)`
+		// passed for the three-plus-catch-all shape that requirement was written to replace.
+		await expect(menu.locator('[role="menuitem"]')).toHaveCount(6);
 	});
 
 	test('closes on Escape and returns focus to the trigger', async ({ page }, testInfo) => {
 		test.skip(testInfo.project.name === 'mobile-chrome', 'desktop nav is hidden on mobile');
 
 		await page.goto('/');
-		const trigger = page.locator('header a[aria-haspopup="true"]').first();
+		const trigger = programsTrigger(page);
 		await trigger.focus();
 		await expect(page.locator('header [role="menu"]')).toBeVisible();
 
@@ -243,8 +280,11 @@ test.describe('header scroll state', () => {
 		});
 	});
 
+	// `/contact-us`, not `/admissions`: the latter opens on a full-bleed photo hero since the two
+	// content pages were brought onto the house hero idiom, so it is now a DARK route and belongs to
+	// the case above. `/contact-us` is the remaining top-level page that genuinely opens on white.
 	test('a light route is already ink, and only gains the bar', async ({ page }) => {
-		await page.goto('/admissions');
+		await page.goto('/contact-us');
 		await page.waitForTimeout(700);
 
 		// No scrim and no white wordmark on a page that opens on white, scrolled or not.

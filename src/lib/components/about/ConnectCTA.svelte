@@ -2,7 +2,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import NewsletterForm from '$lib/components/NewsletterForm.svelte';
-	import connectImg from '$lib/assets/programs/ai-entrepreneurship/AI-Entrep_07.jpg?enhanced';
+	import connectImg from '$lib/assets/programs/ai-camp/AI-Entrep_07.jpg?enhanced';
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->

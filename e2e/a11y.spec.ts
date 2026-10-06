@@ -7,11 +7,15 @@ import AxeBuilder from '@axe-core/playwright';
 // A route that does not exist yet is listed anyway and skipped with an explicit reason, so the
 // day it lands it is already under the gate instead of waiting for someone to remember it.
 //
-// /results is on this list although §6.4 does not name it (§6.4 is the "must ship complete"
-// content set, which is a different question from "must be accessible"). It carries a photograph
-// with alt text, three third-party <iframe> players and a nested heading hierarchy — all three
-// are where serious violations come from — so exempting it would leave the page with the most
-// axe surface area as the one page nothing checks.
+// /success-stories is on this list although §6.4 does not name it (§6.4 is the "must ship
+// complete" content set, which is a different question from "must be accessible"). It carries a
+// photograph with alt text, three third-party <iframe> players and a nested heading hierarchy —
+// all three are where serious violations come from — so exempting it would leave the page with the
+// most axe surface area as the one page nothing checks.
+//
+// The Academics / Student Life / Our Team routes are listed for the same reason, and listed now
+// rather than when their copy arrives: four of them are stubs today, and a stub is exactly when a
+// heading-order or contrast mistake gets baked in unnoticed.
 const SECTION_6_4 = [
 	'/',
 	'/programs',
@@ -22,7 +26,15 @@ const SECTION_6_4 = [
 	'/programs/summer-winter-camps',
 	'/programs/ithaca-night',
 	'/admissions',
-	'/results',
+	'/academics',
+	'/academics/ap',
+	'/academics/ossd',
+	'/academics/stem',
+	'/academics/tutoring',
+	'/student-life',
+	'/success-stories',
+	'/about-us',
+	'/about-us/our-team',
 	'/contact-us'
 ] as const;
 

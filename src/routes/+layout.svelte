@@ -12,6 +12,7 @@
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import PopupBanner from '$lib/components/PopupBanner.svelte';
+	import LocaleSuggestion from '$lib/components/LocaleSuggestion.svelte';
 	import * as m from '$lib/paraglide/messages';
 	import { getLocale } from '$lib/paraglide/runtime';
 	import { page, navigating } from '$app/state';
@@ -147,4 +148,9 @@
 	</main>
 	<Footer />
 	<PopupBanner />
+	<!-- Both are client-only, dismissible overlays, and both are deliberately OUTSIDE the admin
+	     branch. LocaleSuggestion renders nothing on /zh and nothing until it has read
+	     navigator.languages after mount; it is pinned under the header at z-30 so it cannot collide
+	     with PopupBanner's full-bleed z-50 bottom bar (see the comment in that component). -->
+	<LocaleSuggestion />
 {/if}

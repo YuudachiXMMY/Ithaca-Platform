@@ -22,7 +22,7 @@
 	import type { Result } from '$lib/content/types';
 	import * as m from '$lib/paraglide/messages';
 
-	import aiecAward from '$lib/assets/programs/ai-entrepreneurship/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg?enhanced';
+	import aiecAward from '$lib/assets/programs/ai-camp/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg?enhanced';
 
 	interface Props {
 		groups: readonly ResultYearGroup[];
@@ -42,8 +42,7 @@
 	 * one. That also covers `TODO(asset)` sentinels, which is the shape `partners.ts` already uses.
 	 */
 	const EVIDENCE: Record<string, Picture> = {
-		'$lib/assets/programs/ai-entrepreneurship/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg':
-			aiecAward
+		'$lib/assets/programs/ai-camp/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg': aiecAward
 	};
 
 	/** Static key → message map, so Paraglide can still tree-shake (no `m['results_type_' + t]`). */

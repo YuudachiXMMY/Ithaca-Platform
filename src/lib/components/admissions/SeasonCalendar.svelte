@@ -19,14 +19,42 @@
 -->
 <script lang="ts">
 	import { ArrowRight } from 'lucide-svelte';
+	import type { Picture } from '@sveltejs/enhanced-img';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import type { CalendarRow } from '$lib/admissions';
 	import * as m from '$lib/paraglide/messages';
+
+	import evImg from '$lib/assets/programs/ev-challenge/EV26-5.jpg?enhanced';
+	import aiCampImg from '$lib/assets/programs/ai-camp/AI-Entrep_81.jpg?enhanced';
+	import dialoguesImg from '$lib/assets/programs/ai-interview/carmi-levy.png?enhanced';
+	import engineeringImg from '$lib/assets/programs/ev-challenge/EV26-3.jpg?enhanced';
+	import summerWinterImg from '$lib/assets/programs/ai-camp/ai-camp-HB8A5065.jpg?enhanced';
+	import ithacaNightImg from '$lib/assets/programs/ai-camp/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg?enhanced';
 
 	interface Props {
 		rows: readonly CalendarRow[];
 	}
 	let { rows }: Props = $props();
+
+	/**
+	 * `Program.slug` → the card photograph.
+	 *
+	 * The specifiers are the ones `/programs` already uses for the same six cards, so a season card
+	 * here and the index card it sits beside cannot show two different pictures of one programme.
+	 * `@sveltejs/enhanced-img` needs a STATIC import specifier, which is why this is a map rather
+	 * than a field on `Season` — the same convention `ResultsTimeline` and `/programs` follow.
+	 *
+	 * A slug with no entry renders the text header below instead of a broken image, which is also
+	 * what a programme added to `season-data.ts` before anyone has shot it will do.
+	 */
+	const PROGRAM_IMAGE: Record<string, Picture> = {
+		'ev-challenge': evImg,
+		'ai-entrepreneurship-camp': aiCampImg,
+		'ithaca-dialogues': dialoguesImg,
+		'engineering-projects': engineeringImg,
+		'summer-winter-camps': summerWinterImg,
+		'ithaca-night': ithacaNightImg
+	};
 
 	const STATUS: Record<CalendarRow['registration'], () => string> = {
 		open: m.admissions_calendar_statusOpen,
@@ -73,57 +101,95 @@
 {:else}
 	<ul class="grid grid-cols-1 gap-4 lg:grid-cols-2">
 		{#each rows as row (row.season.id)}
-			<li class="flex flex-col border border-border-strong bg-surface-1 p-5">
-				<div class="flex flex-wrap items-start justify-between gap-3">
-					<h3 class="text-lg leading-snug font-bold tracking-tight text-foreground">
-						{row.programName}
-					</h3>
-					<span
-						class="shrink-0 border border-brand/40 px-2 py-1 font-mono text-[11px] tracking-[0.2em] text-brand-bright uppercase"
-					>
-						{STATUS[row.registration]()}
-					</span>
-				</div>
+			{@const picture = PROGRAM_IMAGE[row.season.programSlug] ?? null}
+			<li class="group flex flex-col border border-border-strong bg-surface-1">
+				{#if picture}
+					<!-- The programme name and the status badge sit ON the photograph, in the `band-*`
+					     family, the same way the about-us and /programs overlay cards carry theirs. The
+					     image is decorative here — the name it illustrates is the heading two lines of
+					     markup away — so `alt` is empty rather than a second copy of that name. -->
+					<div class="relative aspect-[16/9] overflow-hidden">
+						<enhanced:img
+							src={picture}
+							alt=""
+							sizes="(max-width: 1024px) 100vw, 50vw"
+							loading="lazy"
+							class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+						/>
+						<div
+							class="absolute inset-0 bg-gradient-to-t from-overlay/95 via-overlay/60 to-overlay/20"
+							aria-hidden="true"
+						></div>
+						<div
+							class="absolute inset-x-0 bottom-0 flex flex-wrap items-end justify-between gap-3 p-5"
+						>
+							<h3 class="text-lg leading-snug font-bold tracking-tight text-band-foreground">
+								{row.programName}
+							</h3>
+							<span
+								class="shrink-0 border border-band-brand/50 px-2 py-1 font-mono text-[11px] tracking-[0.2em] text-band-brand-strong uppercase"
+							>
+								{STATUS[row.registration]()}
+							</span>
+						</div>
+					</div>
+				{:else}
+					<div class="flex flex-wrap items-start justify-between gap-3 p-5 pb-0">
+						<h3 class="text-lg leading-snug font-bold tracking-tight text-foreground">
+							{row.programName}
+						</h3>
+						<span
+							class="shrink-0 border border-brand/40 px-2 py-1 font-mono text-[11px] tracking-[0.2em] text-brand-bright uppercase"
+						>
+							{STATUS[row.registration]()}
+						</span>
+					</div>
+				{/if}
 
-				<dl class="mt-5 grid grid-cols-1 gap-y-3 text-sm sm:grid-cols-[9rem_1fr] sm:gap-x-5">
-					<dt class={termClass}>{m.admissions_calendar_labelSeason()}</dt>
-					<dd class="text-foreground">{row.seasonLabel}</dd>
+				<div class="flex flex-1 flex-col p-5">
+					<dl class="grid grid-cols-1 gap-y-3 text-sm sm:grid-cols-[9rem_1fr] sm:gap-x-5">
+						<dt class={termClass}>{m.admissions_calendar_labelSeason()}</dt>
+						<dd class="text-foreground">{row.seasonLabel}</dd>
 
-					<dt class={termClass}>{m.admissions_calendar_labelWindow()}</dt>
-					<dd class="text-foreground">{windowLabel(row)}</dd>
+						<dt class={termClass}>{m.admissions_calendar_labelWindow()}</dt>
+						<dd class="text-foreground">{windowLabel(row)}</dd>
 
-					{#if row.grades}
-						<dt class={termClass}>{m.admissions_calendar_labelGrades()}</dt>
-						<!-- Spaced hyphen, not an en dash: it is what both catalogues already write for a
+						{#if row.grades}
+							<dt class={termClass}>{m.admissions_calendar_labelGrades()}</dt>
+							<!-- Spaced hyphen, not an en dash: it is what both catalogues already write for a
 						     numeric range (`Grades 8 - 11`, `第三赛季（2026 - 2027）`). -->
-						<dd class="text-foreground">{row.grades.min} - {row.grades.max}</dd>
-					{/if}
+							<dd class="text-foreground">{row.grades.min} - {row.grades.max}</dd>
+						{/if}
 
-					{#if row.cadence}
-						<dt class={termClass}>{m.admissions_calendar_labelCadence()}</dt>
-						<dd class="text-foreground">{row.cadence}</dd>
-					{/if}
+						{#if row.cadence}
+							<dt class={termClass}>{m.admissions_calendar_labelCadence()}</dt>
+							<dd class="text-foreground">{row.cadence}</dd>
+						{/if}
 
-					{#if row.sessionTimes.length > 0}
-						<dt class={termClass}>{m.admissions_calendar_labelSessions()}</dt>
-						<dd class="text-foreground">
-							{#each row.sessionTimes as time (time)}
-								<span class="block">{time}</span>
-							{/each}
-						</dd>
-					{/if}
-				</dl>
+						{#if row.sessionTimes.length > 0}
+							<dt class={termClass}>{m.admissions_calendar_labelSessions()}</dt>
+							<dd class="text-foreground">
+								{#each row.sessionTimes as time (time)}
+									<span class="block">{time}</span>
+								{/each}
+							</dd>
+						{/if}
+					</dl>
 
-				<a
-					href={localizeHref(row.programPath)}
-					class="group mt-5 inline-flex w-fit items-center gap-2 text-sm font-semibold text-brand-bright underline underline-offset-4 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-				>
-					{m.admissions_calendar_programLink()}
-					<ArrowRight
-						class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
-						aria-hidden="true"
-					/>
-				</a>
+					<!-- `group/link` rather than a bare `group`: the <li> already owns one (the photo's
+					     hover zoom reads it), and a nested unnamed group would make hovering anywhere
+					     on the card nudge this arrow. -->
+					<a
+						href={localizeHref(row.programPath)}
+						class="group/link mt-auto inline-flex w-fit items-center gap-2 pt-5 text-sm font-semibold text-brand-bright underline underline-offset-4 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+					>
+						{m.admissions_calendar_programLink()}
+						<ArrowRight
+							class="h-4 w-4 transition-transform duration-200 group-hover/link:translate-x-0.5"
+							aria-hidden="true"
+						/>
+					</a>
+				</div>
 			</li>
 		{/each}
 	</ul>

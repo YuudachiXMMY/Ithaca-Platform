@@ -186,12 +186,14 @@ test.describe('the admissions funnel, on a phone', () => {
 		await expect(form.locator('input[type="checkbox"][value="ev-challenge"]')).toBeChecked();
 	});
 
-	test('/admissions and /results are reachable from the chrome, not just by URL', async ({
+	test('/admissions and /success-stories are reachable from the chrome, not just by URL', async ({
 		page
 	}) => {
 		await page.goto('/zh/programs/ev-challenge');
 
-		// Header: on a phone the nav lives behind the hamburger.
+		// Header: on a phone the nav lives behind the hamburger. The drawer renders NAV_ITEMS
+		// straight through, so Success Stories sits inside the Student Life accordion rather than
+		// at the top level — expanding it is part of what "reachable" means here.
 		await page.locator('header button[aria-expanded]').first().click();
 		const drawer = page
 			.getByRole('navigation')
@@ -199,10 +201,15 @@ test.describe('the admissions funnel, on a phone', () => {
 			.last();
 		await expect(drawer.locator('a[href="/zh/admissions"]')).toBeVisible();
 
+		const studentLife = drawer.locator('li', { has: page.locator('a[href="/zh/student-life"]') });
+		await studentLife.locator('button[aria-expanded]').click();
+		await expect(drawer.locator('a[href="/zh/success-stories"]')).toBeVisible();
+
 		await page.keyboard.press('Escape');
-		// Footer: the supporting page lives here and only here.
-		await expect(page.locator('footer a[href="/zh/results"]')).toHaveCount(1);
+		// Footer: still a human-readable sitemap of the top level, plus Success Stories. It is no
+		// longer the ONLY place that page is reachable from — `docs/DECISIONS.md` K-2 was reversed
+		// when the Student Life group landed — so this asserts presence, not exclusivity.
+		await expect(page.locator('footer a[href="/zh/success-stories"]')).toHaveCount(1);
 		await expect(page.locator('footer a[href="/zh/admissions"]')).toHaveCount(1);
-		await expect(page.locator('header a[href="/zh/results"]')).toHaveCount(0);
 	});
 });

@@ -61,9 +61,10 @@ describe('Programs dropdown — R-GLB-1', () => {
 /**
  * The admissions path has to be reachable without typing a URL.
  *
- * `/admissions` and `/results` both shipped in the sitemap and in NOTHING else — no header entry,
- * no footer link, no programme-page CTA — so the page the redesign's hypothesis turns on could only
- * be found by guessing its path. These assertions are the floor under that.
+ * `/admissions` and what is now `/success-stories` both shipped in the sitemap and in NOTHING else —
+ * no header entry, no footer link, no programme-page CTA — so the page the redesign's hypothesis
+ * turns on could only be found by guessing its path. These assertions are the floor under that, and
+ * they have since grown to cover the three groups the owner added on top.
  */
 describe('the funnel is reachable — R-GLB-1 / R-GLB-2', () => {
 	const hrefs = NAV_ITEMS.map((item) => item.href);
@@ -85,10 +86,63 @@ describe('the funnel is reachable — R-GLB-1 / R-GLB-2', () => {
 		expect(hrefs.filter((href) => !RIGHT_NAV_HREFS.includes(href)).length).toBeGreaterThan(0);
 	});
 
-	it('lists /results in the footer and only in the footer', () => {
-		const footer = FOOTER_LINKS.map((item) => item.href);
-		expect(footer).toContain('/results');
-		expect(hrefs).not.toContain('/results');
+	// Reverses `docs/DECISIONS.md` K-2. The page was footer-ONLY on the argument that a header slot
+	// cost more than it was worth; the owner then asked for a Student Life group, and Success
+	// Stories is the only page in that group with real content, so the slot is no longer being
+	// spent on it alone. It is now in BOTH places, and this pins both — the previous version of
+	// this test asserted `not.toContain` on the header, so it is also the test that would have
+	// failed silently-in-the-right-direction if the nav entry had been added and the decision
+	// record left behind.
+	it('reaches /success-stories from the Student Life dropdown AND the footer', () => {
+		const studentLife = NAV_ITEMS.find((item) => item.href === '/student-life');
+		expect(studentLife?.children?.map((child) => child.href)).toContain('/success-stories');
+		expect(FOOTER_LINKS.map((item) => item.href)).toContain('/success-stories');
+		// The old path must not come back as a nav destination; `src/routes/results/+page.ts` is a
+		// 308 stub, and linking a redirect from the chrome spends a round trip on every click.
+		const every = [...hrefs, ...NAV_ITEMS.flatMap((i) => i.children ?? []).map((c) => c.href)];
+		expect(every).not.toContain('/results');
+	});
+
+	/**
+	 * Every nav href is a route that exists.
+	 *
+	 * Discovered the same way `sitemap.xml` and `og/cards.test.ts` discover theirs, so "in the nav"
+	 * and "is a page" are the same set by construction. This landed with seven new destinations
+	 * added at once, where a single typo (`/academics/osssd`) would have produced a header link to
+	 * a 404 that renders a plausible white error page — and `headerOnDark` would have claimed it as
+	 * dark, so the error page would also have had an invisible nav. Nothing else in the suite looks
+	 * at the relationship between these two lists.
+	 */
+	it('points every entry, top level and child, at a route that exists', () => {
+		const routes = new Set(
+			Object.keys(import.meta.glob('/src/routes/**/+page.svelte')).map(
+				(file) => file.replace('/src/routes', '').replace('/+page.svelte', '') || '/'
+			)
+		);
+		const all = [
+			...NAV_ITEMS,
+			...NAV_ITEMS.flatMap((item) => item.children ?? []),
+			...FOOTER_LINKS
+		];
+		expect(all.map((item) => item.href).filter((href) => !routes.has(href))).toEqual([]);
+	});
+
+	// The rule `NAV_ITEMS` documents: a dropdown exists to offer a choice, so a group that would
+	// show one link lists its own page as well. Left unpinned, a later edit that moves Our Team or
+	// Success Stories elsewhere leaves a hover panel containing a single item, which reads as a bug.
+	it('never renders a dropdown with fewer than two entries', () => {
+		for (const item of NAV_ITEMS.filter((i) => i.children)) {
+			expect(item.children!.length, item.href).toBeGreaterThanOrEqual(2);
+		}
+	});
+
+	it('resolves a real label for every dropdown entry in every group', () => {
+		const everyChild = NAV_ITEMS.flatMap((item) => item.children ?? []);
+		// Programs' six are covered above; this is the other three groups' nine.
+		expect(everyChild.length).toBeGreaterThanOrEqual(14);
+		for (const child of everyChild) {
+			expect(navLabel(child.label), child.label).not.toBe(child.label);
+		}
 	});
 
 	it('carries every header destination except Home into the footer', () => {
@@ -126,6 +180,22 @@ describe('headerOnDark', () => {
 		for (const path of [
 			'/',
 			'/about-us',
+			// `/admissions` and `/success-stories` both render `shared/PageHero.svelte`, which paints
+			// a full-bleed photograph under an `overlay` scrim. They opened on white until the two
+			// content pages were brought onto the house hero idiom; listing them here is the half of
+			// that change the header depends on, and omitting it would put ink on the photograph.
+			'/admissions',
+			'/success-stories',
+			// The three subtrees the Academics / Student Life / About groups added. Their INDEX
+			// pages are dark too, which is why `headerOnDark` matches these by bare prefix — the
+			// opposite of `/programs`, whose index opens on white and is excluded below.
+			'/about-us/our-team',
+			'/academics',
+			'/academics/ap',
+			'/academics/ossd',
+			'/academics/stem',
+			'/academics/tutoring',
+			'/student-life',
 			'/programs/ev-challenge',
 			'/programs/engineering-projects',
 			'/programs/summer-winter-camps',
@@ -145,7 +215,7 @@ describe('headerOnDark', () => {
 	});
 
 	it('leaves every light route alone', () => {
-		for (const path of ['/admissions', '/results', '/contact-us', '/privacy', '/terms']) {
+		for (const path of ['/contact-us', '/privacy', '/terms']) {
 			expect(headerOnDark(path), path).toBe(false);
 		}
 	});

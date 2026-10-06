@@ -67,11 +67,58 @@ export const OG_CARDS: Readonly<Record<string, OgCard>> = {
 		title: m.admissions_hero_title,
 		crumb: m.admissions_hero_title
 	},
-	'/results': {
+	'/success-stories': {
 		template: 'default',
 		eyebrow: m.results_hero_eyebrow,
 		title: m.results_hero_title,
-		crumb: m.results_hero_title
+		crumb: m.nav_successStories
+	},
+	// The Academics / Student Life / About groups. Every field is an EXISTING page message, per
+	// the rule above — a card that restated the headline in its own words would be a second place
+	// to edit, and the first to go stale is the one nobody sees in a browser. `crumb` takes the
+	// NAV label rather than the hero title, which is what makes the breadcrumb read "OSSD" instead
+	// of "Ontario Secondary School Diploma".
+	'/about-us/our-team': {
+		template: 'default',
+		eyebrow: m.ourTeam_hero_eyebrow,
+		title: m.ourTeam_hero_title,
+		crumb: m.nav_ourTeam
+	},
+	'/academics': {
+		template: 'default',
+		eyebrow: m.academics_hero_eyebrow,
+		title: m.academics_hero_title,
+		crumb: m.nav_academics
+	},
+	'/academics/ap': {
+		template: 'default',
+		eyebrow: m.ap_hero_eyebrow,
+		title: m.ap_hero_title,
+		crumb: m.nav_ap
+	},
+	'/academics/ossd': {
+		template: 'default',
+		eyebrow: m.ossd_hero_eyebrow,
+		title: m.ossd_hero_title,
+		crumb: m.nav_ossd
+	},
+	'/academics/stem': {
+		template: 'default',
+		eyebrow: m.stem_hero_eyebrow,
+		title: m.stem_hero_title,
+		crumb: m.nav_stem
+	},
+	'/academics/tutoring': {
+		template: 'default',
+		eyebrow: m.tutoring_hero_eyebrow,
+		title: m.tutoring_hero_title,
+		crumb: m.nav_tutoring
+	},
+	'/student-life': {
+		template: 'default',
+		eyebrow: m.studentLife_hero_eyebrow,
+		title: m.studentLife_hero_title,
+		crumb: m.nav_studentLife
 	},
 	'/contact-us': {
 		template: 'default',

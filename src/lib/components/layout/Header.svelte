@@ -3,6 +3,7 @@
 	import { fly, fade, slide } from 'svelte/transition';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { Menu, X, ChevronDown } from 'lucide-svelte';
+	import type { NavItem } from '$lib/data/nav';
 	import {
 		NAV_ITEMS,
 		RIGHT_NAV_HREFS,
@@ -147,8 +148,21 @@
 	const linkActive = $derived(onDark ? 'text-band-brand' : 'text-brand-bright');
 	const activeRule = $derived(onDark ? 'bg-band-brand' : 'bg-brand');
 
-	function checkActive(href: string): boolean {
-		return href === '/' ? path === '/' : path === href || path.startsWith(href + '/');
+	const matches = (href: string) =>
+		href === '/' ? path === '/' : path === href || path.startsWith(href + '/');
+
+	/**
+	 * Is this item the one the visitor is reading?
+	 *
+	 * A group counts as active when ANY of its children does, not just when the path is under its
+	 * own href. That distinction is load-bearing exactly once today: Student Life's dropdown
+	 * reaches `/success-stories`, which does not sit under `/student-life` (see `NAV_ITEMS`), so a
+	 * pure prefix test leaves the whole bar unmarked on the one page in that group with real
+	 * content. Deriving it from `children` rather than adding an `activeFor` field keeps it true
+	 * for the next group whose URLs and menu disagree.
+	 */
+	function checkActive(item: NavItem): boolean {
+		return matches(item.href) || (item.children?.some((child) => matches(child.href)) ?? false);
 	}
 
 	function handleScroll() {
@@ -184,6 +198,94 @@
 	}}
 />
 
+<!--
+	ONE renderer for both desktop nav groups.
+
+	It was two, and that is exactly how Student Life shipped without its dropdown: the right-hand
+	loop had no `{#if item.children}` branch, because until the owner asked for this group nothing
+	on the right of the logo had ever had children. The bar looked right and every test passed —
+	`nav.test.ts` checks the DATA, and the data was correct — while the menu simply did not exist on
+	desktop, even though the mobile drawer rendered it fine. A screenshot caught it. Duplicated
+	markup is not kept in sync by discipline; there is now nothing to keep in sync.
+-->
+{#snippet navEntry(item: NavItem)}
+	{@const active = checkActive(item)}
+	{#if item.children}
+		{@const open = openDropdown === item.href}
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div
+			class="relative"
+			onmouseenter={() => openMenu(item.href)}
+			onmouseleave={closeMenu}
+			onfocusin={() => openMenu(item.href)}
+			onfocusout={closeMenu}
+			onkeydown={(e) => handleDropdownKeydown(e, item.href)}
+		>
+			<a
+				href={localizeHref(item.href)}
+				class={cn(
+					'relative flex items-center gap-1.5 py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+					active ? linkActive : linkIdle
+				)}
+				aria-expanded={open}
+				aria-haspopup="true"
+			>
+				{#if active}
+					<span class={cn('absolute -bottom-px left-0 h-px w-4', activeRule)} aria-hidden="true"
+					></span>
+				{/if}
+				{navLabel(item.label)}
+				<ChevronDown
+					class={cn('h-3 w-3 transition-transform duration-200', open && 'rotate-180')}
+					aria-hidden="true"
+				/>
+			</a>
+
+			{#if open}
+				<div
+					class="absolute top-full left-0 z-50 mt-2 w-max max-w-[340px] min-w-[240px] overflow-hidden rounded-sm border border-border bg-surface-4/90 py-2 shadow-2xl backdrop-blur-xl"
+					role="menu"
+					transition:fly={{ y: 8, duration: dropdownDuration }}
+				>
+					{#each item.children as child (child.href)}
+						{@const status = navSeasonStatus(child)}
+						<a
+							href={localizeHref(child.href)}
+							class="flex items-center justify-between gap-4 px-4 py-2.5 text-sm text-foreground-muted transition-colors hover:bg-surface-2 hover:text-foreground"
+							role="menuitem"
+						>
+							<span>{navLabel(child.label)}</span>
+							<!-- R-GLB-1: every entry carries its season status. A programme with no
+										     Season record yet renders no badge, never an empty one. -->
+							{#if status}
+								<span
+									class="shrink-0 border border-brand/30 px-1.5 py-0.5 font-mono text-[10px] tracking-[0.12em] text-brand-bright uppercase"
+								>
+									{status}
+								</span>
+							{/if}
+						</a>
+					{/each}
+				</div>
+			{/if}
+		</div>
+	{:else}
+		<a
+			href={localizeHref(item.href)}
+			class={cn(
+				'relative py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+				active ? linkActive : linkIdle
+			)}
+		>
+			{#if active}
+				<span class={cn('absolute -bottom-px left-0 h-px w-4', activeRule)} aria-hidden="true"
+				></span>
+			{/if}
+			{navLabel(item.label)}
+		</a>
+	{/if}
+{/snippet}
+
 <header
 	class={cn(
 		'fixed inset-x-0 top-0 z-40 transition-all duration-500 ease-out',
@@ -214,87 +316,12 @@
 	>
 		<!-- Left slot: desktop nav -->
 		<div class="flex items-center">
-			<nav class="hidden items-center gap-10 lg:flex" aria-label={m.common_nav_mainNavigation()}>
+			<nav
+				class="hidden items-center gap-7 lg:flex xl:gap-10"
+				aria-label={m.common_nav_mainNavigation()}
+			>
 				{#each LEFT_NAV as item (item.href)}
-					{@const active = checkActive(item.href)}
-					{#if item.children}
-						{@const open = openDropdown === item.href}
-						<!-- svelte-ignore a11y_no_static_element_interactions -->
-						<div
-							class="relative"
-							onmouseenter={() => openMenu(item.href)}
-							onmouseleave={closeMenu}
-							onfocusin={() => openMenu(item.href)}
-							onfocusout={closeMenu}
-							onkeydown={(e) => handleDropdownKeydown(e, item.href)}
-						>
-							<a
-								href={localizeHref(item.href)}
-								class={cn(
-									'relative flex items-center gap-1.5 py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
-									active ? linkActive : linkIdle
-								)}
-								aria-expanded={open}
-								aria-haspopup="true"
-							>
-								{#if active}
-									<span
-										class={cn('absolute -bottom-px left-0 h-px w-4', activeRule)}
-										aria-hidden="true"
-									></span>
-								{/if}
-								{navLabel(item.label)}
-								<ChevronDown
-									class={cn('h-3 w-3 transition-transform duration-200', open && 'rotate-180')}
-									aria-hidden="true"
-								/>
-							</a>
-
-							{#if open}
-								<div
-									class="absolute top-full left-0 z-50 mt-2 w-max max-w-[340px] min-w-[240px] overflow-hidden rounded-sm border border-border bg-surface-4/90 py-2 shadow-2xl backdrop-blur-xl"
-									role="menu"
-									transition:fly={{ y: 8, duration: dropdownDuration }}
-								>
-									{#each item.children as child (child.href)}
-										{@const status = navSeasonStatus(child)}
-										<a
-											href={localizeHref(child.href)}
-											class="flex items-center justify-between gap-4 px-4 py-2.5 text-sm text-foreground-muted transition-colors hover:bg-surface-2 hover:text-foreground"
-											role="menuitem"
-										>
-											<span>{navLabel(child.label)}</span>
-											<!-- R-GLB-1: every entry carries its season status. A programme with no
-											     Season record yet renders no badge, never an empty one. -->
-											{#if status}
-												<span
-													class="shrink-0 border border-brand/30 px-1.5 py-0.5 font-mono text-[10px] tracking-[0.12em] text-brand-bright uppercase"
-												>
-													{status}
-												</span>
-											{/if}
-										</a>
-									{/each}
-								</div>
-							{/if}
-						</div>
-					{:else}
-						<a
-							href={localizeHref(item.href)}
-							class={cn(
-								'relative py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
-								active ? linkActive : linkIdle
-							)}
-						>
-							{#if active}
-								<span
-									class={cn('absolute -bottom-px left-0 h-px w-4', activeRule)}
-									aria-hidden="true"
-								></span>
-							{/if}
-							{navLabel(item.label)}
-						</a>
-					{/if}
+					{@render navEntry(item)}
 				{/each}
 			</nav>
 		</div>
@@ -323,28 +350,11 @@
 
 		<!-- Right slot: desktop contact + switcher + mobile toggle -->
 		<div class="flex items-center justify-end">
-			<nav class="hidden items-center gap-10 lg:flex">
+			<nav class="hidden items-center gap-7 lg:flex xl:gap-10">
 				{#each RIGHT_NAV as item (item.href)}
-					{@const active = checkActive(item.href)}
-					<a
-						href={localizeHref(item.href)}
-						class={cn(
-							'relative py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
-							active ? linkActive : linkIdle
-						)}
-					>
-						{#if active}
-							<span class={cn('absolute -bottom-px left-0 h-px w-4', activeRule)} aria-hidden="true"
-							></span>
-						{/if}
-						{navLabel(item.label)}
-					</a>
+					{@render navEntry(item)}
 				{/each}
 			</nav>
-
-			<div class="ml-6 hidden items-center lg:flex">
-				<LanguageSwitcher {onDark} />
-			</div>
 
 			<button
 				bind:this={toggleEl}
@@ -405,7 +415,7 @@
 
 		<ul class="flex-1 space-y-1 overflow-y-auto px-4">
 			{#each NAV_ITEMS as item (item.href)}
-				{@const active = checkActive(item.href)}
+				{@const active = checkActive(item)}
 				{@const expanded = expandedItem === item.label}
 				<li>
 					<div class="flex items-center">

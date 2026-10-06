@@ -6,7 +6,7 @@ content readiness is the critical path, so this file is surfaced in every PR des
 **Status key**: 🔴 blocking launch · 🟡 placeholder shipped, real content still needed ·
 🟢 resolved
 
-Last reviewed: 2026-09-29
+Last reviewed: 2026-10-02
 
 ---
 
@@ -85,6 +85,84 @@ lowers lead quality; publishing a figure or a range with an inclusions list is t
 recommended posture.
 
 ---
+
+### C-9 · The eight pages the Academics / Student Life / About groups added
+
+The owner asked for a `Academics` group (AP, OSSD, STEM, Tutoring), a `Student Life` group, an
+`Our Team` page, and `/results` renamed to `/success-stories`. Six of the eight new routes ship as
+honest stubs: a hero, one true paragraph, and two CTAs out to a page that can answer. Nothing about
+IFA's courses, credentials, prices or outcomes was invented to fill them.
+
+**Two of these are not merely empty — they make a claim by existing, and need an owner ruling
+before launch, not just copy.**
+
+#### 🔴 C-9a · `/academics/ossd` contradicts the PRD's own scope
+
+`.claude/PRPs/prds/ithacateens-redesign.prd.md:155` lists, under **非目标用户**:
+
+> 寻找全日制私立学校/OSSD 学分课程的家庭（IFA 是课外项目，与 itorontoacademy.com 的定位不同）
+
+— families looking for a full-time private school or OSSD credit courses are an explicit NON-target,
+because IFA is an extracurricular program. The site now has an OSSD page in its main navigation.
+Either the positioning changed or the page does not belong. The shipped copy describes the diploma's
+public requirements (30 credits, OSSLT, 40 community hours) and says nothing whatsoever about IFA's
+role in it, which is the only version that is safe to publish while this is unresolved.
+
+**Needed from owner**, in order: (a) which is true — information only, advising, or actual credit
+courses? (b) if credit courses: the BSID number and inspected-private-school status, neither of
+which is evidenced anywhere in this repo. Claiming credit-granting authority without it is a
+regulatory problem, not a copy problem.
+
+#### 🔴 C-9b · `/academics/tutoring` has no antecedent anywhere
+
+A repo-wide grep for "tutor" returns only the files this change created, plus `nav.ts`. There is no
+message, no content module, no `Season` record, no PRD line. Tutoring is new to IFA's web presence
+entirely. **Needed**: whether it is live or intended; subjects; who tutors and with what
+qualification; one-to-one or small group; session length; price; in person or online; and whether it
+is open to the public or only to enrolled students.
+
+#### 🟡 C-9c · The rest of what each stub is waiting on
+
+| Page                 | Needed from owner                                                                                                                                                                                                                                                                                                              |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `/academics`         | Per-track grade bands (the site publishes only 4–12 organization-wide, and AP/OSSD plainly do not apply to grade 4). Instructor credentials — Ontario College of Teachers certification, subject qualifications, AP training — which is the strongest trust signal an academics page normally carries and is currently absent. |
+| `/academics/ap`      | Whether IFA teaches AP courses or prepares students for exams taken elsewhere; which subjects; College Board AP Course Audit authorization and school code (without it the site must not call them "AP courses"); exam-centre status; tuition, grades, prerequisites.                                                          |
+| `/academics/stem`    | Whether this is a credit-bearing stream or an umbrella over the existing EV / Engineering / AI Camp programmes — and if the latter, whether it is redundant with C-1's work rather than additive.                                                                                                                              |
+| `/student-life`      | The actual weekly rhythm; what an Ithaca Night evening is (frequency, venue, format, audience — `/programs/ithaca-night` is itself a C-1 placeholder); cohort size; two or three student quotes carried through the `docs/DECISIONS.md` Q7 consent template.                                                                   |
+| `/about-us/our-team` | Confirmation that four people is the published roster before this list has its own URL (C-4 already records that full bios are owed). The hero states no headcount deliberately, so it does not go stale when a fifth person lands.                                                                                            |
+
+#### 🟡 C-9d · Photography: the library cannot illustrate academics
+
+36 candidate photographs were reviewed frame by frame; 19 were rejected (a competing headline inside
+the frame, or a shot that is effectively a portrait of one or two identifiable students). Of the 17
+that passed, **not one shows teaching, studying, tutoring or coursework.** They are event-floor,
+lounge and workshop frames. Every Academics hero is therefore a stand-in, and `/academics` uses text
+cards rather than photo cards specifically so that four unwritten pages do not look like four
+finished ones.
+
+**Needed**: a tutoring session; a subject class; a student working through coursework; a landscape
+frame of staff at work with students (there is currently **no photograph of the team on the team
+page** — the hero shows strangers at an event). Two further notes:
+
+- **Consent.** Several shipped heroes show identifiable students. `results_hero_description` commits
+  the site in writing to publishing student material only with that student's and family's consent.
+  A hero anchored on recognisable faces should clear the same bar, and nothing in the repo records
+  that it does.
+- **Two assets are stored sideways.** `EV25-10.jpg` and `EV25-11.jpg` are landscape canvases holding
+  90°-rotated pixels with no EXIF orientation tag, so a browser renders them on their side.
+  `EV25-11.jpg` was rotated upright losslessly (`jpegtran -rotate 90`) to serve as the STEM hero;
+  it is now portrait, so a wide hero crops it hard. `EV25-10.jpg` is still sideways and unused.
+
+#### 🟡 C-9e · Two pre-existing defects these pages make more visible
+
+- **The organization's Chinese name is inconsistent in the catalogue**: 伊萨卡家族学院 appears 30
+  times, 伊萨卡家庭学院 4 times (`common_logoAlt`, `common_nav_homeLink`, `about_hero_imageAlt`,
+  `common_footerHomeAriaLabel` — all alt/aria text, so a screen-reader user hears a different
+  organization name than the one every visible heading uses). Not corrected here: it is the owner's
+  brand, not a typo for an implementer to settle.
+- **`src/lib/data/team.ts` hardcodes the English honorifics** "Mr." / "Ms." into the `name` field, so
+  the Chinese page renders "Mr. Joshua Wang" under a fully Chinese hero. Already logged under C-4;
+  giving `TeamGrid` its own route makes it considerably more prominent.
 
 ## 🟡 Placeholder shipped
 

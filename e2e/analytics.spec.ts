@@ -179,8 +179,10 @@ test.describe('GA4 events — R-SEO-5', () => {
 		// order-independent because observer firing order across two elements is undefined.
 		await page.locator('img[src*="Joshua-WeChat"]').first().scrollIntoViewIfNeeded();
 		await page.locator('footer img[src*="Joshua-WeChat"]').scrollIntoViewIfNeeded();
-		await expect.poll(async () => (await seen()).length).toBe(2);
-		expect(await seen()).toEqual(['contact_page', 'footer']);
+		// Poll on the ARRAY, not on its length: a length poll that times out reports "expected 2,
+		// got 1" and throws away the one piece of information that identifies which placement is
+		// missing. Same assertion, a failure you can act on.
+		await expect.poll(seen).toEqual(['contact_page', 'footer']);
 
 		// The fallback only exists once the server has refused the enquiry.
 		await page.locator('#contact-name').fill(PII.name);
@@ -191,8 +193,7 @@ test.describe('GA4 events — R-SEO-5', () => {
 		await expect(fallback).toBeVisible();
 		await fallback.scrollIntoViewIfNeeded();
 
-		await expect.poll(async () => (await seen()).length).toBe(3);
-		expect(await seen()).toEqual(['contact_form_fallback', 'contact_page', 'footer']);
+		await expect.poll(seen).toEqual(['contact_form_fallback', 'contact_page', 'footer']);
 
 		const locales = (await sent(page))
 			.filter((event) => event.name === 'wechat_qr_view')
@@ -210,12 +211,28 @@ test.describe('GA4 events — R-SEO-5', () => {
 		]);
 	});
 
-	test('booking_click fires from the admissions CTA', async ({ page }) => {
+	// Two anchors reach `#book`: the hero's primary button and the tuition section's text link. Both
+	// are asserted, in DOM order, because the previous version of this test clicked `.first()` and
+	// named one location — so adding a second booking CTA above the old one silently repointed the
+	// assertion at the new anchor and left the old one unmeasured. Pinning the count plus both
+	// locations is what makes that failure loud.
+	test('booking_click fires from both admissions CTAs, with distinct locations', async ({
+		page
+	}) => {
 		await page.goto('/admissions');
 		await pinNavigation(page);
-		await page.locator('a[href="#book"]').first().click();
 
+		const bookLinks = page.locator('main a[href="#book"]');
+		await expect(bookLinks).toHaveCount(2);
+
+		await bookLinks.first().click();
 		expect((await sent(page)).filter((event) => event.name === 'booking_click')).toEqual([
+			{ name: 'booking_click', params: { location: 'admissions_hero', locale: 'en' } }
+		]);
+
+		await bookLinks.nth(1).click();
+		expect((await sent(page)).filter((event) => event.name === 'booking_click')).toEqual([
+			{ name: 'booking_click', params: { location: 'admissions_hero', locale: 'en' } },
 			{ name: 'booking_click', params: { location: 'admissions_tuition', locale: 'en' } }
 		]);
 	});

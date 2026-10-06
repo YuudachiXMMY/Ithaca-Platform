@@ -14,7 +14,7 @@ import { RESULTS } from './content/results';
  * renders a card three components further down from a second, ungated read of the same records —
  * which is precisely how a consent gate fails in practice. This one instead:
  *
- *  1. Renders the REAL route — `src/routes/results/+page.svelte` — through `svelte/server`, with
+ *  1. Renders the REAL route — `src/routes/success-stories/+page.svelte` — through `svelte/server`, with
  *     `$lib/content/results` module-mocked. Nothing between the record and the HTML is stubbed:
  *     the page's own wiring, the timeline component, the year grouping and the JSON-LD builder are
  *     all under test. A page that called `resultsTimeline()` and then also looped over `RESULTS`
@@ -131,7 +131,7 @@ async function renderResults(records: readonly Result[], locale: Locale): Promis
 	const [{ render }, runtime, resultsPage] = await Promise.all([
 		import('svelte/server'),
 		import('$lib/paraglide/runtime'),
-		import('../routes/results/+page.svelte')
+		import('../routes/success-stories/+page.svelte')
 	]);
 	runtime.overwriteGetLocale(() => locale);
 
