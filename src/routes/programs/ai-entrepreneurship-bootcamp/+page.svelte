@@ -17,19 +17,19 @@
 
 	// Hand-placed mosaics (specific images / alts / spans), so build-time enhanced
 	// imports per image — NOT a folder glob, which would render all ~90 photos.
-	import heroA from '$lib/assets/programs/ai-camp/AIEC2026/OTLFInnovationDay-2026-Presentations-188.jpg?enhanced';
-	import heroB from '$lib/assets/programs/ai-camp/AI-Entrep_70.jpg?enhanced';
-	import heroC from '$lib/assets/programs/ai-camp/AIEC2026/OTLFInnovationDay-2026-Presentations-179.jpg?enhanced';
-	import heroMobile from '$lib/assets/programs/ai-camp/ai-camp-hero.png?enhanced';
-	import ov1 from '$lib/assets/programs/ai-camp/AI-Entrep_05.jpg?enhanced';
-	import ov2 from '$lib/assets/programs/ai-camp/AIEC2026/AIEC2026-clossette_2s.png?enhanced';
-	import ov3 from '$lib/assets/programs/ai-camp/AI-Entrep_65.jpg?enhanced';
-	import ov4 from '$lib/assets/programs/ai-camp/AI-Entrep_79.jpg?enhanced';
-	import structureImg from '$lib/assets/programs/ai-camp/AI-Entrep_12.jpg?enhanced';
-	import contest1 from '$lib/assets/programs/ai-camp/AI-Entrep_50.jpg?enhanced';
-	import contest2 from '$lib/assets/programs/ai-camp/AIEC2026/OTLFInnovationDay-2026-Presentations-164.jpg?enhanced';
-	import goalsImg from '$lib/assets/programs/ai-camp/AI-Entrep_89.jpg?enhanced';
-	import teamImg from '$lib/assets/programs/ai-camp/AI-Entrep_93s.jpg?enhanced';
+	import heroA from '$lib/assets/programs/ai-bootcamp/AIEC2026/OTLFInnovationDay-2026-Presentations-188.jpg?enhanced';
+	import heroB from '$lib/assets/programs/ai-bootcamp/AI-Entrep_70.jpg?enhanced';
+	import heroC from '$lib/assets/programs/ai-bootcamp/AIEC2026/OTLFInnovationDay-2026-Presentations-179.jpg?enhanced';
+	import heroMobile from '$lib/assets/programs/ai-bootcamp/ai-camp-hero.png?enhanced';
+	import ov1 from '$lib/assets/programs/ai-bootcamp/AI-Entrep_05.jpg?enhanced';
+	import ov2 from '$lib/assets/programs/ai-bootcamp/AIEC2026/AIEC2026-clossette_2s.png?enhanced';
+	import ov3 from '$lib/assets/programs/ai-bootcamp/AI-Entrep_65.jpg?enhanced';
+	import ov4 from '$lib/assets/programs/ai-bootcamp/AI-Entrep_79.jpg?enhanced';
+	import structureImg from '$lib/assets/programs/ai-bootcamp/AI-Entrep_12.jpg?enhanced';
+	import contest1 from '$lib/assets/programs/ai-bootcamp/AI-Entrep_50.jpg?enhanced';
+	import contest2 from '$lib/assets/programs/ai-bootcamp/AIEC2026/OTLFInnovationDay-2026-Presentations-164.jpg?enhanced';
+	import goalsImg from '$lib/assets/programs/ai-bootcamp/AI-Entrep_89.jpg?enhanced';
+	import teamImg from '$lib/assets/programs/ai-bootcamp/AI-Entrep_93s.jpg?enhanced';
 
 	/**
 	 * `prd.md` R-PT-1 / R-CONTENT-1 — the detail bar reads `aiec-c3` from

@@ -4,7 +4,7 @@
 	import PageHero from '$lib/components/shared/PageHero.svelte';
 	import TeamGrid from '$lib/components/about/TeamGrid.svelte';
 	import ConnectCTA from '$lib/components/about/ConnectCTA.svelte';
-	import hero from '$lib/assets/programs/ai-camp/AI-Entrep_13.jpg?enhanced';
+	import hero from '$lib/assets/programs/ai-bootcamp/AI-Entrep_13.jpg?enhanced';
 
 	/**
 	 * `/about-us/our-team` — the one page in this batch that ships complete.

@@ -208,7 +208,7 @@ export const PROGRAMS: readonly Program[] = [
 		grades: { min: 8, max: 12 },
 		format: 'in-person',
 		hero: {
-			src: '$lib/assets/programs/ai-camp/AIEC2026/OTLFInnovationDay-2026-Presentations-188.jpg',
+			src: '$lib/assets/programs/ai-bootcamp/AIEC2026/OTLFInnovationDay-2026-Presentations-188.jpg',
 			alt: {
 				en: 'Ithaca students pitching at OTLF Innovation Day 2026',
 				zh: '伊萨卡学生在 2026 OTLF 创新日路演'
@@ -218,19 +218,19 @@ export const PROGRAMS: readonly Program[] = [
 		},
 		gallery: [
 			{
-				src: '$lib/assets/programs/ai-camp/AI-Entrep_05.jpg',
+				src: '$lib/assets/programs/ai-bootcamp/AI-Entrep_05.jpg',
 				alt: { en: 'Students at AI Entrepreneurship Bootcamp', zh: 'AI 创业训练营的学生' },
 				width: 1920,
 				height: 1280
 			},
 			{
-				src: '$lib/assets/programs/ai-camp/AI-Entrep_12.jpg',
+				src: '$lib/assets/programs/ai-bootcamp/AI-Entrep_12.jpg',
 				alt: { en: 'Team working on an MVP', zh: '团队开发 MVP' },
 				width: 1920,
 				height: 1280
 			},
 			{
-				src: '$lib/assets/programs/ai-camp/AI-Entrep_81.jpg',
+				src: '$lib/assets/programs/ai-bootcamp/AI-Entrep_81.jpg',
 				alt: { en: 'Students at AI Entrepreneurship Bootcamp', zh: 'AI 创业训练营的学生' },
 				width: 1920,
 				height: 1280
@@ -308,7 +308,7 @@ export const PROGRAMS: readonly Program[] = [
 				height: 1092
 			},
 			{
-				src: '$lib/assets/programs/ai-camp/ai-camp-HB8A5242.jpg',
+				src: '$lib/assets/programs/ai-bootcamp/ai-camp-HB8A5242.jpg',
 				alt: { en: 'Students preparing interview questions', zh: '学生准备采访提纲' },
 				width: 1920,
 				height: 1280
@@ -476,7 +476,7 @@ export const PROGRAMS: readonly Program[] = [
 		grades: ACADEMY_GRADES,
 		format: 'in-person',
 		hero: placeholderHero(
-			'$lib/assets/programs/ai-camp/ai-camp-HB8A5065.jpg',
+			'$lib/assets/programs/ai-bootcamp/ai-camp-HB8A5065.jpg',
 			'Students at an Ithaca seasonal camp',
 			'伊萨卡季节性营地的学生'
 		),
@@ -500,7 +500,7 @@ export const PROGRAMS: readonly Program[] = [
 		grades: ACADEMY_GRADES,
 		format: 'in-person',
 		hero: placeholderHero(
-			'$lib/assets/programs/ai-camp/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg',
+			'$lib/assets/programs/ai-bootcamp/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg',
 			'Ithaca Night community showcase',
 			'伊萨卡之夜社区展示活动'
 		),

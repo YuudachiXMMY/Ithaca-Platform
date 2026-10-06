@@ -1,8 +1,8 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
-	import teachImg from '$lib/assets/programs/ai-camp/ai-camp-HB8A5242.jpg?enhanced';
-	import ethicsImg from '$lib/assets/programs/ai-camp/ai-camp-HB8A5065.jpg?enhanced';
+	import teachImg from '$lib/assets/programs/ai-bootcamp/ai-camp-HB8A5242.jpg?enhanced';
+	import ethicsImg from '$lib/assets/programs/ai-bootcamp/ai-camp-HB8A5065.jpg?enhanced';
 </script>
 
 <section class="bg-surface-3 py-12 lg:py-16" aria-label={m.about_approach_ariaLabel()}>

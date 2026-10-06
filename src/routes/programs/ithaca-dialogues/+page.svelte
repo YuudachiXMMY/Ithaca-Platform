@@ -17,8 +17,8 @@
 
 	import heroImg from '$lib/assets/site/about-hero.jpg?enhanced';
 	import tracksImg from '$lib/assets/pillars/pillar-explore.png?enhanced';
-	import sectorsImg from '$lib/assets/programs/ai-camp/ai-camp-HB8A5242.jpg?enhanced';
-	import ctaImg from '$lib/assets/programs/ai-camp/ai-camp-HB8A5465.jpg?enhanced';
+	import sectorsImg from '$lib/assets/programs/ai-bootcamp/ai-camp-HB8A5242.jpg?enhanced';
+	import ctaImg from '$lib/assets/programs/ai-bootcamp/ai-camp-HB8A5465.jpg?enhanced';
 
 	/**
 	 * `prd.md` R-PT-1 / R-CONTENT-1 — the hero pills read `dialogues-f26` from
