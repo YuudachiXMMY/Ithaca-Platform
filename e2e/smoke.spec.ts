@@ -1,4 +1,4 @@
-import { test, expect, type APIRequestContext } from '@playwright/test';
+import { test, expect, type APIRequestContext, type Page } from '@playwright/test';
 
 // Route coverage is DERIVED from /sitemap.xml rather than hardcoded. The sitemap endpoint
 // already enumerates routes with `import.meta.glob('/src/routes/**/+page.svelte')`, so a new
@@ -113,7 +113,26 @@ test.describe('locale switch', () => {
 	// subsets, because `--font-stack-body` carried a generic family in front of 'Noto Sans SC'
 	// and CSS font matching stops at a generic. Nothing in the suite noticed, because nothing
 	// looked at the network. These two tests look at the network.
+	/**
+	 * `networkidle` is the right wait for these two — they are about what the network did, so they
+	 * have to wait for it to stop — but it cannot arrive while something on the page is still
+	 * failing. On CI `DATABASE_URL` is a deliberate placeholder (see `playwright.config.ts`), so
+	 * `/api/popups/active` returns a Prisma error on every page and the network never goes quiet:
+	 * these were the only two tests in this file using `networkidle` and the only two that hung,
+	 * at any budget.
+	 *
+	 * Stubbing it keeps the wait honest rather than trading it for a weaker one. An empty body is
+	 * the real "no popup configured" response, which is also what a developer with no local
+	 * database sees, so this changes nothing about font loading — the thing actually under test.
+	 */
+	async function stubPopups(page: Page) {
+		await page.route('**/api/popups/active', (route) =>
+			route.fulfill({ status: 200, contentType: 'application/json', body: 'null' })
+		);
+	}
+
 	test('English pages fetch zero CJK font bytes', async ({ page }) => {
+		await stubPopups(page);
 		const cjk: string[] = [];
 		page.on('request', (r) => {
 			if (r.url().includes('noto-sans-sc')) cjk.push(new URL(r.url()).pathname);
@@ -123,6 +142,7 @@ test.describe('locale switch', () => {
 	});
 
 	test('Chinese pages actually fetch the Noto Sans SC faces, one per weight', async ({ page }) => {
+		await stubPopups(page);
 		const faces = new Set<string>();
 		page.on('response', (r) => {
 			const p = new URL(r.url()).pathname;

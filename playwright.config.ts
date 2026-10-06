@@ -25,21 +25,13 @@ export default defineConfig({
 	retries: process.env.CI ? 1 : 0,
 	reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list']],
 
-	/**
-	 * Playwright's 30s default is a developer-machine number. It is ample locally — pages here are
-	 * prerendered and `page.goto` returns in a second or two — and it is NOT ample on a 2-core CI
-	 * runner, where `smoke.spec.ts`'s "English pages fetch zero CJK font bytes" failed with
-	 * `page.goto: Test timeout of 30000ms exceeded`. Note the failure was the NAVIGATION, not the
-	 * assertion on the next line: nothing about the CJK font was ever in question.
-	 *
-	 * Two things stack on CI. The runner is slower, and `DATABASE_URL` is a deliberate placeholder
-	 * (see `webServer.env` below), so every page's `/api/popups/active` fetch spends a Prisma
-	 * connection failure before the load settles. Both are by design; the 30s budget was simply
-	 * never sized against them.
-	 *
-	 * Local stays at the default so a genuine hang still surfaces quickly while developing.
-	 */
-	timeout: process.env.CI ? 90_000 : 30_000,
+	// NOTE: there is deliberately no `timeout` override here. Raising it was tried and was the
+	// wrong answer: the two tests that blew the 30s default were the only two using
+	// `waitUntil: 'networkidle'`, which on CI never arrives because `DATABASE_URL` is a
+	// placeholder and `/api/popups/active` keeps failing. A bigger budget only made each failure
+	// cost 3x more and pushed the whole job past ci.yml's `timeout-minutes: 20`. Those two tests
+	// now stub the endpoint instead (see e2e/smoke.spec.ts); every other test has always fit
+	// inside 30s on CI, so the default stays and a genuine hang still fails fast.
 
 	use: {
 		baseURL: BASE_URL,
