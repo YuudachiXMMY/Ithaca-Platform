@@ -25,11 +25,11 @@
 	import * as m from '$lib/paraglide/messages';
 
 	import evImg from '$lib/assets/programs/ev-challenge/EV26-5.jpg?enhanced';
-	import aiCampImg from '$lib/assets/programs/ai-entrepreneurship/AI-Entrep_81.jpg?enhanced';
+	import aiCampImg from '$lib/assets/programs/ai-camp/AI-Entrep_81.jpg?enhanced';
 	import dialoguesImg from '$lib/assets/programs/ai-interview/carmi-levy.png?enhanced';
 	import engineeringImg from '$lib/assets/programs/ev-challenge/EV26-3.jpg?enhanced';
 	import summerWinterImg from '$lib/assets/programs/ai-camp/ai-camp-HB8A5065.jpg?enhanced';
-	import ithacaNightImg from '$lib/assets/programs/ai-entrepreneurship/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg?enhanced';
+	import ithacaNightImg from '$lib/assets/programs/ai-camp/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg?enhanced';
 
 	interface Props {
 		rows: readonly CalendarRow[];

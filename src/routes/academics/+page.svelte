@@ -6,7 +6,7 @@
 	import Seo from '$lib/components/Seo.svelte';
 	import PageHero from '$lib/components/shared/PageHero.svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
-	import hero from '$lib/assets/programs/ai-entrepreneurship/AI-Entrep_30.jpg?enhanced';
+	import hero from '$lib/assets/programs/ai-camp/AI-Entrep_30.jpg?enhanced';
 
 	/**
 	 * `/academics` — the hub the header's Academics group points at.

@@ -25,7 +25,7 @@ export const RESULTS: readonly Result[] = [
 			zh: 'AI 创业营的团队参加人工智能创业大赛，荣获 AIEC 2026 大奖。'
 		},
 		evidence: {
-			src: '$lib/assets/programs/ai-entrepreneurship/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg',
+			src: '$lib/assets/programs/ai-camp/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg',
 			alt: {
 				en: 'Ithaca students receiving the AIEC 2026 Grand Prize at OTLF Innovation Day',
 				zh: '伊萨卡学生在 OTLF 创新日领取 AIEC 2026 大奖'
