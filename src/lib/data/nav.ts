@@ -62,8 +62,8 @@ export const NAV_ITEMS: NavItem[] = [
 			{ label: 'evTeam', href: '/programs/ev-challenge', programSlug: 'ev-challenge' },
 			{
 				label: 'aiEntrepreneurshipCamp',
-				href: '/programs/ai-entrepreneurship-camp',
-				programSlug: 'ai-entrepreneurship-camp'
+				href: '/programs/ai-entrepreneurship-bootcamp',
+				programSlug: 'ai-entrepreneurship-bootcamp'
 			},
 			{
 				label: 'ithacaDialogues',

@@ -20,7 +20,7 @@
 		{
 			label: m.about_programs_aiCamp_label,
 			description: m.about_programs_aiCamp_description,
-			href: '/programs/ai-entrepreneurship-camp',
+			href: '/programs/ai-entrepreneurship-bootcamp',
 			image: aiEntrep88
 		},
 		{

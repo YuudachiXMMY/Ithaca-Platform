@@ -45,8 +45,8 @@
 	 * computed length into the dates as a parenthetical and leaves `cadence` alone.
 	 */
 	const locale = getLocale();
-	const season = programSeason(SEASONS, PROGRAMS, 'ai-entrepreneurship-camp', locale);
-	const program = PROGRAMS.find((candidate) => candidate.slug === 'ai-entrepreneurship-camp');
+	const season = programSeason(SEASONS, PROGRAMS, 'ai-entrepreneurship-bootcamp', locale);
+	const program = PROGRAMS.find((candidate) => candidate.slug === 'ai-entrepreneurship-bootcamp');
 
 	const DETAILS = season
 		? [
@@ -90,7 +90,7 @@
 		locale,
 		SITE.url,
 		SITE.name,
-		SITE.url + ogCardFile('/programs/ai-entrepreneurship-camp', locale)
+		SITE.url + ogCardFile('/programs/ai-entrepreneurship-bootcamp', locale)
 	);
 
 	const MODULES = [
@@ -178,15 +178,15 @@
 				{m.programs_aiCamp_hero_startDate({ date: season?.startMonth ?? m.season_tbc() })}
 			</p>
 			<!-- R-PT-1's primary, re-pointed from a bare `/contact-us` to
-			     `/admissions?program=ai-entrepreneurship-camp` (R-ADM-7 reads the slug and preselects).
+			     `/admissions?program=ai-entrepreneurship-bootcamp` (R-ADM-7 reads the slug and preselects).
 			     No brochure link beside it: unlike the other two programme pages, this one ALREADY
 			     carries "Request Brochure" in its closing CTA, and a second copy in the hero would be
 			     the same offer twice on one page. -->
 			<a
-				href={registerHref('ai-entrepreneurship-camp')}
+				href={registerHref('ai-entrepreneurship-bootcamp')}
 				onclick={() =>
 					trackProgramCtaClick({
-						program: 'ai-entrepreneurship-camp',
+						program: 'ai-entrepreneurship-bootcamp',
 						location: 'program_page',
 						locale
 					})}
@@ -229,7 +229,7 @@
 		<div class="relative order-1 h-[40vh] lg:hidden">
 			<enhanced:img
 				src={heroMobile}
-				alt="AI Entrepreneurship Camp"
+				alt="AI Entrepreneurship Bootcamp"
 				sizes="100vw"
 				class="absolute inset-0 h-full w-full object-cover"
 			/>
@@ -560,7 +560,7 @@
 	<section class="relative py-14 md:py-20">
 		<enhanced:img
 			src={heroB}
-			alt="AI Entrepreneurship Camp community"
+			alt="AI Entrepreneurship Bootcamp community"
 			sizes="(max-width: 1024px) 100vw, 80vw"
 			class="absolute inset-0 h-full w-full object-cover"
 		/>
@@ -582,10 +582,10 @@
 				     `program_cta_click`: either one is a "Program page → enquiry" click. -->
 				<div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
 					<a
-						href={registerHref('ai-entrepreneurship-camp')}
+						href={registerHref('ai-entrepreneurship-bootcamp')}
 						onclick={() =>
 							trackProgramCtaClick({
-								program: 'ai-entrepreneurship-camp',
+								program: 'ai-entrepreneurship-bootcamp',
 								location: 'program_page',
 								locale
 							})}
@@ -597,10 +597,10 @@
 						/>
 					</a>
 					<a
-						href={brochureHref('ai-entrepreneurship-camp')}
+						href={brochureHref('ai-entrepreneurship-bootcamp')}
 						onclick={() =>
 							trackProgramCtaClick({
-								program: 'ai-entrepreneurship-camp',
+								program: 'ai-entrepreneurship-bootcamp',
 								location: 'program_page',
 								locale
 							})}

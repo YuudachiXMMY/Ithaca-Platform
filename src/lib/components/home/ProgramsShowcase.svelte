@@ -24,8 +24,8 @@
 		},
 		{
 			img: aiImg,
-			href: '/programs/ai-entrepreneurship-camp',
-			slug: 'ai-entrepreneurship-camp' as string | null,
+			href: '/programs/ai-entrepreneurship-bootcamp',
+			slug: 'ai-entrepreneurship-bootcamp' as string | null,
 			title: m.home_programs_ai_title,
 			description: m.home_programs_ai_description,
 			alt: m.home_programs_ai_alt

@@ -248,7 +248,7 @@ describe('the shipped season records', () => {
 	it('the AI Camp current season is cohort 3, on the published Sep–Dec 2026 window', () => {
 		// The owner ruled on 2026-09-29: cohort 3 is current and no exact dates are forthcoming,
 		// so the published month-level window stands (docs/CONTENT-GAPS.md C-2, now closed).
-		const camp = currentSeason(SEASONS, 'ai-entrepreneurship-camp');
+		const camp = currentSeason(SEASONS, 'ai-entrepreneurship-bootcamp');
 		expect(camp?.id).toBe('aiec-c3');
 		expect(formatSeasonWindow(camp!, 'en')).toBe('September 2026 – December 2026');
 		expect(formatSeasonWindow(camp!, 'zh')).toBe('2026 年 9 月 – 2026 年 12 月');
@@ -258,7 +258,7 @@ describe('the shipped season records', () => {
 		// Sep 1 – Dec 31 computes to ~17 weeks, but the camp runs 13 weeks *within* that window.
 		// Both are true; the published one is the one a parent needs, so `cadence` is copy and
 		// must not be quietly replaced by seasonDuration().
-		const camp = currentSeason(SEASONS, 'ai-entrepreneurship-camp');
+		const camp = currentSeason(SEASONS, 'ai-entrepreneurship-bootcamp');
 		expect(camp?.cadence?.en).toContain('13 weeks');
 		expect(seasonDuration(camp!)).not.toEqual({ value: 13, unit: 'week' });
 	});

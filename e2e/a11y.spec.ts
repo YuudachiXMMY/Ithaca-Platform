@@ -20,7 +20,7 @@ const SECTION_6_4 = [
 	'/',
 	'/programs',
 	'/programs/ev-challenge',
-	'/programs/ai-entrepreneurship-camp',
+	'/programs/ai-entrepreneurship-bootcamp',
 	'/programs/ithaca-dialogues',
 	'/programs/engineering-projects',
 	'/programs/summer-winter-camps',

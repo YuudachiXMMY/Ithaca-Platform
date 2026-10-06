@@ -49,7 +49,7 @@
 	 */
 	const PROGRAM_IMAGE: Record<string, Picture> = {
 		'ev-challenge': evImg,
-		'ai-entrepreneurship-camp': aiCampImg,
+		'ai-entrepreneurship-bootcamp': aiCampImg,
 		'ithaca-dialogues': dialoguesImg,
 		'engineering-projects': engineeringImg,
 		'summer-winter-camps': summerWinterImg,

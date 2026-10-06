@@ -56,11 +56,11 @@ export const SEASONS: readonly Season[] = [
 		}
 	},
 
-	// ── AI Entrepreneurship Camp ─────────────────────────────────────────────────────────────
+	// ── AI Entrepreneurship Bootcamp ─────────────────────────────────────────────────────────────
 	// Cohort 1 is stated once and contradicted nowhere.
 	{
 		id: 'aiec-c1',
-		programSlug: 'ai-entrepreneurship-camp',
+		programSlug: 'ai-entrepreneurship-bootcamp',
 		label: { en: 'Cohort 1 (2025)', zh: '首届营期（2025）' },
 		start: '2025-09-01',
 		end: '2025-11-30',
@@ -68,7 +68,7 @@ export const SEASONS: readonly Season[] = [
 	},
 	{
 		id: 'aiec-c2',
-		programSlug: 'ai-entrepreneurship-camp',
+		programSlug: 'ai-entrepreneurship-bootcamp',
 		label: { en: 'Cohort 2 (2026)', zh: '第二届营期（2026）' },
 		// Both sources agree on the start date, so it is encoded.
 		start: '2026-01-10',
@@ -88,7 +88,7 @@ export const SEASONS: readonly Season[] = [
 	},
 	{
 		id: 'aiec-c3',
-		programSlug: 'ai-entrepreneurship-camp',
+		programSlug: 'ai-entrepreneurship-bootcamp',
 		label: { en: 'Cohort 3 (2026)', zh: '第三届营期（2026）' },
 		// The owner confirmed on 2026-09-29 that cohort 3 is the current one and that exact dates
 		// are not forthcoming, so the published month-level window is taken at face value:

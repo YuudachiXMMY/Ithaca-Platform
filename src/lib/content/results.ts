@@ -17,12 +17,12 @@ export const RESULTS: readonly Result[] = [
 		id: 'aiec-2026-grand-prize',
 		// Reduced ISO precision on purpose — see the file header.
 		date: '2026',
-		programSlug: 'ai-entrepreneurship-camp',
+		programSlug: 'ai-entrepreneurship-bootcamp',
 		type: 'award',
 		title: { en: 'AIEC 2026 Grand Prize', zh: 'AIEC 2026 大奖' },
 		detail: {
-			en: 'Teams from the AI Entrepreneurship Camp competed in the AI Entrepreneurship Contest and won the AIEC 2026 Grand Prize.',
-			zh: 'AI 创业营的团队参加人工智能创业大赛，荣获 AIEC 2026 大奖。'
+			en: 'Teams from the AI Entrepreneurship Bootcamp competed in the AI Entrepreneurship Contest and won the AIEC 2026 Grand Prize.',
+			zh: 'AI 创业训练营的团队参加人工智能创业大赛，荣获 AIEC 2026 大奖。'
 		},
 		evidence: {
 			src: '$lib/assets/programs/ai-entrepreneurship/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg',

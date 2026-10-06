@@ -37,10 +37,10 @@ export const PROGRAM_CARDS: readonly ProgramCard[] = [
 	},
 	{
 		id: 'aiCamp',
-		href: '/programs/ai-entrepreneurship-camp',
-		slug: 'ai-entrepreneurship-camp',
+		href: '/programs/ai-entrepreneurship-bootcamp',
+		slug: 'ai-entrepreneurship-bootcamp',
 		image: 'programs/ai-entrepreneurship/AI-Entrep_81.jpg',
-		imageAlt: 'Students at AI Entrepreneurship Camp',
+		imageAlt: 'Students at AI Entrepreneurship Bootcamp',
 		span: 'medium'
 	},
 	{

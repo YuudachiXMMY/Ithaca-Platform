@@ -192,10 +192,10 @@ export const PROGRAMS: readonly Program[] = [
 		// make R-PT-3's "render when model3d is set" branch lie.
 	},
 
-	// ── AI Entrepreneurship Camp ─────────────────────────────────────────────────────────────
+	// ── AI Entrepreneurship Bootcamp ─────────────────────────────────────────────────────────────
 	{
-		slug: 'ai-entrepreneurship-camp',
-		name: { en: 'AI Entrepreneurship Camp', zh: 'AI 创业营' },
+		slug: 'ai-entrepreneurship-bootcamp',
+		name: { en: 'AI Entrepreneurship Bootcamp', zh: 'AI 创业训练营' },
 		tagline: {
 			en: 'From first idea to investor-ready pitch in 13 weeks.',
 			zh: '13 周内，从第一个创意到投资人级别的路演。'
@@ -219,7 +219,7 @@ export const PROGRAMS: readonly Program[] = [
 		gallery: [
 			{
 				src: '$lib/assets/programs/ai-entrepreneurship/AI-Entrep_05.jpg',
-				alt: { en: 'Students at AI Entrepreneurship Camp', zh: 'AI 创业营的学生' },
+				alt: { en: 'Students at AI Entrepreneurship Bootcamp', zh: 'AI 创业训练营的学生' },
 				width: 1920,
 				height: 1280
 			},
@@ -231,7 +231,7 @@ export const PROGRAMS: readonly Program[] = [
 			},
 			{
 				src: '$lib/assets/programs/ai-entrepreneurship/AI-Entrep_81.jpg',
-				alt: { en: 'Students at AI Entrepreneurship Camp', zh: 'AI 创业营的学生' },
+				alt: { en: 'Students at AI Entrepreneurship Bootcamp', zh: 'AI 创业训练营的学生' },
 				width: 1920,
 				height: 1280
 			}
