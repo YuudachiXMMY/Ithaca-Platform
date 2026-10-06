@@ -152,7 +152,7 @@ export const OG_CARDS: Readonly<Record<string, OgCard>> = {
 		title: m.programs_evChallenge_hero_title,
 		crumb: m.nav_evTeam
 	},
-	'/programs/ai-entrepreneurship-camp': {
+	'/programs/ai-entrepreneurship-bootcamp': {
 		template: 'program',
 		eyebrow: m.nav_programs,
 		title: m.programs_aiCamp_hero_title,

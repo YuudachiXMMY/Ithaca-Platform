@@ -293,7 +293,7 @@
 	)}
 >
 	<!-- The scrim. Without it "white text on a dark hero" is a hope, not a property: the two split
-	     heroes (ithaca-dialogues, ai-entrepreneurship-camp) put a white panel under half the bar,
+	     heroes (ithaca-dialogues, ai-entrepreneurship-bootcamp) put a white panel under half the bar,
 	     and the EV Challenge photo has a bright green patch that leaves pure white at 3.2:1. A
 	     gradient makes the ground a known quantity across the full width, so the band-* tokens'
 	     published ratios hold and a future hero photo cannot quietly break them.

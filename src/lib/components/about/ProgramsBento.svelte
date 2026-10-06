@@ -3,9 +3,9 @@
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import evImg from '$lib/assets/programs/ev-challenge/EV25-10.s.png?enhanced';
-	import aiEntrep88 from '$lib/assets/programs/ai-camp/AI-Entrep_88.jpg?enhanced';
+	import aiEntrep88 from '$lib/assets/programs/ai-bootcamp/AI-Entrep_88.jpg?enhanced';
 	import carmiLevy from '$lib/assets/programs/ai-interview/carmi-levy.png?enhanced';
-	import aiEntrep29 from '$lib/assets/programs/ai-camp/AI-Entrep_29.jpg?enhanced';
+	import aiEntrep29 from '$lib/assets/programs/ai-bootcamp/AI-Entrep_29.jpg?enhanced';
 
 	// Card order/content ported from the Next about-us ProgramsBento. The "eliteInterviews"
 	// card links to the canonical /programs/ithaca-dialogues route (Next linked the legacy
@@ -20,7 +20,7 @@
 		{
 			label: m.about_programs_aiCamp_label,
 			description: m.about_programs_aiCamp_description,
-			href: '/programs/ai-entrepreneurship-camp',
+			href: '/programs/ai-entrepreneurship-bootcamp',
 			image: aiEntrep88
 		},
 		{

@@ -25,6 +25,14 @@ export default defineConfig({
 	retries: process.env.CI ? 1 : 0,
 	reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list']],
 
+	// NOTE: there is deliberately no `timeout` override here. Raising it was tried and was the
+	// wrong answer: the two tests that blew the 30s default were the only two using
+	// `waitUntil: 'networkidle'`, which on CI never arrives because `DATABASE_URL` is a
+	// placeholder and `/api/popups/active` keeps failing. A bigger budget only made each failure
+	// cost 3x more and pushed the whole job past ci.yml's `timeout-minutes: 20`. Those two tests
+	// now stub the endpoint instead (see e2e/smoke.spec.ts); every other test has always fit
+	// inside 30s on CI, so the default stays and a genuine hang still fails fast.
+
 	use: {
 		baseURL: BASE_URL,
 		trace: 'on-first-retry',

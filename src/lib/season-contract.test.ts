@@ -44,10 +44,25 @@ import { SEASONS } from './content/season-data';
 
 /**
  * Rendering a real programme page costs an `@sveltejs/enhanced-img` pass over six full-resolution
- * JPEGs on the first import, and each case resets the module graph and pays it again. Vitest's 5s
- * default is not a meaningful signal here; 60s is.
+ * JPEGs on the first import. Vitest's 5s default is not a meaningful signal here.
+ *
+ * That first pass is now paid in `beforeAll` (see `WARMUP_TIMEOUT_MS`), so this budget covers
+ * re-EVALUATING the module graph, not re-TRANSFORMING it — `vi.resetModules()` clears the module
+ * registry but not Vite's transform cache, so only the first render in the file is expensive.
+ * 60s was enough for that on a developer machine and was NOT enough on a 2-core CI runner, where
+ * the cold image pass spanned the first two cases and timed both of them out while the third
+ * passed on the now-warm cache. Kept generous rather than tight: this file's job is to catch a
+ * hard-coded date, and a flaky timeout is a worse signal than a slow test.
  */
-const RENDER_TIMEOUT_MS = 60_000;
+const RENDER_TIMEOUT_MS = 120_000;
+
+/**
+ * The one-time cost — `@sveltejs/enhanced-img` over six full-resolution JPEGs — belongs to the
+ * file, not to whichever case happens to run first. Billing it to a single `it` is what made this
+ * suite fail on CI while passing locally: the work was never stuck, it just did not fit one case's
+ * budget on slower hardware.
+ */
+const WARMUP_TIMEOUT_MS = 300_000;
 
 /** `ev-s03` as published: 2026-09-01 → 2027-05-31, nine months. */
 const EV_SEASON_ID = 'ev-s03';
@@ -143,7 +158,7 @@ function text(html: string): string {
 	return html.replace(/<!--[\s\S]*?-->/g, '').replace(/&#[0-9]+;|&amp;/g, ' ');
 }
 
-beforeAll(() => {
+beforeAll(async () => {
 	// Sanity: the whole suite is meaningless if the record it pivots on is not the one it names.
 	const ev = SEASONS.find((season) => season.id === EV_SEASON_ID);
 	expect(
@@ -151,7 +166,14 @@ beforeAll(() => {
 		`${EV_SEASON_ID} is gone from season-data.ts — this test needs rewriting`
 	).toBeDefined();
 	expect(ev?.start).not.toBe(SHIFTED_START);
-});
+
+	// Warm Vite's transform cache so the enhanced-img pass is not billed to the first case. The
+	// result is deliberately discarded — this renders the UNSHIFTED records, which is what the
+	// first case renders anyway, so nothing is asserted here that is not asserted there.
+	await renderSurfaces(SEASONS, 'en');
+	vi.doUnmock('$lib/content/season-data');
+	vi.resetModules();
+}, WARMUP_TIMEOUT_MS);
 
 afterEach(() => {
 	vi.doUnmock('$lib/content/season-data');

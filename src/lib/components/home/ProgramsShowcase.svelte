@@ -5,9 +5,9 @@
 	import { ArrowRight } from 'lucide-svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 	import evImg from '$lib/assets/programs/ev-challenge/EV25-10.s.png?enhanced';
-	import aiImg from '$lib/assets/programs/ai-camp/AI-Entrep_68.jpg?enhanced';
+	import aiImg from '$lib/assets/programs/ai-bootcamp/AI-Entrep_68.jpg?enhanced';
 	import eliteImg from '$lib/assets/programs/ai-interview/carmi-levy.png?enhanced';
-	import otherImg from '$lib/assets/programs/ai-camp/AIEC2026/AIEC2026-clossette_2s.png?enhanced';
+	import otherImg from '$lib/assets/programs/ai-bootcamp/AIEC2026/AIEC2026-clossette_2s.png?enhanced';
 
 	// Cells render UNCONDITIONALLY — present in SSR, visible with no JS. The former build mounted
 	// them only after an `inview` flip on the grid, but the empty grid collapsed to ~2px so the
@@ -24,8 +24,8 @@
 		},
 		{
 			img: aiImg,
-			href: '/programs/ai-entrepreneurship-camp',
-			slug: 'ai-entrepreneurship-camp' as string | null,
+			href: '/programs/ai-entrepreneurship-bootcamp',
+			slug: 'ai-entrepreneurship-bootcamp' as string | null,
 			title: m.home_programs_ai_title,
 			description: m.home_programs_ai_description,
 			alt: m.home_programs_ai_alt

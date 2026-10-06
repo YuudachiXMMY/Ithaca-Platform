@@ -1,4 +1,4 @@
-import { test, expect, type APIRequestContext } from '@playwright/test';
+import { test, expect, type APIRequestContext, type Page } from '@playwright/test';
 
 // Route coverage is DERIVED from /sitemap.xml rather than hardcoded. The sitemap endpoint
 // already enumerates routes with `import.meta.glob('/src/routes/**/+page.svelte')`, so a new
@@ -42,12 +42,32 @@ test.describe('public routes', () => {
 		expect(admin).toContain('noindex');
 	});
 
+	// A map rather than a list because the three legacy slugs no longer share one destination:
+	// the two interview paths were folded into Ithaca Dialogues, while `ai-entrepreneurship-camp`
+	// is the SAME programme under its new name and must land on its own page. Asserting a single
+	// shared destination would have let the camp→bootcamp stub point anywhere and still pass.
+	const LEGACY_SLUGS: Record<string, string> = {
+		'/programs/elite-interview': '/programs/ithaca-dialogues',
+		'/programs/ai-pioneers-interview': '/programs/ithaca-dialogues',
+		'/programs/ai-entrepreneurship-camp': '/programs/ai-entrepreneurship-bootcamp'
+	};
+
 	test('the legacy program slugs still redirect to the canonical route', async ({ request }) => {
-		for (const legacy of ['/programs/elite-interview', '/programs/ai-pioneers-interview']) {
+		for (const [legacy, canonical] of Object.entries(LEGACY_SLUGS)) {
 			const res = await request.get(legacy, { maxRedirects: 0 });
 			expect(res.status(), `${legacy} should 308`).toBe(308);
-			expect(res.headers()['location']).toContain('/programs/ithaca-dialogues');
+			expect(res.headers()['location'], `${legacy} should point at ${canonical}`).toContain(
+				canonical
+			);
 		}
+	});
+
+	// The renamed programme's stub is the one that can break silently: a 308 whose target is itself
+	// (or whose target 308s back) is an infinite loop a browser reports as ERR_TOO_MANY_REDIRECTS,
+	// and the assertion above — which only reads the Location header — would still pass.
+	test('the renamed bootcamp route is a real page, not another redirect', async ({ request }) => {
+		const res = await request.get('/programs/ai-entrepreneurship-bootcamp');
+		expect(res.status()).toBe(200);
 	});
 });
 
@@ -93,7 +113,26 @@ test.describe('locale switch', () => {
 	// subsets, because `--font-stack-body` carried a generic family in front of 'Noto Sans SC'
 	// and CSS font matching stops at a generic. Nothing in the suite noticed, because nothing
 	// looked at the network. These two tests look at the network.
+	/**
+	 * `networkidle` is the right wait for these two — they are about what the network did, so they
+	 * have to wait for it to stop — but it cannot arrive while something on the page is still
+	 * failing. On CI `DATABASE_URL` is a deliberate placeholder (see `playwright.config.ts`), so
+	 * `/api/popups/active` returns a Prisma error on every page and the network never goes quiet:
+	 * these were the only two tests in this file using `networkidle` and the only two that hung,
+	 * at any budget.
+	 *
+	 * Stubbing it keeps the wait honest rather than trading it for a weaker one. An empty body is
+	 * the real "no popup configured" response, which is also what a developer with no local
+	 * database sees, so this changes nothing about font loading — the thing actually under test.
+	 */
+	async function stubPopups(page: Page) {
+		await page.route('**/api/popups/active', (route) =>
+			route.fulfill({ status: 200, contentType: 'application/json', body: 'null' })
+		);
+	}
+
 	test('English pages fetch zero CJK font bytes', async ({ page }) => {
+		await stubPopups(page);
 		const cjk: string[] = [];
 		page.on('request', (r) => {
 			if (r.url().includes('noto-sans-sc')) cjk.push(new URL(r.url()).pathname);
@@ -103,6 +142,7 @@ test.describe('locale switch', () => {
 	});
 
 	test('Chinese pages actually fetch the Noto Sans SC faces, one per weight', async ({ page }) => {
+		await stubPopups(page);
 		const faces = new Set<string>();
 		page.on('response', (r) => {
 			const p = new URL(r.url()).pathname;

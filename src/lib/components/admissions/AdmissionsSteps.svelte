@@ -20,7 +20,7 @@
 -->
 <script lang="ts">
 	import { ADMISSION_STEPS, type AdmissionStepId } from '$lib/content/admissions';
-	import stepsImage from '$lib/assets/programs/ai-camp/AI-Entrep_14.jpg?enhanced';
+	import stepsImage from '$lib/assets/programs/ai-bootcamp/AI-Entrep_14.jpg?enhanced';
 	import * as m from '$lib/paraglide/messages';
 
 	// A static id → message map, so Paraglide can still tree-shake (no dynamic m['…' + id]()).

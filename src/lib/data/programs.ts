@@ -37,10 +37,10 @@ export const PROGRAM_CARDS: readonly ProgramCard[] = [
 	},
 	{
 		id: 'aiCamp',
-		href: '/programs/ai-entrepreneurship-camp',
-		slug: 'ai-entrepreneurship-camp',
-		image: 'programs/ai-camp/AI-Entrep_81.jpg',
-		imageAlt: 'Students at AI Entrepreneurship Camp',
+		href: '/programs/ai-entrepreneurship-bootcamp',
+		slug: 'ai-entrepreneurship-bootcamp',
+		image: 'programs/ai-bootcamp/AI-Entrep_81.jpg',
+		imageAlt: 'Students at AI Entrepreneurship Bootcamp',
 		span: 'medium'
 	},
 	{
@@ -63,7 +63,7 @@ export const PROGRAM_CARDS: readonly ProgramCard[] = [
 		id: 'summerWinter',
 		href: '/programs/summer-winter-camps',
 		slug: 'summer-winter-camps',
-		image: 'programs/ai-camp/ai-camp-HB8A5065.jpg',
+		image: 'programs/ai-bootcamp/ai-camp-HB8A5065.jpg',
 		imageAlt: 'Summer and Winter Camps',
 		span: 'compact'
 	},
@@ -71,7 +71,7 @@ export const PROGRAM_CARDS: readonly ProgramCard[] = [
 		id: 'ithacaNight',
 		href: '/programs/ithaca-night',
 		slug: 'ithaca-night',
-		image: 'programs/ai-camp/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg',
+		image: 'programs/ai-bootcamp/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg',
 		imageAlt: 'Ithaca Night community event',
 		span: 'compact'
 	}

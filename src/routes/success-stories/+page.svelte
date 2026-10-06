@@ -27,7 +27,7 @@
 	 * neither makes a claim this page is not entitled to make. The award photograph stays where it
 	 * belongs: attached to the gated record it is evidence FOR, inside `ResultsTimeline`.
 	 */
-	import heroImage from '$lib/assets/programs/ai-camp/AIEC2026/OTLFInnovationDay-2026-EventSpace-8.jpg?enhanced';
+	import heroImage from '$lib/assets/programs/ai-bootcamp/AIEC2026/OTLFInnovationDay-2026-EventSpace-8.jpg?enhanced';
 	import ctaImage from '$lib/assets/programs/ev-challenge/EV26-7.jpg?enhanced';
 
 	/**

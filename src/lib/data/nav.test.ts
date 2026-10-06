@@ -201,7 +201,7 @@ describe('headerOnDark', () => {
 			'/programs/summer-winter-camps',
 			'/programs/ithaca-night',
 			'/programs/ithaca-dialogues',
-			'/programs/ai-entrepreneurship-camp'
+			'/programs/ai-entrepreneurship-bootcamp'
 		]) {
 			expect(headerOnDark(path), path).toBe(true);
 		}

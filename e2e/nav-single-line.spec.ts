@@ -86,6 +86,86 @@ for (const locale of ['en', 'zh'] as const) {
 }
 
 /**
+ * Every Programs dropdown entry fits on one line inside the panel.
+ *
+ * The bar above is not the only place a label can run out of room. The dropdown panel is
+ * `w-max max-w-[340px]` and each row is `flex … gap-4` holding an unconstrained label `<span>`
+ * next to a `shrink-0` season badge — so once the label plus the badge exceed the panel's cap, the
+ * label wraps to a second line. Like the bar, that state is legible and passes everything else:
+ * axe, contrast, smoke.
+ *
+ * This was added when "AI Entrepreneurship Camp" became "AI Entrepreneurship Bootcamp" (+4
+ * characters, and the longest label in the menu by a wide margin). Measured after that rename: the
+ * panel sits at 295px of its 340px cap, with the longest label at 202px + a 16px gap + a 43px
+ * "Open" badge + 32px of padding. So there are ~45px — roughly six more characters — before the
+ * cap binds and a label starts wrapping.
+ *
+ * Two assertions, and only the first is load-bearing in the usual case:
+ *
+ *  1. `labelHeight <= lineHeight` — the actual wrap detector.
+ *  2. the panel has not reached its `max-w` cap — the headroom check. Note that measuring a row's
+ *     slack against the panel would be nearly vacuous: `w-max` sizes the panel to exactly its
+ *     widest row, so slack is 0 by construction for every row, cap or no cap. The cap is the only
+ *     thing that can actually squeeze a row, so the cap is what this asserts.
+ *
+ * Method mirrors the bar test: compare against a self-calibrating reference — the row's own
+ * line-height, and the panel's own computed max-width — rather than hardcoded pixels, so a
+ * type-scale or token change does not false-alarm.
+ */
+for (const locale of ['en', 'zh'] as const) {
+	const url = locale === 'en' ? '/' : '/zh';
+
+	test(`no Programs dropdown label wraps inside the panel (${locale})`, async ({
+		page
+	}, testInfo) => {
+		test.skip(
+			testInfo.project.name === 'mobile-chrome',
+			'the drawer lists children without a panel'
+		);
+
+		await page.setViewportSize({ width: 1280, height: 900 });
+		await page.goto(url);
+
+		// Hovering the Programs trigger is what mounts the panel; it is not in the DOM until then.
+		await page.locator('header a[href$="/programs"]').first().hover();
+		const panel = page.locator('header [role="menu"]').first();
+		await expect(panel).toBeVisible();
+
+		const panelMetrics = await panel.evaluate((el) => ({
+			width: Math.round(el.getBoundingClientRect().width),
+			maxWidth: Math.round(parseFloat(getComputedStyle(el).maxWidth)),
+			rows: [...el.querySelectorAll('a[role="menuitem"]')].map((row) => {
+				const label = row.querySelector('span')!;
+				return {
+					text: label.textContent!.trim(),
+					labelHeight: Math.round(label.getBoundingClientRect().height),
+					lineHeight: Math.round(parseFloat(getComputedStyle(label).lineHeight))
+				};
+			})
+		}));
+
+		expect(panelMetrics.rows.length, 'the Programs panel must list the programmes').toBeGreaterThan(
+			0
+		);
+
+		for (const row of panelMetrics.rows) {
+			expect(
+				row.labelHeight,
+				`"${row.text}" is ${row.labelHeight}px tall against a ${row.lineHeight}px line — it wrapped inside the dropdown`
+			).toBeLessThanOrEqual(row.lineHeight);
+		}
+
+		// `w-max` means the panel is exactly as wide as its widest row until `max-w` binds. Reaching
+		// the cap is therefore the moment headroom runs out — after which the next added character
+		// wraps instead of widening.
+		expect(
+			panelMetrics.width,
+			`the dropdown has grown to its ${panelMetrics.maxWidth}px cap — the next longer label will wrap`
+		).toBeLessThan(panelMetrics.maxWidth);
+	});
+}
+
+/**
  * The locale switch left the header for the footer, and that is the only reason the right-hand
  * group fits (370.5px of a 412px column; it was 459.5px with the switcher). Pinning both halves
  * means a well-meaning "the switcher should be in the header" revert fails here rather than

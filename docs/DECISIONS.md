@@ -214,7 +214,7 @@ at **1.01:1** — not "hard to read", invisible.
 | -------------------------------------------------------------------------------- | --------------------- | ---------------- |
 | `/`, `/about-us`                                                                 | 1.0–1.7               | 1.16–1.57        |
 | `/programs/{ev-challenge,engineering-projects,summer-winter-camps,ithaca-night}` | **1.01**–1.88         | 1.26–1.88        |
-| `/programs/{ithaca-dialogues,ai-entrepreneurship-camp}` (split heroes)           | 1.62–3.57             | 1.42             |
+| `/programs/{ithaca-dialogues,ai-entrepreneurship-bootcamp}` (split heroes)       | 1.62–3.57             | 1.42             |
 | `/programs`, `/admissions`, `/results`, `/contact-us`, `/privacy`, `/terms`      | 7.4–8.9 ✓             | 9.3 ✓            |
 
 **Root cause.** The ground was decided _twice_. `Header.svelte` had a path test that chose between
@@ -229,7 +229,7 @@ beside it was wrong, which is why the report reads as two separate problems.
 | **A gradient scrim under the transparent header**                  | Without it, "white text on a dark hero" is a hope, not a property. The EV Challenge photo has a bright green patch that leaves even **pure white at 3.2:1**, and the two split heroes put a white panel under half the bar. The scrim makes the ground a known quantity across the full width, so a future hero photo cannot quietly break the contract. |
 | **Scrolled bar 70% → 90% opaque**                                  | At 70% the bar's contrast still depended on the page content scrolling under it: the hamburger measured **4.29:1** on `/`. This was pre-existing and nothing had ever looked at it.                                                                                                                                                                      |
 
-**Split heroes — provisional.** `/programs/ithaca-dialogues` and `/programs/ai-entrepreneurship-camp`
+**Split heroes — provisional.** `/programs/ithaca-dialogues` and `/programs/ai-entrepreneurship-bootcamp`
 put a photo under one half of the bar and a white panel under the other, so no single text colour
 works. The owner chose the full-width scrim for consistency with the other six dark pages, knowing
 it washes the white half (2026-10-01: _"先尝试使用这个方案，后续如果效果不佳再尝试其他方案"_). **If it reads
