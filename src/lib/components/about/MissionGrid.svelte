@@ -2,7 +2,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 	import pillarPbl from '$lib/assets/pillars/pillar-pbl.jpg?enhanced';
-	import aiEntrep75 from '$lib/assets/programs/ai-entrepreneurship/AI-Entrep_75.jpg?enhanced';
+	import aiEntrep75 from '$lib/assets/programs/ai-camp/AI-Entrep_75.jpg?enhanced';
 	import pillarEthics from '$lib/assets/pillars/pillar-ethics.jpg?enhanced';
 
 	const blocks = [

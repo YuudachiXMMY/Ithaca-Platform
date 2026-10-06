@@ -2,7 +2,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import Seo from '$lib/components/Seo.svelte';
 	import PlaceholderPage from '$lib/components/shared/PlaceholderPage.svelte';
-	import hero from '$lib/assets/programs/ai-entrepreneurship/AI-Entrep_51.jpg?enhanced';
+	import hero from '$lib/assets/programs/ai-camp/AI-Entrep_51.jpg?enhanced';
 
 	// Content not written yet — `docs/CONTENT-GAPS.md` C-9 lists exactly what this page is waiting
 	// for and what was deliberately NOT invented to fill the space.

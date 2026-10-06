@@ -1,8 +1,8 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
-	import aiEntrep03 from '$lib/assets/programs/ai-entrepreneurship/AI-Entrep_03.jpg?enhanced';
-	import aiEntrep08 from '$lib/assets/programs/ai-entrepreneurship/AI-Entrep_08.jpg?enhanced';
+	import aiEntrep03 from '$lib/assets/programs/ai-camp/AI-Entrep_03.jpg?enhanced';
+	import aiEntrep08 from '$lib/assets/programs/ai-camp/AI-Entrep_08.jpg?enhanced';
 
 	const featured = [
 		{
