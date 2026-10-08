@@ -7,6 +7,7 @@
 	import {
 		NAV_ITEMS,
 		RIGHT_NAV_HREFS,
+		drawerChildren,
 		headerOnDark,
 		navLabel,
 		navSeasonStatus
@@ -103,11 +104,16 @@
 		}
 	}
 
-	// Mobile accordion: single expanded item at a time.
+	// Mobile accordion: single expanded group at a time.
+	//
+	// Keyed by href rather than by `label` — not to fix a collision (the seven top-level labels
+	// are distinct, and children never reach this state) but so the drawer has ONE identity per
+	// item: the same string keys the `{#each}`, names the submenu's `id`, and is what the e2e
+	// selectors address it by (`aria-controls="drawer-submenu-/academics"`).
 	let expandedItem = $state<string | null>(null);
 
-	function toggleExpanded(label: string) {
-		expandedItem = expandedItem === label ? null : label;
+	function toggleExpanded(href: string) {
+		expandedItem = expandedItem === href ? null : href;
 	}
 
 	// Canonical (de-localized) path so active-link detection works for /zh too.
@@ -413,16 +419,77 @@
 			</button>
 		</div>
 
+		<!--
+			A group row here is a BUTTON, not a link. It was a full-width link with a 36px chevron
+			button beside it, which meant the label — the only part of a 288px row a thumb reliably
+			lands on — navigated, and the submenu was reachable only by hitting the arrow. The four
+			groups are containers; on a phone, tapping a container should open it.
+
+			The consequence is in `drawerChildren`: once the row stops navigating, the group's own
+			index page has to be IN the submenu, so `/academics` and `/programs` get a trailing
+			"All Courses" / "All Programs" entry. The desktop bar is untouched — there the trigger
+			is a link AND a hover/focus menu, which works because a pointer can do both.
+		-->
 		<ul class="flex-1 space-y-1 overflow-y-auto px-4">
 			{#each NAV_ITEMS as item (item.href)}
 				{@const active = checkActive(item)}
-				{@const expanded = expandedItem === item.label}
 				<li>
-					<div class="flex items-center">
+					{#if item.children}
+						{@const expanded = expandedItem === item.href}
+						{@const submenuId = `drawer-submenu-${item.href}`}
+						<button
+							type="button"
+							onclick={() => toggleExpanded(item.href)}
+							class={cn(
+								'flex w-full items-center justify-between gap-2 rounded-sm px-3 py-2.5 text-left text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+								active
+									? 'bg-brand/10 text-brand-bright'
+									: 'text-foreground-muted hover:bg-surface-2 hover:text-foreground'
+							)}
+							aria-expanded={expanded}
+							aria-controls={submenuId}
+							aria-label={m.common_nav_toggleSubmenu({ label: navLabel(item.label) })}
+						>
+							<span>{navLabel(item.label)}</span>
+							<ChevronDown
+								class={cn(
+									'h-4 w-4 shrink-0 transition-transform duration-200',
+									expanded && 'rotate-180'
+								)}
+								aria-hidden="true"
+							/>
+						</button>
+						{#if expanded}
+							<ul
+								id={submenuId}
+								class="mt-1 mb-1 space-y-1 overflow-hidden pl-4"
+								transition:slide={{ duration: submenuDuration }}
+							>
+								{#each drawerChildren(item) as child (child.href)}
+									{@const status = navSeasonStatus(child)}
+									<li>
+										<a
+											href={localizeHref(child.href)}
+											class="flex items-center justify-between gap-3 rounded-sm px-3 py-2 text-sm text-foreground-subtle transition-colors hover:bg-surface-2 hover:text-foreground"
+										>
+											<span>{navLabel(child.label)}</span>
+											{#if status}
+												<span
+													class="shrink-0 border border-brand/30 px-1.5 py-0.5 font-mono text-[10px] tracking-[0.12em] text-brand-bright uppercase"
+												>
+													{status}
+												</span>
+											{/if}
+										</a>
+									</li>
+								{/each}
+							</ul>
+						{/if}
+					{:else}
 						<a
 							href={localizeHref(item.href)}
 							class={cn(
-								'flex-1 rounded-sm px-3 py-2.5 text-sm font-medium transition-colors',
+								'block rounded-sm px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
 								active
 									? 'bg-brand/10 text-brand-bright'
 									: 'text-foreground-muted hover:bg-surface-2 hover:text-foreground'
@@ -430,44 +497,6 @@
 						>
 							{navLabel(item.label)}
 						</a>
-						{#if item.children}
-							<button
-								onclick={() => toggleExpanded(item.label)}
-								class="rounded-sm p-2 text-foreground-subtle transition-colors hover:bg-surface-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-								aria-expanded={expanded}
-								aria-label={m.common_nav_toggleSubmenu({ label: navLabel(item.label) })}
-							>
-								<ChevronDown
-									class={cn('h-4 w-4 transition-transform duration-200', expanded && 'rotate-180')}
-									aria-hidden="true"
-								/>
-							</button>
-						{/if}
-					</div>
-					{#if item.children && expanded}
-						<ul
-							class="mt-1 mb-1 space-y-1 overflow-hidden pl-4"
-							transition:slide={{ duration: submenuDuration }}
-						>
-							{#each item.children as child (child.href)}
-								{@const status = navSeasonStatus(child)}
-								<li>
-									<a
-										href={localizeHref(child.href)}
-										class="flex items-center justify-between gap-3 rounded-sm px-3 py-2 text-sm text-foreground-subtle transition-colors hover:bg-surface-2 hover:text-foreground"
-									>
-										<span>{navLabel(child.label)}</span>
-										{#if status}
-											<span
-												class="shrink-0 border border-brand/30 px-1.5 py-0.5 font-mono text-[10px] tracking-[0.12em] text-brand-bright uppercase"
-											>
-												{status}
-											</span>
-										{/if}
-									</a>
-								</li>
-							{/each}
-						</ul>
 					{/if}
 				</li>
 			{/each}

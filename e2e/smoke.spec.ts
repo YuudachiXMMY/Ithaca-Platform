@@ -232,6 +232,106 @@ test.describe('programs dropdown', () => {
 	});
 });
 
+/**
+ * The mobile drawer's accordion.
+ *
+ * The drawer used to render each group as a full-width LINK with a 36px chevron button beside it:
+ * the row said "About" and went to /about-us, and the submenu was reachable only by hitting the
+ * arrow. On a phone that is the wrong default — the four groups are containers, and the thing a
+ * thumb lands on is the label. So the row is now a button that expands, and the group's own page
+ * moved INSIDE the submenu as its last entry (`drawerChildren`).
+ *
+ * Playwright's `click()` is the only level this is visible at: `nav.test.ts` proves the submenu
+ * DATA reaches every index page, and that data was equally correct while the row still navigated.
+ */
+test.describe('mobile nav drawer', () => {
+	const openDrawer = async (page: import('@playwright/test').Page) => {
+		await page.locator('header button[aria-expanded]').first().click();
+		return page
+			.getByRole('navigation')
+			.filter({ has: page.locator('ul') })
+			.last();
+	};
+
+	test('a group row expands its submenu instead of navigating', async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== 'mobile-chrome', 'the drawer only exists below lg');
+
+		await page.goto('/');
+		const drawer = await openDrawer(page);
+
+		const academics = drawer.locator('button[aria-controls="drawer-submenu-/academics"]');
+		await expect(academics).toHaveAttribute('aria-expanded', 'false');
+		// Nothing at the top level of the drawer links to /academics any more — if a link survives
+		// there, the row is still navigable and this change did not land.
+		await expect(drawer.locator('a[href="/academics"]')).toHaveCount(0);
+
+		await academics.click();
+
+		await expect(academics).toHaveAttribute('aria-expanded', 'true');
+		// The assertion the whole change is about: still on the homepage, submenu now open.
+		await expect(page).toHaveURL(/\/$/);
+
+		const submenu = drawer.locator('ul[id="drawer-submenu-/academics"]');
+		await expect(submenu).toBeVisible();
+		await expect(submenu.locator('a[href="/academics/ap"]')).toBeVisible();
+		// Last, not first — the tracks are what the visitor opened the group to see.
+		await expect(submenu.locator('a').last()).toHaveAttribute('href', '/academics');
+
+		// And it is a real toggle, not a one-way open.
+		await academics.click();
+		await expect(academics).toHaveAttribute('aria-expanded', 'false');
+		await expect(drawer.locator('ul[id="drawer-submenu-/academics"]')).toHaveCount(0);
+	});
+
+	test('one group at a time — opening the next collapses the last', async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== 'mobile-chrome', 'the drawer only exists below lg');
+
+		await page.goto('/');
+		const drawer = await openDrawer(page);
+
+		const about = drawer.locator('button[aria-controls="drawer-submenu-/about-us"]');
+		const programs = drawer.locator('button[aria-controls="drawer-submenu-/programs"]');
+
+		await about.click();
+		await expect(about).toHaveAttribute('aria-expanded', 'true');
+
+		await programs.click();
+		await expect(programs).toHaveAttribute('aria-expanded', 'true');
+		await expect(about).toHaveAttribute('aria-expanded', 'false');
+	});
+
+	test('a childless row is still a link and still navigates', async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== 'mobile-chrome', 'the drawer only exists below lg');
+
+		await page.goto('/');
+		const drawer = await openDrawer(page);
+
+		// Home / Admissions / Contact Us have no children, so nothing about them changed.
+		await expect(drawer.locator('button[aria-expanded]')).toHaveCount(4);
+		await drawer.locator('a[href="/admissions"]').click();
+		await expect(page).toHaveURL(/\/admissions$/);
+	});
+
+	test('a submenu link navigates and closes the drawer', async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== 'mobile-chrome', 'the drawer only exists below lg');
+
+		await page.goto('/');
+		const drawer = await openDrawer(page);
+
+		await drawer.locator('button[aria-controls="drawer-submenu-/programs"]').click();
+		await drawer.locator('ul[id="drawer-submenu-/programs"] a[href="/programs"]').click();
+
+		await expect(page).toHaveURL(/\/programs$/);
+		// Navigating closes the drawer (the $effect on `path` in Header), so the hamburger reports
+		// collapsed again. Asserted via the toggle rather than the panel's aria-label, which is
+		// localized.
+		await expect(page.locator('header button[aria-expanded]').first()).toHaveAttribute(
+			'aria-expanded',
+			'false'
+		);
+	});
+});
+
 test.describe('contact form', () => {
 	// The page carries two role="alert" live regions: the contact form's and the newsletter
 	// form's. The latter is intentionally always present but empty (correct aria-live

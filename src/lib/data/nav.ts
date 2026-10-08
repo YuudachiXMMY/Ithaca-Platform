@@ -17,6 +17,13 @@ export interface NavItem {
 	 */
 	programSlug?: string;
 	children?: NavItem[];
+	/**
+	 * Label key for the trailing "All …" entry the MOBILE DRAWER appends to this group's submenu so
+	 * the group's own index page stays reachable once the row stops navigating — see
+	 * `drawerChildren`. Only the groups whose `children` do NOT already name their own page need it
+	 * (`academics`, `programs`); `about` and `studentLife` list theirs as `children[0]`.
+	 */
+	allLabel?: string;
 }
 
 // Ported from the Next app's src/types/index.ts. Header splits LEFT_NAV / RIGHT_NAV around the
@@ -48,6 +55,7 @@ export const NAV_ITEMS: NavItem[] = [
 	{
 		label: 'academics',
 		href: '/academics',
+		allLabel: 'allCourses',
 		children: [
 			{ label: 'ap', href: '/academics/ap' },
 			{ label: 'ossd', href: '/academics/ossd' },
@@ -58,6 +66,7 @@ export const NAV_ITEMS: NavItem[] = [
 	{
 		label: 'programs',
 		href: '/programs',
+		allLabel: 'allPrograms',
 		children: [
 			{ label: 'evTeam', href: '/programs/ev-team', programSlug: 'ev-team' },
 			{
@@ -103,6 +112,34 @@ export const NAV_ITEMS: NavItem[] = [
 	{ label: 'admissions', href: '/admissions' },
 	{ label: 'contactUs', href: '/contact-us' }
 ];
+
+/**
+ * The submenu the MOBILE DRAWER renders for a group: `children`, plus a trailing "All …" entry
+ * pointing at the group's own page when `children` does not already name it.
+ *
+ * It exists because of a hit-target decision, not a data one. In the drawer a group row is a
+ * BUTTON that expands — tapping "Academics" opens the four tracks instead of going to
+ * `/academics`. The row used to be a full-width link with a 36px chevron beside it, so the label
+ * (the only part a thumb reliably lands on) navigated and the submenu was reachable only by
+ * hitting the arrow. Once the row stops navigating, the group's index page is reachable from the
+ * drawer only if it is IN the submenu — and `/academics` and `/programs` deliberately keep their
+ * own href out of `children` (see the arity note above), so they declare `allLabel` and get it
+ * appended here. `about` and `studentLife` already list theirs, so they get nothing.
+ *
+ * Last rather than first: the tracks and the programmes are what the visitor opened the group to
+ * see, and "All Courses" is the fallback underneath them.
+ *
+ * Drawer-only on purpose. The desktop dropdown keeps rendering `children` verbatim, because its
+ * trigger IS a link to the index — appending "All Programs" under a trigger that already goes
+ * there would re-create the vague catch-all `NAV_ITEMS` got rid of.
+ */
+export function drawerChildren(item: NavItem): NavItem[] {
+	const children = item.children ?? [];
+	// The `some` guard is not defensive padding: it is what keeps this correct if a later edit adds
+	// `/academics` to its own `children` and forgets to drop `allLabel`.
+	if (!item.allLabel || children.some((child) => child.href === item.href)) return children;
+	return [...children, { label: item.allLabel, href: item.href }];
+}
 
 /**
  * The hrefs the header renders to the RIGHT of the centre logo (`Header.svelte` splits `NAV_ITEMS`
@@ -168,6 +205,8 @@ const NAV_LABEL: Record<string, () => string> = {
 	aboutUs: m.nav_aboutUs,
 	ourTeam: m.nav_ourTeam,
 	academics: m.nav_academics,
+	allCourses: m.nav_allCourses,
+	allPrograms: m.nav_allPrograms,
 	ap: m.nav_ap,
 	ossd: m.nav_ossd,
 	stem: m.nav_stem,
