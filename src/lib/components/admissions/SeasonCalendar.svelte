@@ -1,5 +1,9 @@
 <!--
-  SeasonCalendar — prd.md R-ADM-2.
+  SeasonCalendar — prd.md R-ADM-2 (what is open, and when) AND R-ADM-3 (what it costs).
+
+  R-ADM-3 used to be its own section further down the page, listing every programme a second time
+  under a "Tuition" heading. Two sections enumerating one record set is how `/admissions` came to
+  print each programme name three times; the price is now a field on the season it prices.
 
   Every row is derived by `$lib/admissions.admissionsCalendar()` from the `Season` records; not one
   date, duration or cadence is written here. That is R-CONTENT-1's whole point: change `start` in
@@ -171,6 +175,42 @@
 							<dd class="text-foreground">
 								{#each row.sessionTimes as time (time)}
 									<span class="block">{time}</span>
+								{/each}
+							</dd>
+						{/if}
+
+						<!-- R-ADM-3. The price lives HERE, on the season it prices, rather than in a second
+						     section repeating every programme name under a "Tuition" heading. Those were
+						     two renderings of one record set, and the page listed each programme twice to
+						     show them. `row.price` is null for every live season today (all
+						     `display: 'inquire'`), which renders as "by enquiry" — never as a guessed
+						     number.
+
+						     Given weight the other values do not get: it is the field a reader is scanning
+						     FOR, and `brand-bright` is already how the rest of the site marks the figure
+						     in a data block. -->
+						<dt class={termClass}>{m.admissions_calendar_labelTuition()}</dt>
+						<dd class="font-semibold text-brand-bright">
+							{row.price ?? m.admissions_tuition_inquireValue()}
+						</dd>
+
+						<!-- Empty on every live season (season-data.ts carries a TODO(content) for both),
+						     so these render only when there is something real to list. An invented
+						     inclusion is worse than no list. -->
+						{#if row.includes.length > 0}
+							<dt class={termClass}>{m.admissions_tuition_includesTitle()}</dt>
+							<dd class="text-foreground">
+								{#each row.includes as item (item)}
+									<span class="block">{item}</span>
+								{/each}
+							</dd>
+						{/if}
+
+						{#if row.excludes.length > 0}
+							<dt class={termClass}>{m.admissions_tuition_excludesTitle()}</dt>
+							<dd class="text-foreground-muted">
+								{#each row.excludes as item (item)}
+									<span class="block">{item}</span>
 								{/each}
 							</dd>
 						{/if}

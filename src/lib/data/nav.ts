@@ -227,6 +227,11 @@ export function headerOnDark(path: string): boolean {
 		path.startsWith('/academics') ||
 		path.startsWith('/student-life') ||
 		path === '/admissions' ||
+		// `/contact-us` joined this list when it stopped opening on centred text over a bare
+		// background and started rendering `shared/PageHero.svelte` like every other top-level page.
+		// The two edits are one change: ship the hero without this line and the header keeps its
+		// light-ground ink over a photograph.
+		path === '/contact-us' ||
 		path === '/success-stories' ||
 		path.startsWith('/programs/')
 	);

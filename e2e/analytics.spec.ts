@@ -216,24 +216,21 @@ test.describe('GA4 events — R-SEO-5', () => {
 	// named one location — so adding a second booking CTA above the old one silently repointed the
 	// assertion at the new anchor and left the old one unmeasured. Pinning the count plus both
 	// locations is what makes that failure loud.
-	test('booking_click fires from both admissions CTAs, with distinct locations', async ({
-		page
-	}) => {
+	// ONE CTA, deliberately. `/admissions` used to carry a second `#book` link in the tuition
+	// section ("Ask about tuition") firing `location: 'admissions_tuition'`. That section no longer
+	// exists — each season card carries its own price — and two links to one anchor under two
+	// labels were two labels, not two offers. The count assertion is the point of this test now:
+	// re-introducing a second same-intent CTA fails here rather than quietly splitting the metric.
+	test('booking_click fires from the one admissions CTA', async ({ page }) => {
 		await page.goto('/admissions');
 		await pinNavigation(page);
 
 		const bookLinks = page.locator('main a[href="#book"]');
-		await expect(bookLinks).toHaveCount(2);
+		await expect(bookLinks).toHaveCount(1);
 
 		await bookLinks.first().click();
 		expect((await sent(page)).filter((event) => event.name === 'booking_click')).toEqual([
 			{ name: 'booking_click', params: { location: 'admissions_hero', locale: 'en' } }
-		]);
-
-		await bookLinks.nth(1).click();
-		expect((await sent(page)).filter((event) => event.name === 'booking_click')).toEqual([
-			{ name: 'booking_click', params: { location: 'admissions_hero', locale: 'en' } },
-			{ name: 'booking_click', params: { location: 'admissions_tuition', locale: 'en' } }
 		]);
 	});
 

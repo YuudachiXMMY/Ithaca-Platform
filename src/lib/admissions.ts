@@ -1,7 +1,6 @@
 import type { Locale, Program, Season } from './content/types';
 import {
 	INTL_LOCALE,
-	currentSeason,
 	formatSeasonWindow,
 	isIsoDate,
 	seasonDuration,
@@ -39,6 +38,21 @@ export interface CalendarRow {
 	readonly cadence: string | null;
 	readonly sessionTimes: readonly string[];
 	readonly registration: Season['registration'];
+	/**
+	 * R-ADM-3, on the row rather than in a section of its own.
+	 *
+	 * `formatTuition` output for THIS season, or null when there is no honest figure to print —
+	 * which covers `display: 'inquire'`, an under-specified `'exact'` / `'range'` record, and a
+	 * season carrying no `tuition` block at all. A null price renders as "by enquiry"; it never
+	 * renders as a number.
+	 *
+	 * Read off `season.tuition` directly, NOT via `currentSeason()`. A price belongs to the window
+	 * it prices: a programme running one cohort while the next intake takes registrations has two
+	 * rows here, and each quotes its own figure instead of both inheriting the "current" one.
+	 */
+	readonly price: string | null;
+	readonly includes: readonly string[];
+	readonly excludes: readonly string[];
 }
 
 /**
@@ -96,26 +110,12 @@ export function admissionsCalendar(
 				duration: seasonDuration(season),
 				cadence: season.cadence ? season.cadence[locale] : null,
 				sessionTimes: (season.sessionTimes ?? []).map((time) => time[locale]),
-				registration: season.registration
+				registration: season.registration,
+				price: formatTuition(season.tuition, locale),
+				includes: (season.tuition?.includes ?? []).map((item) => item[locale]),
+				excludes: (season.tuition?.excludes ?? []).map((item) => item[locale])
 			};
 		});
-}
-
-/** One row of the R-ADM-3 tuition section: a programme's current season and what it costs. */
-export interface TuitionRow {
-	readonly programSlug: string;
-	readonly programName: string;
-	readonly programPath: string;
-	readonly seasonLabel: string;
-	readonly display: 'inquire' | 'exact' | 'range';
-	/**
-	 * The formatted price, or null when there is no honest figure to print — which covers both
-	 * `display: 'inquire'` and an `'exact'` / `'range'` record whose amounts are still missing.
-	 * A null price renders as "by enquiry"; it never renders as a number.
-	 */
-	readonly price: string | null;
-	readonly includes: readonly string[];
-	readonly excludes: readonly string[];
 }
 
 function currency(amount: number, code: string, locale: Locale): string {
@@ -158,40 +158,6 @@ export function formatTuition(tuition: Season['tuition'], locale: Locale): strin
 	}
 
 	return null;
-}
-
-/**
- * The R-ADM-3 tuition rows: one per programme that has a current, still-open season.
- *
- * `currentSeason()` is the right selector here (and the wrong one for the calendar): a price is a
- * property of one season, and R-CONTENT-2 already defines which season that is. A programme whose
- * current season is closed, or which carries no `tuition` block at all, is omitted — an empty row
- * saying nothing is worse than a shorter list.
- */
-export function admissionsTuition(
-	seasons: readonly Season[],
-	programs: readonly Program[],
-	locale: Locale
-): TuitionRow[] {
-	const rows: TuitionRow[] = [];
-
-	for (const program of programs) {
-		const season = currentSeason(seasons, program.slug);
-		if (!season || season.registration === 'closed' || !season.tuition) continue;
-
-		rows.push({
-			programSlug: program.slug,
-			programName: program.name[locale],
-			programPath: `/programs/${program.slug}`,
-			seasonLabel: season.label[locale],
-			display: season.tuition.display,
-			price: formatTuition(season.tuition, locale),
-			includes: season.tuition.includes.map((item) => item[locale]),
-			excludes: (season.tuition.excludes ?? []).map((item) => item[locale])
-		});
-	}
-
-	return rows;
 }
 
 /**

@@ -320,11 +320,16 @@ test.describe('header scroll state', () => {
 		});
 	});
 
-	// `/contact-us`, not `/admissions`: the latter opens on a full-bleed photo hero since the two
-	// content pages were brought onto the house hero idiom, so it is now a DARK route and belongs to
-	// the case above. `/contact-us` is the remaining top-level page that genuinely opens on white.
+	// `/programs`, not `/contact-us` and not `/admissions`. Both of those now open on a full-bleed
+	// photo hero (`shared/PageHero.svelte`) and belong to the dark case above; `/contact-us` was the
+	// last top-level page still opening on centred text over a bare background, and it stopped being
+	// one with the admissions/contact redesign.
+	//
+	// The `/programs` INDEX is the remaining content page that genuinely opens on white — the
+	// programme DETAIL pages under it are dark, which is exactly the distinction the trailing slash
+	// in `headerOnDark`'s `startsWith('/programs/')` draws and `nav.test.ts` pins.
 	test('a light route is already ink, and only gains the bar', async ({ page }) => {
-		await page.goto('/contact-us');
+		await page.goto('/programs');
 		await page.waitForTimeout(700);
 
 		// No scrim and no white wordmark on a page that opens on white, scrolled or not.

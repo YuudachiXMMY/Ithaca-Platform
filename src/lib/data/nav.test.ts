@@ -180,11 +180,13 @@ describe('headerOnDark', () => {
 		for (const path of [
 			'/',
 			'/about-us',
-			// `/admissions` and `/success-stories` both render `shared/PageHero.svelte`, which paints
-			// a full-bleed photograph under an `overlay` scrim. They opened on white until the two
-			// content pages were brought onto the house hero idiom; listing them here is the half of
-			// that change the header depends on, and omitting it would put ink on the photograph.
+			// `/admissions`, `/contact-us` and `/success-stories` all render
+			// `shared/PageHero.svelte`, which paints a full-bleed photograph under an `overlay`
+			// scrim. Each opened on white until it was brought onto the house hero idiom; listing
+			// them here is the half of that change the header depends on, and omitting one would put
+			// light-ground ink on a photograph.
 			'/admissions',
+			'/contact-us',
 			'/success-stories',
 			// The three subtrees the Academics / Student Life / About groups added. Their INDEX
 			// pages are dark too, which is why `headerOnDark` matches these by bare prefix — the
@@ -215,7 +217,7 @@ describe('headerOnDark', () => {
 	});
 
 	it('leaves every light route alone', () => {
-		for (const path of ['/contact-us', '/privacy', '/terms']) {
+		for (const path of ['/privacy', '/terms']) {
 			expect(headerOnDark(path), path).toBe(false);
 		}
 	});

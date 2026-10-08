@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ArrowRight } from 'lucide-svelte';
+	import { Plus } from 'lucide-svelte';
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
 	import * as publicEnv from '$env/static/public';
@@ -12,11 +12,10 @@
 	import SeasonCalendar from '$lib/components/admissions/SeasonCalendar.svelte';
 	import BookingEmbed from '$lib/components/admissions/BookingEmbed.svelte';
 	import EnquiryForm from '$lib/components/contact/EnquiryForm.svelte';
-	import { admissionsCalendar, admissionsTuition, resolveProgramParam } from '$lib/admissions';
+	import { admissionsCalendar, resolveProgramParam } from '$lib/admissions';
 	import { SEASONS } from '$lib/content/season-data';
 	import { PROGRAMS, LIVE_PROGRAM_SLUGS } from '$lib/content/programs';
 	import { ADMISSIONS_FAQ } from '$lib/content/faq';
-	import { POLICY_TOPICS, type PolicyTopicId } from '$lib/content/admissions';
 	import { trackBookingClick } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
 
@@ -43,18 +42,12 @@
 	 */
 	const locale = getLocale();
 
-	// R-ADM-2 / R-ADM-3. Both derived from the same `Season` records via $lib/seasons, so a date or
-	// a price edited in season-data.ts moves this page and the programme pages together (R-CONTENT-1).
+	// R-ADM-2 AND R-ADM-3, from one derivation. Each row carries its own season's dates, grade band
+	// and price, so a date or a figure edited in season-data.ts moves this page and the programme
+	// pages together (R-CONTENT-1) — and cannot move one of them without the other.
 	const calendar = admissionsCalendar(SEASONS, PROGRAMS, locale);
-	const tuition = admissionsTuition(SEASONS, PROGRAMS, locale);
 	/** Any row without a printable figure means the explanatory "by enquiry" paragraph is warranted. */
-	const anyByEnquiry = tuition.some((row) => row.price === null);
-
-	const POLICY_LABEL: Record<PolicyTopicId, () => string> = {
-		refund: m.admissions_policies_refund,
-		attendance: m.admissions_policies_attendance,
-		safety: m.admissions_policies_safety
-	};
+	const anyByEnquiry = calendar.some((row) => row.price === null);
 
 	/**
 	 * R-ADM-6 — the consultation booking link.
@@ -98,33 +91,35 @@
 	 * the site separates sections by SURFACE (`about-us` alternates surface-0 / surface-3, the
 	 * homepage drops to surface-4 for its data band) and reserves dark ground for photography. These
 	 * alternate the same way, so a reader can see where one answer ends and the next begins.
+	 *
+	 * The ladder has to read correctly BOTH with and without the FAQ, which is conditional on the
+	 * owner supplying entries: hence `surface-2` under `#book` rather than another `surface-0`,
+	 * which would abut the FAQ's ground on the day the FAQ appears.
 	 */
 	const containerClass = 'mx-auto w-full max-w-[1400px] px-5 py-14 sm:px-8 md:px-[6vw] md:py-20';
-	const eyebrowClass = 'font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase';
 	const headingClass = 'text-2xl font-bold tracking-tight text-foreground md:text-4xl';
 </script>
 
 <Seo title={m.admissions_hero_title()} description={m.admissions_meta_description()} />
 
 <!--
-  SECTION HEADS — eyebrow optional, and rationed.
+  SECTION HEADS — a heading, and the sentence under it if there is one.
 
-  Every section on this page carried one, so all seven read as interchangeable slots in a template.
-  Three remain (hero, the process, the policies) and the rest lead with the heading, which is what
-  the about-us and programme pages do. The eyebrow is now opt-IN rather than a required argument,
-  so adding one back is a visible decision in the markup rather than a default.
+  This snippet used to take an eyebrow and paint a 24px brand-gradient hairline under every
+  heading. Both were optional in the signature and present nearly everywhere in practice, so all
+  seven sections opened with the identical four-part cadence (mono-caps label, heading, hairline,
+  paragraph) and the page read as one template filled in seven times, whatever the surface under
+  it. The eyebrow and the hairline now exist exactly once on this route, in `PageHero`, where the
+  hairline is the house hero signature rather than decoration.
+
+  The mono small-caps device survives in only two places below the hero, both of them load-bearing:
+  the `<dt>` terms inside each season card, which are labelling data, and the registration-status
+  badge. It is no longer the page's answer to every typographic question.
 -->
-{#snippet sectionHead(heading: string, description?: string, eyebrow?: string)}
-	{#if eyebrow}
-		<p class={eyebrowClass}>{eyebrow}</p>
-	{/if}
-	<h2 class="{headingClass} {eyebrow ? 'mt-6' : ''}">{heading}</h2>
-	<div
-		class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-		aria-hidden="true"
-	></div>
+{#snippet sectionHead(heading: string, description?: string)}
+	<h2 class={headingClass}>{heading}</h2>
 	{#if description}
-		<p class="mt-6 max-w-[60ch] text-base leading-relaxed text-foreground-muted">{description}</p>
+		<p class="mt-5 max-w-[60ch] text-base leading-relaxed text-foreground-muted">{description}</p>
 	{/if}
 {/snippet}
 
@@ -142,9 +137,11 @@
 	>
 		{#snippet actions()}
 			<!-- `booking_click` — R-SEO-5, fired from `admissions_hero`.
-			     ONE primary action on this page, and it is this one. The tuition section links to the
-			     same `#book` but as a text link with its own narrower label, so the page has a single
-			     filled button rather than two competing for the same colour. -->
+			     ONE primary action on this page, and it is now the ONLY one. The tuition section used
+			     to carry a second `#book` link ("Ask about tuition") pointing at the same anchor with
+			     the same intent; with the price folded into each season card there is no longer a
+			     section for it to sit in, and one page asking to be contacted twice under two labels
+			     was never two offers, only two labels. -->
 			<a
 				href="#book"
 				onclick={() => trackBookingClick({ location: 'admissions_hero', locale })}
@@ -163,7 +160,7 @@
 	<section class="bg-surface-0">
 		<div class={containerClass}>
 			<Reveal y={24}>
-				{@render sectionHead(m.admissions_steps_title(), undefined, m.admissions_steps_eyebrow())}
+				{@render sectionHead(m.admissions_steps_title())}
 				<div class="mt-12">
 					<AdmissionsSteps />
 				</div>
@@ -171,11 +168,23 @@
 		</div>
 	</section>
 
-	<!-- 4. R-ADM-2 — season calendar, generated from every non-closed Season. -->
+	<!-- 4. R-ADM-2 + R-ADM-3 — one section, generated from every non-closed Season. The dates and
+	     the price are fields of the same row, so they are rendered on the same card; there is no
+	     longer a separate tuition section re-listing every programme under its own heading. -->
 	<section class="bg-surface-3">
 		<div class={containerClass}>
 			<Reveal y={24}>
 				{@render sectionHead(m.admissions_calendar_title(), m.admissions_calendar_description())}
+
+				<!-- Why the cards say "by enquiry" rather than a number. Shown only when at least one
+				     row actually has no figure — which is every row today, and will stop being true
+				     one season at a time as the owner fills them in. -->
+				{#if anyByEnquiry}
+					<p class="mt-5 max-w-[70ch] text-base leading-relaxed text-foreground-muted">
+						{m.admissions_tuition_inquireBody()}
+					</p>
+				{/if}
+
 				<div class="mt-10">
 					<SeasonCalendar rows={calendar} />
 				</div>
@@ -183,121 +192,7 @@
 		</div>
 	</section>
 
-	<!-- 5. R-ADM-3 — tuition, obeying each current season's `tuition.display`. -->
-	<section class="bg-surface-0">
-		<div class={containerClass}>
-			<Reveal y={24}>
-				{@render sectionHead(m.admissions_tuition_title())}
-
-				{#if anyByEnquiry}
-					<p class="mt-6 max-w-[70ch] text-base leading-relaxed text-foreground-muted">
-						{m.admissions_tuition_inquireBody()}
-					</p>
-				{/if}
-
-				{#if tuition.length > 0}
-					<ul class="mt-10 grid grid-cols-1 gap-px bg-border lg:grid-cols-3">
-						{#each tuition as row (row.programSlug)}
-							<li class="flex flex-col gap-3 bg-surface-1 p-5">
-								<h3 class="text-base leading-snug font-bold tracking-tight text-foreground">
-									{row.programName}
-								</h3>
-								<p class="font-mono text-[11px] tracking-[0.2em] text-foreground-subtle uppercase">
-									{row.seasonLabel}
-								</p>
-								<p class="text-lg font-semibold text-brand-bright">
-									{row.price ?? m.admissions_tuition_inquireValue()}
-								</p>
-
-								<!-- `includes` is empty on every live season (season-data.ts carries a
-								     TODO(content) for it), so these lists render only when there is
-								     something real to list. An invented inclusion is worse than no list. -->
-								{#if row.includes.length > 0}
-									<div>
-										<p class="text-xs font-medium text-foreground-muted">
-											{m.admissions_tuition_includesTitle()}
-										</p>
-										<ul class="mt-1.5 flex flex-col gap-1">
-											{#each row.includes as item (item)}
-												<li class="text-sm leading-snug text-foreground-muted">{item}</li>
-											{/each}
-										</ul>
-									</div>
-								{/if}
-
-								{#if row.excludes.length > 0}
-									<div>
-										<p class="text-xs font-medium text-foreground-muted">
-											{m.admissions_tuition_excludesTitle()}
-										</p>
-										<ul class="mt-1.5 flex flex-col gap-1">
-											{#each row.excludes as item (item)}
-												<li class="text-sm leading-snug text-foreground-muted">{item}</li>
-											{/each}
-										</ul>
-									</div>
-								{/if}
-							</li>
-						{/each}
-					</ul>
-				{/if}
-
-				<!-- `booking_click` — R-SEO-5. This anchor is the booking intent that EXISTS today:
-				     PUBLIC_BOOKING_URL is unset (docs/DECISIONS.md Q6), so the provider link inside
-				     BookingEmbed never renders, and an event fired only there would report zero for
-				     as long as the variable stays unset. `location` keeps the two distinguishable.
-
-				     A text link, not a second filled button. The hero already carries this page's one
-				     primary action; a second slab of the same colour halfway down competes with it
-				     rather than reinforcing it. The label stays specific to the question this section
-				     raises ("what does it cost") — a different question from the hero's, asked in the
-				     place a reader has just thought of it. -->
-				<a
-					href="#book"
-					onclick={() => trackBookingClick({ location: 'admissions_tuition', locale })}
-					class="group mt-10 inline-flex w-fit items-center gap-2 text-sm font-semibold text-brand-bright underline underline-offset-4 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-				>
-					{m.admissions_tuition_cta()}
-					<ArrowRight
-						class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
-						aria-hidden="true"
-					/>
-				</a>
-			</Reveal>
-		</div>
-	</section>
-
-	<!-- 6. R-ADM-4 — policies. The three headings are the requirement; the terms themselves are a
-	     CONTENT-GAPS C-3 blocker, so the page says how to get the current version rather than
-	     paraphrasing a refund policy nobody has written. A family would rely on that paraphrase. -->
-	<section class="bg-surface-2">
-		<div class={containerClass}>
-			<Reveal y={24}>
-				{@render sectionHead(
-					m.admissions_policies_title(),
-					undefined,
-					m.admissions_policies_eyebrow()
-				)}
-				<!-- The three topics are LABELS, not sections: there is no text under them yet, and three
-				     bordered cards each containing only a heading read as a rendering fault. One panel
-				     naming the three and saying how to get the current terms is the honest shape. -->
-				<div class="mt-10 max-w-[70ch] border border-border-strong bg-surface-1 p-6">
-					<ul class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-8">
-						{#each POLICY_TOPICS as topic (topic)}
-							<li class="font-mono text-[11px] tracking-[0.2em] text-brand-bright uppercase">
-								{POLICY_LABEL[topic]()}
-							</li>
-						{/each}
-					</ul>
-					<p class="mt-5 text-sm leading-relaxed text-foreground-muted">
-						{m.admissions_policies_note()}
-					</p>
-				</div>
-			</Reveal>
-		</div>
-	</section>
-
-	<!-- 7. R-ADM-5 — FAQ. ADMISSIONS_FAQ is empty today (faq.ts carries the TODO(content)), and an
+	<!-- 5. R-ADM-5 — FAQ. ADMISSIONS_FAQ is empty today (faq.ts carries the TODO(content)), and an
 	     empty disclosure list is worse than no section: placeholder questions would read as answers.
 	     The section appears the moment the owner supplies entries. -->
 	{#if ADMISSIONS_FAQ.length > 0}
@@ -316,12 +211,14 @@
 									>
 										{item.q[locale]}
 									</span>
-									<span
-										class="shrink-0 font-mono text-base leading-none text-brand"
+									<!-- lucide, rotated by the disclosure's own open state, rather than a "+"
+									     typed as a mono glyph. A hand-set character is not an icon: it
+									     inherits the text baseline, it cannot animate between states, and
+									     this page already has an icon family. -->
+									<Plus
+										class="h-4 w-4 shrink-0 text-brand transition-transform duration-200 group-open:rotate-45"
 										aria-hidden="true"
-									>
-										+
-									</span>
+									/>
 								</summary>
 								<div class="max-w-[60ch] pb-5 text-sm leading-relaxed text-foreground-muted">
 									<p>{item.a[locale]}</p>
@@ -334,40 +231,75 @@
 		</section>
 	{/if}
 
-	<!-- 8. R-ADM-6 / R-ADM-7 — #book. With BOOKING_URL configured this is a lazily-mounted embed
-	     beside a plain link; unset (today) it degrades to the enquiry form, which is the same form
-	     /contact-us posts, so the two paths cannot drift. -->
+	<!-- 6. R-ADM-6 / R-ADM-7 / R-ADM-4 — #book. With BOOKING_URL configured this is a lazily-mounted
+	     embed; unset (today) it degrades to the enquiry form, which is the same form /contact-us
+	     posts, so the two paths cannot drift.
+
+	     R-ADM-4 (refunds, attendance, safety) lives in the right-hand column rather than in a band
+	     of its own. The terms themselves are a CONTENT-GAPS C-3 blocker, so what the page can
+	     honestly say is "ask, and you get the current version in writing before you register" —
+	     which is a thing a reader needs at the moment they are about to send an enquiry, not two
+	     scrolls above it. As its own section it was a grey panel holding three mono pills and a
+	     sentence, the shape §4.4 warns about: a card used where no elevation is being communicated.
+
+	     The split is also the page's fourth distinct layout family (after the hero, the step rail
+	     and the season grid), which is what keeps six sections from scrolling as one rhythm. -->
 	<!-- scroll-margin so the sticky header does not cover the heading when /admissions#book lands.
 	     `--spacing-nav` was removed with the design-system pass (it had zero consumers); every call
 	     site writes the arbitrary value instead. -->
-	<section id="book" class="scroll-mt-[var(--nav-h)] bg-surface-3">
+	<section id="book" class="scroll-mt-[var(--nav-h)] bg-surface-2">
 		<div class={containerClass}>
 			<Reveal y={24}>
 				{@render sectionHead(m.admissions_book_title(), m.admissions_book_description())}
 
-				{#if BOOKING_URL}
-					{#if paramProgramName}
-						<p
-							class="mt-6 inline-flex w-fit border border-brand/30 bg-surface-2 px-3 py-1 font-mono text-[11px] tracking-[0.2em] text-brand-bright uppercase"
-						>
-							{m.admissions_book_selected({ program: paramProgramName })}
+				<div
+					class="mt-10 grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] lg:gap-16"
+				>
+					<div>
+						{#if BOOKING_URL}
+							{#if paramProgramName}
+								<p
+									class="mb-6 inline-flex w-fit border border-brand/30 bg-surface-1 px-3 py-1 text-sm text-brand-bright"
+								>
+									{m.admissions_book_selected({ program: paramProgramName })}
+								</p>
+							{/if}
+							<div class="max-w-[880px]">
+								<BookingEmbed url={BOOKING_URL} />
+							</div>
+						{:else}
+							<p class="mb-8 max-w-[70ch] text-sm leading-relaxed text-foreground-subtle">
+								{m.admissions_book_formNote()}
+							</p>
+							<EnquiryForm
+								formLabel={m.admissions_book_title()}
+								idPrefix="admissions"
+								analyticsForm="admissions"
+							/>
+						{/if}
+					</div>
+
+					<!-- A hairline-led aside, not a bordered card: it qualifies the form beside it rather
+					     than standing as its own object.
+
+					     The three R-ADM-4 topics are carried by the HEADING, which already enumerates
+					     them ("Refunds, attendance and safety" / "退费、出勤与安全"). They used to be
+					     repeated under it as three mono-caps pills, which said the heading a second
+					     time in a different typeface and read as a table of contents for text that
+					     does not exist yet. `POLICY_TOPICS` stays in $lib/content/admissions as the
+					     scaffolding for the day the terms themselves are written (CONTENT-GAPS C-3);
+					     it is not needed to render a heading and a sentence. -->
+					<aside
+						class="border-t border-border-strong pt-6 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8"
+					>
+						<h3 class="text-base font-bold tracking-tight text-foreground">
+							{m.admissions_policies_title()}
+						</h3>
+						<p class="mt-3 text-sm leading-relaxed text-foreground-muted">
+							{m.admissions_policies_note()}
 						</p>
-					{/if}
-					<div class="mt-10 max-w-[880px]">
-						<BookingEmbed url={BOOKING_URL} />
-					</div>
-				{:else}
-					<p class="mt-6 max-w-[70ch] text-sm leading-relaxed text-foreground-subtle">
-						{m.admissions_book_formNote()}
-					</p>
-					<div class="mt-10 max-w-[720px]">
-						<EnquiryForm
-							formLabel={m.admissions_book_title()}
-							idPrefix="admissions"
-							analyticsForm="admissions"
-						/>
-					</div>
-				{/if}
+					</aside>
+				</div>
 			</Reveal>
 		</div>
 	</section>

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
 	admissionsCalendar,
-	admissionsTuition,
 	formatTuition,
 	resolveProgramParam,
 	resolveTopicParam
@@ -190,47 +189,49 @@ describe('formatTuition', () => {
 	});
 });
 
-describe('admissionsTuition', () => {
-	it('uses the current season of each programme — R-CONTENT-2, not the whole open set', () => {
-		const rows = admissionsTuition(
+/**
+ * R-ADM-3 moved INTO the calendar row.
+ *
+ * There used to be a second derivation, `admissionsTuition()`, that selected ONE season per
+ * programme via `currentSeason()` and rendered its own section. That shape forced the page to list
+ * every programme twice — once in the calendar, once in the price list — and it could not answer
+ * the question a two-open-season programme actually raises, because `currentSeason()` returns one
+ * season and a price belongs to the season it prices, not to the programme.
+ *
+ * Each row now carries ITS OWN season's figure, read straight off `season.tuition`. A programme
+ * running a cohort while the next intake takes registrations shows each window at its own price,
+ * which is both more informative and impossible to get out of sync with the dates beside it.
+ */
+describe('admissionsCalendar — tuition on the row', () => {
+	it('prices each open season from its own record, not from one season per programme', () => {
+		const rows = admissionsCalendar(
 			[
 				season({
 					id: 'a-now',
 					programSlug: 'alpha',
-					end: '2027-05-31',
-					label: { en: 'Season 03', zh: '第三赛季' },
-					tuition: { display: 'inquire', currency: 'CAD', includes: [] }
+					start: '2026-09-01',
+					tuition: { display: 'exact', amount: 1200, currency: 'CAD', includes: [] }
 				}),
 				season({
-					id: 'a-old',
+					id: 'a-next',
 					programSlug: 'alpha',
-					end: '2026-06-30',
-					registration: 'closed',
-					tuition: { display: 'exact', amount: 1, currency: 'CAD', includes: [] }
+					start: '2027-01-15',
+					tuition: { display: 'exact', amount: 1400, currency: 'CAD', includes: [] }
 				})
 			],
 			PROGRAMS,
-			'zh'
+			'en'
 		);
 
-		expect(rows).toHaveLength(1);
-		expect(rows[0].seasonLabel).toBe('第三赛季');
-		expect(rows[0].price).toBeNull();
+		expect(rows.map((row) => row.price)).toEqual(['$1,200', '$1,400']);
 	});
 
-	it('omits a programme whose current season carries no tuition block', () => {
-		const rows = admissionsTuition([season({ id: 'a', programSlug: 'alpha' })], PROGRAMS, 'en');
-
-		expect(rows).toEqual([]);
-	});
-
-	it('omits a programme whose only seasons are closed', () => {
-		const rows = admissionsTuition(
+	it('carries a null price for an "inquire" season, so the row renders "by enquiry"', () => {
+		const rows = admissionsCalendar(
 			[
 				season({
 					id: 'a',
 					programSlug: 'alpha',
-					registration: 'closed',
 					tuition: { display: 'inquire', currency: 'CAD', includes: [] }
 				})
 			],
@@ -238,11 +239,19 @@ describe('admissionsTuition', () => {
 			'en'
 		);
 
-		expect(rows).toEqual([]);
+		expect(rows[0].price).toBeNull();
+	});
+
+	it('carries a null price when the season has no tuition block at all', () => {
+		const rows = admissionsCalendar([season({ id: 'a', programSlug: 'alpha' })], PROGRAMS, 'en');
+
+		expect(rows[0].price).toBeNull();
+		expect(rows[0].includes).toEqual([]);
+		expect(rows[0].excludes).toEqual([]);
 	});
 
 	it('localizes the includes and excludes lists', () => {
-		const rows = admissionsTuition(
+		const rows = admissionsCalendar(
 			[
 				season({
 					id: 'a',
