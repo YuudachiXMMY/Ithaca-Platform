@@ -77,5 +77,6 @@ cache-rule procedure lives in **[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)**.
 ## Documentation
 
 - [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md) — architecture overview + AI-agent guidance
+- [`docs/EDITING-GUIDE.md`](docs/EDITING-GUIDE.md) — **编辑指南 / content & layout editing guide**: which file to touch for copy, data, spacing, colour, and images, plus the checks to run after
 - [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — **build & deploy runbook** (image, release flow, topology, Cloudflare, rollback)
 - [`docs/CUTOVER.md`](docs/CUTOVER.md) — post-cutover history + the deferred `admin_users` decommission
