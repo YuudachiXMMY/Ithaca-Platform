@@ -4,6 +4,7 @@ import {
 	NAV_ITEMS,
 	RIGHT_NAV_HREFS,
 	SEASON_STATUS,
+	drawerChildren,
 	headerOnDark,
 	navLabel,
 	navSeasonStatus
@@ -154,6 +155,70 @@ describe('the funnel is reachable — R-GLB-1 / R-GLB-2', () => {
 	it('resolves a real label for every footer entry', () => {
 		for (const item of FOOTER_LINKS) {
 			expect(navLabel(item.label), item.label).not.toBe(item.label);
+		}
+	});
+});
+
+/**
+ * The mobile drawer's submenu.
+ *
+ * On a phone a group row (About / Academics / Programs / Student Life) is a BUTTON that expands
+ * its submenu — it does not navigate. That is the whole reason this helper exists: the moment the
+ * row stops being a link, the group's own index page is reachable from the drawer only if it is
+ * listed INSIDE the submenu, and `/academics` and `/programs` deliberately keep their own href out
+ * of `children` (see the arity note on `NAV_ITEMS`). So the floor asserted here is reachability,
+ * not shape: every group's index page must appear in what the drawer renders.
+ */
+describe('drawerChildren — the mobile drawer submenu', () => {
+	const groups = NAV_ITEMS.filter((item) => item.children);
+
+	it('reaches every group’s own index page from inside its submenu', () => {
+		expect(groups.length).toBeGreaterThanOrEqual(4);
+		for (const item of groups) {
+			expect(
+				drawerChildren(item).map((child) => child.href),
+				item.href
+			).toContain(item.href);
+		}
+	});
+
+	// The owner asked for it last, not first: the four tracks / six programmes are what the visitor
+	// opened the group to see, and "All Courses" is the fallback underneath them.
+	it('appends the index entry at the END for the groups that need one', () => {
+		for (const href of ['/academics', '/programs']) {
+			const item = groups.find((group) => group.href === href)!;
+			const rendered = drawerChildren(item);
+			expect(rendered).toHaveLength(item.children!.length + 1);
+			expect(rendered.at(-1)!.href, href).toBe(href);
+			// A distinct "All …" label, not a second copy of the group's own name sitting under it.
+			expect(rendered.at(-1)!.label, href).not.toBe(item.label);
+		}
+	});
+
+	// About and Student Life already list their own page as `children[0]`, so appending would give
+	// them the same destination twice in one submenu.
+	it('appends nothing to the groups that already name their own page', () => {
+		for (const href of ['/about-us', '/student-life']) {
+			const item = groups.find((group) => group.href === href)!;
+			expect(drawerChildren(item), href).toEqual(item.children);
+			const hrefs = drawerChildren(item).map((child) => child.href);
+			expect(new Set(hrefs).size, href).toBe(hrefs.length);
+		}
+	});
+
+	it('resolves a real label for every entry it renders, never the raw key', () => {
+		for (const item of groups) {
+			for (const child of drawerChildren(item)) {
+				expect(navLabel(child.label), child.label).not.toBe(child.label);
+			}
+		}
+	});
+
+	// Home / Admissions / Contact Us stay plain links; the drawer must not render an empty
+	// accordion for them.
+	it('returns nothing for a childless entry', () => {
+		for (const item of NAV_ITEMS.filter((i) => !i.children)) {
+			expect(drawerChildren(item), item.href).toEqual([]);
 		}
 	});
 });

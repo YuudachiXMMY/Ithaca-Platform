@@ -205,8 +205,10 @@ test.describe('the admissions funnel, on a phone', () => {
 			.last();
 		await expect(drawer.locator('a[href="/zh/admissions"]')).toBeVisible();
 
-		const studentLife = drawer.locator('li', { has: page.locator('a[href="/zh/student-life"]') });
-		await studentLife.locator('button[aria-expanded]').click();
+		// The group row is a BUTTON, not a link — tapping it expands rather than navigates — so it is
+		// addressed by what it controls, not by a href it no longer has. `aria-controls` carries the
+		// canonical href; only the links inside get the /zh prefix.
+		await drawer.locator('button[aria-controls="drawer-submenu-/student-life"]').click();
 		await expect(drawer.locator('a[href="/zh/success-stories"]')).toBeVisible();
 
 		await page.keyboard.press('Escape');
