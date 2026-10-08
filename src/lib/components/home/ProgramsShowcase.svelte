@@ -4,7 +4,7 @@
 	import { trackProgramCtaClick } from '$lib/analytics';
 	import { ArrowRight } from 'lucide-svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
-	import evImg from '$lib/assets/programs/ev-challenge/EV25-10.s.png?enhanced';
+	import evImg from '$lib/assets/programs/ev-team/EV25-10.s.png?enhanced';
 	import aiImg from '$lib/assets/programs/ai-bootcamp/AI-Entrep_68.jpg?enhanced';
 	import eliteImg from '$lib/assets/programs/ai-interview/carmi-levy.png?enhanced';
 	import otherImg from '$lib/assets/programs/ai-bootcamp/AIEC2026/AIEC2026-clossette_2s.png?enhanced';
@@ -16,8 +16,8 @@
 	const PROGRAMS = [
 		{
 			img: evImg,
-			href: '/programs/ev-challenge',
-			slug: 'ev-challenge' as string | null,
+			href: '/programs/ev-team',
+			slug: 'ev-team' as string | null,
 			title: m.home_programs_ev_title,
 			description: m.home_programs_ev_description,
 			alt: m.home_programs_ev_alt

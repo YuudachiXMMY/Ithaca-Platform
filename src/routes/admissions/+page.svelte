@@ -29,7 +29,7 @@
 	 * it is the EV team with the vehicle they built, which is also the most concrete answer the site
 	 * has to the question a parent opens `/admissions` asking.
 	 */
-	import heroImage from '$lib/assets/programs/ev-challenge/EV26-4.jpg?enhanced';
+	import heroImage from '$lib/assets/programs/ev-team/EV26-4.jpg?enhanced';
 
 	/**
 	 * `/admissions` — `prd.md` §7.5 (R-ADM-1…7).
@@ -231,19 +231,22 @@
 		</section>
 	{/if}
 
-	<!-- 6. R-ADM-6 / R-ADM-7 / R-ADM-4 — #book. With BOOKING_URL configured this is a lazily-mounted
+	<!-- 6. R-ADM-6 / R-ADM-7 — #book, and the landing target of every programme page's
+	     "Register Now" (see $lib/program-cta). With BOOKING_URL configured this is a lazily-mounted
 	     embed; unset (today) it degrades to the enquiry form, which is the same form /contact-us
 	     posts, so the two paths cannot drift.
 
-	     R-ADM-4 (refunds, attendance, safety) lives in the right-hand column rather than in a band
-	     of its own. The terms themselves are a CONTENT-GAPS C-3 blocker, so what the page can
-	     honestly say is "ask, and you get the current version in writing before you register" —
-	     which is a thing a reader needs at the moment they are about to send an enquiry, not two
-	     scrolls above it. As its own section it was a grey panel holding three mono pills and a
-	     sentence, the shape §4.4 warns about: a card used where no elevation is being communicated.
+	     R-ADM-4 (refunds, attendance, safety) USED to sit in a right-hand column here, as a
+	     heading plus one sentence saying the terms would be sent on request. It has been WITHHELD
+	     at the owner's instruction until the terms themselves exist (CONTENT-GAPS C-3). Nothing
+	     else moved: `POLICY_TOPICS` and the `admissions_policies_*` messages stay in place as the
+	     scaffolding for the day they are written, so restoring the aside is a markup change rather
+	     than a re-authoring.
 
-	     The split is also the page's fourth distinct layout family (after the hero, the step rail
-	     and the season grid), which is what keeps six sections from scrolling as one rhythm. -->
+	     With the aside gone the section is a single column. The form keeps `max-w-[720px]` — the
+	     same measure /contact-us gives it — rather than stretching to the 1400px container: a
+	     four-field form at full page width reads as a layout accident, and the two pages render
+	     the SAME component, so they should not disagree about how wide it is. -->
 	<!-- scroll-margin so the sticky header does not cover the heading when /admissions#book lands.
 	     `--spacing-nav` was removed with the design-system pass (it had zero consumers); every call
 	     site writes the arbitrary value instead. -->
@@ -252,53 +255,30 @@
 			<Reveal y={24}>
 				{@render sectionHead(m.admissions_book_title(), m.admissions_book_description())}
 
-				<div
-					class="mt-10 grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] lg:gap-16"
-				>
-					<div>
-						{#if BOOKING_URL}
-							{#if paramProgramName}
-								<p
-									class="mb-6 inline-flex w-fit border border-brand/30 bg-surface-1 px-3 py-1 text-sm text-brand-bright"
-								>
-									{m.admissions_book_selected({ program: paramProgramName })}
-								</p>
-							{/if}
-							<div class="max-w-[880px]">
-								<BookingEmbed url={BOOKING_URL} />
-							</div>
-						{:else}
-							<p class="mb-8 max-w-[70ch] text-sm leading-relaxed text-foreground-subtle">
-								{m.admissions_book_formNote()}
+				<div class="mt-10">
+					{#if BOOKING_URL}
+						{#if paramProgramName}
+							<p
+								class="mb-6 inline-flex w-fit border border-brand/30 bg-surface-1 px-3 py-1 text-sm text-brand-bright"
+							>
+								{m.admissions_book_selected({ program: paramProgramName })}
 							</p>
+						{/if}
+						<div class="max-w-[880px]">
+							<BookingEmbed url={BOOKING_URL} />
+						</div>
+					{:else}
+						<p class="mb-8 max-w-[70ch] text-sm leading-relaxed text-foreground-subtle">
+							{m.admissions_book_formNote()}
+						</p>
+						<div class="max-w-[720px]">
 							<EnquiryForm
 								formLabel={m.admissions_book_title()}
 								idPrefix="admissions"
 								analyticsForm="admissions"
 							/>
-						{/if}
-					</div>
-
-					<!-- A hairline-led aside, not a bordered card: it qualifies the form beside it rather
-					     than standing as its own object.
-
-					     The three R-ADM-4 topics are carried by the HEADING, which already enumerates
-					     them ("Refunds, attendance and safety" / "退费、出勤与安全"). They used to be
-					     repeated under it as three mono-caps pills, which said the heading a second
-					     time in a different typeface and read as a table of contents for text that
-					     does not exist yet. `POLICY_TOPICS` stays in $lib/content/admissions as the
-					     scaffolding for the day the terms themselves are written (CONTENT-GAPS C-3);
-					     it is not needed to render a heading and a sentence. -->
-					<aside
-						class="border-t border-border-strong pt-6 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8"
-					>
-						<h3 class="text-base font-bold tracking-tight text-foreground">
-							{m.admissions_policies_title()}
-						</h3>
-						<p class="mt-3 text-sm leading-relaxed text-foreground-muted">
-							{m.admissions_policies_note()}
-						</p>
-					</aside>
+						</div>
+					{/if}
 				</div>
 			</Reveal>
 		</div>

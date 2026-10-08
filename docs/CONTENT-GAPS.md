@@ -84,6 +84,19 @@ finding recorded in the redesign PRD: hiding tuition raises enquiry volume short
 lowers lead quality; publishing a figure or a range with an inclusions list is the
 recommended posture.
 
+**2026-10-08 — the R-ADM-4 block is now WITHHELD, not placeholdered.** `/admissions#book` used to
+carry a "Refunds, attendance and safety" aside: the heading, plus one sentence promising the terms
+on request. The owner asked for it to come off the page until the terms themselves exist, which is
+the right call — a heading that names three policies and then has no policy under it reads as a
+table of contents for a document nobody can open, and a parent who clicks nothing and reads only
+the heading comes away believing the policies are published.
+
+Nothing was deleted: `POLICY_TOPICS` in `$lib/content/admissions.ts` and the
+`admissions_policies_*` keys in both message catalogues are untouched, so restoring the block when
+the terms land is a markup change, not a re-authoring. **This is still the same blocker** — the
+four bullets above are what is owed. The only change is that the site no longer advertises the
+debt on the page.
+
 ---
 
 ### C-9 · The eight pages the Academics / Student Life / About groups added

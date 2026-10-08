@@ -2,9 +2,9 @@
 	import * as m from '$lib/paraglide/messages';
 	import type { Picture } from 'vite-imagetools';
 	import img189 from '$lib/assets/highlights/wechat-img-189.jpg?enhanced';
-	import ev5 from '$lib/assets/programs/ev-challenge/EV25-5s.png?enhanced';
+	import ev5 from '$lib/assets/programs/ev-team/EV25-5s.png?enhanced';
 	import img187 from '$lib/assets/highlights/wechat-img-187.jpg?enhanced';
-	import ev7 from '$lib/assets/programs/ev-challenge/EV25-7-fixed.jpg?enhanced';
+	import ev7 from '$lib/assets/programs/ev-team/EV25-7-fixed.jpg?enhanced';
 	import img197 from '$lib/assets/highlights/wechat-img-197.jpg?enhanced';
 	import appImg from '$lib/assets/programs/app.png?enhanced';
 

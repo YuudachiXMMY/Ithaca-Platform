@@ -2,7 +2,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
-	import evImg from '$lib/assets/programs/ev-challenge/EV25-10.s.png?enhanced';
+	import evImg from '$lib/assets/programs/ev-team/EV25-10.s.png?enhanced';
 	import aiEntrep88 from '$lib/assets/programs/ai-bootcamp/AI-Entrep_88.jpg?enhanced';
 	import carmiLevy from '$lib/assets/programs/ai-interview/carmi-levy.png?enhanced';
 	import aiEntrep29 from '$lib/assets/programs/ai-bootcamp/AI-Entrep_29.jpg?enhanced';
@@ -14,7 +14,7 @@
 		{
 			label: m.about_programs_evTeam_label,
 			description: m.about_programs_evTeam_description,
-			href: '/programs/ev-challenge',
+			href: '/programs/ev-team',
 			image: evImg
 		},
 		{

@@ -281,7 +281,7 @@ test.describe('header chrome is legible on the ground it actually sits on', () =
 	// a fix for the top of the page can easily break the state just below it.
 	test('still legible once the bar paints its own background', async ({ page, request }) => {
 		const paths = (await sitemapPaths(request)).filter(
-			(p) => p === '/' || p.endsWith('/programs/ev-challenge') || p.endsWith('/admissions')
+			(p) => p === '/' || p.endsWith('/programs/ev-team') || p.endsWith('/admissions')
 		);
 		expect(paths.length, 'expected routes vanished from the sitemap').toBeGreaterThanOrEqual(3);
 

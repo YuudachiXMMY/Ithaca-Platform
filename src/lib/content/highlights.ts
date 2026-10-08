@@ -40,7 +40,7 @@ export const HIGHLIGHTS: readonly Highlight[] = [
 			width: 1707,
 			height: 2560
 		},
-		programSlug: 'ev-challenge'
+		programSlug: 'ev-team'
 	},
 	{
 		id: 'ev-workshop',
@@ -51,7 +51,7 @@ export const HIGHLIGHTS: readonly Highlight[] = [
 			zh: '设计并组装 EV 零部件，学习电机系统与能源管理知识。'
 		},
 		media: {
-			src: '$lib/assets/programs/ev-challenge/EV25-5s.png',
+			src: '$lib/assets/programs/ev-team/EV25-5s.png',
 			alt: {
 				en: 'Students working on electric vehicle components during workshop',
 				zh: '学生在工作坊中组装电动车零部件'
@@ -59,7 +59,7 @@ export const HIGHLIGHTS: readonly Highlight[] = [
 			width: 1500,
 			height: 1200
 		},
-		programSlug: 'ev-challenge'
+		programSlug: 'ev-team'
 	},
 	{
 		id: 'sedra-design-centre',
@@ -91,7 +91,7 @@ export const HIGHLIGHTS: readonly Highlight[] = [
 			zh: '跨学科项目将技术专长与创意解题相结合，激发集体智慧。'
 		},
 		media: {
-			src: '$lib/assets/programs/ev-challenge/EV25-7-fixed.jpg',
+			src: '$lib/assets/programs/ev-team/EV25-7-fixed.jpg',
 			alt: { en: 'Students collaborating on a team project', zh: '学生共同协作完成团队项目' },
 			width: 1920,
 			height: 2560

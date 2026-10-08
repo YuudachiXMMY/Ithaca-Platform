@@ -19,7 +19,7 @@ import AxeBuilder from '@axe-core/playwright';
 const SECTION_6_4 = [
 	'/',
 	'/programs',
-	'/programs/ev-challenge',
+	'/programs/ev-team',
 	'/programs/ai-entrepreneurship-bootcamp',
 	'/programs/ithaca-dialogues',
 	'/programs/engineering-projects',

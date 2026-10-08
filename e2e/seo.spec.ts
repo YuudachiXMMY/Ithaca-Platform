@@ -63,11 +63,11 @@ test.describe('per-page OG cards — R-SEO-2', () => {
 	test('the zh card is a different file from the en card, with Chinese alt text', async ({
 		request
 	}) => {
-		const en = await (await request.get('/programs/ev-challenge')).text();
-		const zh = await (await request.get('/zh/programs/ev-challenge')).text();
+		const en = await (await request.get('/programs/ev-team')).text();
+		const zh = await (await request.get('/zh/programs/ev-team')).text();
 
-		expect(meta(en, 'og:image')).toContain('/og/en/programs/ev-challenge.png');
-		expect(meta(zh, 'og:image')).toContain('/og/zh/programs/ev-challenge.png');
+		expect(meta(en, 'og:image')).toContain('/og/en/programs/ev-team.png');
+		expect(meta(zh, 'og:image')).toContain('/og/zh/programs/ev-team.png');
 		// WeChat is the primary arrival path; an English card on a Chinese share is the defect.
 		expect(meta(zh, 'og:image:alt')).toMatch(/\p{Script=Han}/u);
 		expect(meta(en, 'og:locale')).toBe('en_CA');
@@ -89,13 +89,13 @@ test.describe('BreadcrumbList — R-SEO-3', () => {
 	}
 
 	test('inner pages carry a trail, the home page does not', async ({ request }) => {
-		const inner = jsonLd(await (await request.get('/programs/ev-challenge')).text());
+		const inner = jsonLd(await (await request.get('/programs/ev-team')).text());
 		const crumbs = inner.find((block) => block['@type'] === 'BreadcrumbList');
 		expect(crumbs).toBeDefined();
 		const items = crumbs?.itemListElement as { position: number; name: string; item: string }[];
 		expect(items.map((entry) => entry.position)).toEqual([1, 2, 3]);
 		expect(items.map((entry) => entry.name)).toEqual(['Home', 'Programs', 'EV Team']);
-		expect(items[2].item).toMatch(/\/programs\/ev-challenge$/);
+		expect(items[2].item).toMatch(/\/programs\/ev-team$/);
 
 		const home = jsonLd(await (await request.get('/')).text());
 		expect(home.some((block) => block['@type'] === 'BreadcrumbList')).toBe(false);
@@ -113,11 +113,11 @@ test.describe('BreadcrumbList — R-SEO-3', () => {
 	test('a programme page still carries its Course entity alongside the trail', async ({
 		request
 	}) => {
-		const blocks = jsonLd(await (await request.get('/programs/ev-challenge')).text());
+		const blocks = jsonLd(await (await request.get('/programs/ev-team')).text());
 		const course = blocks.find((block) => block['@type'] === 'Course');
 		expect(course).toBeDefined();
 		// R-SEO-2 × R-SEO-3: the Course image is the same card the og:image points at.
-		expect(course?.image).toMatch(/\/og\/en\/programs\/ev-challenge\.png$/);
+		expect(course?.image).toMatch(/\/og\/en\/programs\/ev-team\.png$/);
 		expect(course?.hasCourseInstance).toBeDefined();
 	});
 });

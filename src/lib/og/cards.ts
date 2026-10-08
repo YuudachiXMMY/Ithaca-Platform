@@ -146,7 +146,7 @@ export const OG_CARDS: Readonly<Record<string, OgCard>> = {
 	},
 	// The six programmes. `eyebrow` names the programme so the headline is free to be a slogan
 	// ("Build. Race. Lead."); where the headline already names it, the eyebrow is the section.
-	'/programs/ev-challenge': {
+	'/programs/ev-team': {
 		template: 'program',
 		eyebrow: m.programs_index_cards_evTeam_title,
 		title: m.programs_evChallenge_hero_title,
@@ -200,7 +200,7 @@ export function ogCardFor(path: string): OgCard | null {
 
 /**
  * The prerendered file for one page in one locale: `/og/en/home.png`,
- * `/og/zh/programs/ev-challenge.png`.
+ * `/og/zh/programs/ev-team.png`.
  *
  * The locale is a PATH SEGMENT, not a `?locale=` query and not Paraglide's `/zh` prefix. Both
  * alternatives were rejected: a query string cannot be prerendered to a static file, and routing
@@ -213,7 +213,7 @@ export function ogCardFile(path: string, locale: Locale): string {
 }
 
 /**
- * Inverse of `ogCardFile`: `'en/programs/ev-challenge.png'` → the locale and the resolved card.
+ * Inverse of `ogCardFile`: `'en/programs/ev-team.png'` → the locale and the resolved card.
  *
  * Returns the CARD, not just the path, so the endpoint cannot re-index the registry with a key the
  * validation did not check.

@@ -63,7 +63,7 @@ describe('ogCardFile / parseOgCardSlug', () => {
 	});
 
 	it('nests a programme path under the locale segment', () => {
-		expect(ogCardFile('/programs/ev-challenge', 'zh')).toBe('/og/zh/programs/ev-challenge.png');
+		expect(ogCardFile('/programs/ev-team', 'zh')).toBe('/og/zh/programs/ev-team.png');
 	});
 
 	it('treats a trailing slash as the same page', () => {

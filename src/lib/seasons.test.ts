@@ -73,10 +73,10 @@ describe('currentSeason — R-CONTENT-2', () => {
 
 	it('only ever considers seasons of the requested program', () => {
 		const seasons = [
-			season({ id: 'ours', programSlug: 'ev-challenge', end: '2026-05-31' }),
+			season({ id: 'ours', programSlug: 'ev-team', end: '2026-05-31' }),
 			season({ id: 'theirs', programSlug: 'ai-camp', end: '2030-05-31' })
 		];
-		expect(currentSeason(seasons, 'ev-challenge')?.id).toBe('ours');
+		expect(currentSeason(seasons, 'ev-team')?.id).toBe('ours');
 	});
 
 	it('returns undefined for an empty list', () => {
@@ -239,7 +239,7 @@ describe('formatSeasonWindow — R-I18N-4', () => {
 // five places follow" contract: if someone edits EV Season 03's `start`, this fails first.
 describe('the shipped season records', () => {
 	it('EV Season 03 is the current EV season and matches the published detail strip', () => {
-		const ev = currentSeason(SEASONS, 'ev-challenge');
+		const ev = currentSeason(SEASONS, 'ev-team');
 		expect(ev?.id).toBe('ev-s03');
 		expect(seasonDuration(ev!)).toEqual({ value: 9, unit: 'month' });
 		expect(formatSeasonWindow(ev!, 'en')).toBe('September 2026 – May 2027');

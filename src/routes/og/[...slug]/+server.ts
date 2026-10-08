@@ -17,7 +17,7 @@ import type { EntryGenerator, RequestHandler } from './$types';
  * control, on a box that also serves the site.
  *
  * The route shape is what makes prerendering possible. The locale is a PATH SEGMENT
- * (`/og/zh/programs/ev-challenge.png`), not a query parameter and not Paraglide's `/zh` prefix:
+ * (`/og/zh/programs/ev-team.png`), not a query parameter and not Paraglide's `/zh` prefix:
  *
  *  - a query string has no prerendered file to write to;
  *  - routing through Paraglide's prefix would make the card depend on `src/hooks.ts`'s `reroute`

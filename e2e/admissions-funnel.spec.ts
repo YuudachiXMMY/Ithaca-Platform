@@ -105,19 +105,23 @@ test.describe('the admissions funnel, on a phone', () => {
 		};
 
 		// 1. Arrive on the programme page, in Chinese, from a share.
-		await page.goto('/zh/programs/ev-challenge');
+		await page.goto('/zh/programs/ev-team');
 		await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
 		await shot('1-program-page');
 
-		// 2. The register CTA exists, is visible without hunting, and carries the slug.
-		const register = page.locator('main a[href="/zh/admissions?program=ev-challenge"]').first();
+		// 2. The register CTA exists, is visible without hunting, and carries the slug AND the
+		//    #book anchor — a reader who has decided should not re-read the page to find the form.
+		const register = page.locator('main a[href="/zh/admissions?program=ev-team#book"]').first();
 		await expect(register).toBeVisible();
 		await register.click();
 
 		// 3. It lands on /admissions with the query intact — and the programme arrives PRESELECTED.
-		await expect(page).toHaveURL(/\/zh\/admissions\?program=ev-challenge$/);
+		await expect(page).toHaveURL(/\/zh\/admissions\?program=ev-team#book$/);
 		await expect(page.getByRole('heading', { level: 1 })).toHaveText('招生入学');
-		await shot('2-admissions-top');
+		// The fragment has to actually MOVE the viewport, not just sit in the URL: `#book` is the
+		// last of six sections, so if the scroll never happens the whole change is cosmetic.
+		await expect(page.locator('#book')).toBeInViewport();
+		await shot('2-admissions-book');
 
 		const form = page.locator('form[aria-label]').first();
 		const disclosure = form.locator('details');
@@ -126,8 +130,8 @@ test.describe('the admissions funnel, on a phone', () => {
 		await expect(disclosure).toHaveAttribute('open', '');
 		// The chip names the programme in the reading locale, not the slug.
 		await expect(form.getByText('咨询项目：EV 车队')).toBeVisible();
-		await expect(form.locator('input[type="checkbox"][value="ev-challenge"]')).toBeChecked();
-		await form.locator('input[type="checkbox"][value="ev-challenge"]').scrollIntoViewIfNeeded();
+		await expect(form.locator('input[type="checkbox"][value="ev-team"]')).toBeChecked();
+		await form.locator('input[type="checkbox"][value="ev-team"]').scrollIntoViewIfNeeded();
 		await shot('3-preselected');
 
 		// 4. Fill the two required fields and send.
@@ -145,7 +149,7 @@ test.describe('the admissions funnel, on a phone', () => {
 		expect(posted, 'the enquiry never reached /api/contact').not.toBeNull();
 		const body = JSON.parse(posted!) as Record<string, unknown>;
 		// The two fields that make this a QUALIFIED enquiry rather than an anonymous one.
-		expect(body.programs).toEqual(['ev-challenge']);
+		expect(body.programs).toEqual(['ev-team']);
 		expect(body.locale).toBe('zh');
 
 		// 5. The click that started it is measurable, and carries nothing it should not.
@@ -153,7 +157,7 @@ test.describe('the admissions funnel, on a phone', () => {
 		expect(clicks, JSON.stringify(await events(page))).toEqual([
 			{
 				name: 'program_cta_click',
-				params: { program: 'ev-challenge', location: 'program_page', locale: 'zh' }
+				params: { program: 'ev-team', location: 'program_page', locale: 'zh' }
 			}
 		]);
 
@@ -164,7 +168,7 @@ test.describe('the admissions funnel, on a phone', () => {
 				params: {
 					form: 'admissions',
 					locale: 'zh',
-					program: 'ev-challenge',
+					program: 'ev-team',
 					program_count: 1,
 					has_grade: false
 				}
@@ -177,19 +181,19 @@ test.describe('the admissions funnel, on a phone', () => {
 	});
 
 	test('the brochure CTA carries the same slug to /contact-us', async ({ page }) => {
-		await page.goto('/zh/programs/ev-challenge');
-		await page.locator('main a[href="/zh/contact-us?program=ev-challenge"]').first().click();
+		await page.goto('/zh/programs/ev-team');
+		await page.locator('main a[href="/zh/contact-us?program=ev-team"]').first().click();
 
-		await expect(page).toHaveURL(/\/zh\/contact-us\?program=ev-challenge$/);
+		await expect(page).toHaveURL(/\/zh\/contact-us\?program=ev-team$/);
 		const form = page.locator('form[aria-label]').first();
 		await expect(form.locator('details')).toHaveAttribute('open', '');
-		await expect(form.locator('input[type="checkbox"][value="ev-challenge"]')).toBeChecked();
+		await expect(form.locator('input[type="checkbox"][value="ev-team"]')).toBeChecked();
 	});
 
 	test('/admissions and /success-stories are reachable from the chrome, not just by URL', async ({
 		page
 	}) => {
-		await page.goto('/zh/programs/ev-challenge');
+		await page.goto('/zh/programs/ev-team');
 
 		// Header: on a phone the nav lives behind the hamburger. The drawer renders NAV_ITEMS
 		// straight through, so Success Stories sits inside the Student Life accordion rather than

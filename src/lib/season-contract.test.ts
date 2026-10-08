@@ -17,7 +17,7 @@ import { SEASONS } from './content/season-data';
  * a component "calls `currentSeason()`". Both pass while the page renders a literal three sections
  * further down. This one instead:
  *
- *  1. Renders the REAL page components — `src/routes/programs/ev-challenge/+page.svelte` and
+ *  1. Renders the REAL page components — `src/routes/programs/ev-team/+page.svelte` and
  *     `src/routes/programs/+page.svelte` — through `svelte/server`, with `$lib/content/season-data`
  *     module-mocked. Nothing is stubbed between the record and the HTML; the page's own wiring is
  *     under test.
@@ -110,7 +110,7 @@ interface Surfaces {
 	readonly programBody: string;
 	/** `<svelte:head>` output — where the Course / CourseInstance JSON-LD lands. */
 	readonly programHead: string;
-	/** The ONE `/programs` bento card that links to `/programs/ev-challenge`. */
+	/** The ONE `/programs` bento card that links to `/programs/ev-team`. */
 	readonly indexCard: string;
 }
 
@@ -123,7 +123,7 @@ async function renderSurfaces(seasons: readonly Season[], locale: Locale): Promi
 	const [{ render }, runtime, evPage, indexPage] = await Promise.all([
 		import('svelte/server'),
 		import('$lib/paraglide/runtime'),
-		import('../routes/programs/ev-challenge/+page.svelte'),
+		import('../routes/programs/ev-team/+page.svelte'),
 		import('../routes/programs/+page.svelte')
 	]);
 	runtime.overwriteGetLocale(() => locale);
@@ -132,7 +132,7 @@ async function renderSurfaces(seasons: readonly Season[], locale: Locale): Promi
 	return {
 		programBody: ev.body,
 		programHead: ev.head,
-		indexCard: cardFor(render(indexPage.default).body, 'ev-challenge')
+		indexCard: cardFor(render(indexPage.default).body, 'ev-team')
 	};
 }
 

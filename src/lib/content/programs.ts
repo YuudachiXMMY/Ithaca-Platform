@@ -33,7 +33,7 @@ function placeholderHero(src: string, en: string, zh: string): Media {
 export const PROGRAMS: readonly Program[] = [
 	// ── EV Team ──────────────────────────────────────────────────────────────────────────────
 	{
-		slug: 'ev-challenge',
+		slug: 'ev-team',
 		name: { en: 'EV Team', zh: 'EV 车队' },
 		tagline: { en: 'Build. Race. Lead.', zh: '制造。竞速。领导。' },
 		summary: {
@@ -45,7 +45,7 @@ export const PROGRAMS: readonly Program[] = [
 		format: 'in-person',
 		location: { en: 'Greater Toronto Area', zh: '大多伦多地区' },
 		hero: {
-			src: '$lib/assets/programs/ev-challenge/EV26-1.jpg',
+			src: '$lib/assets/programs/ev-team/EV26-1.jpg',
 			alt: {
 				en: 'Ithaca EV team with their electric vehicle at the track',
 				zh: '伊萨卡 EV 车队与他们的电动汽车在赛道上'
@@ -55,19 +55,19 @@ export const PROGRAMS: readonly Program[] = [
 		},
 		gallery: [
 			{
-				src: '$lib/assets/programs/ev-challenge/EV25-12.jpg',
+				src: '$lib/assets/programs/ev-team/EV25-12.jpg',
 				alt: { en: 'Students building the EV chassis', zh: '学生制造 EV 底盘' },
 				width: 1279,
 				height: 1706
 			},
 			{
-				src: '$lib/assets/programs/ev-challenge/EV25-8.jpg',
+				src: '$lib/assets/programs/ev-team/EV25-8.jpg',
 				alt: { en: 'Students testing the electric vehicle', zh: '学生测试电动汽车' },
 				width: 1920,
 				height: 2560
 			},
 			{
-				src: '$lib/assets/programs/ev-challenge/EV26-2.jpg',
+				src: '$lib/assets/programs/ev-team/EV26-2.jpg',
 				alt: {
 					en: 'Ithaca EV team at the Waterloo EV Challenge',
 					zh: '伊萨卡 EV 车队参加滑铁卢 EV 挑战赛'
@@ -76,7 +76,7 @@ export const PROGRAMS: readonly Program[] = [
 				height: 1280
 			},
 			{
-				src: '$lib/assets/programs/ev-challenge/EV26-5.jpg',
+				src: '$lib/assets/programs/ev-team/EV26-5.jpg',
 				alt: { en: 'The Ithaca electric trike on track', zh: '伊萨卡电动三轮车在赛道上' },
 				width: 1920,
 				height: 1280
@@ -449,7 +449,7 @@ export const PROGRAMS: readonly Program[] = [
 		grades: ACADEMY_GRADES,
 		format: 'in-person',
 		hero: placeholderHero(
-			'$lib/assets/programs/ev-challenge/EV26-3.jpg',
+			'$lib/assets/programs/ev-team/EV26-3.jpg',
 			'Students working on an engineering project',
 			'学生进行工程项目'
 		),

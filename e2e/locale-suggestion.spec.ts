@@ -35,11 +35,11 @@ test.describe('a Chinese-preferring browser', () => {
 	test('is offered the /zh twin of the page it is actually on', async ({ page }) => {
 		// Not the homepage: the offer has to carry the CURRENT path, or it answers a question the
 		// visitor did not ask by dumping them on a Chinese homepage.
-		await page.goto('/programs/ev-challenge');
+		await page.goto('/programs/ev-team');
 		await expect(card(page)).toBeVisible();
 
 		const offer = card(page).getByRole('link');
-		await expect(offer).toHaveAttribute('href', '/zh/programs/ev-challenge');
+		await expect(offer).toHaveAttribute('href', '/zh/programs/ev-team');
 		// The card speaks Chinese while the page around it stays English — that is the whole point,
 		// and `lang` is what makes a screen reader switch voice for it.
 		await expect(card(page)).toHaveAttribute('lang', 'zh');

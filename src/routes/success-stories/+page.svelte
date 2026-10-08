@@ -28,7 +28,7 @@
 	 * belongs: attached to the gated record it is evidence FOR, inside `ResultsTimeline`.
 	 */
 	import heroImage from '$lib/assets/programs/ai-bootcamp/AIEC2026/OTLFInnovationDay-2026-EventSpace-8.jpg?enhanced';
-	import ctaImage from '$lib/assets/programs/ev-challenge/EV26-7.jpg?enhanced';
+	import ctaImage from '$lib/assets/programs/ev-team/EV26-7.jpg?enhanced';
 
 	/**
 	 * `/success-stories` — `prd.md` §7.6 (R-RES-1), workstream G.

@@ -33,7 +33,7 @@ export const SEASONS: readonly Season[] = [
 	// shifts `start` below and requires every one of them to move.
 	{
 		id: 'ev-s03',
-		programSlug: 'ev-challenge',
+		programSlug: 'ev-team',
 		label: { en: 'Season 03', zh: '第三赛季' },
 		start: '2026-09-01',
 		end: '2027-05-31',

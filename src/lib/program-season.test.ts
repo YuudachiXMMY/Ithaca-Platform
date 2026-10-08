@@ -127,7 +127,7 @@ describe('programSeason', () => {
 		// One assertion against real content, because the whole point of the module is that the
 		// published page reads this record — if the id or the slug drifts, every surface goes blank
 		// and nothing else in the suite would say so.
-		const view = programSeason(SEASONS, PROGRAMS, 'ev-challenge', 'en');
+		const view = programSeason(SEASONS, PROGRAMS, 'ev-team', 'en');
 		expect(view?.season.id).toBe('ev-s03');
 		expect(view?.duration).toEqual({ value: 9, unit: 'month' });
 	});

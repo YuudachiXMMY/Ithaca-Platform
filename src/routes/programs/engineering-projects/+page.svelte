@@ -2,7 +2,7 @@
 	import PlaceholderProgram from '$lib/components/programs/PlaceholderProgram.svelte';
 	import * as m from '$lib/paraglide/messages';
 	import Seo from '$lib/components/Seo.svelte';
-	import heroImage from '$lib/assets/programs/ev-challenge/EV26-3.jpg?enhanced';
+	import heroImage from '$lib/assets/programs/ev-team/EV26-3.jpg?enhanced';
 </script>
 
 <Seo

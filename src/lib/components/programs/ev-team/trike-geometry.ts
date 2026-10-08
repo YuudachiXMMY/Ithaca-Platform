@@ -3,7 +3,8 @@
  *
  * Verbatim port of the `F{}` point arrays, `ringPoints()` helper, and `Wheel`
  * spoke builder from the React-Three-Fiber original
- * (`src/components/programs/ev-challenge/EVModel3D.tsx:35-223,246-346`).
+ * (`src/components/programs/ev-challenge/EVModel3D.tsx:35-223,246-346` — the
+ * retired Next.js tree, so that path keeps its original spelling).
  *
  * The R3F scene rendered ~103 drei `<Line>` primitives. Threlte has no drop-in
  * for drei's `<Line lineWidth>`, so this module flattens every line into a

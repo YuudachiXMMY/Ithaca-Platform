@@ -37,7 +37,7 @@ const program = (slug: string, en: string, zh: string): Program =>
 		seasonIds: []
 	}) satisfies Program;
 
-const PROGRAMS: Program[] = [program('ev-challenge', 'EV Team', 'EV 车队')];
+const PROGRAMS: Program[] = [program('ev-team', 'EV Team', 'EV 车队')];
 
 function result(over: Partial<Result> & Pick<Result, 'id' | 'date' | 'consentVerified'>): Result {
 	return {
@@ -171,7 +171,7 @@ describe('resultsTimeline', () => {
 			id: 'linked',
 			date: '2026',
 			consentVerified: true,
-			programSlug: 'ev-challenge'
+			programSlug: 'ev-team'
 		});
 		const orphan = result({
 			id: 'orphan',
@@ -183,7 +183,7 @@ describe('resultsTimeline', () => {
 		const byId = new Map(group.results.map((r) => [r.id, r]));
 
 		expect(byId.get('linked')?.programName).toBe('EV 车队');
-		expect(byId.get('linked')?.programPath).toBe('/programs/ev-challenge');
+		expect(byId.get('linked')?.programPath).toBe('/programs/ev-team');
 		expect(byId.get('orphan')?.programName).toBeNull();
 		expect(byId.get('orphan')?.programPath).toBeNull();
 	});
@@ -240,7 +240,7 @@ describe('dialoguesInterviews', () => {
 
 	it('returns nothing for a programme that has no record or no films', () => {
 		expect(dialoguesInterviews([withVideos], 'nope', 'en')).toEqual([]);
-		expect(dialoguesInterviews(PROGRAMS, 'ev-challenge', 'en')).toEqual([]);
+		expect(dialoguesInterviews(PROGRAMS, 'ev-team', 'en')).toEqual([]);
 	});
 });
 

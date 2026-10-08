@@ -67,9 +67,17 @@
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- external contact links (maps/mailto/tel); a dynamic href here is not an internal route -->
 
-<div
-	class="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16"
->
+<!--
+  ONE COLUMN, always.
+
+  This block used to be a `lg:grid-cols-[7fr_5fr]` split — three contact rows beside the WeChat
+  code — because it had the whole page measure to itself. It now lives in the right-hand column of
+  the merged "Send us a message" section, so its own two-column split would be a split inside a
+  split: at that width the `<dl>` wrapped the postal address over three lines and the QR shrank
+  below the size at which a phone can read it. Stacked, both get the column's full width, and the
+  hairline between address/email/phone carries the separation the second column used to.
+-->
+<div class="flex flex-col gap-8">
 	<!-- A definition list, because that is what label/value pairs are. Rows are separated by a
 	     single hairline between them, not boxed individually. -->
 	<dl class="flex flex-col">
@@ -100,7 +108,7 @@
 	<!-- WeChat is the site's primary arrival path, so it gets the code itself rather than a row
 	     with an ID in it. `showId` prints the ID once, under the code; no other element on this
 	     page repeats it. -->
-	<div class="border-t border-border-strong pt-6 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8">
+	<div class="border-t border-border-strong pt-6">
 		<p class="mb-4 flex items-center gap-2.5 text-sm text-foreground-muted">
 			{m.contact_page_channels_wechat()}
 		</p>

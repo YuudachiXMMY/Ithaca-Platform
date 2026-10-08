@@ -97,7 +97,7 @@ export function ogImageFor(url: URL, locale: 'en' | 'zh' = getLocale()) {
  * `BreadcrumbList` structured data for an inner page — `prd.md` R-SEO-3.
  *
  * Built from the ancestors of the current path that are themselves registered pages, so
- * `/programs/ev-challenge` yields Home → Programs → EV Team while `/about-us` yields Home → About
+ * `/programs/ev-team` yields Home → Programs → EV Team while `/about-us` yields Home → About
  * Us. Names come from `OgCard.crumb`: short and navigational ("EV Team"), never the page's
  * headline ("Build. Race. Lead."), which is what a breadcrumb is for.
  *

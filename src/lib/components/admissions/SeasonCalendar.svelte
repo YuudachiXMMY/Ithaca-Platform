@@ -28,10 +28,10 @@
 	import type { CalendarRow } from '$lib/admissions';
 	import * as m from '$lib/paraglide/messages';
 
-	import evImg from '$lib/assets/programs/ev-challenge/EV26-5.jpg?enhanced';
+	import evImg from '$lib/assets/programs/ev-team/EV26-5.jpg?enhanced';
 	import aiCampImg from '$lib/assets/programs/ai-bootcamp/AI-Entrep_81.jpg?enhanced';
 	import dialoguesImg from '$lib/assets/programs/ai-interview/carmi-levy.png?enhanced';
-	import engineeringImg from '$lib/assets/programs/ev-challenge/EV26-3.jpg?enhanced';
+	import engineeringImg from '$lib/assets/programs/ev-team/EV26-3.jpg?enhanced';
 	import summerWinterImg from '$lib/assets/programs/ai-bootcamp/ai-camp-HB8A5065.jpg?enhanced';
 	import ithacaNightImg from '$lib/assets/programs/ai-bootcamp/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg?enhanced';
 
@@ -52,7 +52,7 @@
 	 * what a programme added to `season-data.ts` before anyone has shot it will do.
 	 */
 	const PROGRAM_IMAGE: Record<string, Picture> = {
-		'ev-challenge': evImg,
+		'ev-team': evImg,
 		'ai-entrepreneurship-bootcamp': aiCampImg,
 		'ithaca-dialogues': dialoguesImg,
 		'engineering-projects': engineeringImg,

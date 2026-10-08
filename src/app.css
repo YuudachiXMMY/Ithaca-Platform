@@ -865,13 +865,13 @@ html {
 	}
 }
 
-/* EV Challenge: ambient section backgrounds. Referenced by
-   routes/programs/ev-challenge/+page.svelte. Same treatment as .ev-roles-bg —
+/* EV Team: ambient section backgrounds. Referenced by
+   routes/programs/ev-team/+page.svelte. Same treatment as .ev-roles-bg —
    a white-to-mist ground under two soft teal glows, all of it token-driven.
    LIGHT since 2026-09-29: these four were the last inverted-band sections on
    the public site and the owner moved the EV stretch onto the light system. */
 /* Fallback floor for all four: the light ground alone. These four classes ARE the
-   only background on their sections (routes/programs/ev-challenge/+page.svelte),
+   only background on their sections (routes/programs/ev-team/+page.svelte),
    and everything inside them is now light-context ink — so this is the declaration
    that has to survive a browser without color-mix(). The teal glows on top are
    decorative and are gated in the @supports block below. */

@@ -14,7 +14,7 @@ import { localizeHref } from '$lib/paraglide/runtime';
  * this change.
  *
  * Both take the slug rather than a full href so a call site cannot forget the query string, and
- * both go through `localizeHref` so `/zh/programs/ev-challenge` stays in Chinese across the hop.
+ * both go through `localizeHref` so `/zh/programs/ev-team` stays in Chinese across the hop.
  * `localizeHref` returns `pathname + search + hash`, so the query survives localization.
  *
  * `program-cta.test.ts` pins the output of both against `resolveProgramParam`'s own validation for
@@ -22,9 +22,17 @@ import { localizeHref } from '$lib/paraglide/runtime';
  * "no preselection", which is exactly the failure this module exists to prevent.
  */
 
-/** `/admissions?program=<slug>` — the R-PT-1 primary ("Register"). */
+/**
+ * `/admissions?program=<slug>#book` — the R-PT-1 primary ("Register").
+ *
+ * The `#book` fragment targets the "Talk to us" section, which is the LAST of six on
+ * `/admissions`. Without it a reader who had already decided landed at the top of the page and
+ * had to scroll past the glance strip, the five steps, the season calendar and the FAQ to reach
+ * the form they had just asked for — with nothing on screen to say it was down there. The anchor
+ * and its `scroll-mt-[var(--nav-h)]` already existed for the hero's own in-page button.
+ */
 export function registerHref(slug: string): string {
-	return localizeHref(`/admissions?program=${encodeURIComponent(slug)}`);
+	return localizeHref(`/admissions?program=${encodeURIComponent(slug)}#book`);
 }
 
 /** `/contact-us?program=<slug>` — the R-PT-1 secondary ("Request brochure"). */

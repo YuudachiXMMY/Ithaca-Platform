@@ -277,16 +277,16 @@ describe('admissionsCalendar — tuition on the row', () => {
 
 describe('query-parameter resolution', () => {
 	it('accepts a known programme slug — R-ADM-7', () => {
-		expect(
-			resolveProgramParam(new URLSearchParams('?program=ev-challenge'), ['ev-challenge'])
-		).toBe('ev-challenge');
+		expect(resolveProgramParam(new URLSearchParams('?program=ev-team'), ['ev-team'])).toBe(
+			'ev-team'
+		);
 	});
 
 	it('rejects an unknown slug, so a stale link cannot make the form unsubmittable', () => {
 		expect(
-			resolveProgramParam(new URLSearchParams('?program=elite-interview'), ['ev-challenge'])
+			resolveProgramParam(new URLSearchParams('?program=elite-interview'), ['ev-team'])
 		).toBeNull();
-		expect(resolveProgramParam(new URLSearchParams(''), ['ev-challenge'])).toBeNull();
+		expect(resolveProgramParam(new URLSearchParams(''), ['ev-team'])).toBeNull();
 	});
 
 	it('accepts only the three topics the endpoint enumerates', () => {

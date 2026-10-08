@@ -94,7 +94,7 @@ test.describe('GA4 events — R-SEO-5', () => {
 		await page.locator('form details summary').first().click();
 		await expect(page.locator('#contact-grade')).toBeVisible();
 		await page.locator('#contact-grade').selectOption('9');
-		await page.locator('input[type="checkbox"][value="ev-challenge"]').check();
+		await page.locator('input[type="checkbox"][value="ev-team"]').check();
 		await page.locator('#contact-source').fill(PII.source);
 
 		await page.getByRole('button', { name: /send|submit/i }).click();
@@ -106,7 +106,7 @@ test.describe('GA4 events — R-SEO-5', () => {
 		expect(inquiry?.params).toEqual({
 			form: 'contact',
 			locale: 'en',
-			program: 'ev-challenge',
+			program: 'ev-team',
 			program_count: 1,
 			has_grade: true
 		});
@@ -239,20 +239,21 @@ test.describe('GA4 events — R-SEO-5', () => {
 		await pinNavigation(page);
 		// Scoped to <main>: the header nav and the footer link to the same URLs and are NOT
 		// programme CTAs, so an unscoped `.first()` would click the wrong element and prove nothing.
-		await page.locator('main a[href="/programs/ev-challenge"]').first().click();
+		await page.locator('main a[href="/programs/ev-team"]').first().click();
 		expect((await sent(page)).filter((event) => event.name === 'program_cta_click')).toEqual([
 			{
 				name: 'program_cta_click',
-				params: { program: 'ev-challenge', location: 'programs_index', locale: 'en' }
+				params: { program: 'ev-team', location: 'programs_index', locale: 'en' }
 			}
 		]);
 
-		// R-PT-1: the programme CTA now carries `?program=<slug>` so the destination can preselect.
-		// Asserting on the full href is the point — a link that drops the query still navigates, and
-		// the preselection it was built for just silently never fires.
+		// R-PT-1: the programme CTA carries `?program=<slug>` so the destination can preselect, and
+		// `#book` so it lands on the "Talk to us" section rather than the top of a six-section page.
+		// Asserting on the full href is the point — a link that drops either part still navigates,
+		// and the thing it was built for just silently never happens.
 		await page.goto('/programs/ithaca-night');
 		await pinNavigation(page);
-		await page.locator('main a[href="/admissions?program=ithaca-night"]').first().click();
+		await page.locator('main a[href="/admissions?program=ithaca-night#book"]').first().click();
 		expect((await sent(page)).filter((event) => event.name === 'program_cta_click')).toEqual([
 			{
 				name: 'program_cta_click',
@@ -264,18 +265,18 @@ test.describe('GA4 events — R-SEO-5', () => {
 	test('locale_switch fires only on the link that changes locale', async ({ page }, testInfo) => {
 		test.skip(testInfo.project.name === 'mobile-chrome', 'switcher lives in the mobile drawer');
 
-		await page.goto('/programs/ev-challenge');
+		await page.goto('/programs/ev-team');
 		await pinNavigation(page);
 
 		// Clicking the locale already being read is not a switch.
-		await page.locator('a[href="/programs/ev-challenge"]:visible').first().click();
+		await page.locator('a[href="/programs/ev-team"]:visible').first().click();
 		expect((await sent(page)).filter((event) => event.name === 'locale_switch')).toEqual([]);
 
-		await page.locator('a[href="/zh/programs/ev-challenge"]:visible').first().click();
+		await page.locator('a[href="/zh/programs/ev-team"]:visible').first().click();
 		expect((await sent(page)).filter((event) => event.name === 'locale_switch')).toEqual([
 			{
 				name: 'locale_switch',
-				params: { from: 'en', to: 'zh', path: '/programs/ev-challenge' }
+				params: { from: 'en', to: 'zh', path: '/programs/ev-team' }
 			}
 		]);
 	});

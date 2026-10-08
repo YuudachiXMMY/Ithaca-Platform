@@ -13,10 +13,10 @@
 	import { trackProgramCtaClick } from '$lib/analytics';
 
 	// Build-time enhanced images for the program cards.
-	import evImg from '$lib/assets/programs/ev-challenge/EV26-5.jpg?enhanced';
+	import evImg from '$lib/assets/programs/ev-team/EV26-5.jpg?enhanced';
 	import aiImg from '$lib/assets/programs/ai-bootcamp/AI-Entrep_81.jpg?enhanced';
 	import eliteImg from '$lib/assets/programs/ai-interview/carmi-levy.png?enhanced';
-	import engineeringImg from '$lib/assets/programs/ev-challenge/EV26-3.jpg?enhanced';
+	import engineeringImg from '$lib/assets/programs/ev-team/EV26-3.jpg?enhanced';
 	import summerWinterImg from '$lib/assets/programs/ai-bootcamp/ai-camp-HB8A5065.jpg?enhanced';
 	import ithacaNightImg from '$lib/assets/programs/ai-bootcamp/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg?enhanced';
 

@@ -198,7 +198,7 @@ describe('headerOnDark', () => {
 			'/academics/stem',
 			'/academics/tutoring',
 			'/student-life',
-			'/programs/ev-challenge',
+			'/programs/ev-team',
 			'/programs/engineering-projects',
 			'/programs/summer-winter-camps',
 			'/programs/ithaca-night',
@@ -225,7 +225,7 @@ describe('headerOnDark', () => {
 	// Header.svelte feeds this the de-localized path, so /zh must never reach it as a prefix. If
 	// that ever regresses, every Chinese page silently falls back to the light chrome.
 	it('is given canonical paths, not localized ones', () => {
-		expect(headerOnDark('/zh/programs/ev-challenge')).toBe(false);
+		expect(headerOnDark('/zh/programs/ev-team')).toBe(false);
 		expect(headerOnDark('/zh')).toBe(false);
 	});
 });

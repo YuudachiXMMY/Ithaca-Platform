@@ -29,9 +29,9 @@ export interface ProgramCard {
 export const PROGRAM_CARDS: readonly ProgramCard[] = [
 	{
 		id: 'evTeam',
-		href: '/programs/ev-challenge',
-		slug: 'ev-challenge',
-		image: 'programs/ev-challenge/EV26-5.jpg',
+		href: '/programs/ev-team',
+		slug: 'ev-team',
+		image: 'programs/ev-team/EV26-5.jpg',
 		imageAlt: 'EV Challenge electric vehicle',
 		span: 'featured'
 	},
@@ -55,7 +55,7 @@ export const PROGRAM_CARDS: readonly ProgramCard[] = [
 		id: 'engineering',
 		href: '/programs/engineering-projects',
 		slug: 'engineering-projects',
-		image: 'programs/ev-challenge/EV26-3.jpg',
+		image: 'programs/ev-team/EV26-3.jpg',
 		imageAlt: 'Engineering Projects',
 		span: 'compact'
 	},

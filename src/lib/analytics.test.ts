@@ -100,7 +100,7 @@ describe('the six R-SEO-5 events', () => {
 		trackInquirySubmit({
 			form: 'admissions',
 			locale: 'zh',
-			program: 'ev-challenge',
+			program: 'ev-team',
 			programCount: 2,
 			hasGrade: true,
 			topic: 'admissions'
@@ -109,7 +109,7 @@ describe('the six R-SEO-5 events', () => {
 		trackWechatQrView({ location: 'contact_form_fallback', locale: 'zh' });
 		trackPhoneTap({ location: 'footer', locale: 'en' });
 		trackProgramCtaClick({ program: 'ithaca-dialogues', location: 'programs_index', locale: 'zh' });
-		trackLocaleSwitch({ from: 'en', to: 'zh', path: '/programs/ev-challenge' });
+		trackLocaleSwitch({ from: 'en', to: 'zh', path: '/programs/ev-team' });
 
 		expect(sent).toEqual([
 			[
@@ -118,7 +118,7 @@ describe('the six R-SEO-5 events', () => {
 				{
 					form: 'admissions',
 					locale: 'zh',
-					program: 'ev-challenge',
+					program: 'ev-team',
 					program_count: 2,
 					has_grade: true,
 					topic: 'admissions'
@@ -132,7 +132,7 @@ describe('the six R-SEO-5 events', () => {
 				'program_cta_click',
 				{ program: 'ithaca-dialogues', location: 'programs_index', locale: 'zh' }
 			],
-			['event', 'locale_switch', { from: 'en', to: 'zh', path: '/programs/ev-challenge' }]
+			['event', 'locale_switch', { from: 'en', to: 'zh', path: '/programs/ev-team' }]
 		]);
 	});
 
@@ -168,7 +168,7 @@ describe('no PII — R-BE-5', () => {
 			...PII,
 			form: 'contact',
 			locale: 'en',
-			program: 'ev-challenge',
+			program: 'ev-team',
 			program_count: 1,
 			has_grade: true
 		});
@@ -177,7 +177,7 @@ describe('no PII — R-BE-5', () => {
 		expect(params).toEqual({
 			form: 'contact',
 			locale: 'en',
-			program: 'ev-challenge',
+			program: 'ev-team',
 			program_count: 1,
 			has_grade: true
 		});
@@ -191,7 +191,7 @@ describe('no PII — R-BE-5', () => {
 		trackInquirySubmit({
 			form: 'contact',
 			locale: 'en',
-			program: 'ev-challenge',
+			program: 'ev-team',
 			programCount: 1,
 			hasGrade: true
 		});
@@ -218,7 +218,7 @@ describe('no PII — R-BE-5', () => {
 	it('drops non-scalar values, which is how an object could smuggle a field in', () => {
 		const sent = installGtag();
 		track('program_cta_click', {
-			program: { slug: 'ev-challenge', enquiry: PII } as unknown as string,
+			program: { slug: 'ev-team', enquiry: PII } as unknown as string,
 			location: 'programs_index',
 			locale: 'en'
 		});

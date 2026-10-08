@@ -22,7 +22,7 @@
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { loadGsap } from '$lib/motion/gsap';
 	import * as m from '$lib/paraglide/messages';
-	import machineImg from '$lib/assets/programs/ev-challenge/EV26-6.jpg?enhanced';
+	import machineImg from '$lib/assets/programs/ev-team/EV26-6.jpg?enhanced';
 
 	// Spec strip + track tags (static, not translated in the Next source).
 	const SPECS = [

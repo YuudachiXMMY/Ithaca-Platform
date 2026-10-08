@@ -23,17 +23,17 @@
 		seasonWindowWithLength
 	} from '$lib/season-copy';
 
-	import EVModel3DSection from '$lib/components/programs/ev-challenge/EVModel3DSection.svelte';
-	import WorkshopToRoles from '$lib/components/programs/ev-challenge/WorkshopToRoles.svelte';
+	import EVModel3DSection from '$lib/components/programs/ev-team/EVModel3DSection.svelte';
+	import WorkshopToRoles from '$lib/components/programs/ev-team/WorkshopToRoles.svelte';
 	import VimeoEmbed from '$lib/components/media/VimeoEmbed.svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 
-	import heroImg from '$lib/assets/programs/ev-challenge/EV26-1.jpg?enhanced';
-	import missionImg from '$lib/assets/programs/ev-challenge/EV25-12.jpg?enhanced';
-	import detailsImg from '$lib/assets/programs/ev-challenge/EV25-10.s.png?enhanced';
-	import gainsImg from '$lib/assets/programs/ev-challenge/EV25-8.jpg?enhanced';
-	import competitionImg from '$lib/assets/programs/ev-challenge/EV26-2.jpg?enhanced';
-	import ctaImg from '$lib/assets/programs/ev-challenge/EV26-5.jpg?enhanced';
+	import heroImg from '$lib/assets/programs/ev-team/EV26-1.jpg?enhanced';
+	import missionImg from '$lib/assets/programs/ev-team/EV25-12.jpg?enhanced';
+	import detailsImg from '$lib/assets/programs/ev-team/EV25-10.s.png?enhanced';
+	import gainsImg from '$lib/assets/programs/ev-team/EV25-8.jpg?enhanced';
+	import competitionImg from '$lib/assets/programs/ev-team/EV26-2.jpg?enhanced';
+	import ctaImg from '$lib/assets/programs/ev-team/EV26-5.jpg?enhanced';
 
 	/**
 	 * `prd.md` R-PT-1 / R-CONTENT-1 — every date, grade band, cadence and session time below is read
@@ -48,8 +48,8 @@
 	 * they are two renderings of one record, not two records.
 	 */
 	const locale = getLocale();
-	const season = programSeason(SEASONS, PROGRAMS, 'ev-challenge', locale);
-	const program = PROGRAMS.find((candidate) => candidate.slug === 'ev-challenge');
+	const season = programSeason(SEASONS, PROGRAMS, 'ev-team', locale);
+	const program = PROGRAMS.find((candidate) => candidate.slug === 'ev-team');
 
 	/**
 	 * The hero strip: label/value pairs, compact forms. `null` values are filtered out, so a record
@@ -119,7 +119,7 @@
 		locale,
 		SITE.url,
 		SITE.name,
-		SITE.url + ogCardFile('/programs/ev-challenge', locale)
+		SITE.url + ogCardFile('/programs/ev-team', locale)
 	);
 
 	const GAINS = [
@@ -174,6 +174,37 @@
 		}
 	];
 
+	/**
+	 * The two season films, as PEERS.
+	 *
+	 * They used to be a "featured" embed at full container width and a "secondary" one capped at
+	 * `lg:max-w-[62%]`, with the three portrait clips pushed to `lg:ml-auto lg:max-w-[52%]`
+	 * underneath — 62% + 52% = 114%, so the two lower blocks could not sit on one row and instead
+	 * stacked at two different widths, each hugging a different edge. Nothing justified the
+	 * hierarchy: Season 2 is not a more important film than Season 1, it is the more recent one,
+	 * which the label already says.
+	 *
+	 * The labels were also mispaired. `season1Label` held "2025-26" and `season2Label` held
+	 * "2024-25" (both inverted against `PROGRAMS[0].videos`, where 1202133392 is the 2025-26 film),
+	 * and the markup compensated by rendering `season2()` next to `season1Label()`. Two errors
+	 * cancelling made the page LOOK right while the message catalogue said the opposite; the
+	 * catalogue is now correct and each row reads its own pair.
+	 */
+	const SEASON_FILMS = [
+		{
+			videoId: '1202133392',
+			title: 'EV 2025-26 Season Highlights',
+			season: m.programs_evChallenge_pastSeasons_season2,
+			label: m.programs_evChallenge_pastSeasons_season2Label
+		},
+		{
+			videoId: '1202133393',
+			title: 'EV 2024-25 Season Highlights',
+			season: m.programs_evChallenge_pastSeasons_season1,
+			label: m.programs_evChallenge_pastSeasons_season1Label
+		}
+	];
+
 	// Secondary past-season clips (portrait Vimeo embeds), verbatim ids from Next.
 	const CLIP_IDS = ['1202133768', '1202133767', '1202133769'];
 
@@ -189,7 +220,7 @@
 
 		return runGsapOnMount(
 			// Dynamic GSAP import failed → keep the static hero (parallax is additive).
-			'[ev-challenge] GSAP failed to load; using static fallback',
+			'[ev-team] GSAP failed to load; using static fallback',
 			(gsap) => {
 				if (!heroSectionEl) return;
 				return gsap.context(() => {
@@ -251,25 +282,25 @@
 				<!-- R-PT-1's CTA pair. "Register Now" used to land on the bare `/contact-us`, i.e. on a
 				     blank four-field form: the parent who had just read this page arrived at
 				     `/admissions` — the page built for exactly that moment — never, and arrived at the
-				     enquiry form with nothing filled in. Both links now carry `?program=ev-challenge`,
+				     enquiry form with nothing filled in. Both links now carry `?program=ev-team`,
 				     which is what `/admissions` and the enquiry form read to preselect (R-ADM-7).
 
 				     The brochure link is new. This hero had one button and no lower-commitment option,
 				     and "send me the details" is the step most WeChat arrivals actually want first. -->
 				<div class="flex flex-wrap items-center gap-x-6 gap-y-4">
 					<a
-						href={registerHref('ev-challenge')}
+						href={registerHref('ev-team')}
 						onclick={() =>
-							trackProgramCtaClick({ program: 'ev-challenge', location: 'program_page', locale })}
+							trackProgramCtaClick({ program: 'ev-team', location: 'program_page', locale })}
 						class="inline-flex h-12 items-center justify-center gap-2 bg-band-action px-8 text-sm font-semibold tracking-wide text-band-action-foreground transition-all duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
 					>
 						{m.programs_evChallenge_hero_registerNow()}
 						<ArrowRight class="h-4 w-4" />
 					</a>
 					<a
-						href={brochureHref('ev-challenge')}
+						href={brochureHref('ev-team')}
 						onclick={() =>
-							trackProgramCtaClick({ program: 'ev-challenge', location: 'program_page', locale })}
+							trackProgramCtaClick({ program: 'ev-team', location: 'program_page', locale })}
 						class="group inline-flex items-center gap-2 text-sm font-medium text-band-foreground/80 transition-colors duration-200 hover:text-band-brand-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand"
 					>
 						{m.programs_evChallenge_hero_requestBrochure()}
@@ -340,7 +371,8 @@
 	<!-- 3. The Machine + Two Tracks — Threlte 3D trike + GSAP 400% pin (reduce = static) -->
 	<EVModel3DSection />
 
-	<!-- 4. Workshop → Team Roles — GSAP scrub:2.5 scatter/swoop (reduce = static grid) -->
+	<!-- 4. Workshop photos, then the four team roles. Two static sections; the 350vh scrub
+	     scatter/swoop that used to drive them was removed at the owner's instruction. -->
 	<WorkshopToRoles />
 
 	<!-- 6. Program Details -->
@@ -498,47 +530,47 @@
 			</div>
 		</Reveal>
 
-		<!-- Featured video -->
+		<!-- The two season films, equal width, one row from lg up. Each carries its own
+		     season/year pair on the same hairline-led label the rest of the page uses. -->
 		<Reveal y={24}>
 			<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
-				<VimeoEmbed videoId="1202133392" title="EV 2026 Season Highlights" aspectPadding="56.25%" />
-				<div class="mt-4 flex items-center gap-3">
-					<div
-						class="h-px w-10 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-						aria-hidden="true"
-					></div>
-					<span class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
-						{m.programs_evChallenge_pastSeasons_season2()}
-					</span>
-					<span class="text-[11px] text-foreground-subtle">
-						{m.programs_evChallenge_pastSeasons_season1Label()}
-					</span>
+				<div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-6">
+					{#each SEASON_FILMS as film (film.videoId)}
+						<div>
+							<VimeoEmbed
+								videoId={film.videoId}
+								title={film.title}
+								aspectPadding="56.25%"
+								loading="lazy"
+							/>
+							<div class="mt-4 flex items-center gap-3">
+								<div
+									class="h-px w-10 shrink-0 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+									aria-hidden="true"
+								></div>
+								<span class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+									{film.season()}
+								</span>
+								<span class="text-[11px] text-foreground-subtle">
+									{film.label()}
+								</span>
+							</div>
+						</div>
+					{/each}
 				</div>
 			</div>
 		</Reveal>
 
-		<!-- Secondary videos -->
+		<!-- The three portrait clips, as one full-measure strip of three.
+		     `grid-cols-3` at EVERY width rather than stacking on small screens: these are 9:16
+		     boxes, so one column would spend 5.3 viewport heights on three incidental clips. They
+		     are a strip, and a strip of three is the unit — not three objects that happen to be
+		     adjacent. -->
 		<Reveal y={24}>
-			<div
-				class="mx-auto mt-12 max-w-[1400px] space-y-3 px-5 sm:px-8 md:mt-20 md:px-[6vw] lg:space-y-4"
-			>
-				<div class="lg:max-w-[62%]">
-					<VimeoEmbed
-						videoId="1202133393"
-						title="EV 2025 Season Highlights"
-						aspectPadding="56.25%"
-					/>
-					<div class="mt-3 flex items-center gap-2">
-						<div class="h-px w-6 bg-border"></div>
-						<span class="font-mono text-[10px] tracking-wider text-foreground-subtle">
-							{m.programs_evChallenge_pastSeasons_season1()}
-						</span>
-					</div>
-				</div>
-
-				<div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:ml-auto lg:max-w-[52%] lg:gap-3">
+			<div class="mx-auto mt-12 max-w-[1400px] px-5 sm:px-8 md:mt-16 md:px-[6vw]">
+				<div class="grid grid-cols-3 gap-2 lg:gap-3">
 					{#each CLIP_IDS as videoId (videoId)}
-						<VimeoEmbed {videoId} title="EV team clip" aspectPadding="177.78%" />
+						<VimeoEmbed {videoId} title="EV team clip" aspectPadding="177.78%" loading="lazy" />
 					{/each}
 				</div>
 			</div>
@@ -564,10 +596,10 @@
 							     brochure link here; the hero already offers one, and the FAQ column
 							     beside this button is itself a "get in touch" route. -->
 							<a
-								href={registerHref('ev-challenge')}
+								href={registerHref('ev-team')}
 								onclick={() =>
 									trackProgramCtaClick({
-										program: 'ev-challenge',
+										program: 'ev-team',
 										location: 'program_page',
 										locale
 									})}

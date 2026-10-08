@@ -65,7 +65,7 @@
 <Seo title={m.contact_page_title()} description={m.contact_page_description()} />
 
 <!--
-  `/contact-us` — four sections, four different shapes.
+  `/contact-us` — three sections, three different shapes.
 
   The page used to be: a centred eyebrow / hairline / headline / paragraph stack over a bare
   background, four identical bordered tiles, a fifth bordered panel for the WeChat QR, then a
@@ -73,8 +73,11 @@
   five blocks were "bordered box containing a mono small-caps label", and the one job this page
   has — get the enquiry sent — was competing for attention with an iframe.
 
-  Now: photo hero (the house idiom), an asymmetric channel block, the form on its own, and the map
-  full-width underneath where it has room to be useful instead of room to distract.
+  Now: photo hero (the house idiom), ONE "get in touch" section holding the form and the direct
+  channels side by side, and the map full-width underneath where it has room to be useful instead
+  of room to distract. The form and the channels were two separate sections on two grounds until
+  the owner asked for them to be one module; see the note on that section for why the order is
+  what it is.
 -->
 <div class="bg-background">
 	<!-- 1. Hero. SSR-visible, no Reveal: this is the LCP element. -->
@@ -87,34 +90,60 @@
 		headingId="contact-heading"
 	/>
 
-	<!-- 2. How to reach a person, before the form. Someone who already knows they want to phone or
-	     add us on WeChat should not have to scroll past a form to find out how. -->
-	<section class="bg-surface-0">
-		<div class={containerClass}>
-			<Reveal y={24}>
-				<h2 class={headingClass}>{m.contact_page_reachUs()}</h2>
-				<div class="mt-10">
-					<ContactChannels {locale} />
-				</div>
-			</Reveal>
-		</div>
-	</section>
+	<!-- 2. The form and the direct channels, as ONE section.
+	     ────────────────────────────────────────────────────────────────────────────────────────
+	     These were two stacked sections on two different grounds ("Reach us directly" on
+	     surface-0, then "Send us a message" on surface-3). A visitor arrives with ONE question —
+	     how do I get in touch — and the page answered it twice, with a full section break and a
+	     ground change between the two halves, so choosing between "fill this in" and "or just
+	     call" meant scrolling back and forth between two screens to see both options at once.
 
-	<!-- 3. The form, on its own ground and at its own width. This is the page's single job, so it
-	     is the only thing in its section; it is no longer sharing a grid row with a map.
-	     `max-w-[720px]` matches /admissions#book, where the same component renders. -->
+	     Now: the form at 7fr, the channels as a 5fr hairline-led aside. This is the same shape
+	     /admissions#book uses for the same component, which is the point — one form, one idiom.
+	     The aside's hairline is on its LEFT at lg and on TOP when the grid collapses, so the
+	     separation follows the stacking direction instead of becoming a stray vertical rule.
+
+	     ORDER, on purpose. DOM order is form → channels, so tab order matches the left-to-right
+	     reading order on desktop and the top-to-bottom one on mobile; no `order-*` flip, no
+	     focus-order/visual-order mismatch for the keyboard and screen-reader paths that
+	     e2e/a11y.spec.ts checks. The cost is that a phone visitor who only wants to call now
+	     passes the form on the way — one heading's worth of scroll inside a single section,
+	     against a whole section break before.
+
+	     `id="enquiry"` stays on this section: it is an external anchor target. -->
 	<section id="enquiry" class="scroll-mt-[var(--nav-h)] bg-surface-3">
 		<div class={containerClass}>
 			<Reveal y={24}>
-				<h2 class={headingClass}>{m.contact_page_sendMessage()}</h2>
-				<div class="mt-10 max-w-[720px]">
-					<EnquiryForm formLabel={m.contact_page_sendMessage()} idPrefix="contact" />
+				<div
+					class="grid grid-cols-1 items-start gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16"
+				>
+					<div>
+						<h2 class={headingClass}>{m.contact_page_sendMessage()}</h2>
+						<div class="mt-10">
+							<EnquiryForm formLabel={m.contact_page_sendMessage()} idPrefix="contact" />
+						</div>
+					</div>
+
+					<aside
+						class="border-t border-border-strong pt-10 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-10"
+					>
+						<!-- A step down in size from the form's heading, not a different level. Both are
+						     `<h2>` — they are peer answers to the same question, and demoting this one
+						     to `<h3>` would claim it is part of the form. But set at the same
+						     `md:text-4xl` in a 5fr column it out-shouted the 7fr column it qualifies. -->
+						<h2 class="text-xl font-bold tracking-tight text-foreground md:text-2xl">
+							{m.contact_page_reachUs()}
+						</h2>
+						<div class="mt-8">
+							<ContactChannels {locale} />
+						</div>
+					</aside>
 				</div>
 			</Reveal>
 		</div>
 	</section>
 
-	<!-- 4. The map, full width. At `1fr` beside the form it was too narrow to orient anyone and
+	<!-- 3. The map, full width. At `1fr` beside the form it was too narrow to orient anyone and
 	     wide enough to pull the eye off the form; given the whole measure it can do the one thing a
 	     map is for. 16:9 with the ratio reserved before the iframe mounts, so the lazy swap cannot
 	     move the page (the Lighthouse CLS gate is 0.05). -->

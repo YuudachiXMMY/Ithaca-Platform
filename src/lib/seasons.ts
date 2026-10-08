@@ -118,7 +118,7 @@ export interface SeasonDuration {
 
 /**
  * How long a season runs, computed rather than hand-typed — `prd.md` R-PT-1 renders this in the
- * hero strip, and "9 months" was previously a literal in `ev-challenge/+page.svelte`.
+ * hero strip, and "9 months" was previously a literal in `ev-team/+page.svelte`.
  *
  * Returns null when either endpoint is unknown or the season ends before it starts, so a page
  * omits the figure instead of printing `NaN`. `scripts/content-check.ts` reports the gap.

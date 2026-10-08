@@ -59,7 +59,7 @@ export const NAV_ITEMS: NavItem[] = [
 		label: 'programs',
 		href: '/programs',
 		children: [
-			{ label: 'evTeam', href: '/programs/ev-challenge', programSlug: 'ev-challenge' },
+			{ label: 'evTeam', href: '/programs/ev-team', programSlug: 'ev-team' },
 			{
 				label: 'aiEntrepreneurshipCamp',
 				href: '/programs/ai-entrepreneurship-bootcamp',
@@ -202,7 +202,7 @@ export const SEASON_STATUS: Record<Season['registration'], () => string> = {
  * The header is transparent until scrolled, which means its legibility depends on whatever the
  * page happens to render in its first ~130px. That used to be decided twice — once for the logo,
  * by a path test inside Header.svelte, and never for the nav text, which simply kept the light
- * palette's ink tokens. The result was measured at 1.01:1 on /programs/ev-challenge: not "hard to
+ * palette's ink tokens. The result was measured at 1.01:1 on /programs/ev-team: not "hard to
  * read", invisible. One predicate now feeds every piece of chrome, so the wordmark and the links
  * cannot disagree about the ground they are standing on.
  *

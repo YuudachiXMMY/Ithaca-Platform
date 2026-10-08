@@ -84,16 +84,16 @@ test.describe('locale switch', () => {
 	// R-I18N-3: the switch must preserve the current path (and query), not dump the
 	// visitor on the homepage in the other language.
 	test('preserves the current path when going en -> zh', async ({ page }) => {
-		await page.goto('/programs/ev-challenge');
-		await switchLocaleTo(page, '/zh/programs/ev-challenge');
-		await expect(page).toHaveURL(/\/zh\/programs\/ev-challenge$/);
+		await page.goto('/programs/ev-team');
+		await switchLocaleTo(page, '/zh/programs/ev-team');
+		await expect(page).toHaveURL(/\/zh\/programs\/ev-team$/);
 		await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
 	});
 
 	test('preserves the current path when going zh -> en', async ({ page }) => {
-		await page.goto('/zh/programs/ev-challenge');
-		await switchLocaleTo(page, '/programs/ev-challenge');
-		await expect(page).toHaveURL(/\/programs\/ev-challenge$/);
+		await page.goto('/zh/programs/ev-team');
+		await switchLocaleTo(page, '/programs/ev-team');
+		await expect(page).toHaveURL(/\/programs\/ev-team$/);
 		await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 	});
 
@@ -289,7 +289,7 @@ test.describe('header scroll state', () => {
 		});
 
 	test('a dark-hero route flips to the light bar on scroll, and back', async ({ page }) => {
-		await page.goto('/programs/ev-challenge');
+		await page.goto('/programs/ev-team');
 		// The transition is 500ms; every read below waits it out rather than racing it.
 		await page.waitForTimeout(700);
 
