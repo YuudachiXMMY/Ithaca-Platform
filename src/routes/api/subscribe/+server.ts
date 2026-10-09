@@ -1,7 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
-import { Prisma } from '@prisma/client';
-import { prisma } from '$lib/server/prisma';
+import { postSubscribe, SiteApiError } from '$lib/server/site-api';
 import { guardPublicPost } from '$lib/server/guard';
 import { parseJsonBody } from '$lib/server/validation';
 import { sendMail } from '$lib/server/mail';
@@ -32,31 +31,26 @@ export const POST: RequestHandler = async (event) => {
 		if (!parsed.success) return parsed.response;
 
 		const { email, name } = parsed.data;
-		// Single-winner create: only the request that actually inserts the row sends the
-		// welcome mail. A concurrent racer hits the unique-email P2002 and is handled
-		// (409 if already active, else reactivate) — never leaked as a raw 500 (preserves
-		// the TOCTOU fix from #29).
-		let created = false;
-		try {
-			await prisma.subscriber.create({ data: { email, name, status: 'active' } });
-			created = true;
-		} catch (err) {
-			if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-				const existing = await prisma.subscriber.findUnique({ where: { email } });
-				if (existing?.status === 'active') {
-					return json(
-						{ success: false, error: 'This email is already subscribed' } satisfies ApiResponse,
-						{ status: 409 }
-					);
-				}
-				await prisma.subscriber.update({
-					where: { email },
-					data: { status: 'active', name: name ?? existing?.name }
-				});
-			} else {
-				throw err;
-			}
+		// Persistence moved to the Course-Scheduling-System, which owns this data. The single-winner
+		// semantics are PRESERVED EXACTLY — they just moved behind the `outcome` discriminant:
+		//
+		//   created        → this request is the one that inserted the row ⇒ it alone sends the
+		//                    welcome mail. Concurrent racers lose on the unique-email constraint
+		//                    over there and come back 'already_active', so one subscriber still
+		//                    gets exactly one welcome mail (the TOCTOU fix from #29 survives).
+		//   reactivated    → previously unsubscribed, now restored. No welcome mail (they have had
+		//                    one before), and their existing name is kept when this request omits it.
+		//   already_active → 409, byte-identical to the old response below.
+		//
+		// Collapsing this to a boolean would silently lose two of those three behaviours.
+		const outcome = await postSubscribe({ email, name });
+		if (outcome === 'already_active') {
+			return json(
+				{ success: false, error: 'This email is already subscribed' } satisfies ApiResponse,
+				{ status: 409 }
+			);
 		}
+		const created = outcome === 'created';
 
 		// Best-effort welcome: the subscriber is committed, so a mail failure must NOT
 		// surface as a misleading 500 (mirrors mail.ts graceful no-op).
@@ -74,7 +68,16 @@ export const POST: RequestHandler = async (event) => {
 
 		return json({ success: true } satisfies ApiResponse);
 	} catch (error) {
-		console.error('[subscribe] unexpected error', error);
+		// Same split as /api/contact: an upstream outage and a bug here need different fixes.
+		if (error instanceof SiteApiError) {
+			console.error(
+				'[subscribe] 落库失败（课程排课系统不可达或拒绝）',
+				error.status ?? '-',
+				error.message
+			);
+		} else {
+			console.error('[subscribe] unexpected error', error);
+		}
 		return json({ success: false } satisfies ApiResponse, { status: 500 });
 	}
 };

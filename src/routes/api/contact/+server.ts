@@ -1,7 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 import { env } from '$env/dynamic/private';
-import { prisma } from '$lib/server/prisma';
+import { postContact, SiteApiError } from '$lib/server/site-api';
 import { guardPublicPost } from '$lib/server/guard';
 import { parseJsonBody } from '$lib/server/validation';
 import { sendMail } from '$lib/server/mail';
@@ -88,24 +88,32 @@ export const POST: RequestHandler = async (event) => {
 			);
 		}
 
-		await prisma.contactMessage.create({
-			data: { name, email, phone, message, subscribe, locale, grade, programs, topic, source }
+		// Persistence moved to the Course-Scheduling-System, which owns this data and its admin
+		// console (/dashboard/site). ONE call replaces the enquiry insert AND the conditional
+		// subscriber upsert — that endpoint runs both in a single transaction, so a visitor who
+		// ticked "subscribe" can never end up recorded as an enquiry but not as a subscriber.
+		//
+		// This is the point where the public form now depends on that service being up. It is a
+		// HARD failure on purpose: it falls through to the catch below and returns 500, so the
+		// visitor is told to try again. The alternative — swallowing the error and returning
+		// success — would silently discard a lead, which is far worse than a visible error.
+		await postContact({
+			name,
+			email,
+			phone,
+			message,
+			subscribe,
+			locale,
+			grade,
+			programs,
+			topic,
+			source
 		});
 
-		if (subscribe) {
-			// Atomic upsert closes the TOCTOU between findUnique and create on the unique
-			// `email`; the update branch is a harmless no-op when already active.
-			await prisma.subscriber.upsert({
-				where: { email },
-				update: { status: 'active' },
-				create: { email, name, status: 'active' }
-			});
-		}
-
 		// Every user field (and the subject) is escaped before HTML interpolation.
-		// Best-effort: the message is already committed (and readable in the admin panel), so a mail
-		// failure must NOT 500 — that would drive a client retry and duplicate the row (mirrors
-		// mail.ts's graceful no-op).
+		// Best-effort: the enquiry is already committed (and readable in the scheduling app's
+		// /dashboard/site console), so a mail failure must NOT 500 — that would drive a client retry
+		// and duplicate the row (mirrors mail.ts's graceful no-op).
 		try {
 			await sendMail({
 				to: INQUIRY_TO,
@@ -156,7 +164,14 @@ export const POST: RequestHandler = async (event) => {
 
 		return json({ success: true } satisfies ApiResponse);
 	} catch (error) {
-		console.error('[contact] unexpected error', error);
+		// Distinguish "the scheduling app rejected/was unreachable" from "a bug in here" — they have
+		// completely different fixes, and from a bare 500 an operator cannot tell which happened.
+		// The response body stays empty either way (no internal detail to the visitor).
+		if (error instanceof SiteApiError) {
+			console.error('[contact] 落库失败（课程排课系统不可达或拒绝）', error.status ?? '-', error.message);
+		} else {
+			console.error('[contact] unexpected error', error);
+		}
 		return json({ success: false } satisfies ApiResponse, { status: 500 });
 	}
 };

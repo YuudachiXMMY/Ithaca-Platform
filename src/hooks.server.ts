@@ -74,6 +74,24 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 	event.locals.session = session?.session ?? null;
 
 	const { pathname } = event.url;
+
+	// The admin console MOVED to the Course-Scheduling-System (/dashboard/site, super-admin login).
+	// The contacts/subscribers/campaigns/popups data moved with it, so the pages below this point
+	// would render an EMPTY console against tables nothing writes any more — worse than no console,
+	// because it reads as "we lost the data". Send operators to the real one instead.
+	//
+	// Redirect here (not in a +layout.server.ts) because /admin's routing policy already lives in
+	// this hook, and because it must also catch /admin/login — the one path the auth guard exempts.
+	// 302, not 301: a permanent redirect would be cached by browsers and Cloudflare, which we would
+	// regret the moment this app grows its own admin surface again.
+	//
+	// Unset SITE_ADMIN_URL falls through to the old behaviour, so a deploy that forgets the variable
+	// keeps a working (if empty) console rather than bouncing operators into a dead redirect.
+	if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+		const consoleUrl = env.PUBLIC_SITE_ADMIN_URL;
+		if (consoleUrl) redirect(302, consoleUrl);
+	}
+
 	if (pathname.startsWith('/admin') && pathname !== '/admin/login' && !event.locals.user) {
 		redirect(303, `/admin/login?callbackUrl=${encodeURIComponent(pathname)}`);
 	}
