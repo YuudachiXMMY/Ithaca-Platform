@@ -13,6 +13,21 @@
 #     success on every release.
 # Renaming this repository has the same effect. If the image name ever must change, change the
 # compose `image:` in the same operation.
+#
+# ⚠️ KEEPING the name has a one-time cost, and it is NOT silent — we hit it for real on the first
+# release from this repo (run 38084784696, 2026-10-10). A GHCR package is owned-linked to the
+# repository that first created it, here `YuudachiXMMY/IthacaFA-web`. This repository's
+# GITHUB_TOKEN therefore has no write access to it: the image BUILDS fine and the PUSH fails with
+#   denied: permission_denied: write_package
+# The fix is a one-time grant, and for user-scoped (non-org) packages it is UI-only — there is no
+# REST endpoint for package Actions access:
+#   https://github.com/users/YuudachiXMMY/packages/container/ithacafa-web/settings
+#   → Manage Actions access → Add repository → Ithaca-Platform → role: Write
+# Do NOT "fix" this by renaming the image instead; that trades a loud, one-time, reversible
+# permission error for the silent production freeze described above.
+# Leave the old repository's grant in place. ARCHIVING IthacaFA-web is safe (the package link is
+# metadata; the package and all 27 versions survive and stay pullable), but DELETING that
+# repository would break the link.
 name: web release
 
 on:
