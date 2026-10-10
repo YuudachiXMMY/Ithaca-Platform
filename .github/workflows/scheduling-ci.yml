@@ -1,0 +1,176 @@
+# apps/scheduling (dashboard.ithacateens.com, Next.js) — PR quality gate.
+#
+# Monorepo note: GitHub only reads workflows from the REPOSITORY ROOT. The pre-merge original is
+# in git history at apps/scheduling/.github/workflows/ci.yml.
+#
+# `defaults.run.working-directory` applies to `run` steps only — the buildx `uses` steps need an
+# explicit `context:`, and setup-node needs `cache-dependency-path`.
+name: scheduling CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/scheduling/**'
+      - '.github/workflows/scheduling-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/scheduling/**'
+      - '.github/workflows/scheduling-ci.yml'
+
+# Was missing before the merge: two quick pushes used to run two full 8-minute jobs.
+concurrency:
+  group: scheduling-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: apps/scheduling
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        # mirror.gcr.io rather than docker.io: GitHub runners share egress IPs, so unauthenticated
+        # pulls hit Docker Hub's `toomanyrequests` limit — which shows up as "Initialize containers"
+        # failing in seconds, unrelated to any code change, and a re-run does not help (the window
+        # is hours). This repo has no DOCKERHUB_* secrets to authenticate with.
+        #
+        # mirror.gcr.io is Docker Hub's own pull-through cache, not a different publisher:
+        # `docker manifest inspect` returns a byte-identical manifest (same digest) for both. Only
+        # the transport changes, so this adds no new trusted party.
+        #
+        # Note: the Dockerfile's `node:${NODE_VERSION}` / `node:24-slim` still come from Docker Hub
+        # (buildx steps below) and can hit the same limit. Deliberately not changed, because that
+        # Dockerfile also builds on the server (DEPLOY_TYPE=git-source) — changing it would alter
+        # production's supply chain. If that gap needs closing, add
+        # `ARG NODE_REGISTRY=docker.io/library` (default unchanged) and pass the mirror only here.
+        image: mirror.gcr.io/library/postgres:17-alpine
+        env:
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app
+          POSTGRES_DB: course_scheduling
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U app -d course_scheduling"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgres://app:app@localhost:5432/course_scheduling
+      BETTER_AUTH_SECRET: ci-secret-ci-secret-ci-secret-32bytes
+      BETTER_AUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      # E2E (Playwright) reads these; the seed writes to the same Postgres the app:prod container uses.
+      E2E_BASE_URL: http://localhost:3000
+      E2E_DATABASE_URL: postgres://app:app@localhost:5432/course_scheduling
+      E2E_BETTER_AUTH_SECRET: ci-secret-ci-secret-ci-secret-32bytes
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Host Node toolchain for the Playwright E2E suite (npm — matches Dockerfile/package-lock,
+      # NOT pnpm, even though package.json declares packageManager: pnpm for local dev).
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/scheduling/package-lock.json
+
+      - name: Install deps (host)
+        run: npm ci --no-audit --no-fund
+
+      # H5: tenant-isolation guard — fail fast if raw `db.{select,insert,update,delete}(` appears
+      # outside the forTenant spine / audited allowlist (Postgres RLS is deferred per ADR 0001;
+      # this is the mechanical backstop the vitest behavioural suite cannot give for NEW routes).
+      # It validates every ALLOWLIST entry with existsSync, so it fails LOUDLY (exit 1, listing
+      # the missing entries) if run from the wrong directory rather than silently passing.
+      - name: Tenant-isolation guard
+        run: npx tsx scripts/check-tenant-db-access.ts
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Both builds share one cache scope on purpose: the `test` target's layers are a superset of
+      # `build`, and `runtime` re-exports most of them, so separate scopes would store the same
+      # blobs twice. mode=min (not max) because GitHub's Actions cache is a 10 GB PER-REPOSITORY
+      # hard cap that money cannot raise — and this repo now hosts two apps. With mode=max the two
+      # apps' release layers evicted each other, and the LRU victim was whichever ref is touched
+      # least often, i.e. the release branches that go straight to production.
+      #
+      # PR events read the cache but never write it, so a PR cannot evict main's warm layers.
+      - name: Build test image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./apps/scheduling
+          target: test
+          load: true
+          tags: app:test
+          cache-from: type=gha,scope=scheduling
+          cache-to: ${{ github.event_name == 'pull_request' && '' || 'type=gha,mode=min,scope=scheduling' }}
+
+      - name: Build runtime image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./apps/scheduling
+          target: runtime
+          load: true
+          tags: app:prod
+          build-args: |
+            NEXT_PUBLIC_APP_URL=${{ env.NEXT_PUBLIC_APP_URL }}
+          cache-from: type=gha,scope=scheduling
+          cache-to: ${{ github.event_name == 'pull_request' && '' || 'type=gha,mode=min,scope=scheduling' }}
+
+      # Migrate + run the vitest suite against the postgres service, inside the image.
+      - name: Migrate + test (in-container)
+        run: |
+          docker run --rm --network host \
+            -e DATABASE_URL="$DATABASE_URL" \
+            -e NODE_ENV=test \
+            app:test sh -c "node dist/migrate.mjs && npm run test"
+
+      # Start the production image (backed by the same postgres service) for both the health smoke
+      # and the Playwright E2E suite.
+      - name: Start app (production image)
+        run: |
+          docker run -d --name app --network host \
+            -e DATABASE_URL="$DATABASE_URL" \
+            -e BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
+            -e BETTER_AUTH_URL="$BETTER_AUTH_URL" \
+            -e NEXT_PUBLIC_APP_URL="$NEXT_PUBLIC_APP_URL" \
+            app:prod
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/api/health; then echo "healthy"; exit 0; fi
+            sleep 2
+          done
+          echo "health check failed"; docker logs app; exit 1
+
+      # E2E: global-setup seeds the fixture tenant into the running app's DB and mints
+      # storageState, then Playwright reuses the already-running app:prod on :3000.
+      - name: E2E (Playwright)
+        run: npm run test:e2e
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scheduling-playwright-report
+          path: |
+            apps/scheduling/playwright-report/
+            apps/scheduling/test-results/
+          retention-days: 14
+
+      - name: App logs on failure
+        if: failure()
+        run: docker logs app || true

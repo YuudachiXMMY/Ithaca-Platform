@@ -1,0 +1,105 @@
+# ── apps/web → GHCR, on pushes to `prod` ───────────────────────────────────────────────────
+# Builds the SvelteKit app (adapter-node, stateless) from apps/web/ and publishes the image the
+# IthacaServer `ithacafo-web` compose pulls.
+#
+# ⚠️ IMAGE_NAME IS HARDCODED ON PURPOSE. DO NOT change it back to ${{ github.repository }}.
+# That is what it used to be, and in this repo it would resolve to
+# `ghcr.io/yuudachixmmy/ithaca-platform` instead of `ghcr.io/yuudachixmmy/ithacafa-web`. The
+# failure mode is SILENT and nasty:
+#   · a brand-new GHCR package gets created, and the existing 27 versions — including the ONLY
+#     valid rollback target, sha256:2e38fe16… (tag 7d0aa28) — are orphaned under the old name;
+#   · IthacaServer/apps/ithacafo-web/docker-compose.yml keeps pulling the OLD package's `latest`,
+#     so production stays frozen on the pre-merge image FOREVER while this workflow reports
+#     success on every release.
+# Renaming this repository has the same effect. If the image name ever must change, change the
+# compose `image:` in the same operation.
+name: web release
+
+on:
+  push:
+    branches: [prod]
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/web-release.yml'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: yuudachixmmy/ithacafa-web
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=
+            type=raw,value=latest
+
+      # PUBLIC_* are inlined into the client bundle at BUILD time (Vite), so they must be passed
+      # as build-args — a runtime-only value would be `undefined` in the browser. PUBLIC_SITE_URL
+      # bakes every canonical/OG/hreflang/sitemap URL: keep it the real prod origin.
+      #
+      # NOT passed, deliberately: PUBLIC_TURNSTILE_SITE_KEY. It is also a build-time
+      # ($env/static/public) value, and the Dockerfile declares no ARG for it — so the site key is
+      # always empty in the image. That is FINE only while TURNSTILE_SECRET_KEY is unset
+      # server-side (verifyTurnstile then returns `skipped`). Setting the secret without adding
+      # the ARG + build-arg here makes /api/contact 403 for every visitor, and no server-side env
+      # change can fix it.
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./apps/web
+          file: ./apps/web/Dockerfile
+          push: true
+          build-args: |
+            PUBLIC_GA_TRACKING_ID=${{ vars.PUBLIC_GA_TRACKING_ID || 'G-675W5PPJEJ' }}
+            PUBLIC_SITE_URL=${{ vars.PUBLIC_SITE_URL || 'https://ithacateens.com' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=web-release
+          cache-to: type=gha,mode=min,scope=web-release
+
+      # The digest is the only rollback credential this app has: the compose uses a floating
+      # `latest` with pull_policy:always and records no digest, and `ops rollback` refuses to run
+      # in image mode. Writing it here gives a durable second record outside GHCR.
+      - name: Record the pushed digest
+        run: |
+          {
+            echo "### apps/web image pushed"
+            echo ""
+            echo '```'
+            echo "digest: ${{ steps.build.outputs.digest }}"
+            echo "tags:"
+            echo "${{ steps.meta.outputs.tags }}"
+            echo '```'
+            echo ""
+            echo "To pin/roll back, set in IthacaServer/apps/ithacafo-web/.env.extra:"
+            echo ""
+            echo '```'
+            echo "WEB_IMAGE=\"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}\""
+            echo '```'
+            echo ""
+            echo "then \`./scripts/provision.sh ithacafo-web\` (ops deploy alone does NOT sync compose/.env)."
+          } >> "$GITHUB_STEP_SUMMARY"
