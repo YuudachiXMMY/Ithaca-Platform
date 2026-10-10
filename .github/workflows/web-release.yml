@@ -21,6 +21,16 @@ on:
     paths:
       - 'apps/web/**'
       - '.github/workflows/web-release.yml'
+  # Manual trigger, and it is not optional convenience — `paths:` above has a sharp edge that
+  # bit us on day one: when a push introduces NO new commits (e.g. CREATING `prod` at a commit
+  # that already exists on `main`, where GitHub reports `before` as all-zeros and therefore an
+  # empty changed-file set), the path filter excludes the event and this workflow silently does
+  # not run. A release push that quietly builds nothing is exactly the failure mode to avoid.
+  #
+  # `paths:` is still worth keeping: promoting a scheduling-only change to `prod` should not
+  # rebuild the web image. workflow_dispatch is the escape hatch for the no-new-commits case
+  # and for re-publishing a known-good tree without inventing a dummy commit.
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
