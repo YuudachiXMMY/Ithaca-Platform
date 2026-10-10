@@ -1,0 +1,4 @@
+/* prettier-plugin-tailwindcss entry (referenced by prettier.config.js -> tailwindStylesheet).
+   Not imported by any component — the real stylesheet is src/app.css, imported in
+   +layout.svelte. This re-export gives the class-sorter the full design system (tokens). */
+@import '../app.css';

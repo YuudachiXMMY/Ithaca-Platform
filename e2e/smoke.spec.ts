@@ -1,0 +1,482 @@
+import { test, expect, type APIRequestContext, type Page } from '@playwright/test';
+
+// Route coverage is DERIVED from /sitemap.xml rather than hardcoded. The sitemap endpoint
+// already enumerates routes with `import.meta.glob('/src/routes/**/+page.svelte')`, so a new
+// page (e.g. /admissions, /results) joins this suite the moment it exists — no list to forget
+// to update. It also means a route accidentally dropped from the sitemap fails here loudly.
+async function sitemapPaths(request: APIRequestContext): Promise<string[]> {
+	const res = await request.get('/sitemap.xml');
+	expect(res.status(), '/sitemap.xml must be served').toBe(200);
+	const xml = await res.text();
+
+	const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+	expect(locs.length, 'sitemap must not be empty').toBeGreaterThan(0);
+
+	// <loc> carries the canonical absolute origin (PUBLIC_SITE_URL); we test localhost.
+	return [...new Set(locs.map((href) => new URL(href).pathname))].sort();
+}
+
+test.describe('public routes', () => {
+	test('every sitemap route responds 200 in both locales', async ({ request }) => {
+		const paths = await sitemapPaths(request);
+
+		// 20 public pages x {en, zh} — the original 12, plus the eight the Academics / Student
+		// Life / About groups added. Guards against the sitemap silently collapsing to a handful
+		// of entries, which would make the per-path loop vacuously pass.
+		expect(paths.length).toBeGreaterThanOrEqual(40);
+		expect(paths.filter((p) => p.startsWith('/zh')).length).toBeGreaterThanOrEqual(20);
+
+		const failures: string[] = [];
+		for (const path of paths) {
+			const res = await request.get(path);
+			if (res.status() !== 200) failures.push(`${path} -> ${res.status()}`);
+		}
+		expect(failures, 'routes that did not return 200').toEqual([]);
+	});
+
+	test('no public route is excluded from indexing, and admin leaves this origin', async ({
+		request
+	}) => {
+		const home = await (await request.get('/')).text();
+		expect(home).not.toContain('name="robots" content="noindex"');
+
+		// There is no admin surface here any more: /admin/* 302s to the scheduling app's console
+		// (hooks.server.ts), so there is no local HTML left to mark noindex. maxRedirects:0 keeps
+		// this assertion off the network — the default would chase the redirect to the real host.
+		const admin = await request.get('/admin/login', { maxRedirects: 0 });
+		expect(admin.status()).toBe(302);
+		expect(admin.headers()['location']).toContain('/dashboard/site');
+	});
+
+	// A map rather than a list because the three legacy slugs no longer share one destination:
+	// the two interview paths were folded into Ithaca Dialogues, while `ai-entrepreneurship-camp`
+	// is the SAME programme under its new name and must land on its own page. Asserting a single
+	// shared destination would have let the camp→bootcamp stub point anywhere and still pass.
+	const LEGACY_SLUGS: Record<string, string> = {
+		'/programs/elite-interview': '/programs/ithaca-dialogues',
+		'/programs/ai-pioneers-interview': '/programs/ithaca-dialogues',
+		'/programs/ai-entrepreneurship-camp': '/programs/ai-entrepreneurship-bootcamp'
+	};
+
+	test('the legacy program slugs still redirect to the canonical route', async ({ request }) => {
+		for (const [legacy, canonical] of Object.entries(LEGACY_SLUGS)) {
+			const res = await request.get(legacy, { maxRedirects: 0 });
+			expect(res.status(), `${legacy} should 308`).toBe(308);
+			expect(res.headers()['location'], `${legacy} should point at ${canonical}`).toContain(
+				canonical
+			);
+		}
+	});
+
+	// The renamed programme's stub is the one that can break silently: a 308 whose target is itself
+	// (or whose target 308s back) is an infinite loop a browser reports as ERR_TOO_MANY_REDIRECTS,
+	// and the assertion above — which only reads the Location header — would still pass.
+	test('the renamed bootcamp route is a real page, not another redirect', async ({ request }) => {
+		const res = await request.get('/programs/ai-entrepreneurship-bootcamp');
+		expect(res.status()).toBe(200);
+	});
+});
+
+test.describe('locale switch', () => {
+	// The switcher is rendered twice: once in the desktop bar (`hidden md:flex`) and once in
+	// the mobile drawer. Both copies are in the DOM at every viewport, so match on `:visible`
+	// and open the drawer first when the hamburger is the thing on screen.
+	async function switchLocaleTo(page: import('@playwright/test').Page, href: string) {
+		const hamburger = page.locator('header button[aria-expanded]').first();
+		if (await hamburger.isVisible()) await hamburger.click();
+		await page.locator(`a[href="${href}"]:visible`).first().click();
+	}
+
+	// R-I18N-3: the switch must preserve the current path (and query), not dump the
+	// visitor on the homepage in the other language.
+	test('preserves the current path when going en -> zh', async ({ page }) => {
+		await page.goto('/programs/ev-team');
+		await switchLocaleTo(page, '/zh/programs/ev-team');
+		await expect(page).toHaveURL(/\/zh\/programs\/ev-team$/);
+		await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
+	});
+
+	test('preserves the current path when going zh -> en', async ({ page }) => {
+		await page.goto('/zh/programs/ev-team');
+		await switchLocaleTo(page, '/programs/ev-team');
+		await expect(page).toHaveURL(/\/programs\/ev-team$/);
+		await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+	});
+
+	test('only the zh document loads the CJK font stylesheet', async ({ page }) => {
+		// The whole point of the per-locale gate in +layout.svelte: an English visitor must
+		// not pay for the Noto Sans SC @font-face declarations, nor for the faces themselves.
+		await page.goto('/');
+		await expect(page.locator('link[href="/fonts/noto-sans-sc.css"]')).toHaveCount(0);
+
+		await page.goto('/zh');
+		await expect(page.locator('link[href="/fonts/noto-sans-sc.css"]')).toHaveCount(1);
+	});
+
+	// The assertion above is a proxy — it checks that the <link> is absent, not that no bytes
+	// were fetched, and a proxy is exactly what let the opposite defect run in production for
+	// months: the stylesheet WAS linked on /zh and the browser still downloaded zero of the 505
+	// subsets, because `--font-stack-body` carried a generic family in front of 'Noto Sans SC'
+	// and CSS font matching stops at a generic. Nothing in the suite noticed, because nothing
+	// looked at the network. These two tests look at the network.
+	/**
+	 * `networkidle` is the right wait for these two — they are about what the network did, so they
+	 * have to wait for it to stop — but it cannot arrive while something on the page is still
+	 * failing. On CI `DATABASE_URL` is a deliberate placeholder (see `playwright.config.ts`), so
+	 * `/api/popups/active` returns a Prisma error on every page and the network never goes quiet:
+	 * these were the only two tests in this file using `networkidle` and the only two that hung,
+	 * at any budget.
+	 *
+	 * Stubbing it keeps the wait honest rather than trading it for a weaker one. An empty body is
+	 * the real "no popup configured" response, which is also what a developer with no local
+	 * database sees, so this changes nothing about font loading — the thing actually under test.
+	 */
+	async function stubPopups(page: Page) {
+		await page.route('**/api/popups/active', (route) =>
+			route.fulfill({ status: 200, contentType: 'application/json', body: 'null' })
+		);
+	}
+
+	test('English pages fetch zero CJK font bytes', async ({ page }) => {
+		await stubPopups(page);
+		const cjk: string[] = [];
+		page.on('request', (r) => {
+			if (r.url().includes('noto-sans-sc')) cjk.push(new URL(r.url()).pathname);
+		});
+		await page.goto('/', { waitUntil: 'networkidle' });
+		expect(cjk, 'an English page requested a CJK font resource').toEqual([]);
+	});
+
+	test('Chinese pages actually fetch the Noto Sans SC faces, one per weight', async ({ page }) => {
+		await stubPopups(page);
+		const faces = new Set<string>();
+		page.on('response', (r) => {
+			const p = new URL(r.url()).pathname;
+			if (p.startsWith('/fonts/noto-sans-sc/') && p.endsWith('.woff2')) faces.add(p);
+		});
+		await page.goto('/zh', { waitUntil: 'networkidle' });
+
+		// scripts/build-cjk-subset.ts emits one file per weight, site-wide. Two weights: 400 for
+		// body copy and 700 for headings and buttons. Light was dropped because all weights are
+		// fetched (there is no unicode-range to skip any) and 373 KB was competing with the LCP
+		// element. A count of 0 means the font stack regressed to a generic family again — the
+		// defect that ran in production for months; a count above 2 means either the stock
+		// Fontsource partitioning came back or a weight was added without re-measuring.
+		expect([...faces].sort(), 'CJK faces fetched on /zh').toEqual([
+			'/fonts/noto-sans-sc/noto-sans-sc-subset-400.woff2',
+			'/fonts/noto-sans-sc/noto-sans-sc-subset-700.woff2'
+		]);
+	});
+});
+
+test.describe('programs dropdown', () => {
+	// Scoped by href, not `.first()`. There are now THREE dropdown triggers in the bar (About,
+	// Academics, Programs) and About is the first of them, so `.first()` quietly stopped testing
+	// the menu this block is named after — while still passing, because About also opens and also
+	// has menuitems. A selector for "a dropdown" is not a selector for "this dropdown".
+	const programsTrigger = (page: import('@playwright/test').Page) =>
+		page.locator('header a[aria-haspopup="true"][href="/programs"]');
+
+	/**
+	 * Every group that HAS children renders a trigger that offers them.
+	 *
+	 * This is a DOM assertion on purpose. `nav.test.ts` proves the data — that About, Academics and
+	 * Student Life each carry `children` — and the data was correct while Student Life rendered as a
+	 * plain link with no menu at all, because the header had two separate loops and only the
+	 * left-hand one had an `{#if item.children}` branch. Nothing failed: the bar looked right, the
+	 * mobile drawer rendered the submenu fine, and every existing test passed. Asserting the
+	 * rendered triggers is the only level at which that is visible.
+	 */
+	test('every dropdown group in the bar actually opens one', async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name === 'mobile-chrome', 'desktop nav is hidden on mobile');
+
+		await page.goto('/');
+		const GROUPS = ['/about-us', '/academics', '/programs', '/student-life'];
+
+		// The count matters as much as the members: it is what fails if a fifth group is added to
+		// NAV_ITEMS and only the data side is updated.
+		await expect(page.locator('header a[aria-haspopup="true"]')).toHaveCount(GROUPS.length);
+		for (const href of GROUPS) {
+			await expect(
+				page.locator(`header a[aria-haspopup="true"][href="${href}"]`),
+				`${href} should be a dropdown trigger`
+			).toHaveCount(1);
+		}
+	});
+
+	// WCAG 2.1.1. The trigger advertises aria-haspopup="true" + aria-expanded, so a
+	// keyboard user is told a menu exists; it must actually be openable without a mouse.
+	test('opens from the keyboard and exposes every program', async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name === 'mobile-chrome', 'desktop nav is hidden on mobile');
+
+		await page.goto('/');
+		const trigger = programsTrigger(page);
+		await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+		await trigger.focus();
+		await expect(trigger).toBeFocused();
+		await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+		const menu = page.locator('header [role="menu"]');
+		await expect(menu).toBeVisible();
+		// R-GLB-1 is "every programme", so the count IS the requirement. `not.toHaveCount(0)`
+		// passed for the three-plus-catch-all shape that requirement was written to replace.
+		await expect(menu.locator('[role="menuitem"]')).toHaveCount(6);
+	});
+
+	test('closes on Escape and returns focus to the trigger', async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name === 'mobile-chrome', 'desktop nav is hidden on mobile');
+
+		await page.goto('/');
+		const trigger = programsTrigger(page);
+		await trigger.focus();
+		await expect(page.locator('header [role="menu"]')).toBeVisible();
+
+		await page.keyboard.press('Escape');
+		await expect(page.locator('header [role="menu"]')).toHaveCount(0);
+		await expect(trigger).toBeFocused();
+	});
+});
+
+/**
+ * The mobile drawer's accordion.
+ *
+ * The drawer used to render each group as a full-width LINK with a 36px chevron button beside it:
+ * the row said "About" and went to /about-us, and the submenu was reachable only by hitting the
+ * arrow. On a phone that is the wrong default — the four groups are containers, and the thing a
+ * thumb lands on is the label. So the row is now a button that expands, and the group's own page
+ * moved INSIDE the submenu as its last entry (`drawerChildren`).
+ *
+ * Playwright's `click()` is the only level this is visible at: `nav.test.ts` proves the submenu
+ * DATA reaches every index page, and that data was equally correct while the row still navigated.
+ */
+test.describe('mobile nav drawer', () => {
+	const openDrawer = async (page: import('@playwright/test').Page) => {
+		await page.locator('header button[aria-expanded]').first().click();
+		return page
+			.getByRole('navigation')
+			.filter({ has: page.locator('ul') })
+			.last();
+	};
+
+	test('a group row expands its submenu instead of navigating', async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== 'mobile-chrome', 'the drawer only exists below lg');
+
+		await page.goto('/');
+		const drawer = await openDrawer(page);
+
+		const academics = drawer.locator('button[aria-controls="drawer-submenu-/academics"]');
+		await expect(academics).toHaveAttribute('aria-expanded', 'false');
+		// Nothing at the top level of the drawer links to /academics any more — if a link survives
+		// there, the row is still navigable and this change did not land.
+		await expect(drawer.locator('a[href="/academics"]')).toHaveCount(0);
+
+		await academics.click();
+
+		await expect(academics).toHaveAttribute('aria-expanded', 'true');
+		// The assertion the whole change is about: still on the homepage, submenu now open.
+		await expect(page).toHaveURL(/\/$/);
+
+		const submenu = drawer.locator('ul[id="drawer-submenu-/academics"]');
+		await expect(submenu).toBeVisible();
+		await expect(submenu.locator('a[href="/academics/ap"]')).toBeVisible();
+		// Last, not first — the tracks are what the visitor opened the group to see.
+		await expect(submenu.locator('a').last()).toHaveAttribute('href', '/academics');
+
+		// And it is a real toggle, not a one-way open.
+		await academics.click();
+		await expect(academics).toHaveAttribute('aria-expanded', 'false');
+		await expect(drawer.locator('ul[id="drawer-submenu-/academics"]')).toHaveCount(0);
+	});
+
+	test('one group at a time — opening the next collapses the last', async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== 'mobile-chrome', 'the drawer only exists below lg');
+
+		await page.goto('/');
+		const drawer = await openDrawer(page);
+
+		const about = drawer.locator('button[aria-controls="drawer-submenu-/about-us"]');
+		const programs = drawer.locator('button[aria-controls="drawer-submenu-/programs"]');
+
+		await about.click();
+		await expect(about).toHaveAttribute('aria-expanded', 'true');
+
+		await programs.click();
+		await expect(programs).toHaveAttribute('aria-expanded', 'true');
+		await expect(about).toHaveAttribute('aria-expanded', 'false');
+	});
+
+	test('a childless row is still a link and still navigates', async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== 'mobile-chrome', 'the drawer only exists below lg');
+
+		await page.goto('/');
+		const drawer = await openDrawer(page);
+
+		// Home / Admissions / Contact Us have no children, so nothing about them changed.
+		await expect(drawer.locator('button[aria-expanded]')).toHaveCount(4);
+		await drawer.locator('a[href="/admissions"]').click();
+		await expect(page).toHaveURL(/\/admissions$/);
+	});
+
+	test('a submenu link navigates and closes the drawer', async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== 'mobile-chrome', 'the drawer only exists below lg');
+
+		await page.goto('/');
+		const drawer = await openDrawer(page);
+
+		await drawer.locator('button[aria-controls="drawer-submenu-/programs"]').click();
+		await drawer.locator('ul[id="drawer-submenu-/programs"] a[href="/programs"]').click();
+
+		await expect(page).toHaveURL(/\/programs$/);
+		// Navigating closes the drawer (the $effect on `path` in Header), so the hamburger reports
+		// collapsed again. Asserted via the toggle rather than the panel's aria-label, which is
+		// localized.
+		await expect(page.locator('header button[aria-expanded]').first()).toHaveAttribute(
+			'aria-expanded',
+			'false'
+		);
+	});
+});
+
+test.describe('contact form', () => {
+	// The page carries two role="alert" live regions: the contact form's and the newsletter
+	// form's. The latter is intentionally always present but empty (correct aria-live
+	// practice), so match only the region that actually has content.
+	const liveError = (page: import('@playwright/test').Page) =>
+		page.getByRole('alert').filter({ hasText: /\S/ });
+
+	test('rejects an empty submission client-side without a network call', async ({ page }) => {
+		let posted = false;
+		await page.route('**/api/contact', (route) => {
+			posted = true;
+			return route.abort();
+		});
+
+		await page.goto('/contact-us');
+		await page.getByRole('button', { name: /send|submit|提交|发送/i }).click();
+
+		await expect(liveError(page)).toBeVisible();
+		expect(posted, 'an empty form must not reach the server').toBe(false);
+	});
+
+	test('surfaces the error in the active locale', async ({ page }) => {
+		await page.goto('/zh/contact-us');
+		await page.getByRole('button', { name: /提交|发送|send|submit/i }).click();
+
+		// A Chinese visitor must not be shown an English validation message.
+		await expect(liveError(page)).toHaveText(/[一-鿿]/);
+	});
+});
+
+test.describe('header scroll state', () => {
+	/**
+	 * The bar is transparent over a dark hero and animates to a light, opaque bar past 20px.
+	 *
+	 * `header-contrast.spec.ts` asserts the colours are legible in each state, but it would pass
+	 * even if the transition never fired: band-* over a dark hero and ink over a light page both
+	 * clear 4.5:1, so "the header never changed" and "the header changed correctly" are the same
+	 * green. Nothing pinned the transition itself.
+	 *
+	 * It is also, incidentally, the only check in the suite that the header HYDRATES. `scrolled` is
+	 * client state; if the JS fails to load the header freezes in its server-rendered form, looks
+	 * plausible, and every other assertion in the suite still passes. That exact failure is easy to
+	 * produce by accident — a stale asset manifest will do it.
+	 */
+	const headerState = (page: import('@playwright/test').Page) =>
+		page.evaluate(() => {
+			const header = document.querySelector('header')!;
+			const scrim = header.children[0] as HTMLElement;
+			return {
+				painted: getComputedStyle(header).backgroundColor !== 'rgba(0, 0, 0, 0)',
+				blurred: getComputedStyle(header).backdropFilter.includes('blur'),
+				scrim: Number(getComputedStyle(scrim).opacity),
+				inkLogo: (header.querySelector('img') as HTMLImageElement).currentSrc.includes('logo-ink')
+			};
+		});
+
+	test('a dark-hero route flips to the light bar on scroll, and back', async ({ page }) => {
+		await page.goto('/programs/ev-team');
+		// The transition is 500ms; every read below waits it out rather than racing it.
+		await page.waitForTimeout(700);
+
+		expect(await headerState(page), 'at the top of a dark hero').toEqual({
+			painted: false,
+			blurred: false,
+			scrim: 1,
+			inkLogo: false
+		});
+
+		await page.evaluate(() => window.scrollTo(0, 500));
+		await page.waitForTimeout(700);
+		expect(await headerState(page), 'scrolled past the hero').toEqual({
+			painted: true,
+			blurred: true,
+			scrim: 0,
+			inkLogo: true
+		});
+
+		// Reversible. A one-way flip would look fine in every screenshot taken going down the page.
+		await page.evaluate(() => window.scrollTo(0, 0));
+		await page.waitForTimeout(700);
+		expect(await headerState(page), 'back at the top').toEqual({
+			painted: false,
+			blurred: false,
+			scrim: 1,
+			inkLogo: false
+		});
+	});
+
+	// `/programs`, not `/contact-us` and not `/admissions`. Both of those now open on a full-bleed
+	// photo hero (`shared/PageHero.svelte`) and belong to the dark case above; `/contact-us` was the
+	// last top-level page still opening on centred text over a bare background, and it stopped being
+	// one with the admissions/contact redesign.
+	//
+	// The `/programs` INDEX is the remaining content page that genuinely opens on white — the
+	// programme DETAIL pages under it are dark, which is exactly the distinction the trailing slash
+	// in `headerOnDark`'s `startsWith('/programs/')` draws and `nav.test.ts` pins.
+	test('a light route is already ink, and only gains the bar', async ({ page }) => {
+		await page.goto('/programs');
+		await page.waitForTimeout(700);
+
+		// No scrim and no white wordmark on a page that opens on white, scrolled or not.
+		expect(await headerState(page)).toEqual({
+			painted: false,
+			blurred: false,
+			scrim: 0,
+			inkLogo: true
+		});
+
+		await page.evaluate(() => window.scrollTo(0, 500));
+		await page.waitForTimeout(700);
+		expect(await headerState(page)).toEqual({
+			painted: true,
+			blurred: true,
+			scrim: 0,
+			inkLogo: true
+		});
+	});
+});
+
+test.describe('global chrome', () => {
+	test('the skip link is the first focusable element and targets main', async ({ page }) => {
+		await page.goto('/');
+		await page.keyboard.press('Tab');
+
+		const skip = page.locator(':focus');
+		await expect(skip).toHaveAttribute('href', /#/);
+		const href = await skip.getAttribute('href');
+		await expect(page.locator(href!)).toHaveCount(1);
+	});
+
+	test('every page has exactly one h1', async ({ request }) => {
+		const paths = await sitemapPaths(request);
+		const offenders: string[] = [];
+
+		for (const path of paths) {
+			const html = await (await request.get(path)).text();
+			const count = (html.match(/<h1[\s>]/g) ?? []).length;
+			if (count !== 1) offenders.push(`${path} has ${count} <h1>`);
+		}
+		expect(offenders).toEqual([]);
+	});
+});

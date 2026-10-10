@@ -1,0 +1,21 @@
+# Package Managers
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+bun.lock
+bun.lockb
+
+# Miscellaneous
+/static/
+
+# Paraglide (generated)
+src/lib/paraglide/
+
+# Prisma migrations SQL
+prisma/migrations/
+
+# inlang project (tool-generated: cache, .meta.json, README.md, settings.json)
+project.inlang/
+
+# Agent / planning scratch (not shippable source)
+.claude/
