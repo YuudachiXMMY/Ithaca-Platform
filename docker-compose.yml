@@ -1,0 +1,111 @@
+name: course-scheduling
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      # M2: no default — refuse to boot with a trivial/blank password (fails `docker compose up` early).
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set a strong POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-course_scheduling}
+    ports:
+      # M2: bind to loopback only — never expose Postgres to the LAN/internet. Intra-compose services
+      # still reach it over the compose network at postgres:5432 (no host port needed for the app).
+      - '127.0.0.1:${POSTGRES_HOST_PORT:-5432}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-app} -d ${POSTGRES_DB:-course_scheduling}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+      args:
+        NODE_VERSION: 24.21.0-alpine
+        # M5: NEXT_PUBLIC_APP_URL is baked in at build time — supply the real public origin here.
+        NEXT_PUBLIC_APP_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
+        # P7b: VAPID public key is INLINED into the client bundle at build. Public key is safe to
+        # expose. Empty default keeps the build working (Web Push simply stays disabled) when unset.
+        NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${NEXT_PUBLIC_VAPID_PUBLIC_KEY:-}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-course_scheduling}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?set BETTER_AUTH_SECRET in .env}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
+      NEXT_PUBLIC_APP_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
+      # P8: report-drafting provider + credentials. The standalone server does NOT read .env at
+      # runtime, so these must be injected here or the container falls back to REPORT_PROVIDER's
+      # 'anthropic' default and fails with "未配置 Claude API Key". Empty defaults keep them optional
+      # (emptyStringAsUndefined in src/env.ts treats "" as unset); set the ones your provider needs.
+      REPORT_PROVIDER: ${REPORT_PROVIDER:-anthropic}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-opus-4-8}
+      MINIMAX_API_KEY: ${MINIMAX_API_KEY:-}
+      MINIMAX_MODEL: ${MINIMAX_MODEL:-MiniMax-M3}
+      MINIMAX_BASE_URL: ${MINIMAX_BASE_URL:-https://api.minimaxi.com/v1}
+      # Env-seeded default super admin. REQUIRED on first deploy: self-service signup is disabled, so
+      # the entrypoint seed is the ONLY way to get a login — without these it skips and nobody can log
+      # in. Injected here because the standalone runtime does NOT read .env. Re-deploys never change an
+      # existing admin's password. ADMIN_EMAIL/ADMIN_PASSWORD use the same `:?` refuse-to-boot guard as
+      # POSTGRES_PASSWORD/BETTER_AUTH_SECRET above.
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?set ADMIN_EMAIL in .env — signup is disabled, the first admin must be seeded}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set a strong ADMIN_PASSWORD in .env}
+      ADMIN_NAME: ${ADMIN_NAME:-管理员}
+      DEFAULT_ORG_NAME: ${DEFAULT_ORG_NAME:-默认机构}
+      DEFAULT_ORG_ID: ${DEFAULT_ORG_ID:-org_default}
+      # P7b: reminder cron secret + Web Push (VAPID). All optional (empty default → treated as unset
+      # via emptyStringAsUndefined) so the container boots without a scheduler / push configured.
+      # CRON_SECRET gates POST /api/cron/reminders; VAPID_* enable best-effort push. The
+      # NEXT_PUBLIC_ copy is also injected at runtime for any server path that reads it.
+      CRON_SECRET: ${CRON_SECRET:-}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-}
+      NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${NEXT_PUBLIC_VAPID_PUBLIC_KEY:-}
+      # F12: forward the ADR-0002 sandbox escape valve. The standalone runtime does NOT read .env, so
+      # without this line CHROMIUM_NO_SANDBOX is unreachable on the `docker compose up` path and a
+      # hardened host that cannot grant unprivileged user namespaces can't fall back — PNG/PDF export
+      # fails to launch chromium. Empty default keeps the secure sandboxed default (see src/lib/browser.ts).
+      CHROMIUM_NO_SANDBOX: ${CHROMIUM_NO_SANDBOX:-}
+      # 官网运营控制台(/dashboard/site)。全部可选、空值视为未设置 —— 不配也能正常启动:
+      #   · SITE_INGEST_SECRET 未设 → /api/site/* 保持 401 惰性(fail closed,绝不放行);
+      #   · SMTP_* 未设 → 控制台能存草稿，但群发会被明确拒绝(不会假装发成功)。
+      # standalone 运行时**不读 .env**,所以这些必须在此注入，否则只在 next dev 下生效。
+      SITE_INGEST_SECRET: ${SITE_INGEST_SECRET:-}
+      # SMTP_HOST 在服务器上填内网别名 `stalwart`(与本应用同在 proxy 网络);
+      # ⚠️ SMTP_TLS_INSECURE 只有在 SMTP_HOST 正是该内网别名时才可设为 1 ——
+      # 配成公网主机名会让应用拒绝启动(src/lib/mail.ts 的 assertTlsConfigSafe)。
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_TLS_INSECURE: ${SMTP_TLS_INSECURE:-}
+    ports:
+      # F17: bind to loopback only (mirrors postgres above) — the app is meant to sit behind the Traefik
+      # TLS edge, which reaches it over the compose network, not the host port. A bare 0.0.0.0:3000 on a
+      # public host would expose the app in cleartext, bypassing TLS. Override APP_HOST_PORT if needed.
+      - '127.0.0.1:${APP_HOST_PORT:-3000}:3000'
+  test:
+    profiles: ['test']
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-course_scheduling}
+      NODE_ENV: test
+    command: ['sh', '-c', 'node dist/migrate.mjs && npm run test']
+volumes:
+  pgdata: {}

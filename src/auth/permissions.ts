@@ -1,0 +1,99 @@
+import { createAccessControl } from 'better-auth/plugins/access'
+import {
+  defaultStatements as orgDefaults,
+  ownerAc,
+  adminAc as orgAdminAc,
+  memberAc,
+} from 'better-auth/plugins/organization/access'
+import {
+  defaultStatements as adminDefaults,
+  adminAc as sysAdminAc,
+} from 'better-auth/plugins/admin/access'
+
+/* 1) ORGANIZATION (per-tenant) access control */
+const statement = {
+  ...orgDefaults, // organization, member, invitation (built-in org mgmt)
+  student: ['create', 'read', 'list', 'update', 'delete'],
+  course: ['create', 'read', 'list', 'update', 'delete'],
+  lesson: ['create', 'read', 'list', 'update', 'delete'],
+  // RESERVED (declared now so the role matrix stays forward-stable):
+  rescheduleRequest: ['create', 'read', 'list', 'approve', 'reject', 'cancel'],
+  creditPackage: ['create', 'read', 'list', 'update', 'delete'],
+  report: ['create', 'read', 'list', 'update', 'approve'], // Phase 5: progress reports
+  // Phase 7b: in-app notification center. System-created (cron + reschedule outcome), so no
+  // create/send verb — read/list to view, update for mark-read. Row-scope (userId === ctx.userId)
+  // is enforced in the data/core layer, not by the verb.
+  notification: ['read', 'list', 'update'],
+} as const
+export type Statements = typeof statement
+export const ac = createAccessControl(statement)
+
+const owner = ac.newRole({
+  ...ownerAc.statements,
+  student: ['create', 'read', 'list', 'update', 'delete'],
+  course: ['create', 'read', 'list', 'update', 'delete'],
+  lesson: ['create', 'read', 'list', 'update', 'delete'],
+  rescheduleRequest: ['create', 'read', 'list', 'approve', 'reject', 'cancel'],
+  creditPackage: ['create', 'read', 'list', 'update', 'delete'],
+  report: ['create', 'read', 'list', 'update', 'approve'],
+  notification: ['read', 'list', 'update'],
+})
+const admin = ac.newRole({
+  ...orgAdminAc.statements,
+  student: ['create', 'read', 'list', 'update', 'delete'],
+  course: ['create', 'read', 'list', 'update', 'delete'],
+  lesson: ['create', 'read', 'list', 'update', 'delete'],
+  rescheduleRequest: ['read', 'list', 'approve', 'reject'],
+  creditPackage: ['create', 'read', 'list', 'update'],
+  report: ['create', 'read', 'list', 'update', 'approve'],
+  notification: ['read', 'list', 'update'],
+})
+const teacher = ac.newRole({
+  ...memberAc.statements,
+  student: ['create', 'read', 'list', 'update'],
+  // 多教师改造: a teacher no longer CREATES courses/sections nor edits course/section settings, and can no
+  // longer add/remove students to a class (enroll/unenroll map to course:update). Only owner/admin manage
+  // those; a teacher READS the course/section (settings are view-only) and works its lessons/reports. An
+  // admin adds the teacher to a section (section_teacher) — that link, not a course:create/update grant, is
+  // what lets them open it.
+  course: ['read', 'list'],
+  lesson: ['create', 'read', 'list', 'update'],
+  rescheduleRequest: ['read', 'list', 'approve', 'reject'],
+  creditPackage: ['read', 'list'],
+  report: ['create', 'read', 'list', 'update', 'approve'],
+  notification: ['read', 'list', 'update'],
+})
+const assistant = ac.newRole({
+  ...memberAc.statements,
+  student: ['read', 'list'],
+  course: ['read', 'list'],
+  lesson: ['create', 'read', 'list', 'update'],
+  rescheduleRequest: ['read', 'list'],
+  creditPackage: ['read', 'list'],
+  report: ['read', 'list'], // assistant may view reports but not draft/approve
+  notification: ['read', 'list', 'update'],
+})
+// Phase-1: parent/student are READ-only placeholders; their only future WRITE is a RescheduleRequest (Phase 7).
+const parent = ac.newRole({
+  student: ['read'],
+  lesson: ['read', 'list'],
+  rescheduleRequest: ['create', 'read', 'list', 'cancel'],
+  report: ['read', 'list'], // Phase 5: 家长门户仅查看 approved 报告（无 create/update/approve）
+  notification: ['read', 'list', 'update'],
+})
+const student_role = ac.newRole({
+  lesson: ['read', 'list'],
+  rescheduleRequest: ['create', 'read', 'list', 'cancel'],
+  report: ['read', 'list'], // Phase 5: 学生门户仅查看自己的 approved 报告
+  notification: ['read', 'list', 'update'],
+})
+
+export const orgRoles = { owner, admin, teacher, assistant, parent, student: student_role }
+export type OrgRole = keyof typeof orgRoles
+
+/* 2) PLATFORM (cross-tenant) admin — the self-hosting operator; a SEPARATE ac universe */
+const adminStatement = { ...adminDefaults } as const
+export const adminAc = createAccessControl(adminStatement)
+const superadmin = adminAc.newRole({ ...sysAdminAc.statements })
+const user = adminAc.newRole({})
+export const adminRoles = { superadmin, user }

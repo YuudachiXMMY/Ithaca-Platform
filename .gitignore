@@ -1,0 +1,47 @@
+# dependencies
+/node_modules
+.pnp
+.pnp.*
+
+# next.js
+/.next
+/out
+/build
+next-env.d.ts
+
+# production build artifacts
+/dist
+
+# testing
+/coverage
+
+# env — never commit secrets; keep the examples
+.env
+.env.*
+!.env.example
+!.env.e2e.example
+
+# playwright / e2e
+/playwright-report
+/test-results
+/blob-report
+/playwright/.cache
+tests/e2e/.auth
+tests/e2e/.seed
+
+# Next.js auto-generated agent rule files (next dev, agentRules)
+/AGENTS.md
+/CLAUDE.md
+
+# misc
+.DS_Store
+*.pem
+*.tsbuildinfo
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# vercel
+.vercel
