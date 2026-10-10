@@ -168,7 +168,11 @@ export const POST: RequestHandler = async (event) => {
 		// completely different fixes, and from a bare 500 an operator cannot tell which happened.
 		// The response body stays empty either way (no internal detail to the visitor).
 		if (error instanceof SiteApiError) {
-			console.error('[contact] 落库失败（课程排课系统不可达或拒绝）', error.status ?? '-', error.message);
+			console.error(
+				'[contact] 落库失败（课程排课系统不可达或拒绝）',
+				error.status ?? '-',
+				error.message
+			);
 		} else {
 			console.error('[contact] unexpected error', error);
 		}

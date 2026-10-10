@@ -59,15 +59,15 @@ async function call<T>(
 		});
 	} catch (e) {
 		// 网络层失败(DNS、连接拒绝、超时)。包一层统一类型,调用点就不必分辨 fetch 的各种抛法。
-		throw new SiteApiError(
-			`调用 ${path} 失败: ${e instanceof Error ? e.message : String(e)}`
-		);
+		throw new SiteApiError(`调用 ${path} 失败: ${e instanceof Error ? e.message : String(e)}`);
 	}
 
 	// 响应体可能不是 JSON(网关的 502 HTML 页)。解析失败不该掩盖掉真正的状态码。
-	const payload = (await res.json().catch(() => null)) as
-		| { success?: boolean; data?: T; error?: string }
-		| null;
+	const payload = (await res.json().catch(() => null)) as {
+		success?: boolean;
+		data?: T;
+		error?: string;
+	} | null;
 
 	if (!res.ok || !payload?.success) {
 		throw new SiteApiError(payload?.error ?? `HTTP ${res.status}`, res.status);

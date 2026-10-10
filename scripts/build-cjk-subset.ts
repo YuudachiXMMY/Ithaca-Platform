@@ -219,6 +219,12 @@ const KNOWN_ABSENT: ReadonlyMap<number, string> = new Map([
 			'the page as a literal © that only the --verify pass sees. Renders in Inter, as today.'
 	],
 	[0x2192, '→ — real copy: messages/{en,zh}.json "12% → 60%". Renders in Inter, as it does today.'],
+	[
+		0x21d2,
+		'⇒ — prose in code comments: src/lib/server/site-api.ts and ' +
+			'src/routes/api/subscribe/+server.ts (both describe the subscribe outcome discriminant). ' +
+			'Arrived with the move of contacts/subscribers/popups to the scheduling system.'
+	],
 	[0x2208, '∈ — prose in a code comment, src/routes/api/admin/emails/send/+server.ts.'],
 	[0x222a, '∪ — same comment.'],
 	[0x2248, '≈ — code comments (src/lib/admissions.test.ts and others).'],
