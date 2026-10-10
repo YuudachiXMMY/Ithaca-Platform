@@ -1,0 +1,115 @@
+# apps/web (ithacateens.com, SvelteKit) — PR quality gate.
+#
+# Monorepo note: GitHub only reads workflows from the REPOSITORY ROOT, so this file lives here
+# rather than under apps/web/. The pre-merge original is in git history at
+# apps/web/.github/workflows/ci.yml (removed in the same commit that added this file).
+#
+# `defaults.run.working-directory` only applies to `run` steps — NOT to `uses` steps. So
+# setup-node needs an explicit cache-dependency-path, and upload-artifact needs a full path.
+# Getting that wrong fails silently (an empty npm cache, or an artifact that never uploads).
+#
+# Ordered cheapest-to-most-expensive so a trivial break fails fast. That ordering is load-bearing:
+# `prettier --check` sitting first is what once masked a CJK-font build failure for four commits.
+name: web CI
+
+on:
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/web-ci.yml'
+  push:
+    branches: [main, prod]
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/web-ci.yml'
+
+# A newer push to the same ref makes the in-flight run pointless.
+concurrency:
+  group: web-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: apps/web
+
+jobs:
+  verify:
+    name: lint · typecheck · test · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # No job-level env on purpose. The placeholder DATABASE_URL / BETTER_AUTH_* used to be
+    # required because hooks.server.ts imported src/lib/server/auth.ts, which instantiated Better
+    # Auth (and through it PrismaClient) at module load — so `npm run check` and `npm run build`
+    # evaluated it while prerendering and threw without a secret. The app is stateless now: every
+    # remaining $env/dynamic/private consumer reads inside a function, so nothing needs env to
+    # merely load. Re-adding placeholders here would hide a regression of that property.
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      # engine-strict=false: camera-controls (a @threlte/extras dep) declares an engines
+      # range that node 20 fails, and .npmrc sets engine-strict=true for local dev.
+      - name: Install dependencies
+        run: npm ci --engine-strict=false
+
+      # ESLint + `prettier --check`.
+      - name: Lint
+        run: npm run lint
+
+      # paraglide-js compile + svelte-kit sync + svelte-check (types AND a11y).
+      - name: Typecheck
+        run: npm run check
+
+      # en/zh message-key parity.
+      - name: i18n key parity
+        run: npm run i18n:check
+
+      - name: Unit tests
+        run: npm test
+
+      # Slowest, so last. PUBLIC_* are inlined by Vite at build time, so they must be present
+      # BEFORE the build (same contract as the Dockerfile and web-release.yml). This step also
+      # runs the CJK font-subset ratchet, which fails the build on any non-ASCII codepoint that
+      # the Noto Sans SC cut cannot render and that is not registered in KNOWN_ABSENT.
+      - name: Build
+        run: npm run build
+        env:
+          PUBLIC_GA_TRACKING_ID: G-675W5PPJEJ
+          PUBLIC_SITE_URL: https://ithacateens.com
+
+      - name: Assert the adapter-node entrypoint was emitted
+        run: test -f build/index.js
+
+      # Playwright is the only UI-level verification this app has: Vitest runs with
+      # `environment: 'node'` and no jsdom, so nothing else asserts that a page renders.
+      # It reuses the build above and boots `node build/index.js` itself (see
+      # playwright.config.ts), on port 4321 rather than the commonly-squatted 3000.
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      # Route coverage (derived from sitemap.xml), locale switch, keyboard nav, form validation,
+      # and the /admin → 302 assertion.
+      - name: E2E smoke
+        run: npx playwright test e2e/smoke.spec.ts
+
+      # R-A11Y-2: zero serious/critical axe issues on every prd.md §6.4 page, in both locales.
+      - name: Accessibility (axe)
+        run: npx playwright test e2e/a11y.spec.ts
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 7

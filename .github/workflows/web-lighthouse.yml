@@ -1,0 +1,75 @@
+# ── apps/web — Lighthouse CI (mobile perf) ──────────────────────────────────────────────────
+# Builds the SvelteKit app and runs `lhci autorun` against the built site. The thresholds that
+# can actually fail the job live in apps/web/lighthouserc.json and are an assertMatrix of
+# PER-ROUTE LCP ratchets (ev-team <= 7800ms, /zh <= 5800ms, everything else <= 4500ms) plus
+# CLS <= 0.05. Everything else (performance 0.85, a11y 0.9, seo 0.9, FCP, TBT) is warn-level.
+#
+# ⚠️ NO LONGER RUNS ON EVERY PR/PUSH — this is a deliberate change made during the monorepo merge.
+# Measured over 15 days before the merge, this workflow was 795 of the web repo's ~2,380 CI
+# minutes per month (67%) and was RED on 59 of 65 runs. The redness is a real, unpaid LCP debt,
+# not flakiness — but it is also not a signal anyone acts on per-PR, and the CI runner's own
+# variance makes it a poor gate: three consecutive samples of `/` measured 6304 / 6509 / 10420 ms
+# (±60%), against a 4500 ms ratchet.
+#
+# So: run it on demand and weekly, keep the ratchet EXACTLY as strict as it was, and track the
+# real LCP debt as its own piece of work. Do NOT "fix" this by loosening assertMatrix — the
+# config comments record that those numbers came from the author's localhost, which is faster
+# than the runner, so loosening would hide regressions rather than measure them.
+name: web Lighthouse
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Mondays 06:00 UTC. Cron on a private repo still consumes billable minutes, so once a week.
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: apps/web
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    # No placeholder auth/DB env needed: the app is stateless, so neither `npm run build` (which
+    # prerenders, importing hooks.server.ts) nor the lhci server (`node build/index.js`) requires
+    # any env to load. Before the Prisma/Better-Auth removal, hooks.server.ts -> auth.ts ran
+    # betterAuth({ secret }) at module load and threw BetterAuthError without one.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        # engine-strict off (mirrors the Docker deps stage, which never copies .npmrc):
+        # camera-controls declares engines.node >=22 but only needs it at the install-time engine
+        # check, so the Node 20 runner (prod parity) builds fine. Without this, .npmrc's
+        # engine-strict=true turns that mismatch into an EBADENGINE abort.
+        run: npm ci --engine-strict=false
+
+      - name: Build
+        env:
+          PUBLIC_GA_TRACKING_ID: G-675W5PPJEJ
+          PUBLIC_SITE_URL: https://ithacateens.com
+        run: npm run build
+
+      - name: Install Lighthouse CI
+        run: npm i -g @lhci/cli@0.15.x
+
+      - name: Run Lighthouse CI
+        run: lhci autorun
+
+      - name: Upload Lighthouse results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-lighthouse-results
+          path: apps/web/.lighthouseci
