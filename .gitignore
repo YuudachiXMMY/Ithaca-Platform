@@ -31,7 +31,11 @@ id_ed25519
 .archive/
 
 # ── 本地工具与索引 ──
-.codegraph/
+# 刻意**不**在这里排除 .codegraph/ 与 .reports/:两边各有一个文件是刻意跟踪的
+# (apps/scheduling/.codegraph/.gitignore、apps/web/.reports/codemap-diff.txt),
+# 而一旦在这里排除了父目录,`!` 否定规则救不回来 —— git 不会进入已排除的目录,
+# 所以那两个文件会落到「已跟踪 + 命中忽略规则」这个以后很难排查的状态。
+# 它们本来就不是密钥、也不大,交给各 app 自己的 .gitignore 在子树内处理。
 .claude/worktrees/
 .playwright-mcp/
 
@@ -40,14 +44,7 @@ test-results/
 playwright-report/
 .lighthouseci/
 coverage/
-.reports/
 
 # ── 操作系统 ──
 .DS_Store
 Thumbs.db
-
-# ── 例外:这两个文件是刻意跟踪的,上面的规则不该认领它们 ──
-# 「已跟踪 + 命中忽略规则」这个状态不会让 git 丢掉它们,但会让以后对它们的
-# `git add` 需要 -f,排查起来很费解。所以显式放行。
-!apps/scheduling/.codegraph/.gitignore
-!apps/web/.reports/codemap-diff.txt
