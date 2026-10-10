@@ -1,0 +1,53 @@
+# ── monorepo 根级 .gitignore ─────────────────────────────────────────────────
+# 每个 app 的 .gitignore 跟着它一起住在 apps/<app>/ 下,只管自己的子树。本文件是
+# **仓库范围的安全网**:下面的模式都不带前导斜杠,所以在任意深度生效,包括根上。
+#
+# 为什么需要它:合并时两个仓库的 .gitignore 都随各自的 app 移进了子目录,根上一度
+# 没有任何忽略规则。审计实测过这个失败模式 —— 在那种状态下一次 `git add -A` 会把
+# 留在根上的 .env(含 SITE_INGEST_SECRET / BETTER_AUTH_SECRET / ADMIN_PASSWORD)
+# 和 443 MB 的 .archive/ 永久压进 pack,而 push 之后只能靠 history rewrite + 轮换
+# 密钥补救(而轮换 SITE_INGEST_SECRET 会同时打断官网表单与排课的 /api/site/*)。
+# 所以这些条目在根上重复一遍是刻意的,不要因为"子目录里已经有了"而删掉。
+
+# ── 依赖与构建产物 ──
+node_modules/
+.next/
+.svelte-kit/
+build/
+dist/
+*.tsbuildinfo
+
+# ── 密钥:任何深度的 .env 都不进仓库,只放 .example ──
+.env
+.env.*
+!.env.example
+!.env.e2e.example
+*.pem
+id_rsa
+id_ed25519
+
+# ── 原始素材母版(官网):443 MB 未发布的照片/视频原图,永不提交 ──
+# 它是唯一的母版,仓库里那些是压缩/派生版本。
+.archive/
+
+# ── 本地工具与索引 ──
+.codegraph/
+.claude/worktrees/
+.playwright-mcp/
+
+# ── 测试与审计产物 ──
+test-results/
+playwright-report/
+.lighthouseci/
+coverage/
+.reports/
+
+# ── 操作系统 ──
+.DS_Store
+Thumbs.db
+
+# ── 例外:这两个文件是刻意跟踪的,上面的规则不该认领它们 ──
+# 「已跟踪 + 命中忽略规则」这个状态不会让 git 丢掉它们,但会让以后对它们的
+# `git add` 需要 -f,排查起来很费解。所以显式放行。
+!apps/scheduling/.codegraph/.gitignore
+!apps/web/.reports/codemap-diff.txt
