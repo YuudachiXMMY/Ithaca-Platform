@@ -25,6 +25,18 @@ test.describe('班级工作台 · 排课行内笔记点评', () => {
     const summary = page.getByPlaceholder('今天讲了…')
     await expect(summary).toBeVisible()
     await summary.fill(`E2E排课笔记-${Date.now()}`)
+
+    // 本用例测的是「保存」，不是「发布」。PR#85 起新笔记的「对外开放」默认勾选，而这里打开的是
+    // **section A** 的课节 —— 正是 portal project 默认 storageState(家长 A)能看到的那个班级。
+    // 不取消就会把这条测试笔记真的发给家长,打红 tests/e2e/portal/notes.spec.ts 的空态用例
+    // (project 顺序 auth-flows → public → staff → portal,共用同一个库)。
+    // 这里只挂载一个内联笔记面板(section-lessons.tsx 的 notesOpenId 是单值),所以 locator 唯一。
+    const shareToggle = page.getByRole('checkbox', { name: /对外开放/ })
+    await shareToggle.uncheck()
+    // 取消确实生效才继续 —— 受控组件,若被随后的 setState 覆盖回勾选,这里当场红掉,
+    // 而不是静默把笔记发布出去、再去打红另一个文件里的用例。
+    await expect(shareToggle).not.toBeChecked()
+
     await page.getByRole('button', { name: '保存笔记', exact: true }).click()
     await expect(page.getByText('已保存本节课笔记')).toBeVisible()
 
@@ -55,6 +67,12 @@ test.describe('班级工作台 · 排课行内笔记点评', () => {
     const summary = page.getByPlaceholder('今天讲了…')
     await expect(summary).toBeVisible()
     await summary.fill(`E2E一键保存-${Date.now()}`)
+
+    // 同上:测的是「一次提交三类改动」,不是「发布」。saveAll 的脏检查含 `shared !== init.shared`
+    // 所以 visibility-only 的改动也会落库,取消勾选不会被当成"没改动"而跳过。
+    const shareToggle = page.getByRole('checkbox', { name: /对外开放/ })
+    await shareToggle.uncheck()
+    await expect(shareToggle).not.toBeChecked()
 
     const studentRows = page.getByTestId('lesson-note-student')
     if ((await studentRows.count()) > 0) {

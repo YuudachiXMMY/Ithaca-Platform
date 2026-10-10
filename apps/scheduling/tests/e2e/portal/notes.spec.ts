@@ -12,10 +12,20 @@ test.describe('Portal 课节笔记', () => {
   // 不只是本文件内的顺序问题：
   //   · 本文件内它先于下面的分享流用例执行（串行、声明顺序），其它 portal spec 均不创建笔记;
   //   · 但 playwright.config.ts 的 project 顺序是 auth-flows → public → staff → portal,
-  //     所以 **staff 的任何用例若留下一条 shared 笔记,这里就会红**。PR#85 把新笔记的
-  //     「对外开放」默认翻成勾选后,tests/e2e/dashboard/schedule.spec.ts 里两个只管"保存"
-  //     的用例就无意中发布了笔记,正是这样把本用例打红的 —— 那两处现已显式 uncheck。
-  // 往 staff 新增会保存本节课笔记的用例时,若该用例不是在测"发布",请显式取消勾选。
+  //     所以 **staff 的任何用例若在 section A 上留下一条 shared 笔记,这里就会红**
+  //     (section A 是本 project 默认 storageState —— 家长 A —— 所在的班级)。
+  //
+  // **按规则办,不要按文件清单办**:staff 下任何会保存「本节课笔记」的用例,若它测的不是
+  // "发布",就必须显式 uncheck() 那个「对外开放」勾选框。PR#85 把默认翻成勾选之后,这是一个
+  // 会反复复发的陷阱 —— 它已经咬过两次:
+  //   1. dashboard/schedule.spec.ts 的「保存本节课共享笔记」与「一键保存所有更改」(抽屉路径);
+  //   2. dashboard/teach-notes.spec.ts 的两个用例(班级工作台内联路径,且写死 section A)。
+  // 第 2 条是在修完第 1 条、CI 连绿两次之后才暴露的 —— 因为污染是**间歇性**的:抽屉路径开的是
+  // 日历里时间上第一节课,可能落在 section A 也可能落在 B。所以"修完跑绿了"不等于"修全了"。
+  //
+  // 本用例之所以只能依赖全局空态,是因为 seed 里**没有**「已同意且无共享笔记」的门户账号:
+  // parent/student 都挂在 section A,parentNoConsent 挂 section B 但刻意未同意(专给同意门用例)。
+  // 要彻底摆脱这个脆弱性,得往 seed 加一个 section B 的已同意家长,并让本用例用它。
   // 请经 `npm run test:e2e`（触发 global-setup 重新 seed）运行,而非单独 playwright 起本文件。
   test('家长空态：导航「课节笔记」→ 标题 + 空态文案', async ({ page }) => {
     await page.goto('/portal')
