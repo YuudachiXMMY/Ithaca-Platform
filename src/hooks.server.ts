@@ -1,9 +1,8 @@
 import { sequence } from '@sveltejs/kit/hooks';
-import { redirect, json, type Handle } from '@sveltejs/kit';
+import { redirect, type Handle } from '@sveltejs/kit';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import { getTextDirection } from '$lib/paraglide/runtime';
 import { env } from '$env/dynamic/public';
-import { auth } from '$lib/server/auth';
 import { closeMailTransports } from '$lib/server/mail';
 
 // Release pooled SMTP sockets on shutdown so they don't keep the event loop busy and delay
@@ -58,48 +57,40 @@ const i18n: Handle = ({ event, resolve }) =>
 		});
 	});
 
-// Better Auth: the single source of truth for the admin session. Populate event.locals once
-// per request (fail-closed on errors), then guard /admin/* pages (redirect to login) and
-// /api/admin/* endpoints (401 envelope). Mirrors the Next app's src/proxy.ts guard. The auth
-// catch-all route (/api/auth/[...all]) handles sign-in/out itself — do NOT dispatch here.
-const handleAuth: Handle = async ({ event, resolve }) => {
-	let session: Awaited<ReturnType<typeof auth.api.getSession>>;
-	try {
-		session = await auth.api.getSession({ headers: event.request.headers });
-	} catch (error) {
-		console.error('[auth] getSession failed', error);
-		session = null;
-	}
-	event.locals.user = session?.user ?? null;
-	event.locals.session = session?.session ?? null;
+// Where /admin/* goes now that this app has no admin surface of its own. The console moved to the
+// Course-Scheduling-System (/dashboard/site, super-admin login) and the contacts / subscribers /
+// campaigns / popups data moved with it, so there is nothing here to serve — only operator
+// bookmarks to honour.
+//
+// Hardcoded default rather than env-only: there is exactly one console, its URL is not a secret,
+// and "the deploy forgot the variable" is precisely when an operator most needs the redirect to
+// work. Before the admin routes were deleted, an unset variable fell through to a local (if empty)
+// console; now it would fall through to a 404, which reads as "the site is broken". Overriding via
+// PUBLIC_SITE_ADMIN_URL still works and is what the IthacaServer compose does. Hardcoding the
+// production origin follows existing practice here (see the PUBLIC_SITE_URL ARG default).
+const SITE_ADMIN_URL_FALLBACK = 'https://dashboard.ithacateens.com/dashboard/site';
 
+// Sole remaining job of this handle: bounce /admin/* to that console. It no longer touches
+// sessions — Better Auth and Prisma are gone, and with them the only runtime reason this app
+// needed a database.
+//
+// It lives in a hook rather than a +layout.server.ts because there are no /admin routes left for a
+// layout to hang off, and because a hook runs before route resolution — so the redirect still fires
+// for paths that no longer exist.
+//
+// 302, not 301: a permanent redirect gets cached by browsers and Cloudflare, which we would regret
+// the moment this app grows its own admin surface again.
+//
+// Matches on event.url.pathname, i.e. the real request path, NOT the de-localized one. Consequence:
+// /zh/admin/* is NOT caught here and 404s. That is pre-existing behaviour (it used to render an
+// indexable 200), and the paraglide `/admin/:path(.*)?` urlPattern in vite.config.ts is what keeps
+// such aliases from being generated in the first place — keep it.
+const adminRedirect: Handle = async ({ event, resolve }) => {
 	const { pathname } = event.url;
-
-	// The admin console MOVED to the Course-Scheduling-System (/dashboard/site, super-admin login).
-	// The contacts/subscribers/campaigns/popups data moved with it, so the pages below this point
-	// would render an EMPTY console against tables nothing writes any more — worse than no console,
-	// because it reads as "we lost the data". Send operators to the real one instead.
-	//
-	// Redirect here (not in a +layout.server.ts) because /admin's routing policy already lives in
-	// this hook, and because it must also catch /admin/login — the one path the auth guard exempts.
-	// 302, not 301: a permanent redirect would be cached by browsers and Cloudflare, which we would
-	// regret the moment this app grows its own admin surface again.
-	//
-	// Unset SITE_ADMIN_URL falls through to the old behaviour, so a deploy that forgets the variable
-	// keeps a working (if empty) console rather than bouncing operators into a dead redirect.
 	if (pathname === '/admin' || pathname.startsWith('/admin/')) {
-		const consoleUrl = env.PUBLIC_SITE_ADMIN_URL;
-		if (consoleUrl) redirect(302, consoleUrl);
+		redirect(302, env.PUBLIC_SITE_ADMIN_URL || SITE_ADMIN_URL_FALLBACK);
 	}
-
-	if (pathname.startsWith('/admin') && pathname !== '/admin/login' && !event.locals.user) {
-		redirect(303, `/admin/login?callbackUrl=${encodeURIComponent(pathname)}`);
-	}
-	if (pathname.startsWith('/api/admin') && !event.locals.user) {
-		return json({ success: false, error: 'Unauthorized' }, { status: 401 });
-	}
-
 	return resolve(event);
 };
 
-export const handle = sequence(i18n, handleAuth);
+export const handle = sequence(i18n, adminRedirect);

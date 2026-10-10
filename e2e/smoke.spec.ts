@@ -34,12 +34,18 @@ test.describe('public routes', () => {
 		expect(failures, 'routes that did not return 200').toEqual([]);
 	});
 
-	test('no public route is excluded from indexing, and admin is', async ({ request }) => {
+	test('no public route is excluded from indexing, and admin leaves this origin', async ({
+		request
+	}) => {
 		const home = await (await request.get('/')).text();
 		expect(home).not.toContain('name="robots" content="noindex"');
 
-		const admin = await (await request.get('/admin/login')).text();
-		expect(admin).toContain('noindex');
+		// There is no admin surface here any more: /admin/* 302s to the scheduling app's console
+		// (hooks.server.ts), so there is no local HTML left to mark noindex. maxRedirects:0 keeps
+		// this assertion off the network — the default would chase the redirect to the real host.
+		const admin = await request.get('/admin/login', { maxRedirects: 0 });
+		expect(admin.status()).toBe(302);
+		expect(admin.headers()['location']).toContain('/dashboard/site');
 	});
 
 	// A map rather than a list because the three legacy slugs no longer share one destination:

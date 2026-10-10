@@ -27,8 +27,8 @@ export default defineConfig({
 
 	// NOTE: there is deliberately no `timeout` override here. Raising it was tried and was the
 	// wrong answer: the two tests that blew the 30s default were the only two using
-	// `waitUntil: 'networkidle'`, which on CI never arrives because `DATABASE_URL` is a
-	// placeholder and `/api/popups/active` keeps failing. A bigger budget only made each failure
+	// `waitUntil: 'networkidle'`, which on CI never arrives because `/api/popups/active` keeps
+	// retrying against an unconfigured upstream. A bigger budget only made each failure
 	// cost 3x more and pushed the whole job past ci.yml's `timeout-minutes: 20`. Those two tests
 	// now stub the endpoint instead (see e2e/smoke.spec.ts); every other test has always fit
 	// inside 30s on CI, so the default stays and a genuine hang still fails fast.
@@ -61,12 +61,8 @@ export default defineConfig({
 		timeout: 120_000,
 		env: {
 			PORT: String(PORT),
-			// Placeholders: the public routes are prerendered and never touch the database,
-			// but hooks.server.ts imports $lib/server/auth at module scope, which constructs
-			// the Prisma client and Better Auth. Construction is lazy — no connection is made.
-			DATABASE_URL: 'postgresql://placeholder:placeholder@localhost:5432/placeholder',
-			BETTER_AUTH_SECRET: 'e2e-placeholder-secret',
-			BETTER_AUTH_URL: BASE_URL,
+			// The DATABASE_URL / BETTER_AUTH_* placeholders that used to live here are gone with
+			// Prisma and Better Auth: no module needs env to load any more.
 			// csrf.ts fails closed when ORIGIN is unset, which would 403 every POST.
 			ORIGIN: BASE_URL
 		}

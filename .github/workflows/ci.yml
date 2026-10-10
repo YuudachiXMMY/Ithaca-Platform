@@ -28,13 +28,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
-    env:
-      # `npm run check` (svelte-kit sync) and `npm run build` load the app's modules,
-      # which reach $env/dynamic/private through src/lib/server/*. Placeholders only —
-      # nothing here connects to a real database or signs a real session.
-      DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
-      BETTER_AUTH_SECRET: ci-placeholder-secret-not-used-for-anything
-      BETTER_AUTH_URL: http://localhost:3000
+    # No job-level env any more. The placeholder DATABASE_URL / BETTER_AUTH_* used to be required
+    # because hooks.server.ts imported src/lib/server/auth.ts, which instantiated Better Auth (and
+    # through it PrismaClient) at module load — so `npm run check` and `npm run build` evaluated it
+    # while prerendering and threw without a secret. The app is stateless now: every remaining
+    # $env/dynamic/private consumer reads inside a function, so nothing needs env to merely load.
 
     steps:
       - uses: actions/checkout@v4

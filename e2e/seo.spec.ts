@@ -133,9 +133,15 @@ test.describe('indexing hygiene — R-SEO-4', () => {
 		expect(robots).toContain('Disallow: /admin');
 		expect(robots).toMatch(/Sitemap: https?:\/\/\S+\/sitemap\.xml/);
 
-		const login = await (await request.get('/admin/login')).text();
-		expect(login).toContain('noindex');
-		expect(meta(login, 'og:image')).toBeNull();
+		// /admin/* used to be a local (noindex) login page. The console moved to the scheduling
+		// app, so there is nothing here to index — the hook bounces every /admin path off this
+		// origin before routing. maxRedirects:0 because the default would follow the 302 out to
+		// the real console and assert against someone else's HTML.
+		const login = await request.get('/admin/login', { maxRedirects: 0 });
+		expect(login.status()).toBe(302);
+		const target = login.headers()['location'];
+		expect(target).toMatch(/^https:\/\//);
+		expect(target).toContain('/dashboard/site');
 	});
 
 	test('there is no /dev/* route to exclude', async ({ request }) => {

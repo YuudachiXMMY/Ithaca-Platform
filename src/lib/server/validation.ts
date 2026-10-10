@@ -7,7 +7,8 @@ import type { ApiResponse } from '$lib/types';
 // message rather than throwing), and on failure return the shared 400 envelope
 // { success:false, error } carrying the FIRST issue's message (or the 'Invalid input' fallback).
 // Behavior-preserving extraction — the response shape, status, and first-issue precedence match
-// the inlined blocks in api/{subscribe,contact} and api/admin/{emails,emails/send,subscribers,popups}.
+// the inlined blocks in api/{subscribe,contact}. (It was also shared with the /api/admin/* write
+// endpoints before the admin panel moved to the scheduling app; those callers are gone.)
 
 /**
  * Build the shared Zod-validation 400 response: `{ success:false, error }` with the first issue's

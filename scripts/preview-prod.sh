@@ -47,11 +47,9 @@ fi
 npm run build
 
 echo "preview: serving a fresh build on http://localhost:$PORT"
-# Placeholders only where unset: the public routes are prerendered and never reach the database,
-# but hooks.server.ts constructs Prisma and Better Auth at module scope.
+# ORIGIN is the only env this needs: csrf.ts fails closed without it and would 403 every POST.
+# The DATABASE_URL / BETTER_AUTH_* placeholders are gone along with Prisma and Better Auth —
+# nothing constructs a client at module scope any more.
 PORT="$PORT" \
 	ORIGIN="${ORIGIN:-http://localhost:$PORT}" \
-	DATABASE_URL="${DATABASE_URL:-postgresql://placeholder:placeholder@localhost:5432/placeholder}" \
-	BETTER_AUTH_SECRET="${BETTER_AUTH_SECRET:-local-preview-secret}" \
-	BETTER_AUTH_URL="${BETTER_AUTH_URL:-http://localhost:$PORT}" \
 	exec node build/index.js
