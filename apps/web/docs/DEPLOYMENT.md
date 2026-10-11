@@ -296,10 +296,24 @@ Sources: Cloudflare Cache Rules
 **Rule B — admin/API (Bypass), ordered AFTER Rule A:**
 
 - Match: `starts_with(http.request.uri.path, "/admin") or starts_with(http.request.uri.path, "/api")`
-- Action: **Bypass cache**. These responses also send `Cache-Control: private, no-store` from the app.
+- Action: **Bypass cache.**
 
 > ⚠️ Keep Rule B **last**: for conflicting cache eligibility Cloudflare applies the **last
 > matching rule**, so Bypass must come after Cache Everything or it has no effect.
+
+> ⚠️ **Rule B is not belt-and-braces here — it is the only belt.** This line used to claim "these
+> responses also send `Cache-Control: private, no-store` from the app". That is **false**, and
+> measured against production on 2026-10-11: `/api/popups/active` sends
+> `public, max-age=60, stale-while-revalidate=600` (set deliberately in
+> `src/routes/api/popups/active/+server.ts` — it is on the hot path of every public page and the
+> content is public). So the app header _invites_ caching and Rule B is what keeps the endpoint off
+> the edge. Verified live: `/` returns `Cf-Cache-Status: HIT` while `/api/popups/active` and
+> `/admin` return `DYNAMIC`.
+>
+> Consequence to keep in mind before touching the rules: removing Rule B would make that endpoint
+> edge-cacheable. For this endpoint that is low-harm (public content, and the staleness just stacks
+> on the existing 60s in-process cache) — but do not generalise the old sentence to a future
+> authenticated `/api/*` route and assume the origin is protecting you. It is not.
 
 **Edge TTL + stale-while-revalidate (emulated ISR — adapter-node has no native ISR):** content
 responses emit `Cache-Control: public, max-age=60, stale-while-revalidate=60`; set Rule A Edge TTL to
