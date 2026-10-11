@@ -1,6 +1,7 @@
 import 'server-only'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
+import { RLS_ROLE_OPTIONS } from './rls-role'
 import * as schema from './schema' // barrel (re-exports ../auth-schema too, per R8)
 
 const connectionString = process.env.DATABASE_URL
@@ -32,7 +33,10 @@ if (!connectionString) throw new Error('DATABASE_URL is not set')
 // Ordering: `app_rt` is created by migration 0026, and both docker/entrypoint.sh and dev.sh migrate
 // before anything serves. On a database that has not been migrated, every connection fails with
 // `role "app_rt" does not exist` — loudly, and never fail-open.
-const RLS_ROLE_OPTIONS = '-c role=app_rt'
+//
+// The option string itself lives in ./rls-role.ts because /api/health's probe must assume the same
+// role on its own isolated connection, and must do so without importing this module (which would
+// construct the pool). See that file for why the two cannot be allowed to drift apart.
 
 // Cache across Next HMR or every save leaks a new pool until Postgres refuses connections.
 const g = globalThis as unknown as { __pgClient?: ReturnType<typeof postgres> }

@@ -60,6 +60,29 @@ Consequences, all intended:
   `src/lib`, `src/mcp` or `src/components` imports it.
 - On an unmigrated database every connection fails with `role "app_rt" does not exist` — loudly, and
   never fail-open. Both `docker/entrypoint.sh` and `dev.sh` migrate before anything serves.
+- `/api/health`'s probe assumes the same role, from the shared `src/db/rls-role.ts` constant. It
+  keeps its own isolated connection (never the app pool — see the probe's comment) but **not** its
+  own identity. Added after this decision shipped: the probe had been left connecting as the
+  superuser `DATABASE_URL` names, so "the loud failure" above was loud only to real traffic. The
+  orchestrator's own health signal stayed green while every request died at connect time, which
+  turned a fail-closed design back into a fail-open deployment.
+- That probe reads a **table** (`select 1 from "organization" limit 0`), not a bare `select 1`,
+  because §1 (create the role) and §2 (grant it table access) of migration `0026` are separate steps
+  and therefore separate failure modes — a migration that aborts between them leaves a role that
+  exists and can read nothing. `select 1` touches no relation, so it needs no GRANT and succeeds in
+  exactly that state: assuming the role is not sufficient to detect it. `limit 0` still runs the
+  privilege check, since PostgreSQL checks table ACLs at executor start, before the first tuple is
+  fetched. Verified on Postgres 17: with `SELECT` revoked from `app_rt`, the table probe fails with
+  `permission denied for table organization` while a bare `select 1` still returns 1.
+  `organization` is chosen as the tenant root (`tenant_id` IS the Better Auth `organizationId`) and
+  because it carries no `tenant_id` column and thus no policy, so the probe's verdict never depends
+  on `app.tenant_id` being set. An RLS-governed table would add nothing: with the GUC unset the
+  policy evaluates to NULL and rows are filtered **silently**, never raising.
+- `tests/health-route.test.ts` asserts both halves — that the role option is passed, and that the
+  probe query reads a relation. `scripts/check-tenant-db-access.ts` gained a third rule for the same
+  reason — any `postgres(...)` built under `src/` must reference `RLS_ROLE_OPTIONS`, so the next
+  self-built connection cannot repeat the omission. Sharing one constant stops two call sites from
+  drifting apart; it cannot stop a third from never opting in.
 
 ### The policy, and why it fails closed
 

@@ -283,6 +283,49 @@ export function findAdminDbImports(root: string = process.cwd()): string[] {
   return hits.sort()
 }
 
+// 0026/RLS — the THIRD thing this guard mechanically prevents, added by orch-review A2.
+//
+// Rules 1 and 2 both assume the connection is already RLS-constrained; neither notices a connection
+// that is not. Runtime code that calls `postgres(...)` itself must pass `RLS_ROLE_OPTIONS`
+// (src/db/rls-role.ts), or it connects as the superuser `DATABASE_URL` names — BYPASSRLS, ignoring
+// every policy — which is the same hole as rule 2 arriving by a different door.
+//
+// This rule exists because that is not hypothetical: `/api/health` built its own connection and was
+// simply never updated when 0026 dropped the runtime to `app_rt`, so it probed as the superuser for
+// several commits with nothing to catch it. Sharing one constant (the fix in that commit) stops two
+// call sites from DRIFTING apart; it cannot stop a third call site from never opting in. Only a
+// mechanical check can, and the cost of forgetting is a silent RLS bypass.
+//
+// Matched on stripped source, like rule 1 — `postgres(` is code, and the `'postgres'` import
+// specifier is a string literal that stripping blanks, so the import alone never trips this.
+const RAW_PG_CLIENT = /\bpostgres\s*\(/
+const RLS_ROLE_REFERENCE = /\bRLS_ROLE_OPTIONS\b/
+
+export function buildsBarePgClient(src: string): boolean {
+  const stripped = stripCommentsAndStrings(src)
+  return RAW_PG_CLIENT.test(stripped) && !RLS_ROLE_REFERENCE.test(stripped)
+}
+
+// The one legitimate exemption, and the reason it is legitimate: `src/db/admin.ts` is DELIBERATELY
+// the superuser client (rule 2 above is what keeps app code from importing it). Adding anything else
+// here means claiming a runtime connection should bypass RLS — say why, in the same line.
+const BARE_PG_CLIENT_ALLOWLIST: readonly string[] = [
+  'src/db/admin.ts', // the deliberate RLS-BYPASSING client; rule 2 confines it to scripts/ + tests/
+]
+
+export function findBarePgClients(root: string = process.cwd()): string[] {
+  const allow = new Set<string>(BARE_PG_CLIENT_ALLOWLIST)
+  const srcRoot = join(root, 'src')
+  if (!existsSync(srcRoot)) return []
+  const hits: string[] = []
+  for (const abs of walk(srcRoot)) {
+    const rel = relative(root, abs).split(sep).join('/')
+    if (allow.has(rel)) continue
+    if (buildsBarePgClient(readFileSync(abs, 'utf8'))) hits.push(rel)
+  }
+  return hits.sort()
+}
+
 function walk(dir: string): string[] {
   const out: string[] = []
   for (const name of readdirSync(dir)) {
@@ -316,7 +359,11 @@ function main(): void {
   const root = process.cwd()
   // Fail loudly if the allowlist rots (a listed file was moved/renamed) — a stale entry silently weakens
   // the guard by allowlisting nothing while looking intentional.
-  const stale = ALLOWLIST.filter((f) => !existsSync(join(root, f)))
+  // Both allowlists, for the same reason: an entry naming a file that is gone exempts nothing while
+  // still reading as an audited decision.
+  const stale = [...ALLOWLIST, ...BARE_PG_CLIENT_ALLOWLIST].filter(
+    (f) => !existsSync(join(root, f)),
+  )
   if (stale.length > 0) {
     console.error('[check-tenant-db-access] ALLOWLIST entries no longer exist (update the list):')
     for (const f of stale) console.error(`  - ${f}`)
@@ -354,8 +401,26 @@ function main(): void {
     process.exit(1)
   }
 
+  // Third rule (0026/RLS, orch-review A2): runtime code that opens its own connection must assume
+  // `app_rt`, or it silently connects as the BYPASSRLS superuser.
+  const barePgClients = findBarePgClients(root)
+  if (barePgClients.length > 0) {
+    console.error(
+      '[check-tenant-db-access] `postgres(...)` built WITHOUT RLS_ROLE_OPTIONS (connects as the superuser):',
+    )
+    for (const f of barePgClients) console.error(`  - ${f}`)
+    console.error(
+      '\nA connection opened without `-c role=app_rt` runs as the `DATABASE_URL` superuser, which has\n' +
+        'BYPASSRLS and therefore ignores every Row Level Security policy — the database-level backstop is\n' +
+        'simply absent on that connection. Pass `connection: { options: RLS_ROLE_OPTIONS }` (import it from\n' +
+        '`@/db/rls-role`), or use `@/db` and go through `forTenant(ctx)`. This is exactly how /api/health\n' +
+        'came to probe as the superuser for several commits. See docs/adr/0003-tenant-isolation-rls-enabled.md.',
+    )
+    process.exit(1)
+  }
+
   console.log(
-    '[check-tenant-db-access] OK — no raw tenant db access outside the allowlist, and no admin-client imports in app code',
+    '[check-tenant-db-access] OK — no raw tenant db access outside the allowlist, no admin-client imports in app code, and every runtime connection assumes app_rt',
   )
   process.exit(0)
 }

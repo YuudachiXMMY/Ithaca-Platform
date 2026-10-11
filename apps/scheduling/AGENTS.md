@@ -25,11 +25,16 @@ const rows = await db.select().from(classSection)
 current_setting('app.tenant_id', true))` 在 GUC 未设时求值为 NULL，**失败即关门**。
 
 但**不要因此松懈**：失败是无声的（空结果，不报错），而且它只在 app 代码里成立 ——
-`scripts/` 与 `tests/` 用的是 `@/db/admin`（超级用户，绕过全部策略）。所以 CI 里的两道机械守卫
+`scripts/` 与 `tests/` 用的是 `@/db/admin`（超级用户，绕过全部策略）。所以 CI 里的三道机械守卫
 都还在，`scripts/check-tenant-db-access.ts`：
 
 1. allowlist 外的文件碰裸 `db` 的 `select/insert/update/delete` → 红；
-2. `src/app` `src/auth` `src/lib` `src/mcp` `src/components` 里 import `@/db/admin` → 红。
+2. `src/app` `src/auth` `src/lib` `src/mcp` `src/components` 里 import `@/db/admin` → 红；
+3. `src/` 下调 `postgres(...)` 自建连接却不带 `RLS_ROLE_OPTIONS` → 红。
+
+第 3 条管的是前两条都管不到的那一层：它们都**假定**连接已经受 RLS 约束，而一条自己建出来、
+没带 `-c role=app_rt` 的连接压根不受约束。`/api/health` 就这么以超级用户探测了好几个提交 ——
+共享一个常量只能防止两处**漂移**，防不住第三处从来没加入。
 
 **它拦住你的时候，正确反应是改用 `forTenant`，不是往 allowlist 里加一行。** 真要加，必须在
 那一行旁边写明**为什么 `forTenant` 不适用**。
