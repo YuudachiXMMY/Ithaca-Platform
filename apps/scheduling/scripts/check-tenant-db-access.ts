@@ -95,8 +95,12 @@ const regexAllowed = (prev: string | undefined): boolean =>
 // correct `}` rather than the first one.
 // LIMITATION (documented, not silently assumed): this catches the literal identifier `db.` only. It does
 // NOT follow aliasing (`import { db as x }`, `const y = db`) — those remain possible bypasses. This guard
-// is a transitional mechanical backstop for the COMMON mistake (`db.select().from(tenantTable)`);
-// Postgres RLS (ADR 0001) is the complete control.
+// is a mechanical backstop for the COMMON mistake (`db.select().from(tenantTable)`), caught at review
+// time. Postgres RLS — deferred when this guard was written, ENABLED by migration 0026
+// (docs/adr/0003-tenant-isolation-rls-enabled.md) — is the control that does not depend on matching
+// source text at all: under the `app_rt` runtime role an unscoped query on a tenant table reads 0
+// rows, aliasing or not. The two are kept together because they fail at different times: this one
+// before merge, RLS at execution.
 export function stripCommentsAndStrings(src: string): string {
   let out = ''
   let mode: 'code' | 'line' | 'block' | 'sq' | 'dq' | 'tpl' | 'regex' = 'code'
@@ -237,6 +241,48 @@ export function hasRawTenantDbAccess(src: string): boolean {
   return RAW_DB_CALL.test(stripped) || RAW_DB_QUERY.test(stripped)
 }
 
+// 0026/RLS — the second thing this guard now mechanically prevents.
+//
+// `src/db/admin.ts` is the deliberately RLS-BYPASSING client (it connects as the DATABASE_URL
+// superuser instead of assuming `app_rt`), and it exists only for `scripts/` and `tests/`, which act
+// legitimately across tenants. Importing it from application code is strictly WORSE than a raw
+// `db.select()`: that at least still runs under the policies and reads 0 rows when unscoped, whereas
+// this removes the database-level backstop entirely — silently, because the query simply succeeds
+// and returns more rows than it should.
+//
+// Matched on the import SPECIFIER, not on usage: there is no safe way to use this module from app
+// code, so the import itself is the defect. `@/db/admin` and relative spellings (`./admin`,
+// `../db/admin`) are both covered.
+//
+// Deliberately does NOT run on comment-stripped source, unlike hasRawTenantDbAccess above. Stripping
+// cannot help here — the specifier IS a string literal, so `stripCommentsAndStrings` would blank the
+// very thing being matched — and a hand-rolled comments-only stripper would have to model regex
+// literals correctly or risk swallowing real code, i.e. risk a FALSE NEGATIVE. For a guard that is
+// the wrong direction to be wrong in: a comment that merely mentions the specifier tripping this
+// check is a harmless annoyance, a missed real import is a silent hole. So: false positives accepted.
+const ADMIN_DB_IMPORT =
+  /\b(?:from|require\s*\(|import\s*\()\s*['"](?:@\/db\/admin|\.{1,2}(?:\/[\w.-]+)*\/admin)['"]/
+
+export function importsAdminDb(src: string): boolean {
+  return ADMIN_DB_IMPORT.test(src)
+}
+
+// The application surface this second rule covers. `src/db/` is excluded: `admin.ts` is the module
+// being guarded and `index.ts` is its RLS-constrained counterpart, and neither imports the other.
+const APP_DIRS = ['src/app/', 'src/auth/', 'src/lib/', 'src/mcp/', 'src/components/'] as const
+
+export function findAdminDbImports(root: string = process.cwd()): string[] {
+  const srcRoot = join(root, 'src')
+  if (!existsSync(srcRoot)) return []
+  const hits: string[] = []
+  for (const abs of walk(srcRoot)) {
+    const rel = relative(root, abs).split(sep).join('/')
+    if (!APP_DIRS.some((d) => rel.startsWith(d))) continue
+    if (importsAdminDb(readFileSync(abs, 'utf8'))) hits.push(rel)
+  }
+  return hits.sort()
+}
+
 function walk(dir: string): string[] {
   const out: string[] = []
   for (const name of readdirSync(dir)) {
@@ -286,11 +332,31 @@ function main(): void {
       '\nTenant-scoped reads/writes MUST go through `forTenant(ctx)` (src/db/tenant.ts) so tenant_id can never\n' +
         'be forgotten. If this access is genuinely tenant-safe (a non-tenant/auth table, or a reviewed\n' +
         'forTenant exception with an EXPLICIT tenantId), add the file to ALLOWLIST in this script WITH a\n' +
-        'one-line justification. See docs/adr/0001-tenant-isolation-rls.md (H5).',
+        'one-line justification. See docs/adr/0003-tenant-isolation-rls-enabled.md (originally H5).',
     )
     process.exit(1)
   }
-  console.log('[check-tenant-db-access] OK — no raw tenant db access outside the allowlist')
+
+  // Second rule (0026/RLS): application code must never import the RLS-bypassing admin client.
+  const adminImports = findAdminDbImports(root)
+  if (adminImports.length > 0) {
+    console.error(
+      '[check-tenant-db-access] application code imports the RLS-BYPASSING client `src/db/admin.ts`:',
+    )
+    for (const f of adminImports) console.error(`  - ${f}`)
+    console.error(
+      '\n`src/db/admin.ts` connects as the DATABASE_URL superuser and therefore ignores every Row Level\n' +
+        'Security policy. It exists ONLY for `scripts/` (migrator, seeds, cross-tenant cleanups, purge) and\n' +
+        '`tests/` (fixture setup, which must create a SECOND tenant to prove the two stay apart).\n' +
+        'Application code must import `@/db` and go through `forTenant(ctx)`. See\n' +
+        'docs/adr/0003-tenant-isolation-rls-enabled.md.',
+    )
+    process.exit(1)
+  }
+
+  console.log(
+    '[check-tenant-db-access] OK — no raw tenant db access outside the allowlist, and no admin-client imports in app code',
+  )
   process.exit(0)
 }
 
