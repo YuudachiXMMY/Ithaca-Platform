@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   ALLOWLIST,
+  buildsBarePgClient,
+  findBarePgClients,
   findViolations,
   hasRawTenantDbAccess,
   stripCommentsAndStrings,
@@ -102,5 +104,47 @@ describe('findViolations (current tree)', () => {
   it('every allowlist entry still exists', () => {
     // A stale allowlist entry silently weakens the guard; keep it honest.
     expect(ALLOWLIST.length).toBeGreaterThan(0)
+  })
+})
+
+// A2 — the third rule. Rules 1 and 2 both assume the connection is already RLS-constrained; this one
+// is about the connection itself. A `postgres(...)` built without `-c role=app_rt` runs as the
+// DATABASE_URL superuser (BYPASSRLS), so RLS is simply absent on it — which is how /api/health came
+// to probe as the superuser for several commits.
+describe('buildsBarePgClient', () => {
+  it('flags a self-built client with no role option', () => {
+    expect(buildsBarePgClient('const probe = postgres(url, { max: 1 })')).toBe(true)
+  })
+
+  it('does NOT flag a client that passes RLS_ROLE_OPTIONS', () => {
+    expect(
+      buildsBarePgClient(
+        "import { RLS_ROLE_OPTIONS } from '@/db/rls-role'\n" +
+          'const probe = postgres(url, { connection: { options: RLS_ROLE_OPTIONS } })',
+      ),
+    ).toBe(false)
+  })
+
+  it('does NOT flag merely importing the driver (the specifier is a string, not a call)', () => {
+    expect(buildsBarePgClient("import postgres from 'postgres'")).toBe(false)
+    expect(buildsBarePgClient("const pg = require('postgres')")).toBe(false)
+  })
+
+  it('does NOT flag the pattern inside a comment', () => {
+    expect(buildsBarePgClient('// never call postgres(url) without the role option')).toBe(false)
+  })
+
+  it('flags a client whose role option is only MENTIONED in a comment', () => {
+    // Stripping runs first, so a comment cannot vouch for code that does not pass the option —
+    // otherwise the guard would be satisfied by a promise instead of by the connection.
+    expect(buildsBarePgClient('// RLS_ROLE_OPTIONS\nconst p = postgres(url, { max: 1 })')).toBe(
+      true,
+    )
+  })
+})
+
+describe('findBarePgClients (current tree)', () => {
+  it('is clean — every runtime connection under src/ assumes app_rt', () => {
+    expect(findBarePgClients()).toEqual([])
   })
 })

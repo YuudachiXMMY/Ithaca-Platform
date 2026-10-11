@@ -57,8 +57,10 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
  │
  └─ api/
      ├─ auth/[...all]     Better Auth handler
-     ├─ health            {"ok":true}；探针自建连接但**同样降为 `app_rt`**，否则 app_rt 缺失时
-     │                    它仍返回绿、编排器继续打流量（见 ADR 0003 的 consequences）
+     ├─ health            {"ok":true}；探针自建连接但**同样降为 `app_rt`**，且**读一张真表**
+     │                    （`select 1 from "organization" limit 0`）—— 角色缺失和授权掉了是
+     │                    0026 的两个独立失败模式，裸 `select 1` 不碰任何表、不需要授权，
+     │                    在后者下仍返回绿（见 ADR 0003 的 consequences）
      ├─ [transport]       MCP Streamable HTTP（静态 bearer，恒定时间比对）
      ├─ cron/reminders    课前 24h / 1h 提醒派发（CRON_SECRET 把门，外部调度器 curl）
      ├─ calendar/[token]              iCal feed（学生）
@@ -129,7 +131,8 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
 
 1. **运行时不是超级用户。** `src/db/index.ts` 建连时带 `-c role=app_rt` 降为受约束角色（选项字符串
    在 `src/db/rls-role.ts`，`/api/health` 的探针共用同一个常量 —— **任何**自建连接的运行时代码
-   都要带上它，否则就是一条绕过 RLS 的裸连接）。
+   都要带上它，否则就是一条绕过 RLS 的裸连接。这条现在由
+   `scripts/check-tenant-db-access.ts` 的第三条规则机械保证，不靠人记得）。
    `DATABASE_URL` 里的 `app` 是超级用户且有 BYPASSRLS，**会忽略策略，连 `FORCE ROW LEVEL
    SECURITY` 都拦不住** —— ADR 0001 漏了这一层，照它写会得到一个装好了却一行都没拦的 RLS。
 2. **GUC 未设时求值为 NULL ⇒ 读 0 行、写被拒。** 失败即关门，但**无声**。
@@ -188,7 +191,7 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
 
 | 脚本 | 用途 |
 |---|---|
-| `check-tenant-db-access.ts` | **CI 守卫**，两条规则：① allowlist 外的文件碰裸 `db` CRUD 就红；② app 代码 import 绕过 RLS 的 `@/db/admin` 就红 |
+| `check-tenant-db-access.ts` | **CI 守卫**，三条规则：① allowlist 外的文件碰裸 `db` CRUD 就红；② app 代码 import 绕过 RLS 的 `@/db/admin` 就红；③ `src/` 里 `postgres(...)` 不带 `RLS_ROLE_OPTIONS` 就红（前两条都假定连接已受 RLS 约束，第三条才管连接本身） |
 | `migrate.ts` | 迁移执行器（幂等 + advisory lock；非零退出就绝不服务半迁移的 schema） |
 | `cleanup-orphan-tenants.ts` | 0016 加 `tenant_id` 外键前必须先跑，否则容器 crash-loop |
 | `cleanup-room-overlaps.ts` | 0015 加 EXCLUDE 约束前必须先跑；`--fix` 会**取消重叠课节中较晚的那一节** |

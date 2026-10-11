@@ -1,3 +1,11 @@
+// A4 (orch-review LOW): `server-only` like every other module in src/db/ (the lone exception in the
+// codebase is src/auth/roles.ts, which is deliberately client-importable). The string below is not a
+// secret — it is in CLAUDE.md and the ADR — but only code that opens a connection has any use for
+// it, and that is server code by definition. Keeping the poison pill uniform means an accidental
+// import from a Client Component fails at build time rather than succeeding and looking
+// intentional. (Tests alias `server-only` to tests/server-only-stub.ts, see vitest.config.ts.)
+import 'server-only'
+
 // The StartupMessage option that drops a connection into the RLS-constrained `app_rt` role
 // (migration 0026, docs/adr/0003-tenant-isolation-rls-enabled.md).
 //
