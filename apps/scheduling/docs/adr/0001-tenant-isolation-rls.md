@@ -49,3 +49,40 @@ Rationale:
 
 At that point, implement RLS keyed off `current_setting('app.tenant_id')` set per request
 via `SET LOCAL`, and supersede this ADR.
+
+---
+
+## Amendment — 2026-10-10 (documentation audit)
+
+Two things changed since this ADR was accepted. Neither reverses the decision; both bear on it.
+
+**1. A mechanical guard now backs Guardrail 1.** When this ADR was written, "all tenant-scoped
+access MUST go through `forTenant(ctx)`" was enforced by discipline plus
+`tests/tenant-isolation.test.ts`. But that suite is a *behavioural* regression test: it cannot
+catch a **new** bypass route that no test exercises, which is precisely the risk stated in
+Context. `scripts/check-tenant-db-access.ts` (production-audit finding H5) closes that gap — it
+fails CI if any file outside a small, audited allowlist reaches for the raw `db` handle's
+`select`/`insert`/`update`/`delete`. Scope is deliberately narrow: raw `db.*` CRUD only, **not**
+`db.transaction` (the atomic-tx pattern that then scopes work via `forTenant(ctx, tx)`) and
+**not** `tx.*`. Adding an allowlist entry is a conscious security decision and must state why
+`forTenant` does not apply.
+
+**2. The first "Revisit when" trigger has plausibly already fired.** The rationale for deferring
+rested on this being "a skeleton with no production data yet". That is no longer the situation:
+26 migrations have shipped, the parent/student portal is live, an MCP connector can write
+lessons, and this app is now the system of record for the public website's enquiries and
+subscribers (`src/db/schema/site.ts`, migration `0025`).
+
+> **This amendment deliberately does not supersede the ADR** — whether to take on the
+> connection-layer refactor that correct RLS requires is an architecture decision for the owner,
+> not something a documentation pass should make. It is recorded here so the next reader does not
+> mistake "Accepted (Phase 1)" for "still unexamined", and so the decision is made on purpose
+> rather than by default.
+
+**One scope note for completeness.** Guardrail 2 lists the auth/session tables as the documented
+exception. There is now a **second** category: the five platform-global website-operations tables
+in `src/db/schema/site.ts`. They carry **no `tenant_id`** by design — there is only one website,
+so sharding its enquiries by organization would be meaningless — and are gated instead by
+`ctx.isPlatformAdmin` (the `/dashboard/site` console) and `SITE_INGEST_SECRET` (the
+`/api/site/*` endpoints). They are therefore out of `forTenant`'s scope rather than an evasion of
+it, and their modules are allowlisted in the guard above.
