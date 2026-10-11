@@ -1,6 +1,17 @@
 # ADR 0001 — Tenant isolation: application-layer enforcement (RLS deferred)
 
-**Status:** Accepted (Phase 1)
+**Status:** ⛔ SUPERSEDED (2026-10-11) by [0003 — PostgreSQL RLS enabled](0003-tenant-isolation-rls-enabled.md)
+
+> **Do not follow this document's recipe.** RLS is now ENABLED (`drizzle/0026_tenant_rls.sql`).
+> Beyond being out of date, the Decision section below is **wrong in a way that would produce a
+> silently inert installation**: it says `FORCE ROW LEVEL SECURITY` suffices because the app
+> connects as the table owner, but `app` is a SUPERUSER with BYPASSRLS, and such a role ignores
+> policies even with FORCE. See 0003 for what actually works and for the measurements.
+>
+> Retained unedited below for provenance — the guardrails it established are the reason the
+> migration to RLS was a backstop addition rather than a rewrite.
+
+**Original status:** Accepted (Phase 1)
 **Date:** 2026-09-12
 **Related review finding:** PR #1 / M1
 
@@ -73,11 +84,12 @@ rested on this being "a skeleton with no production data yet". That is no longer
 lessons, and this app is now the system of record for the public website's enquiries and
 subscribers (`src/db/schema/site.ts`, migration `0025`).
 
-> **This amendment deliberately does not supersede the ADR** — whether to take on the
-> connection-layer refactor that correct RLS requires is an architecture decision for the owner,
-> not something a documentation pass should make. It is recorded here so the next reader does not
-> mistake "Accepted (Phase 1)" for "still unexamined", and so the decision is made on purpose
-> rather than by default.
+> **Resolved on 2026-10-11.** This amendment originally declined to supersede the ADR, on the
+> grounds that taking on the connection-layer refactor was the owner's architecture decision rather
+> than a documentation pass's. The owner then made it: RLS is enabled by `drizzle/0026_tenant_rls.sql`
+> and this ADR is superseded by
+> [0003](0003-tenant-isolation-rls-enabled.md). The paragraph is kept because the reasoning —
+> "make the decision on purpose rather than by default" — is what prompted the decision.
 
 **One scope note for completeness.** Guardrail 2 lists the auth/session tables as the documented
 exception. There is now a **second** category: the five platform-global website-operations tables

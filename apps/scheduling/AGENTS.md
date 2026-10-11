@@ -2,7 +2,8 @@
 
 # 课程排课系统 —— 动手前必读
 
-多租户 SaaS。**租户隔离没有数据库层兜底**，全靠一条代码路径。这是你在这个 app 里要记住的
+多租户 SaaS。租户隔离是**两层**：应用层的 `forTenant(ctx)` 加数据库层的 Postgres RLS
+（迁移 `0026`，`docs/adr/0003-tenant-isolation-rls-enabled.md`）。这是你在这个 app 里要记住的
 第一件事，也是唯一一件会造成真实数据泄露的事。
 
 ## 铁律一：`forTenant(ctx)` 是碰租户数据的唯一一条路
@@ -19,13 +20,27 @@ const rows = await db.select().from(classSection)
 `tenantId = ctx.tenantId`；写入时**强制注入** `tenantId`；update/delete 把 `tenantId` 和 `id`
 从传入的 values 里剥掉，所以一次写入永远不可能把行搬去别的租户或改写它的 id。
 
-**Postgres RLS 被延后了**（`docs/adr/0001-tenant-isolation-rls.md`），所以这层纪律是**唯一**的
-防线。`tests/tenant-isolation.test.ts` 是行为回归测试，它抓不住一条没人测过的**新**绕行路径 ——
-所以 CI 里还有 `scripts/check-tenant-db-access.ts`：任何不在 allowlist 里的文件碰裸 `db` 的
-`select/insert/update/delete` 就让 CI 红。
+底下还有一层：运行时以受 RLS 约束的 `app_rt` 角色连接（建连时由 `-c role=app_rt` 切换），
+所以上面那句 `db.select()` 实际会读到 **0 行**而不是别人的数据 —— 策略 `USING (tenant_id =
+current_setting('app.tenant_id', true))` 在 GUC 未设时求值为 NULL，**失败即关门**。
+
+但**不要因此松懈**：失败是无声的（空结果，不报错），而且它只在 app 代码里成立 ——
+`scripts/` 与 `tests/` 用的是 `@/db/admin`（超级用户，绕过全部策略）。所以 CI 里的两道机械守卫
+都还在，`scripts/check-tenant-db-access.ts`：
+
+1. allowlist 外的文件碰裸 `db` 的 `select/insert/update/delete` → 红；
+2. `src/app` `src/auth` `src/lib` `src/mcp` `src/components` 里 import `@/db/admin` → 红。
 
 **它拦住你的时候，正确反应是改用 `forTenant`，不是往 allowlist 里加一行。** 真要加，必须在
 那一行旁边写明**为什么 `forTenant` 不适用**。
+
+确实有 `forTenant` 表达不了的合法场景（按 token 的公开读取、按行盖 `tenant_id` 的批量写入）——
+那些用 `withTenantScope(tenantId, fn)`，它开一个事务并把作用域设成你指定的那**一个**租户。
+它不给任何额外权限，也**不是**跨租户读取的途径。
+
+⚠️ **`SET LOCAL` 在事务外是静默空操作。** Postgres 接受它、告警、然后丢弃。任何新的作用域
+设置路径都必须在事务里，否则后续查询静默读到 0 行 —— 这个坑在实现时真的踩到了，见
+`src/db/tenant.ts` 里 `callerOwnsTx` 那段注释。
 
 例外只有一类，并且已经写在代码里：`src/db/schema/site.ts` 的五张官网运营表是**平台全局**的
 （只有一个官网，给市场站的询盘按机构分片没有意义），它们**没有 `tenant_id` 列**。它们的门是

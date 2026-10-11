@@ -74,15 +74,16 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
 | 路径 | 职责 |
 |---|---|
 | `src/auth` | **鉴权脊梁**，15 个模块，见下表 |
-| `src/db/tenant.ts` | `forTenant(ctx, exec?)` —— 碰租户数据的唯一一条路 |
+| `src/db/tenant.ts` | `forTenant(ctx, exec?)` —— 碰租户数据的正道；`withTenantScope(tenantId, fn)` —— 给 token 公开读取 / 批量写入这类合法例外用的显式作用域 |
+| `src/db/admin.ts` | ⚠️ **绕过 RLS** 的超级用户客户端。只给 `scripts/` 与 `tests/`，app 代码 import 它会让 CI 红 |
 | `src/db/schema/` | 21 个 schema 模块（见下） |
 | `src/db/auth-schema.ts` | Better Auth **生成**的表（`user`/`session`/`organization`/`member`/…）。改它请跑 `npm run auth:generate`，不要手改 |
 | `src/lib/*` | 业务核心逻辑，一律是可单测的纯函数 / core 函数（见下） |
 | `src/lib/site/` | 官网控制台与写入端点的后端：`ingest-auth` `ingest-core` `admin-core` `campaigns-core` `recipients` `popup-active` `csv` `schemas` `authz` … |
 | `src/mcp/` | `register-tools.ts`（8 个 MCP 工具）+ `message.ts` |
 | `scripts/` | 运维与守卫脚本（见下） |
-| `drizzle/` | 26 个**单向**迁移 + `meta/` |
-| `tests/` | 96 个 vitest 单测 + `tests/e2e/` 的 Playwright 套件 |
+| `drizzle/` | 27 个**单向**迁移 + `meta/`。`0026` 是 RLS 那一笔 |
+| `tests/` | 97 个 vitest 单测 + `tests/e2e/` 的 Playwright 套件 |
 | `docker/entrypoint.sh` | 容器启动序列（见「Docker」） |
 | `.claude/PRPs`、`.claude/reviews` | PRD / plan / report / 安全审计 —— **历史记录**，与代码冲突时代码赢 |
 
@@ -113,8 +114,27 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
 
 辅助：`_helpers`（`primaryId`/`createdAt`/`updatedAt`）、`enums`、`relations`、`index`。
 
-**特例 `site.ts`** —— 官网运营的 5 张表，**平台全局、没有 `tenant_id`**，`forTenant()` 不适用。
-碰它们的模块必须登记进 `scripts/check-tenant-db-access.ts` 的 ALLOWLIST。详见 `AGENTS.md`。
+**特例 `site.ts`** —— 官网运营的 5 张表，**平台全局、没有 `tenant_id`**，`forTenant()` 不适用，
+也**不启用 RLS**。碰它们的模块必须登记进 `scripts/check-tenant-db-access.ts` 的 ALLOWLIST。
+
+### RLS（迁移 `0026`，`docs/adr/0003-tenant-isolation-rls-enabled.md`）
+
+20 张带 `tenant_id` 的表都启用了 Row Level Security，策略是
+`tenant_id = current_setting('app.tenant_id', true)`（`USING` + `WITH CHECK` 都有 —— 只有
+`USING` 的话插入仍能把行塞进别的租户）。
+
+三个必须知道的点：
+
+1. **运行时不是超级用户。** `src/db/index.ts` 建连时带 `-c role=app_rt` 降为受约束角色。
+   `DATABASE_URL` 里的 `app` 是超级用户且有 BYPASSRLS，**会忽略策略，连 `FORCE ROW LEVEL
+   SECURITY` 都拦不住** —— ADR 0001 漏了这一层，照它写会得到一个装好了却一行都没拦的 RLS。
+2. **GUC 未设时求值为 NULL ⇒ 读 0 行、写被拒。** 失败即关门，但**无声**。
+3. **`scripts/` 与 `tests/` 走 `@/db/admin`**（超级用户，绕过策略）—— 迁移、跨租户清理、租户
+   purge、以及"建第二个租户来证明两者隔离"的 fixture，都必须能跨租户。
+
+`token_lookup` 是一条刻意的例外：`share_link` / `section_share_link` / `calendar_feed` 额外有
+一条**仅 SELECT** 的宽松策略，因为按 token 查必须先于知道租户。代价与完整修法见 ADR 0003
+的「Residual risks」。
 
 ### `src/lib` 的业务核心
 
@@ -151,7 +171,7 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
 | `npm run build` | Next 16 Turbopack → `.next/standalone/server.js` |
 | `npm run check` | `typecheck` + `lint`（提交前至少跑这个） |
 | `npm run typecheck` / `lint` / `format` | `tsc --noEmit` / `eslint .` / `prettier --write .` |
-| `npm test` | vitest，96 个文件。**需要一个跑着的 Postgres** |
+| `npm test` | vitest，97 个文件。**需要一个跑着的 Postgres** |
 | `npm run test:e2e` / `:ui` / `:headed` / `:report` | Playwright，需要跑着的 app + 迁移过的库 |
 | `npm run db:generate` | drizzle-kit 生成迁移 SQL |
 | `npm run db:migrate` | 应用迁移（advisory lock 保护） |
@@ -164,7 +184,7 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
 
 | 脚本 | 用途 |
 |---|---|
-| `check-tenant-db-access.ts` | **CI 守卫**：allowlist 外的文件碰裸 `db` CRUD 就红 |
+| `check-tenant-db-access.ts` | **CI 守卫**，两条规则：① allowlist 外的文件碰裸 `db` CRUD 就红；② app 代码 import 绕过 RLS 的 `@/db/admin` 就红 |
 | `migrate.ts` | 迁移执行器（幂等 + advisory lock；非零退出就绝不服务半迁移的 schema） |
 | `cleanup-orphan-tenants.ts` | 0016 加 `tenant_id` 外键前必须先跑，否则容器 crash-loop |
 | `cleanup-room-overlaps.ts` | 0015 加 EXCLUDE 约束前必须先跑；`--fix` 会**取消重叠课节中较晚的那一节** |
