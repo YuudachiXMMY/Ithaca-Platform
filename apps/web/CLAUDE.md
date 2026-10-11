@@ -1,293 +1,199 @@
 @AGENTS.md
 
-# Ithaca Family Academy -- Official Website
+# Ithaca Family Academy 官网（`apps/web`）
 
-## Changelog
+`AGENTS.md` 是硬规矩（无状态、runes、配置内联在 `vite.config.ts`、预渲染的后果、四条禁区）。
+这里是完整架构与操作细节。
 
-| Date       | Action    | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ---------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 2026-08-27 | Reorg     | **Repo cleanup & reorg**: the legacy Next.js 16 tree was decommissioned and the SvelteKit 2 app promoted from `sveltekit/` to the repository root. Stack is now SvelteKit 2 + Svelte 5 (runes), adapter-node, Better Auth, Paraglide (flat `messages/{en,zh}.json`), Prisma + PostgreSQL, nodemailer, Threlte. CI collapsed to one `deploy.yml` (SvelteKit → `ghcr.io/<repo>-kit`) + `lighthouse.yml`, both at root paths. Docs rewritten for the new stack. |
-| 2026-08-25 | (Next.js) | Historical: Phase 0 bugfixes on the retired Next.js app (kept for provenance).                                                                                                                                                                                                                                                                                                                                                                               |
-| 2026-04-17 | Created   | Initial architecture scan (Next.js era).                                                                                                                                                                                                                                                                                                                                                                                                                     |
+> **上一版这份文档有 41 处引用指向已经不存在的东西**（admin 面板、Better Auth、Prisma、
+> 6 个 `db:*` 脚本、`DATABASE_URL`）。那些子系统在 `552a31c`（2026-10-10）被删除。如果你从别处
+> 看到它们，以 `package.json` 与 `.env.example` 为准。
 
-## Project Vision
+## 这个站是什么
 
-Ithaca Family Academy (IFA) is a youth-education organization based in Ontario, Canada,
-focused on AI, engineering, and entrepreneurship for teens. This repository is the
-**official public website and admin CMS**, built as a **SvelteKit 2** full-stack application
-(Svelte 5, adapter-node) with a PostgreSQL database, Prisma ORM, Better Auth, and nodemailer
-email delivery.
+Ithaca Family Academy（安大略省的青少年教育机构，方向是 AI / 工程 / 创业）的**公开官网**，
+英中双语。它只有一类用户：**浏览者**（家长与学生）。运营端（询盘管理、订阅者、邮件群发、
+弹窗配置）已经整体搬到排课系统的 `/dashboard/site`。
 
-The site serves two audiences:
+主要到站路径是**微信分享**，这解释了代码里很多看起来过度的取舍：OG 卡的中心正方形构图、
+自建 CJK 字体子集、`/zh` 单独的 Lighthouse 门限、移动端是 Playwright 的一等目标。
 
-1. **Public visitors** -- parents and students browsing programs, reading about IFA,
-   and submitting contact/subscribe forms.
-2. **Administrators** -- staff who manage subscribers, send email campaigns, and
-   configure popup banners through a protected admin panel.
-
-## Architecture Overview
+## 架构
 
 ```
-SvelteKit 2 (Svelte 5 runes, @sveltejs/adapter-node -> standalone build/index.js)
-  |
-  |-- i18n                Paraglide (@inlang/paraglide-js), en/zh bilingual
-  |                       Locale from URL only (prerender-safe): '/' = en, '/zh' = zh
-  |                       Messages: flat messages/{en,zh}.json -> compiled to src/lib/paraglide
-  |                       Strategy + urlPatterns configured INLINE in vite.config.ts
-  |
-  |-- Public pages        /                (homepage)
-  |                       /about-us
-  |                       /programs/*      (8 program sub-pages + index)
-  |                       /contact-us
-  |                       /privacy  /terms (legal pages)
-  |                       /sitemap.xml     (generated endpoint)
-  |
-  |-- Admin panel         /admin/login
-  |                       /admin/(protected)/subscribers
-  |                       /admin/(protected)/emails
-  |                       /admin/(protected)/popups
-  |                       (session guard in src/hooks.server.ts)
-  |
-  |-- API routes          /api/subscribe            POST  (public, rate-limited)
-  |   (+server.ts)        /api/contact              POST  (public, rate-limited)
-  |                       /api/auth/[...all]         ALL   (Better Auth handler)
-  |                       /api/popups/active         GET   (public)
-  |                       /api/admin/subscribers     GET|DELETE (auth)
-  |                       /api/admin/contacts        GET   (auth)
-  |                       /api/admin/emails          GET|POST   (auth)
-  |                       /api/admin/emails/send     POST       (auth)
-  |                       /api/admin/popups          GET|POST|PUT|DELETE (auth)
-  |
-  |-- Database            PostgreSQL 16 via Prisma
-  |                       App models: Subscriber, ContactMessage, EmailCampaign, Popup
-  |                       Auth models: User, Session, Account, Verification (Better Auth)
-  |                       Legacy (retained until cutover): AdminUser  (see docs/CUTOVER.md §7)
-  |
-  |-- Email               nodemailer SMTP (graceful no-op when SMTP unset)
+SvelteKit 2（Svelte 5 runes · adapter-node → build/index.js · 全站预渲染）
+ │
+ ├─ i18n          Paraglide，locale 只从 URL 取 ⇒ 预渲染安全（不读 cookie/header）
+ │                '/' = en，'/zh/*' = zh；/api/* 与 /admin/* 不本地化
+ │                strategy 与 urlPatterns 内联在 vite.config.ts
+ │
+ ├─ 公开页        /                      首页
+ │                /about-us  /about-us/our-team
+ │                /academics/{ap,ossd,stem,tutoring}
+ │                /admissions            招生漏斗（整站存在的理由）
+ │                /programs/*            10 个项目页 + 索引
+ │                /results  /success-stories  /student-life
+ │                /contact-us
+ │                /privacy  /terms
+ │
+ ├─ 生成端点      /sitemap.xml   由 import.meta.glob 枚举路由 ⇒ 新页自动进站点图
+ │                /robots.txt
+ │                /og/[...slug] satori + resvg 渲染的 OG PNG（构建期预渲染进 build/）
+ │
+ ├─ 公开 API      POST /api/contact         硬失败：写不进去就 500
+ │                POST /api/subscribe       硬失败
+ │                GET  /api/popups/active   软降级：上游挂了就"无弹窗"
+ │
+ └─ /admin/*      302 → 排课系统的 /dashboard/site（hooks.server.ts，有硬编码兜底）
 ```
 
-## Module Structure
+**这个 app 没有自己的持久层。** 唯一的后端依赖是排课系统的 `/api/site/*`，详见根
+`AGENTS.md` 的「跨 app 契约」与 `src/lib/server/site-api.ts`。
 
-```mermaid
-graph TD
-    A["(root) IthacaFA-web"] --> R["src/routes -- Pages & API endpoints"]
-    A --> L["src/lib -- Shared code"]
-    A --> P["prisma -- Schema, migrations, seed"]
-    A --> M["messages -- Paraglide en/zh flat JSON"]
-    A --> PI["project.inlang -- inlang project config"]
-    A --> S["static -- Static assets (media, logo, videos)"]
-    A --> SC["scripts -- prod.sh, docker-smoke.sh, i18n + message tooling"]
+## 目录结构
 
-    R --> R1["routes/(public pages)"]
-    R --> R2["routes/admin/(protected) -- Admin panel"]
-    R --> R3["routes/api -- +server.ts endpoints"]
+| 路径                 | 职责                                                                                                                                      |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/routes`         | 页面（`+page.svelte`）、loader（`+page.ts`）、端点（`+server.ts`）                                                                        |
+| `src/lib/content`    | **内容模型**，PRD §6.1 的逐字移植：`programs` `season-data` `people` `results` `faq` `partners` `highlights` `stats` `admissions` `types` |
+| `src/lib/data`       | **展示用数据**：`nav`（含每个项目的季节状态）、`programs`（索引卡列表）、`contact`、`team`                                                |
+| `src/lib/components` | 手写组件，按页分组：`about` `admissions` `contact` `home` `layout` `media` `programs` `results` `shared`。**没有外部组件库。**            |
+| `src/lib/server`     | 服务端专属：`site-api` `popup-cache` `mail` `csrf` `guard` `validation` `rate-limit` `turnstile` `og/`（satori 字体与渲染）               |
+| `src/lib/og`         | `cards.ts` —— OG 卡注册表，**一张表两个消费者**（PNG 渲染端点 + `Seo.svelte` 的 `og:image`），不许各自为政                                |
+| `src/lib/motion`     | GSAP 封装与生命周期（`gsap-lifecycle.ts`）                                                                                                |
+| `src/lib/actions`    | Svelte action：`focus-trap` `inview`                                                                                                      |
+| `src/lib/assets`     | 构建期处理的图片（`@sveltejs/enhanced-img`）                                                                                              |
+| `src/lib/paraglide`  | Paraglide 编译产物 —— **生成的，已 gitignore**                                                                                            |
+| `src/lib/*.ts`       | 业务纯函数，就近放 `*.test.ts`：`seasons` `program-season` `program-cta` `admissions` `results` `analytics` `seo` `utils`                 |
+| `messages`           | Paraglide 扁平词条：`en.json` / `zh.json`（**一个 locale 一个文件**，不是命名空间目录）                                                   |
+| `static`             | 运行时静态资源：`media/{images,videos}`、自建的 `fonts/`                                                                                  |
+| `scripts`            | 见下方「脚本」                                                                                                                            |
+| `e2e`                | Playwright（8 个套件）                                                                                                                    |
+| `.claude/PRPs`       | PRD / plan / report / review —— **历史记录**，与代码冲突时代码赢                                                                          |
 
-    L --> L1["lib/components -- about, home, layout, media, programs, shared"]
-    L --> L2["lib/server -- auth, prisma, mail, csrf, rate-limit, popup-cache"]
-    L --> L3["lib/data -- contact, nav, programs, team"]
-    L --> L4["lib/assets -- processed images (enhanced-img)"]
-    L --> L5["lib/motion -- transition/animation helpers"]
-```
+### 根层那几个关键文件
 
-## Module Index
+- `src/hooks.server.ts` —— 两件事，都不涉及会话（会话随 Better Auth 一起没了）：
+  ① i18n locale 注入 `<html lang dir>` + GA 片段注入 + **只预加载两个 latin 字体切片**
+  （`type === 'font'` 会让 SvelteKit 预载全部 13 个 subset，约 10 倍字节，是个陷阱）；
+  ② `/admin/*` **302** 跳转（不是 301 —— 永久跳转会被浏览器和 Cloudflare 缓存住）。
+- `src/hooks.ts` —— `reroute`，把 `/zh/about-us` 映射回 `/about-us`。**纯函数**，客户端也跑，
+  所以不能读 cookie/header。
+- `src/app.css` + `src/routes/layout.css` —— 设计 token 的落点，细节见 `docs/DESIGN-TOKENS.md`。
 
-| Module Path          | Language  | Purpose                                                                                                    |
-| -------------------- | --------- | ---------------------------------------------------------------------------------------------------------- |
-| `src/routes`         | Svelte/TS | Pages (`+page.svelte`), loaders (`+page.ts`/`+page.server.ts`), API (`+server.ts`)                         |
-| `src/lib/components` | Svelte    | UI components (about, home, layout, media, programs, shared)                                               |
-| `src/lib/server`     | TS        | Server-only: `auth.ts` (Better Auth), `prisma.ts`, `mail.ts`, `csrf.ts`, `rate-limit.ts`, `popup-cache.ts` |
-| `src/lib/data`       | TS        | Static content data: `team.ts`, `nav.ts`, `programs.ts`, `contact.ts`                                      |
-| `src/lib/assets`     | Images    | Build-processed images (`@sveltejs/enhanced-img`)                                                          |
-| `src/lib/motion`     | TS        | Animation / transition helpers (GSAP, Svelte transitions)                                                  |
-| `src/lib/paraglide`  | TS (gen)  | Paraglide-compiled i18n runtime -- **generated, gitignored**                                               |
-| `prisma`             | Prisma/TS | `schema.prisma`, `migrations/`, `seed.ts`, `migrate-admins-to-betterauth.ts`                               |
-| `messages`           | JSON      | Paraglide message catalogs: `en.json`, `zh.json` (flat)                                                    |
-| `project.inlang`     | JSON      | inlang project settings (`settings.json`)                                                                  |
-| `static`             | Static    | `media/` (images, videos), logo, favicons                                                                  |
-| `scripts`            | Bash/TS   | `prod.sh` (SSH ops), `docker-smoke.sh`, `check-i18n.ts`, `migrate-messages.ts`                             |
-
-## Run & Develop
-
-### Prerequisites
-
-- Node.js 20+ (`.npmrc` sets `engine-strict=true`)
-- Docker (for local PostgreSQL)
-- npm
-
-### Quick Start
+## 跑起来
 
 ```bash
-cp .env.example .env                              # then fill in values
-docker compose -f docker-compose.dev.yml up -d    # PostgreSQL 16 on :5432
-npm install
-npm run db:migrate:deploy                          # apply migrations
-npm run db:seed                                    # seed an admin user
-npm run dev                                         # Vite dev server -> http://localhost:5173
+cp .env.example .env     # 本地什么都不填也能跑
+npm ci --engine-strict=false
+npm run dev              # :5173
 ```
 
-The production server (`node build/index.js`, and the Docker image) listens on **:3000**.
+**本地不需要 Postgres，不需要任何密钥。** 未配置时的降级行为是刻意设计的：SMTP 不配 ⇒ 不发信
+但表单成功；Turnstile 不配 ⇒ 跳过校验；排课系统不配 ⇒ 询盘/订阅 500、弹窗无。
 
-**Never rebuild underneath a running `node build/index.js`.** adapter-node serves
-`build/client` through `sirv`, which indexes that directory **once at startup**, so every
-newly hashed chunk 404s after a rebuild. The page still renders -- the HTML is prerendered --
-but it never hydrates, so nothing is clickable, the header never leaves its initial state,
-and no error is shown. Use `npm run preview:prod` (`scripts/preview-prod.sh`): it frees the
-port **before** building, so the server process is always younger than the assets it serves.
-It refuses to kill anything that is not a preview server.
+生产产物（以及 Docker 镜像）听 `:3000`。要在本地验生产构建，**用 `npm run preview:prod`**
+（`:4399`），不要手工 `build` + `start`（原因见 `AGENTS.md` 的第一条禁区）。
 
-Note that prerendered HTML is served with `Last-Modified` and no `Cache-Control`, so a browser
-may hold a stale document that references chunk hashes the new build no longer has. If a local
-page looks dead after a rebuild, hard-reload it (Cmd+Shift+R) before suspecting the code.
+### 脚本
 
-### Key npm Scripts
+| 命令                                 | 说明                                                                                                              |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`                        | Vite dev server，`:5173`                                                                                          |
+| `npm run build`                      | `fonts:cjk` → `vite build` → `fonts:verify`。**CJK 子集是构建的一部分**，不是可选步骤                             |
+| `npm run preview:prod`               | 先腾端口再构建再服务，`:4399`（`PORT` 可覆盖）；它拒绝杀非 preview 进程                                           |
+| `npm run check`                      | Paraglide 编译 + `svelte-kit sync` + `svelte-check`（类型 + a11y）                                                |
+| `npm run lint` / `format`            | `eslint . && prettier --check .` / `prettier --write .`                                                           |
+| `npm test` / `test:watch`            | vitest（`environment: 'node'`）                                                                                   |
+| `npm run i18n:check`                 | en/zh 词条 key 对齐                                                                                               |
+| `npm run content:check`              | 内容就绪门禁：PRD §6.4 页面上残留 `TODO(content)`、或 live 项目引用了没有有效 `start`/`end` 的 `Season`，则退出 1 |
+| `npm run test:e2e` / `:ui`           | Playwright。**需要先 `npm run build`**                                                                            |
+| `npm run fonts:cjk` / `fonts:verify` | 生成 / 校验自建 Noto Sans SC 子集                                                                                 |
+| `npm run lhci`                       | 本地跑 Lighthouse CI                                                                                              |
+| `npm run prod:*`                     | `deploy` `logs` `status` `backup` `rollback` —— 经 SSH 包装 IthacaServer 的 `ops.sh`                              |
 
-| Command                     | Description                                                 |
-| --------------------------- | ----------------------------------------------------------- |
-| `npm run dev`               | Vite dev server (default `:5173`)                           |
-| `npm run build`             | Production build (adapter-node -> `build/index.js`)         |
-| `npm run preview`           | Preview the production build                                |
-| `npm run preview:prod`      | Build, then serve it on `:4399` (override with `PORT`)      |
-| `npm run start`             | Run the built server (`node build/index.js`)                |
-| `npm run check`             | `paraglide-js compile` + `svelte-kit sync` + `svelte-check` |
-| `npm run lint`              | `eslint .` + `prettier --check .`                           |
-| `npm run format`            | `prettier --write .`                                        |
-| `npm run db:migrate`        | Prisma migrate (dev)                                        |
-| `npm run db:migrate:deploy` | Apply migrations (production)                               |
-| `npm run db:migrate:status` | Show migration status                                       |
-| `npm run db:seed`           | Seed admin user (`prisma/seed.ts`)                          |
-| `npm run db:studio`         | Open Prisma Studio                                          |
-| `npm run prod:deploy`       | Deploy to prod via `scripts/prod.sh` (SSH `ops`)            |
+`scripts/` 下还有 `docker-smoke.sh`（生产镜像端到端冒烟：构建 + 公开路由 + `/admin` 跳转 +
+弹窗软降级路径）、`check-i18n.ts`、`content-check.ts`、`build-cjk-subset.ts`、
+`preview-prod.sh`、`prod.sh`，以及一次性的 `migrate-messages.ts`。
 
-### Environment Variables
+### 环境变量
 
-| Variable                                                                | Required   | Description                                                               |
-| ----------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------- |
-| `DATABASE_URL`                                                          | Yes        | PostgreSQL connection string                                              |
-| `BETTER_AUTH_SECRET`                                                    | Yes (prod) | Signs Better Auth sessions                                                |
-| `BETTER_AUTH_URL`                                                       | Yes        | Canonical public origin for cookies/redirects                             |
-| `ORIGIN`                                                                | Yes (prod) | adapter-node CSRF origin + absolute URLs                                  |
-| `ADDRESS_HEADER` / `PROTOCOL_HEADER` / `HOST_HEADER`                    | No         | Trust headers behind Cloudflare (baked in Dockerfile)                     |
-| `PUBLIC_SITE_URL`                                                       | Build      | Canonical origin for SEO/OG/sitemap -- **inlined at build time**          |
-| `PUBLIC_GA_TRACKING_ID`                                                 | Build      | Google Analytics ID -- **inlined at build time** (default `G-675W5PPJEJ`) |
-| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `SMTP_FROM` | No         | nodemailer; unset = sends skipped                                         |
-| `UPSTASH_REDIS_REST_URL` / `_TOKEN`                                     | No         | Distributed rate limiting; unset = in-memory                              |
-| `ADMIN_EMAIL` / `ADMIN_PASSWORD`                                        | Seed       | Used only by `prisma/seed.ts`                                             |
+全部是可选的或有兜底的，**除了 `ORIGIN`**。
 
-**Note:** `PUBLIC_*` values are read via `$env/static/public` and inlined by Vite at build
-time, so they must be present **before** `npm run build`. In Docker/CI they are supplied as
-build-args (`Dockerfile` + `.github/workflows/deploy.yml`).
+| 变量                                                                     | 时机                   | 说明                                                                                                                                             |
+| ------------------------------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ORIGIN`                                                                 | 运行时（生产**必须**） | adapter-node 的 CSRF 来源 + 绝对 URL。`csrf.ts` 没有它会**全部关门**，于是每个公开 POST 403                                                      |
+| `PUBLIC_SITE_URL`                                                        | **构建期**             | SEO / OG / hreflang / sitemap 的规范 origin                                                                                                      |
+| `PUBLIC_GA_TRACKING_ID`                                                  | **构建期**             | GA ID（Dockerfile 里有默认值）                                                                                                                   |
+| `COURSE_SCHEDULING_API_URL`                                              | 运行时                 | 排课系统 `/api/site/*` 的基址（无尾斜杠）                                                                                                        |
+| `SITE_INGEST_SECRET`                                                     | 运行时                 | 共享密钥，两边必须完全一致。未配 ⇒ 询盘/订阅 500、弹窗软降级                                                                                     |
+| `PUBLIC_SITE_ADMIN_URL`                                                  | 运行时                 | `/admin/*` 跳哪。`hooks.server.ts` 有硬编码兜底，不配也能跳                                                                                      |
+| `INQUIRY_TO`                                                             | 运行时                 | 询盘收件地址。不配兜底到原硬编码地址，避免某次部署忘了就静默丢询盘                                                                               |
+| `ADDRESS_HEADER` / `PROTOCOL_HEADER` / `HOST_HEADER` / `BODY_SIZE_LIMIT` | 运行时                 | Cloudflare 后面取真实客户端信息（已烘进 Dockerfile）                                                                                             |
+| `SMTP_*`（含 `SMTP_TLS_INSECURE`）                                       | 运行时                 | nodemailer / Stalwart。不配 = 不发信但表单成功。`SMTP_TLS_INSECURE=1` **只**用于内网别名 `stalwart`                                              |
+| `PUBLIC_TURNSTILE_SITE_KEY`                                              | **构建期**             | 配 secret 就必须配它，否则全站表单 403（见 `AGENTS.md`）                                                                                         |
+| `TURNSTILE_SECRET_KEY`                                                   | 运行时                 | 不配 = 跳过校验（底下还有 CSRF + 限流托着，降级成"同源 + 限流"而非"开放中继"）                                                                   |
+| `PUBLIC_BOOKING_URL`                                                     | **构建期**             | `/admissions#book` 的预约链接。不配则降级为联系表单。**PRD §18 把它写成运行时 `BOOKING_URL`，那是做不到的** —— `/admissions` 是预渲染的静态 HTML |
+| `UPSTASH_REDIS_REST_URL` / `_TOKEN`                                      | 运行时                 | 分布式限流。不配 = 进程内滑动窗口（单实例够用）                                                                                                  |
 
-### Docker
+**`PUBLIC_*` 经 Vite 在构建期内联**，所以必须在 `vite build` **之前**就位；Docker/CI 里以
+build-arg 传入。非 `PUBLIC_` 的变量全部只在函数内部读（`$env/dynamic/private`），**没有任何
+模块在加载期读 env** —— 这是 Dockerfile 不再需要占位密钥的前提，请保持。
 
-- **Dev**: `docker-compose.dev.yml` -- PostgreSQL 16 only (port 5432); SvelteKit runs on host.
-  Credentials: `ithacafa` / `ithacafa_dev_2026` / database `ithacafa`.
-- **Prod**: `Dockerfile` -- multi-stage build producing a standalone adapter-node server on
-  port 3000. The container CMD runs `prisma migrate deploy` (fail-loud) then `node build/index.js`.
-  Smoke-test the image end-to-end with `bash scripts/docker-smoke.sh`.
+## 测试
 
-## Testing Strategy
+`npm test` 的 vitest 跑在 `environment: 'node'`，**没有 jsdom，也没有
+`@testing-library/svelte`**。所以每个 `*.test.ts` 都是纯逻辑测试，包括放在
+`src/lib/components/` 下面的那些。**UI 层的验证是 Playwright 的活，不是 vitest 的。**
 
-**Vitest is wired** (`vitest` ^4, config inline in `vite.config.ts` under `test:`) with **15
-test files**. Note `environment: 'node'` -- there is no jsdom and no `@testing-library/svelte`,
-so every `*.test.ts` is a pure-logic test, including the ones under `src/lib/components/`.
-UI-level verification is Playwright's job (`e2e/`), not Vitest's.
+Playwright 跑**生产构建**（`node build/index.js`，`:4321`），不是 `vite dev` —— 发布的是预渲染
+产物，而预渲染的 bug 在 dev 下看不见。`reuseExistingServer: false`：端口被占就响亮失败，而不是
+悄悄把整个套件指向别人的服务。
 
-- `npm test` -- `vitest run` (unit tests; `npm run test:watch` for the watcher)
-- `npm run check` -- Paraglide compile + `svelte-kit sync` + `svelte-check` (types + a11y)
-- `npm run lint` -- ESLint + Prettier
-- `npm run i18n:check` -- en/zh message-key parity (`scripts/check-i18n.ts`)
-- `npm run build` -- production build must emit `build/index.js`
-- `npm run test:e2e` -- Playwright against the **production build**, not `vite dev`. Requires
-  `npm run build` first. Boots `node build/index.js` on port 4321 (NOT 3000, which is commonly
-  squatted by local daemons; `reuseExistingServer` is off so a busy port fails loudly instead
-  of silently testing someone else's server).
-  - `e2e/smoke.spec.ts` -- route coverage **derived from `/sitemap.xml`**, so a new page joins
-    the suite automatically; plus locale switch, keyboard nav, form validation, redirects, and
-    the header's scroll state (transparent-over-hero -> light bar), which is also the only
-    check that the header HYDRATES -- a frozen header passes every contrast assertion
-  - `e2e/a11y.spec.ts` -- axe, zero serious/critical on every `prd.md` §6.4 page in both locales
-  - `e2e/header-contrast.spec.ts` -- samples the pixels BEHIND the header on every sitemap route
-    and asserts 4.5:1 for each nav link / hamburger / switcher. axe cannot do this: it reports
-    text-over-image contrast as `incomplete`, which is how 40 of 84 elements shipped below AA
-- `bash scripts/docker-smoke.sh` -- production-image smoke test (build + migrate + routes +
-  Better Auth login) against an isolated, disposable Postgres
-- `.github/workflows/ci.yml` -- **the PR gate**: lint, check, i18n parity, unit tests, build,
-  Playwright smoke, axe
-- `.github/workflows/lighthouse.yml` -- mobile performance gate. The thresholds that actually
-  block are in `lighthouserc.json` and are only two: LCP <= 4500ms and CLS <= 0.05
+| 套件                        | 它守住什么                                                                                                                                                                                                     |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `smoke.spec.ts`             | 路由覆盖**由 `/sitemap.xml` 推导** ⇒ 新页自动入列；外加语言切换、键盘导航、表单校验、重定向，以及 header 的滚动态（这同时是**唯一**能发现 header 没 hydrate 的检查 —— 一个冻住的 header 能通过所有对比度断言） |
+| `a11y.spec.ts`              | axe，PRD §6.4 每一页、两种语言、零 serious/critical。还没上线的路由也列着并显式 skip，落地当天自动进门禁                                                                                                       |
+| `header-contrast.spec.ts`   | 采样 header **背后**的像素，断言每个导航链接 4.5:1。axe 做不到这件事：它把图上文字的对比度报成 `incomplete`，于是 84 个元素里有 40 个低于 AA 还一路绿灯                                                        |
+| `nav-single-line.spec.ts`   | 桌面导航栏单行不折。栏目涨到七项后余量只剩约 10px，而折了之后"完全合法"——过 axe、过对比度，只是丑                                                                                                              |
+| `admissions-funnel.spec.ts` | 整条招生漏斗走通。其它套件各查一个关节，这个查关节连不连 —— 曾经 `/admissions` 只存在于 sitemap 里，这条路走不通而每个单项测试照样绿                                                                           |
+| `analytics.spec.ts`         | 六个 GA4 事件真的接在用户动作上，且 `dataLayer` 里**不含任何表单字段值**                                                                                                                                       |
+| `seo.spec.ts`               | 规范链接 / OG / JSON-LD，覆盖范围同样由 sitemap 推导                                                                                                                                                           |
+| `locale-suggestion.spec.ts` | 中文入口的可发现性（header 语言切换下沉到 footer 之后的补偿）                                                                                                                                                  |
 
-## Coding Conventions
+**CI**（在仓库根，不在这个目录）：
 
-- **Language**: TypeScript (strict), Svelte 5 components (`.svelte`)
-- **Framework**: SvelteKit 2 (`@sveltejs/kit`), `@sveltejs/adapter-node`
-- **Reactivity**: Svelte 5 **runes** (`$state` / `$derived` / `$effect` / `$props`) -- forced on for app code via `compilerOptions.runes` in `vite.config.ts`
-- **Config**: **No `svelte.config.js`** -- SvelteKit, Paraglide, enhanced-img, adapter, CSRF, and prerender are all configured **inline** in `vite.config.ts`
-- **Styling**: Tailwind CSS v4 via `@tailwindcss/vite`
-- **Fonts**: `@fontsource/outfit` (Latin) + `@fontsource/noto-sans-sc` (Chinese), self-hosted
-- **UI library**: No external component library; hand-rolled components under `src/lib/components`
-- **Animations**: Svelte transitions + GSAP (`gsap`); respect reduced-motion
-- **3D rendering**: Threlte (`@threlte/core` + `@threlte/extras`) over `three` (EV Challenge page); `ssr.noExternal: ['three']` in `vite.config.ts`
-- **Images**: `@sveltejs/enhanced-img` for processed imports under `src/lib/assets`; runtime static assets live in `static/media`
-- **i18n**: Paraglide (`@inlang/paraglide-js`); locale from URL only; see the i18n section below
-- **Icons**: `lucide-svelte`
-- **Forms**: SvelteKit **form actions** (`+page.server.ts`), validated with `zod` v4
-- **Auth**: Better Auth (`better-auth`) credential provider (email/password, bcrypt via `bcryptjs`); session resolved in `src/hooks.server.ts`
-- **Database**: Prisma ORM with PostgreSQL; `@prisma/client` singleton in `src/lib/server/prisma.ts`
-- **Email**: nodemailer SMTP in `src/lib/server/mail.ts` with graceful degradation (no-op when SMTP unset)
-- **Validation**: Zod v4 in endpoints/actions; `safeParse` pattern
-- **Path alias**: `$lib` -> `src/lib` (SvelteKit default). There is **no** `@/*` alias.
-- **Server-only code**: everything under `src/lib/server/**` must never be imported client-side
-- **Rate limiting**: sliding-window limiter in `src/lib/server/rate-limit.ts` on public POST routes (`/api/subscribe`, `/api/contact`); optional Upstash Redis backing
-- **CSRF**: `src/lib/server/csrf.ts` (+ `src/lib/csrf-client.ts`); SvelteKit same-origin POST protection plus `csrf.trustedOrigins` in `vite.config.ts`
-- **Analytics**: Google Analytics (gtag.js), ID inlined from `PUBLIC_GA_TRACKING_ID`
+- `web-ci.yml` —— PR 门禁：lint、check、i18n 对齐、单测、构建、Playwright、axe
+- `web-release.yml` —— push `prod` 分支 → 推 GHCR 镜像
+- `web-lighthouse.yml` —— **`workflow_dispatch` + 周定时，不是 per-PR 门禁**。它曾占官网仓
+  67% 的 CI 分钟且 65 跑 59 红；那个红是真实的 LCP 债，但 runner 自身方差太大（`/` 三次采样
+  6304 / 6509 / 10420 ms）不适合当门禁
 
-## Internationalization (i18n)
+`lighthouserc.json` 的门限是**按 URL 的 `assertMatrix`**，每条都是"卡在实测值上的棘轮"而不是
+余量 —— 例如 `/zh` 的 LCP 门限就压在当前测得的值上，页面变快就往下调，**永远不往上调**。
+`/zh` 比英文页多一个 CJK 字体（900 个汉字、两个字重、251 KB，已经压到极限），那 +1.28s 是
+机构方知情后选择支付的成本。
 
-The site uses **Paraglide** (`@inlang/paraglide-js`) for bilingual English/Chinese support.
+## 写代码时
 
-### Architecture
+- **i18n**：新 key 同时进两个 `messages/*.json`，然后 `npm run check`。
+- **内容 vs 数据**：记录进 `src/lib/content/`，索引卡/导航进 `src/lib/data/`。
+  `src/lib/content/types.ts` 的字段名是**和 PRD 对齐的契约**，JSON-LD 生成器、招生日历、
+  `$lib/seasons` 都按那些名字写的 —— 改名会破坏一个写在文档里而不是代码里的约定。
+- **新端点**：用 `guard.ts` 的 `guardPublicPost` + `validation.ts` 的 Zod 400 封装，别重写前置。
+- **OG 卡**：改 `src/lib/og/cards.ts` 这一张表；它的词条存的是 message **函数**而不是字符串，
+  因为渲染发生在请求之外、拿不到 `getLocale()`。
+- **GSAP / Threlte**：注册与清理走 `src/lib/motion/gsap-lifecycle.ts`，并尊重
+  reduced-motion；`three` 经 `ssr.noExternal` 打进 SSR 包。
+- **图片**：构建期处理的放 `src/lib/assets`（`<enhanced:img>`），运行时静态的放 `static/media`。
+- **预渲染是默认**（根 `+layout.ts` 的 `prerender = true`）。要加一个真正动态的页面，得在那个
+  页面上显式 `export const prerender = false`，并想清楚它对 Lighthouse 与缓存的影响。
 
-- **Locale strategy** (in `vite.config.ts`, `paraglideVitePlugin`): `['url', 'baseLocale']` --
-  locale is derived from the URL only, which keeps every page prerender-safe (no cookie/header).
-- **URL patterns**: `/` serves English; `/zh/*` serves Chinese. `/admin/*` and `/api/*` are
-  **not** localized (identical mapping for both locales; listed before the catch-all).
-- **Messages**: flat `messages/en.json` + `messages/zh.json` (Paraglide format -- one file per
-  locale, **not** namespaced directories).
-- **Compiled runtime**: `paraglide-js compile` emits `src/lib/paraglide` (generated, gitignored);
-  it runs via the `prepare` and `check` npm scripts.
-- **Project config**: `project.inlang/settings.json` (strategy + urlPatterns live in `vite.config.ts`, not here).
+## Docker
 
-### i18n Patterns
+多阶段构建 → adapter-node 独立服务，`:3000`。`CMD` 就是 `node build/index.js`，**没有
+`migrate deploy &&` 前缀**（没有库可迁移，也因此没有 P3009 那种会冻住后续部署的失败模式）。
 
-- Import messages from the generated `$lib/paraglide/messages` (e.g. `m.hero_title()`), and
-  locale helpers from `$lib/paraglide/runtime`.
-- Add every new key to **both** `messages/en.json` and `messages/zh.json`.
-- Run `npm run check` (compiles Paraglide) after adding keys; `scripts/check-i18n.ts` checks
-  en/zh key parity. `scripts/migrate-messages.ts` is the one-off importer from the old
-  next-intl namespaced files.
-- Team data lives in `src/lib/data/team.ts` and references static headshots under
-  `static/media/images/team/`.
-
-## AI Usage Guidelines
-
-- **IMPORTANT**: This is SvelteKit 2 + Svelte 5 (runes). APIs differ from older Svelte and from
-  most training data -- verify against the versions pinned in `package.json`, and read
-  `vite.config.ts` (the config is inline; there is no `svelte.config.js`).
-- Read `prisma/schema.prisma` before any DB work.
-- HTTP endpoints are `+server.ts` handlers under `src/routes/api/**`; validate with Zod.
-- Better Auth mounts at `src/routes/api/auth/[...all]`; the session is resolved in
-  `src/hooks.server.ts`, which also guards `src/routes/admin/(protected)/**`.
-- The nodemailer transport may be a no-op in development (SMTP unset); code must tolerate that.
-- **i18n**: all user-facing text goes through Paraglide messages; add keys to both
-  `messages/en.json` and `messages/zh.json`, then run `npm run check`.
-- **Server-only** modules live in `src/lib/server/**` and must never be imported into client code.
-- **GSAP / Threlte**: register/clean up GSAP contexts and check reduced-motion; load Threlte/three
-  only where needed (they are bundled for SSR via `ssr.noExternal: ['three']`).
-- The container CMD runs `prisma migrate deploy` on boot, so **any committed migration
-  auto-applies on the next `-kit` rollout**. Keep migrations additive (new columns nullable or
-  defaulted) and take `npm run prod:backup` first. The legacy `AdminUser` model no longer
-  exists -- it was dropped by `20260926162933_drop_legacy_admin_users`.
-- `docs/DECISIONS.md` records every deviation from the PRD, `docs/CONTENT-GAPS.md` tracks what
-  is still owed by the owner, and `docs/LAUNCH-CHECKLIST.md` is the release gate.
-- Vitest is set up (`npm test` = `vitest run`; config inline in `vite.config.ts`). Put unit tests
-  next to their target as `*.test.ts` (see `src/lib/utils.test.ts` for the pattern).
+`libc6-compat` **不是 Prisma 的遗留** —— 它是构建期 musl 原生插件要的：`@resvg/resvg-js`
+（渲染 OG PNG）和 `@sveltejs/enhanced-img` 背后的 sharp。删了它坏的是 `vite build`，不是运行时。
+runner 阶段刻意没装它，因为那两个包是 devDependencies，`npm ci --omit=dev` 根本不会装。

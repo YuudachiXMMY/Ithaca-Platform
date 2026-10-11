@@ -75,8 +75,11 @@ Last reviewed: 2026-09-29 · Status: **not ready** (workstreams in progress)
 
 ## Forms and backend
 
-- [ ] 🔴 End-to-end: an enquiry lands in the database **and** in the `info@ithacateens.com`
-      inbox
+- [ ] 🔴 End-to-end: an enquiry lands in the **scheduling app's** `/dashboard/site` console
+      (this app has no database of its own — it POSTs to `/api/site/contact`) **and** in the
+      `INQUIRY_TO` inbox (default `info@ithacateens.com`)
+- [ ] 🔴 `COURSE_SCHEDULING_API_URL` + `SITE_INGEST_SECRET` are set and the secret matches the
+      scheduling app **exactly**. Unset ⇒ every enquiry and subscribe 500s
 - [ ] 🔴 The submitter receives a confirmation email in their own locale
 - [ ] 🔴 Turnstile verification active (and degrading gracefully when keys are unset)
 - [ ] 🔴 Rate limiting verified (5/min on `/api/contact`)
@@ -100,13 +103,15 @@ Last reviewed: 2026-09-29 · Status: **not ready** (workstreams in progress)
 
 ## Release
 
-- [ ] 🔴 `npm run prod:backup` taken **before** any migration reaches production. The container
-      CMD runs `prisma migrate deploy` on boot, so a committed migration auto-applies on the
-      next `-kit` rollout
-- [ ] 🔴 The Prisma migration is additive only — new columns nullable or defaulted, no column
-      altered or dropped
-- [ ] 🔴 **Never `rm` or stop the `ithacafo-web` (blue) container.** It hosts the production
-      database; stopping it wiped the database on 2026-09-23
+- [ ] 🔴 `PUBLIC_*` build-args are correct for the target environment — they are **inlined at
+      build time** and cannot be changed by the container's runtime env
+- [ ] 🔴 `ORIGIN` is set in the runtime env. Without it `csrf.ts` fails closed and every public
+      POST 403s — the site looks perfectly healthy and only the forms are dead
+- [ ] 🔴 If `TURNSTILE_SECRET_KEY` is set, a matching `PUBLIC_TURNSTILE_SITE_KEY` build-arg was
+      passed. Secret-without-site-key 403s the contact form for every visitor
+- [ ] 🔴 Any change to the `/api/site/*` payload shape is additive, and the scheduling app has
+      already shipped its side. That contract is the only cross-version coupling left
+      (`src/lib/server/site-api.ts`)
 - [ ] 🔴 Rollback rehearsed: previous image digest identified and re-pinnable
 - [ ] 🔴 Cloudflare edge cache purged after release
 - [ ] 🟡 Owner sign-off

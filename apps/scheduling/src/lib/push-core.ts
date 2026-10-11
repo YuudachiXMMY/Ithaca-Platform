@@ -3,7 +3,7 @@ import webpush from 'web-push'
 import { and, eq } from 'drizzle-orm'
 import { env } from '@/env'
 import { db } from '@/db'
-import { forTenant } from '@/db/tenant'
+import { forTenant, withTenantScope } from '@/db/tenant'
 import { pushSubscription } from '@/db/schema'
 import { saveSubscriptionSchema, isAllowedPushEndpoint } from './push-endpoint'
 import type { AuthContext } from '@/auth/context'
@@ -94,21 +94,23 @@ export async function saveSubscriptionCore(
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? '订阅信息无效')
   const data = parsed.data
 
-  await db
-    .insert(pushSubscription)
-    .values({
-      tenantId: ctx.tenantId, // M1: forced tenant scope on this raw-db exception
-      userId: ctx.userId,
-      endpoint: data.endpoint,
-      p256dh: data.p256dh,
-      auth: data.auth,
-    })
-    .onConflictDoUpdate({
-      // Arbiter = the (tenant, user, endpoint) unique index → only the caller's OWN row can conflict,
-      // so the update can only ever refresh the caller's keys, never another user's row.
-      target: [pushSubscription.tenantId, pushSubscription.userId, pushSubscription.endpoint],
-      set: { p256dh: data.p256dh, auth: data.auth, updatedAt: new Date() },
-    })
+  await withTenantScope(ctx.tenantId, (tx) =>
+    tx
+      .insert(pushSubscription)
+      .values({
+        tenantId: ctx.tenantId, // M1: forced tenant scope on this raw-db exception
+        userId: ctx.userId,
+        endpoint: data.endpoint,
+        p256dh: data.p256dh,
+        auth: data.auth,
+      })
+      .onConflictDoUpdate({
+        // Arbiter = the (tenant, user, endpoint) unique index → only the caller's OWN row can conflict,
+        // so the update can only ever refresh the caller's keys, never another user's row.
+        target: [pushSubscription.tenantId, pushSubscription.userId, pushSubscription.endpoint],
+        set: { p256dh: data.p256dh, auth: data.auth, updatedAt: new Date() },
+      }),
+  )
 
   // B3 (amplification): keep at most MAX per user — prune the oldest overflow so repeated subscribe
   // calls can't grow an unbounded set of server-initiated push targets.

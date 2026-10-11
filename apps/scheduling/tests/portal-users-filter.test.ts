@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { inArray } from 'drizzle-orm'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import { organization, user, member } from '@/db/schema'
 import type { AuthContext } from '@/auth/context'
 import { listPortalUsers } from '@/app/dashboard/users/data'

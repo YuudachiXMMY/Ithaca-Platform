@@ -1,8 +1,19 @@
 # 课程排课系统 · Course Scheduling System
 
-Phase 1 foundation: Next.js 16 (App Router, React 19) + PostgreSQL + Drizzle ORM + Better Auth
-(Organization + Admin/RBAC), a data-layer-enforced multi-tenant authorization spine, and full
-containerization (multi-stage Dockerfile + docker-compose + Coolify deploy).
+Next.js 16 (App Router, React 19) + PostgreSQL 17 + Drizzle ORM + Better Auth
+(Organization + Admin/RBAC), with a **data-layer-enforced multi-tenant authorization spine** and
+full containerization (multi-stage Dockerfile + docker-compose).
+
+Three human surfaces — the staff dashboard (`/dashboard`), the parent/student portal
+(`/portal`), and token-gated public share pages (`/s/<token>`, `/sec/<token>`) — plus two machine
+surfaces: the official website's ingest endpoints (`/api/site/*`) and a Claude MCP connector
+(`/api/[transport]`). It also hosts the **official website's operations console** at
+`/dashboard/site` (enquiries, subscribers, email campaigns, popups).
+
+> **Working on this code?** Read **[`AGENTS.md`](AGENTS.md)** first — tenant isolation has no
+> database-level backstop, so `forTenant(ctx)` is the only sanctioned path to tenant data and
+> `proxy.ts` is explicitly *not* authorization. **[`CLAUDE.md`](CLAUDE.md)** has the full
+> architecture, directory map, and environment contract.
 
 ## Stack
 
@@ -40,11 +51,17 @@ npm run dev                     # http://localhost:3000
 ## Validation
 
 ```bash
+npm run check       # typecheck + lint — the minimum before a commit
 npm run typecheck   # tsc --noEmit
 npm run lint        # eslint .
 npm run build       # Next 16 Turbopack -> .next/standalone/server.js
-npm run test        # vitest — tenant-isolation suite (needs a running Postgres)
+npm run test        # vitest — 96 files incl. the tenant-isolation suite (needs a running Postgres)
 ```
+
+CI additionally runs `npx tsx scripts/check-tenant-db-access.ts` — the **tenant-isolation
+guard**, which fails the build if any file outside a small audited allowlist reaches for the raw
+`db` handle's CRUD verbs. It is the mechanical half of the invariant the vitest suite tests
+behaviourally. See [`AGENTS.md`](AGENTS.md).
 
 ### End-to-end (Playwright)
 
@@ -83,20 +100,43 @@ docker compose --profile test run --rm test # migrate + tenant-isolation tests i
 - `forTenant(ctx)` is the only sanctioned way to touch tenant data: it injects `tenant_id` from the
   verified session on insert and scopes every read/update/delete to the caller's tenant.
 
-## Deploy (Coolify — Phase 1, Task 10)
+## Deploy
 
-- App: **Dockerfile build pack**, exposes port `3000`, push-to-deploy, auto Let's Encrypt via Traefik.
-- Postgres: a **separate managed PostgreSQL 17** resource; enable S3 backups (cron `0 */4 * * *`, retention ≥ 7).
-- Env vars set as **secrets**: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL`. Optional
-  (Phase 7b, reminders + Web Push): `CRON_SECRET`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, and the
-  build ARG `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (same value as `VAPID_PUBLIC_KEY`; inlined into the client bundle at build).
-- Migrations run on container boot from `docker/entrypoint.sh` (bundled `dist/migrate.mjs`).
+> ⚠️ **The current deployment is orchestrated by the sibling `IthacaServer` repo, not by
+> Coolify.** Per the monorepo's root `README.md`: push to the **`prod-scheduling`** branch → the
+> server clones that branch and **builds on-site** (git-source mode) → `ssh icourse ops deploy`.
+> The root README also explains why this app must **not** be switched to image mode: `ops env-edit`
+> runs `compose up -d` as soon as it sees a `.env` diff, without pulling or confirming, so under
+> `pull_policy: always` "rotate an API key" would become a production release carrying schema
+> changes. Read that section before touching the release path.
+>
+> The Coolify-specific procedure below was the original Phase-1 target and is kept because the
+> **requirements it encodes are platform-independent** — whatever runs this container has to
+> satisfy them.
 
-### Reminders (Phase 7b — Coolify Scheduled Task)
+Platform-independent requirements:
+
+- App: **Dockerfile build pack**, exposes port `3000`, TLS terminated upstream (Traefik).
+- Postgres: a **separate** PostgreSQL 17 instance with **off-host backups**. (The web app's
+  2026-09-23 data loss happened because data and backups lived under one directory and nothing
+  was off-host — see `apps/web/docs/DEPLOYMENT.md` §2.)
+- Env vars set as **secrets**, never build-args: `DATABASE_URL`, `BETTER_AUTH_SECRET`,
+  `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL`, plus `ADMIN_EMAIL` / `ADMIN_PASSWORD` on a first
+  deploy (self-service signup is disabled, so without them **nobody can log in**;
+  docker-compose enforces this via `${ADMIN_EMAIL:?…}`). Optional: `CRON_SECRET`, `VAPID_*`,
+  `SITE_INGEST_SECRET`, `MCP_*`, `ANTHROPIC_API_KEY` / `MINIMAX_*`, `SMTP_*`. The one build ARG
+  is `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (same value as `VAPID_PUBLIC_KEY`; inlined into the client
+  bundle at build). The full contract, with each variable's unconfigured behaviour, is in
+  [`CLAUDE.md`](CLAUDE.md).
+- Boot sequence runs from `docker/entrypoint.sh`: orphan-tenant cleanup → room-overlap cleanup
+  → migrate → seed admin → serve. **The order is load-bearing** and step 2 *modifies data*
+  (it cancels the later lesson of each pre-0015 same-room overlap). See [`CLAUDE.md`](CLAUDE.md).
+
+### Reminders — must be an external scheduler
 
 Lesson reminders (24h + 1h before each lesson) are dispatched by an **external scheduler**, not an in-process
-timer (which would die/duplicate on redeploy). Add a **Scheduled Task** on the App resource that curls the secret-gated
-loopback route:
+timer (which would die/duplicate on redeploy). Whatever the platform calls it (Coolify Scheduled Task, a host
+crontab, a systemd timer), it has to curl the secret-gated loopback route:
 
 ```
 # every 5 minutes — the dedupeKey makes overlapping/retried runs idempotent

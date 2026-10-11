@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { eq } from 'drizzle-orm'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import { course, classSection, student, enrollment, lesson, grade, note } from '@/db/schema'
 import { getReportData } from '@/lib/report-data'
 import type { AuthContext } from '@/auth/context'

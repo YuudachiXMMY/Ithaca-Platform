@@ -7,7 +7,7 @@ import { requireAuthContext } from '@/auth/context'
 import { requirePermission } from '@/auth/authorize'
 import { actorOwnsSection, actorOwnsStudent } from '@/auth/scope'
 import { db } from '@/db'
-import { forTenant } from '@/db/tenant'
+import { forTenant, withTenantScope } from '@/db/tenant'
 import { enrollment, classSection } from '@/db/schema'
 
 // P2-9: roster management maps to `course` permissions.
@@ -67,7 +67,7 @@ export async function enrollStudent(input: z.input<typeof enrollSchema>) {
   // so the queries below run on the raw `tx`. To preserve M1 tenant isolation, EVERY WHERE keeps
   // tenantId AND-ed in exactly as forTenant would. The lock only serializes enrollers of the SAME
   // section, so contention is minimal.
-  const row = await db.transaction(async (tx) => {
+  const row = await withTenantScope(ctx.tenantId, async (tx) => {
     const [locked] = await tx
       .select({ capacity: classSection.capacity })
       .from(classSection)

@@ -44,10 +44,13 @@ Every ratio printed anywhere in this document was recomputed in those passes —
 >
 > ### SCOPE — two hard boundaries, stated once, here
 >
-> 1. **Never edit a file under `src/routes/admin/**` in this wave.** Every count in §3 is
->    **public-site only** (i.e. after `| grep -v /admin/`). The admin panel is §3.2 / §3.6 and
->    is deferred by `docs/DECISIONS.md`. Where a count differs with admin included, §3 says so.
->    (Round-2 finding R2-22.)
+> 1. ~~**Never edit a file under `src/routes/admin/**` in this wave.**~~ **VOID as of
+>    2026-10-10** — `552a31c` deleted the admin panel outright, so `src/routes/admin/` does not
+>    exist and the work §3.2 / §3.6 deferred has no object. Every count in §3 is therefore simply
+>    the whole app. The `| grep -v /admin/` filters left in the verification commands throughout
+>    this document are now **no-ops**; they have deliberately not been rewritten, because the
+>    numbers beside them were measured with those filters in place and editing ~15 command
+>    strings would only break that correspondence. (Originally Round-2 finding R2-22.)
 > 2. **Text over a photograph is BAND, never LIGHT** — see **§3.0 R-SCRIM**, which outranks every
 >    table in §3. A scrim is an `absolute inset-0` **sibling**, so the "nearest ancestor with a
 >    background" walk in §2 lands on the (now white) section and gives you the wrong column.

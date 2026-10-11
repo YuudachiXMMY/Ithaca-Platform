@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { eq } from 'drizzle-orm'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import { student, portalLink, progressReport } from '@/db/schema'
 import { getPortalReports } from '@/app/portal/reports/data'
 import type { AuthContext } from '@/auth/context'

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest'
 import { eq, inArray } from 'drizzle-orm'
 import { DateTime } from 'luxon'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import { organization, member, user, course, classSection, lesson } from '@/db/schema'
 import { forTenant } from '@/db/tenant'
 import { materializeSection } from '@/lib/materialize'

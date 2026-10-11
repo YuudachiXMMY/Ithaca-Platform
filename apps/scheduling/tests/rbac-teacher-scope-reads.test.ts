@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
 import { eq } from 'drizzle-orm'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import {
   course,
   classSection,

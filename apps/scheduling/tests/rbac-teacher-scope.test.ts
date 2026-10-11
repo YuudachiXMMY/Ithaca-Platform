@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
 import { eq } from 'drizzle-orm'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import { course, classSection, student, enrollment, lesson } from '@/db/schema'
 import { requireAuthContext, type AuthContext } from '@/auth/context'
 import { sectionIdsForActor, studentIdsForActor, actorOwnsSection } from '@/auth/scope'

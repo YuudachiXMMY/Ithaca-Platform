@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { auth } from '@/auth/auth'
 import { db } from '@/db'
 import { user as userTable, member, account, student, portalLink } from '@/db/schema'
-import { forTenant } from '@/db/tenant'
+import { forTenant, withTenantScope } from '@/db/tenant'
 import { isPortalRole } from '@/auth/portal'
 import { MIN_PASSWORD_LENGTH, PASSWORD_MIN_MESSAGE } from '@/auth/password-policy'
 import { env } from '@/env'
@@ -261,13 +261,15 @@ export async function unlinkPortalUserCore(
   userId: string,
   studentId: string,
 ): Promise<void> {
-  await db
-    .delete(portalLink)
-    .where(
-      and(
-        eq(portalLink.tenantId, ctx.tenantId),
-        eq(portalLink.studentId, studentId),
-        eq(portalLink.userId, userId),
+  await withTenantScope(ctx.tenantId, (tx) =>
+    tx
+      .delete(portalLink)
+      .where(
+        and(
+          eq(portalLink.tenantId, ctx.tenantId),
+          eq(portalLink.studentId, studentId),
+          eq(portalLink.userId, userId),
+        ),
       ),
-    )
+  )
 }

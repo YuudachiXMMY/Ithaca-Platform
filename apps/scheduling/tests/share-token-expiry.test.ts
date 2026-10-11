@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { and, eq } from 'drizzle-orm'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import { shareLink, student } from '@/db/schema'
 import { getShareByToken } from '@/lib/share'
 import { SHARE_TOKEN_TTL_DAYS, defaultShareExpiry, isTokenTimeActive } from '@/lib/share-ttl'

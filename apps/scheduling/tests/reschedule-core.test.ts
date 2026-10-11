@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { eq, inArray } from 'drizzle-orm'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import { forTenant } from '@/db/tenant'
 import {
   organization,

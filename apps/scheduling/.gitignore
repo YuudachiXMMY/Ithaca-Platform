@@ -29,9 +29,13 @@ next-env.d.ts
 tests/e2e/.auth
 tests/e2e/.seed
 
-# Next.js auto-generated agent rule files (next dev, agentRules)
-/AGENTS.md
-/CLAUDE.md
+# NOTE: /AGENTS.md and /CLAUDE.md used to be ignored here, because `next dev` (agentRules,
+# default true) auto-creates them. They are now TRACKED and hand-written — the generator only
+# upserts its own `<!-- BEGIN:nextjs-agent-rules -->` block and leaves everything else alone,
+# and that block is pre-seeded byte-exact so `next dev` reports `unchanged` and never dirties
+# the tree. Verify with: node -e "console.log(require('./node_modules/next/dist/server/lib/
+# generate-agent-files.js').writeAgentFiles(process.cwd()))"  → {agentsMd:'unchanged', claudeMd:'skipped'}
+# If a Next upgrade changes that block's content, commit the regenerated block with the upgrade.
 
 # misc
 .DS_Store

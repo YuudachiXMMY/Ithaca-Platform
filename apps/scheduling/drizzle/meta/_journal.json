@@ -183,6 +183,13 @@
       "when": 1791552153826,
       "tag": "0025_site_admin_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1791749402520,
+      "tag": "0026_tenant_rls",
+      "breakpoints": true
     }
   ]
 }

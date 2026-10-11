@@ -4,6 +4,7 @@ import { getVtimezoneComponent } from '@touch4it/ical-timezones'
 import { DateTime } from 'luxon'
 import { and, eq, gte, inArray, lt, ne, or } from 'drizzle-orm'
 import { db } from '@/db'
+import { withTenantScope } from '@/db/tenant'
 import { lesson, classSection, course, sectionTeacher } from '@/db/schema'
 import { APP_TIME_ZONE } from '@/lib/timezone'
 
@@ -65,52 +66,56 @@ export async function getFeedLessons(
   const { from, to } = feedWindow()
   // Join section → course so each event carries a real name ("课程名 · 班级名") instead of the
   // generic "课节". Both FKs are NOT NULL, so the inner joins never drop a lesson row.
-  const rows = await db
-    .select({
-      id: lesson.id,
-      title: lesson.title,
-      startAt: lesson.startAt,
-      endAt: lesson.endAt,
-      location: lesson.location,
-      sectionName: classSection.name,
-      courseTitle: course.title,
-    })
-    .from(lesson)
-    .innerJoin(
-      classSection,
-      and(eq(classSection.tenantId, lesson.tenantId), eq(classSection.id, lesson.sectionId)),
-    )
-    .innerJoin(
-      course,
-      and(eq(course.tenantId, classSection.tenantId), eq(course.id, classSection.courseId)),
-    )
-    .where(
-      and(
-        eq(lesson.tenantId, tenantId),
-        // 归属收敛：非空 teacherId → 取该教师作为「主讲」(classSection.teacherId) 或被加入 (section_teacher)
-        // 的 section 课次（混合模型，与 scope.ts 一致）；null → 不加此条件（全租户）。
-        teacherId
-          ? or(
-              eq(classSection.teacherId, teacherId),
-              inArray(
-                classSection.id,
-                db
-                  .select({ sectionId: sectionTeacher.sectionId })
-                  .from(sectionTeacher)
-                  .where(
-                    and(
-                      eq(sectionTeacher.tenantId, tenantId),
-                      eq(sectionTeacher.userId, teacherId),
+  // 0026/RLS: token-resolved tenant must be declared for the policies to match (see
+  // src/db/tenant.ts withTenantScope). The explicit `WHERE tenant_id` below is unchanged.
+  const rows = await withTenantScope(tenantId, (tx) =>
+    tx
+      .select({
+        id: lesson.id,
+        title: lesson.title,
+        startAt: lesson.startAt,
+        endAt: lesson.endAt,
+        location: lesson.location,
+        sectionName: classSection.name,
+        courseTitle: course.title,
+      })
+      .from(lesson)
+      .innerJoin(
+        classSection,
+        and(eq(classSection.tenantId, lesson.tenantId), eq(classSection.id, lesson.sectionId)),
+      )
+      .innerJoin(
+        course,
+        and(eq(course.tenantId, classSection.tenantId), eq(course.id, classSection.courseId)),
+      )
+      .where(
+        and(
+          eq(lesson.tenantId, tenantId),
+          // 归属收敛：非空 teacherId → 取该教师作为「主讲」(classSection.teacherId) 或被加入 (section_teacher)
+          // 的 section 课次（混合模型，与 scope.ts 一致）；null → 不加此条件（全租户）。
+          teacherId
+            ? or(
+                eq(classSection.teacherId, teacherId),
+                inArray(
+                  classSection.id,
+                  db
+                    .select({ sectionId: sectionTeacher.sectionId })
+                    .from(sectionTeacher)
+                    .where(
+                      and(
+                        eq(sectionTeacher.tenantId, tenantId),
+                        eq(sectionTeacher.userId, teacherId),
+                      ),
                     ),
-                  ),
-              ),
-            )
-          : undefined,
-        gte(lesson.startAt, from),
-        lt(lesson.startAt, to),
-        ne(lesson.status, 'canceled'),
+                ),
+              )
+            : undefined,
+          gte(lesson.startAt, from),
+          lt(lesson.startAt, to),
+          ne(lesson.status, 'canceled'),
+        ),
       ),
-    )
+  )
   return rows.map((r) => ({
     id: r.id,
     title: r.title ?? sectionDisplayName(r.courseTitle, r.sectionName),

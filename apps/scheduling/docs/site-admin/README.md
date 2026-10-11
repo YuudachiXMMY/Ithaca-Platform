@@ -1,5 +1,13 @@
 # 官网运营控制台（/dashboard/site）联调与上线
 
+> **状态：已上线。** 这份文档是那次移植的联调与上线运行手册，**保留作为记录**。第三、四节的
+> 上线顺序与验证清单已经走完；「四、已知事项」里的 3 与 4 已在 `552a31c` 解决，相应条目已标注。
+> 当前架构请看本项目的 [`CLAUDE.md`](../../CLAUDE.md) 与官网的 `apps/web/CLAUDE.md`。
+>
+> 两个 app 现在同仓（`ithaca-platform`），所以文中「官网仓」/「本项目」指的是
+> `apps/web/` 与 `apps/scheduling/`；文中的官网侧路径（如 `src/routes/api/contact/+server.ts`）
+> 都要加 `apps/web/` 前缀。
+
 ithacateens.com 的 `/admin`（询盘 / 订阅者 / 邮件群发 / 弹窗）已移植到本项目的
 `/dashboard/site`，用本项目的**平台超级管理员**账号登录。
 
@@ -72,7 +80,7 @@ npx vitest run   # 验证过：330 passed
 | `src/routes/api/contact/+server.ts` | 两处 Prisma 写入 → 一次 `postContact()`（同事务）。限流 / CSRF / Turnstile / 双语确认信**一行未动** |
 | `src/routes/api/subscribe/+server.ts` | P2002 那套 → `outcome` 三态判别式，409 与"仅插入方发欢迎信"逐字保留 |
 | `src/lib/server/popup-cache.ts` | Prisma → fetch，并加失败软降级（供陈旧值 / 冷启动短 TTL 重试） |
-| `src/hooks.server.ts` | `/admin/*` → 302 跳本项目控制台（`PUBLIC_SITE_ADMIN_URL` 未设则保持旧行为） |
+| `src/hooks.server.ts` | `/admin/*` → 302 跳本项目控制台。**已于 2026-10-10 改为硬编码兜底**（`https://dashboard.ithacateens.com/dashboard/site`）：旧页面删掉之后，"变量没配"会落到 404 而不是一个空控制台，而那正是运营方最需要跳转生效的时刻。`PUBLIC_SITE_ADMIN_URL` 仍可覆盖 |
 | `.env.example` | 新增三个变量的说明 |
 
 官网侧环境变量：
@@ -110,10 +118,15 @@ PUBLIC_SITE_ADMIN_URL="https://<排课系统域名>/dashboard/site"
    要恢复"立即"需要一个跨服务失效回调 —— 为一个 60 秒窗口引入这条耦合不值得。
 2. **官网表单硬依赖本项目在线。** 这是选择"数据搬到 `course_scheduling`"时接受的代价。
    官网日志会把这类失败与自身 bug 分开打（`[contact] 落库失败（课程排课系统不可达或拒绝）`）。
-3. **官网的 `/api/admin/*` 端点仍在，但已成死代码**（读的表不再有人写）。它们仍受会话保护，
-   无安全影响。连同 `src/routes/admin/**` 一起删除，建议单独一个清理 PR —— 混进本次改动
-   会让 diff 多出约 1700 行删除，没法好好审。
-4. **官网 Prisma 里那五个 model 不删表。** 删除不可逆且没有收益；现有数据留在原处。
+3. ~~**官网的 `/api/admin/*` 端点仍在，但已成死代码**，建议单独一个清理 PR。~~
+   **✅ 已完成 2026-10-10**（`552a31c` / PR #80，"官网无状态化"）。那个清理 PR 做得比这里
+   预计的更彻底：不只删了 `/api/admin/*` 和 `src/routes/admin/**`，连 Better Auth 与 Prisma
+   一起删了 —— 本次移植搬走数据之后，官网再没有任何需要数据库的运行时理由。官网现在是
+   **无状态**的，镜像里没有数据库客户端，容器启动也不再跑迁移。
+4. ~~**官网 Prisma 里那五个 model 不删表。**~~ **语境已变**：官网的 Prisma schema 整个不存在了，
+   所以那五个 model 也不存在了。**表本身仍留在旧的 `ithacafa` 库里**（当时的判断不变：删除
+   不可逆且没有收益），只是现在无人读写，也没有任何代码映射到它们。那批历史询盘与订阅者若
+   哪天要取，只能直接查那个库。
 
 ## 五、询盘资格字段（后续一笔）
 

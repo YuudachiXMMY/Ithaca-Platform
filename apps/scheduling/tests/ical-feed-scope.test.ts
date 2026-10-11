@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { and, eq } from 'drizzle-orm'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import { course, classSection, lesson, sectionTeacher } from '@/db/schema'
 import { getFeedLessons } from '@/lib/ical-feed'
 import { seedOrg, unseedOrg } from './helpers/seed-org'

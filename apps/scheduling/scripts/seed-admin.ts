@@ -25,7 +25,7 @@ import { and, eq } from 'drizzle-orm'
 import postgres from 'postgres'
 import { pathToFileURL } from 'node:url'
 import { auth } from '@/auth/auth'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import { user, member, organization } from '@/db/schema'
 import { env } from '@/env'
 

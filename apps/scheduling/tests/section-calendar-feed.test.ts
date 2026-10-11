@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { eq } from 'drizzle-orm'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import { course, classSection, lesson, sectionShareLink } from '@/db/schema'
 import { seedOrg, unseedOrg } from './helpers/seed-org'
 import { GET } from '@/app/api/calendar/section/[token]/route'
