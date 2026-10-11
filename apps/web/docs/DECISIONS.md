@@ -299,3 +299,40 @@ row — Season 2 is not a more important film than Season 1, it is the more rece
 label already says — above a full-measure strip of the three portrait clips. That strip stays
 `grid-cols-3` at **every** width: they are 9:16 boxes, so one column would spend 5.3 viewport
 heights on three incidental clips.
+
+---
+
+## 2026-10-10 — Documentation audit after the stateless refactor
+
+`552a31c` ("官网无状态化 — 删除 admin 面板、better-auth 与 Prisma", #80) deleted three
+subsystems in one commit but left every document that described them in place. This section
+records what was corrected, because a stale document is not merely out of date — it actively
+feeds wrong premises to the next reader, human or agent.
+
+**Scale of the rot.** `CLAUDE.md` carried **41** references to things that no longer existed
+(the admin panel, `/admin/(protected)/**`, Better Auth, `src/hooks.server.ts` session guards,
+Prisma, `prisma/schema.prisma`, six `db:*` npm scripts, `DATABASE_URL`, `BETTER_AUTH_*`,
+`ADMIN_EMAIL`/`ADMIN_PASSWORD`, and a container `CMD` that ran `migrate deploy` on boot).
+`AGENTS.md` carried 6, `README.md` 15, `docs/DEPLOYMENT.md` 18.
+
+| Document                               | Action                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CLAUDE.md`                            | Rewritten. Also newly documents what the refactor _added_ and nothing described: `src/lib/server/site-api.ts`, Turnstile, the `src/lib/content/` layer, OG card generation, the CJK font subset build step, and five of the eight e2e suites                                                                                                                                                                                                                                                         |
+| `AGENTS.md`                            | Rewritten                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `README.md`                            | Rewritten — the Prisma quick-start, six dead `db:*` scripts and the "Better Auth login" smoke-test description all had to go                                                                                                                                                                                                                                                                                                                                                                         |
+| `docs/DEPLOYMENT.md`                   | Corrected in place: the five-stage self-migrating image is now four stages with a bare `node build/index.js` CMD; the runtime env table lost `DATABASE_URL` / `BETTER_AUTH_*` and gained the scheduling-app and Turnstile variables; the blue/green topology no longer claims green depends on blue's database; the rollback section no longer warns about forward-only migrations; the Cloudflare Rule B rationale was re-derived (it is no longer "an authenticated `/admin` response could leak") |
+| `docs/CUTOVER.md`                      | Closed. Its one forward-looking task — "Part 2: author the DROP `admin_users_legacy` migration" — had already shipped as `20260926162933_drop_legacy_admin_users`, and the entire Prisma tree has since been deleted                                                                                                                                                                                                                                                                                 |
+| `docs/THIRD-PARTY.md`                  | The PostgreSQL 16, `better-auth` and `prisma` rows were removed and replaced by the real current dependency: the scheduling app's `/api/site/*`, with its deliberately asymmetric failure semantics. The four `pending` rows (manrope, inter, satori, resvg) were marked shipped                                                                                                                                                                                                                     |
+| `docs/LAUNCH-CHECKLIST.md`             | The two Prisma-migration release gates and the "never stop blue, it hosts the database" gate were replaced with the four that now actually gate a release: `PUBLIC_*` build-args, `ORIGIN`, the Turnstile key pairing, and `/api/site/*` contract compatibility                                                                                                                                                                                                                                      |
+| `docs/DESIGN-TOKENS.md`                | One targeted edit. Its 19 matches are almost all `\| grep -v /admin/` filters inside verification commands — now harmless no-ops, left alone so the counts recorded beside them still correspond to the command that produced them. The **scope box** was the real problem: it deferred the admin panel's token pass to §3.2 / §3.6, work that now has no object, so it is marked VOID                                                                                                               |
+| `docs/{CONTENT-GAPS,EDITING-GUIDE}.md` | Zero matches; verified clean                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+
+**The documentation rule this establishes.** When a subsystem is deleted, the documents that
+describe it are part of the diff — same commit, not a follow-up pass. Deferring it means that
+for the whole interval every reader, and this repo now has non-human readers, is being told the
+subsystem exists.
+
+**Deliberately not changed.** The `2026-09-29` entry above, and the `/admin/login was indexable`
+row in the defect table, both reference `AdminUser` and `/admin/*`. They are **correct history**:
+this file is an append-only decision log, and rewriting a past entry to match the present would
+destroy the record of why the change happened. Only forward-looking instructions were corrected.
