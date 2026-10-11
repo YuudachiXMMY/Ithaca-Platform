@@ -60,6 +60,13 @@ Consequences, all intended:
   `src/lib`, `src/mcp` or `src/components` imports it.
 - On an unmigrated database every connection fails with `role "app_rt" does not exist` — loudly, and
   never fail-open. Both `docker/entrypoint.sh` and `dev.sh` migrate before anything serves.
+- `/api/health`'s probe assumes the same role, from the shared `src/db/rls-role.ts` constant. It
+  keeps its own isolated connection (never the app pool — see the probe's comment) but **not** its
+  own identity. Added after this decision shipped: the probe had been left connecting as the
+  superuser `DATABASE_URL` names, so "the loud failure" above was loud only to real traffic. The
+  orchestrator's own health signal stayed green while every request died at connect time, which
+  turned a fail-closed design back into a fail-open deployment. `tests/health-route.test.ts` asserts
+  the option is passed.
 
 ### The policy, and why it fails closed
 

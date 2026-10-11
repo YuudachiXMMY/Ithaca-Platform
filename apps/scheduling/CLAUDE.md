@@ -57,7 +57,8 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
  │
  └─ api/
      ├─ auth/[...all]     Better Auth handler
-     ├─ health            {"ok":true}
+     ├─ health            {"ok":true}；探针自建连接但**同样降为 `app_rt`**，否则 app_rt 缺失时
+     │                    它仍返回绿、编排器继续打流量（见 ADR 0003 的 consequences）
      ├─ [transport]       MCP Streamable HTTP（静态 bearer，恒定时间比对）
      ├─ cron/reminders    课前 24h / 1h 提醒派发（CRON_SECRET 把门，外部调度器 curl）
      ├─ calendar/[token]              iCal feed（学生）
@@ -76,6 +77,7 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
 | `src/auth` | **鉴权脊梁**，15 个模块，见下表 |
 | `src/db/tenant.ts` | `forTenant(ctx, exec?)` —— 碰租户数据的正道；`withTenantScope(tenantId, fn)` —— 给 token 公开读取 / 批量写入这类合法例外用的显式作用域 |
 | `src/db/admin.ts` | ⚠️ **绕过 RLS** 的超级用户客户端。只给 `scripts/` 与 `tests/`，app 代码 import 它会让 CI 红 |
+| `src/db/rls-role.ts` | `-c role=app_rt` 这一个常量。单独成文件是为了让 `/api/health` 能复用它而不必 import `@/db`（那会把 10 连接的池建起来） |
 | `src/db/schema/` | 21 个 schema 模块（见下） |
 | `src/db/auth-schema.ts` | Better Auth **生成**的表（`user`/`session`/`organization`/`member`/…）。改它请跑 `npm run auth:generate`，不要手改 |
 | `src/lib/*` | 业务核心逻辑，一律是可单测的纯函数 / core 函数（见下） |
@@ -125,7 +127,9 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
 
 三个必须知道的点：
 
-1. **运行时不是超级用户。** `src/db/index.ts` 建连时带 `-c role=app_rt` 降为受约束角色。
+1. **运行时不是超级用户。** `src/db/index.ts` 建连时带 `-c role=app_rt` 降为受约束角色（选项字符串
+   在 `src/db/rls-role.ts`，`/api/health` 的探针共用同一个常量 —— **任何**自建连接的运行时代码
+   都要带上它，否则就是一条绕过 RLS 的裸连接）。
    `DATABASE_URL` 里的 `app` 是超级用户且有 BYPASSRLS，**会忽略策略，连 `FORCE ROW LEVEL
    SECURITY` 都拦不住** —— ADR 0001 漏了这一层，照它写会得到一个装好了却一行都没拦的 RLS。
 2. **GUC 未设时求值为 NULL ⇒ 读 0 行、写被拒。** 失败即关门，但**无声**。

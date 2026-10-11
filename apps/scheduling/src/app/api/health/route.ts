@@ -1,4 +1,5 @@
 import postgres from 'postgres'
+import { RLS_ROLE_OPTIONS } from '@/db/rls-role'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -27,7 +28,13 @@ async function probeDatabase(): Promise<boolean> {
     max: 1,
     connect_timeout: DB_PROBE_TIMEOUT_S,
     idle_timeout: 1,
-    connection: { statement_timeout: DB_PROBE_TIMEOUT_MS },
+    // H5: assume `app_rt` exactly as @/db does. The probe is isolated from the app POOL, but it must
+    // not be isolated from the app's IDENTITY: `DATABASE_URL` names a superuser, so a probe that
+    // connects without this option answers a question nothing is asking ("can the superuser reach
+    // Postgres?") and stays green while every real request dies at connect time on
+    // `role "app_rt" does not exist` — a half-migrated or mis-granted database would then be marked
+    // healthy and kept in rotation, which is the exact fail-open H1 above exists to prevent.
+    connection: { options: RLS_ROLE_OPTIONS, statement_timeout: DB_PROBE_TIMEOUT_MS },
     onnotice: () => {},
   })
   let timer: ReturnType<typeof setTimeout> | undefined
