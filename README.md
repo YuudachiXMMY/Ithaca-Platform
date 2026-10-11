@@ -40,7 +40,10 @@ apps/
 
 ## CI
 
-根目录四个 workflow，各带 `paths:` 过滤：`web-ci` / `web-release` / `web-lighthouse` / `scheduling-ci`。
+根目录四个 workflow：`web-ci` / `web-release` / `web-lighthouse` / `scheduling-ci`。前三个里**只有
+`web-ci`、`web-release`、`scheduling-ci` 带 `paths:` 过滤** —— `web-lighthouse` 没有，也不可能有：
+它的触发是 `workflow_dispatch` + 周一 06:00 的 `schedule`，而这两种事件**不支持 `paths:`**
+（`paths:` 只对 `push` / `pull_request` 生效）。
 
 GitHub **只读仓库根目录**的 `.github/`，所以它们必须在这里。合并前各 app 自己那份在 git 历史里（`apps/*/.github/workflows/`），同一笔提交里删除。
 
@@ -49,6 +52,15 @@ GitHub **只读仓库根目录**的 `.github/`，所以它们必须在这里。�
 - `defaults.run.working-directory` **只作用于 `run` 步骤**，不作用于 `uses`。所以 `setup-node` 要显式 `cache-dependency-path`、buildx 要显式 `context:`、`upload-artifact` 要写全路径。写错是**静默**失败（空缓存、或 artifact 从不上传）。
 - **Actions 缓存是 per-repository 10 GB 硬上限，付费买不到更多。** 合并前两仓各占 5.30 / 5.74 GB，合计已超。所以 `cache-to` 一律 `mode=min` 且带 scope，PR 事件**只读不写**（一个 PR 不该挤掉 main 的热缓存）。被 LRU 挤掉的总是最久没碰的那批，也就是只在发布日才用到的发布层——而那恰好是直通生产的构建。
 - `web-lighthouse` 改成了 `workflow_dispatch` + 周定时。合并前它是官网仓 67% 的 CI 分钟数且 65 跑 59 红。那个红是**真实的 LCP 债**不是抖动，但 runner 自身方差太大（`/` 三次采样 6304 / 6509 / 10420 ms，对 4500 ms 门限），当 per-PR 门禁不合适。**不要**通过放宽 `assertMatrix` 来"修"它——配置注释记录了那些数字是在作者本机量的，放宽等于藏回归。
+
+## 给 AI agent 的入口
+
+`CLAUDE.md`（Claude Code）与 `AGENTS.md`（通用）在根目录，两个 app 各有自己的一份。
+分层是：`AGENTS.md` 放便携的硬规矩，`CLAUDE.md` 用 `@AGENTS.md` 导入后再写工具特有的细节 ——
+同一条事实只维护一处。
+
+动手之前至少知道两件事：**官网是无状态的**（没有数据库），**排课系统的租户隔离只靠
+`forTenant(ctx)` 一条代码路径，没有 RLS 兜底**。
 
 ## 历史
 
