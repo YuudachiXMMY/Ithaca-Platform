@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest'
 import { eq } from 'drizzle-orm'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import { course, classSection, student, enrollment, lesson, rescheduleRequest } from '@/db/schema'
 import { forTenant } from '@/db/tenant'
 import { approveRescheduleRequestCore, rejectRescheduleRequestCore } from '@/lib/reschedule-core'

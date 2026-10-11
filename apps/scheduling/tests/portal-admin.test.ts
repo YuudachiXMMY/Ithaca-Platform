@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { eq, inArray, like, or } from 'drizzle-orm'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import { organization, user, member, account, student, portalLink } from '@/db/schema'
 import { forTenant } from '@/db/tenant'
 import type { AuthContext } from '@/auth/context'

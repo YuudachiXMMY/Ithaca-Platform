@@ -23,7 +23,7 @@ import { dirname, resolve } from 'node:path'
 
 import { auth } from '@/auth/auth'
 import type { AuthContext } from '@/auth/context'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import {
   account,
   attendance,

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { and, eq } from 'drizzle-orm'
 import { db } from '@/db'
+import { withTenantScope } from '@/db/tenant'
 import { classSection, course } from '@/db/schema'
 import { getSectionShareByToken, getSectionScheduleForShare } from '@/lib/share'
 import { ScheduleCard } from '@/lib/schedule-card'
@@ -14,11 +15,7 @@ export const dynamic = 'force-dynamic'
 // noindex belt-and-suspenders: metadata here + X-Robots-Tag header in next.config (P4-10).
 export const metadata: Metadata = { robots: { index: false, follow: false } }
 
-export default async function SectionSharePage({
-  params,
-}: {
-  params: Promise<{ token: string }>
-}) {
+export default async function SectionSharePage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params
   const share = await getSectionShareByToken(token)
   if (!share) notFound()
@@ -26,15 +23,17 @@ export default async function SectionSharePage({
   // Public read exception (P4-2): the section lookup is scoped by the token-RESOLVED
   // share.tenantId + share.sectionId — NEVER a request param. Deliberate, confined public read
   // (mirrors src/lib/share.ts), not the forTenant() spine.
-  const [sec] = await db
-    .select({ name: classSection.name, courseTitle: course.title })
-    .from(classSection)
-    .innerJoin(
-      course,
-      and(eq(course.tenantId, classSection.tenantId), eq(course.id, classSection.courseId)),
-    )
-    .where(and(eq(classSection.tenantId, share.tenantId), eq(classSection.id, share.sectionId)))
-    .limit(1)
+  const [sec] = await withTenantScope(share.tenantId, (tx) =>
+    tx
+      .select({ name: classSection.name, courseTitle: course.title })
+      .from(classSection)
+      .innerJoin(
+        course,
+        and(eq(course.tenantId, classSection.tenantId), eq(course.id, classSection.courseId)),
+      )
+      .where(and(eq(classSection.tenantId, share.tenantId), eq(classSection.id, share.sectionId)))
+      .limit(1),
+  )
   if (!sec) notFound()
 
   // ScheduleCard hardcodes "{studentName} 的课表" — pass the section's display name as the title.

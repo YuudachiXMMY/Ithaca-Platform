@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { and, eq, isNull } from 'drizzle-orm'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import { course, classSection, sectionShareLink } from '@/db/schema'
 import type { AuthContext } from '@/auth/context'
 import {

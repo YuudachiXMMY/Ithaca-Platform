@@ -10,7 +10,7 @@ vi.mock('@/auth/context', async (importActual) => ({
 }))
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import { course, classSection, lesson, calendarFeed } from '@/db/schema'
 import { requireAuthContext, type AuthContext } from '@/auth/context'
 import { getOrCreateFeed, rotateFeed, revokeFeed } from '@/app/dashboard/calendar/actions'

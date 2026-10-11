@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { and, count, eq, sql } from 'drizzle-orm'
 import type { AuthContext } from '@/auth/context'
 import { db } from '@/db'
-import { forTenant } from '@/db/tenant'
+import { forTenant, withTenantScope } from '@/db/tenant'
 import { rescheduleRequest, lesson, enrollment, classSection } from '@/db/schema'
 import { assertLinkedToStudent } from '@/auth/portal'
 import { actorOwnsSection } from '@/auth/scope'
@@ -80,7 +80,10 @@ export async function createRescheduleRequestCore(
   // exclude peers' uncommitted inserts) and all insert, overshooting the cap. Serialize same-user creators
   // with a per-(tenant,user) transaction-scoped advisory lock, then re-count and insert inside the txn so
   // the loser sees the winner's committed row. tenantId is kept in every WHERE / on the insert for M1.
-  const row = await db.transaction(async (tx) => {
+  // 0026/RLS: this transaction issues RAW `tx` statements on reschedule_request BEFORE any
+  // forTenant(ctx, tx) call would have set app.tenant_id, so the scope must be established by the
+  // transaction itself. withTenantScope does exactly that and nothing else.
+  const row = await withTenantScope(ctx.tenantId, async (tx) => {
     await tx.execute(
       sql`select pg_advisory_xact_lock(hashtext(${`${ctx.tenantId}:${ctx.userId}`}))`,
     )
@@ -126,8 +129,7 @@ async function assertReviewerOwnsRequestLesson(ctx: AuthContext, lessonId: strin
   // never the frozen lesson.teacherId — a reviewer removed from the section must lose review rights. A
   // co-teacher linked via section_teacher can review; owner/admin/superadmin bypass via actorOwnsSection.
   const section = await forTenant(ctx).findById(classSection, target.sectionId)
-  if (!section || !(await actorOwnsSection(ctx, section)))
-    throw new BusinessError('无权处理该申请')
+  if (!section || !(await actorOwnsSection(ctx, section))) throw new BusinessError('无权处理该申请')
 }
 
 // H7 internal control-flow sentinels: thrown inside the approve transaction to ABORT (and thus roll

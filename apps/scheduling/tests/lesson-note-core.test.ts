@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { and, eq, isNull } from 'drizzle-orm'
-import { db } from '@/db'
+import { db } from '@/db/admin'
 import { organization, member, user, course, classSection, lesson, note } from '@/db/schema'
 import { forTenant } from '@/db/tenant'
 import { upsertSharedNoteCore } from '@/lib/lesson-note-core'

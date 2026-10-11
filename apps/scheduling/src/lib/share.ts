@@ -1,6 +1,7 @@
 import 'server-only'
 import { and, eq, gt, inArray, isNull, or } from 'drizzle-orm'
 import { db } from '@/db'
+import { withTenantScope } from '@/db/tenant'
 import { shareLink, sectionShareLink, enrollment, lesson, classSection, course } from '@/db/schema'
 import { type FeedLesson, feedWindow, sectionDisplayName } from '@/lib/ical-feed'
 
@@ -71,14 +72,19 @@ async function courseTitlesForSections(
   sectionIds: string[],
 ): Promise<Map<string, string>> {
   if (sectionIds.length === 0) return new Map()
-  const rows = await db
-    .select({ id: classSection.id, name: classSection.name, courseTitle: course.title })
-    .from(classSection)
-    .innerJoin(
-      course,
-      and(eq(course.tenantId, classSection.tenantId), eq(course.id, classSection.courseId)),
-    )
-    .where(and(eq(classSection.tenantId, tenantId), inArray(classSection.id, sectionIds)))
+  // 0026/RLS: `WHERE tenant_id = …` below is still the control, but the policies read the
+  // transaction's app.tenant_id, so the token-resolved tenant has to be declared or this reads 0
+  // rows. withTenantScope grants no extra authority — it scopes to exactly this one tenant.
+  const rows = await withTenantScope(tenantId, (tx) =>
+    tx
+      .select({ id: classSection.id, name: classSection.name, courseTitle: course.title })
+      .from(classSection)
+      .innerJoin(
+        course,
+        and(eq(course.tenantId, classSection.tenantId), eq(course.id, classSection.courseId)),
+      )
+      .where(and(eq(classSection.tenantId, tenantId), inArray(classSection.id, sectionIds))),
+  )
   return new Map(rows.map((r) => [r.id, sectionDisplayName(r.courseTitle, r.name)]))
 }
 
@@ -94,18 +100,20 @@ async function scheduleForSectionIds(
 ): Promise<FeedLesson[]> {
   if (sectionIds.length === 0) return []
 
-  const rows = await db
-    .select({
-      id: lesson.id,
-      title: lesson.title,
-      startAt: lesson.startAt,
-      endAt: lesson.endAt,
-      location: lesson.location,
-      sectionId: lesson.sectionId,
-      status: lesson.status,
-    })
-    .from(lesson)
-    .where(and(eq(lesson.tenantId, tenantId), inArray(lesson.sectionId, sectionIds)))
+  const rows = await withTenantScope(tenantId, (tx) =>
+    tx
+      .select({
+        id: lesson.id,
+        title: lesson.title,
+        startAt: lesson.startAt,
+        endAt: lesson.endAt,
+        location: lesson.location,
+        sectionId: lesson.sectionId,
+        status: lesson.status,
+      })
+      .from(lesson)
+      .where(and(eq(lesson.tenantId, tenantId), inArray(lesson.sectionId, sectionIds))),
+  )
 
   // Fill each lesson's display title from its course/section before slicing, so the public card
   // shows "课程名 · 班级名" instead of the generic "课节" fallback.
@@ -144,16 +152,18 @@ export async function getStudentScheduleForShare(
   window = feedWindow(),
 ): Promise<FeedLesson[]> {
   // The student's ACTIVE sections (a parent must see only their child's current lessons).
-  const secs = await db
-    .select({ sectionId: enrollment.sectionId })
-    .from(enrollment)
-    .where(
-      and(
-        eq(enrollment.tenantId, tenantId),
-        eq(enrollment.studentId, studentId),
-        eq(enrollment.status, 'active'),
+  const secs = await withTenantScope(tenantId, (tx) =>
+    tx
+      .select({ sectionId: enrollment.sectionId })
+      .from(enrollment)
+      .where(
+        and(
+          eq(enrollment.tenantId, tenantId),
+          eq(enrollment.studentId, studentId),
+          eq(enrollment.status, 'active'),
+        ),
       ),
-    )
+  )
   const sectionIds = secs.map((s) => s.sectionId)
   // Empty active-enrollment set → scheduleForSectionIds returns [] (an `inArray([])` is invalid SQL).
   return scheduleForSectionIds(tenantId, sectionIds, window)

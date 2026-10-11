@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { and, eq } from 'drizzle-orm'
 import { db } from '@/db'
+import { withTenantScope } from '@/db/tenant'
 import { student } from '@/db/schema'
 import { getShareByToken, getStudentScheduleForShare } from '@/lib/share'
 import { ScheduleCard } from '@/lib/schedule-card'
@@ -21,11 +22,13 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
   // Public read exception (P4-2): the student lookup is scoped by the token-RESOLVED
   // share.tenantId + share.studentId — NEVER a request param. This is a deliberate,
   // confined public read (mirrors src/lib/share.ts), not the forTenant() spine.
-  const [s] = await db
-    .select()
-    .from(student)
-    .where(and(eq(student.tenantId, share.tenantId), eq(student.id, share.studentId)))
-    .limit(1)
+  const [s] = await withTenantScope(share.tenantId, (tx) =>
+    tx
+      .select()
+      .from(student)
+      .where(and(eq(student.tenantId, share.tenantId), eq(student.id, share.studentId)))
+      .limit(1),
+  )
   if (!s) notFound()
 
   const lessons = await getStudentScheduleForShare(share.tenantId, share.studentId)
