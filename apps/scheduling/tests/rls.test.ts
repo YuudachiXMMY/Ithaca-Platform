@@ -136,6 +136,12 @@ describe('RLS (migration 0026 / adr 0003)', () => {
   })
 
   // ── Completeness: a new tenant table must not slip through unprotected ────────────────────────
+  //
+  // NOTE: this check is deliberately "a tenant_isolation policy EXISTS", which means it stays GREEN
+  // if someone adds a SECOND, permissive policy alongside it — exactly what 0026 §4's
+  // `token_lookup USING (true)` was. The complementary assertion ("no permissive policy whose
+  // predicate omits app.tenant_id") lives in tests/token-resolver.test.ts, next to the 0027/0028
+  // context that explains why those policies existed. Strengthen them together, not separately.
   it('EVERY tenant_id table has RLS enabled and a tenant_isolation policy', async () => {
     const rows = await adminDb.execute<{
       table_name: string

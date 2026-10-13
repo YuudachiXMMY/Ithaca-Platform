@@ -1,8 +1,8 @@
 import 'server-only'
-import { and, eq, gt, inArray, isNull, or } from 'drizzle-orm'
-import { db } from '@/db'
+import { and, eq, inArray } from 'drizzle-orm'
 import { withTenantScope } from '@/db/tenant'
-import { shareLink, sectionShareLink, enrollment, lesson, classSection, course } from '@/db/schema'
+import { resolveShareLink, resolveSectionShareLink } from '@/db/token-resolvers'
+import { enrollment, lesson, classSection, course } from '@/db/schema'
 import { type FeedLesson, feedWindow, sectionDisplayName } from '@/lib/ical-feed'
 
 // Shape the pure slicing helper needs from a lesson row. Kept minimal so BOTH the public
@@ -124,22 +124,19 @@ async function scheduleForSectionIds(
   return sliceLessonsForSections(named, sectionIds, window)
 }
 
-// Resolve a capability token to its (non-revoked) shareLink row, or null. Global-unique token
-// index → a single row; a revoked token resolves to null so its URL 404s.
+// Resolve a capability token to a narrow { tenantId, studentId, token } PROJECTION of its
+// (non-revoked) share_link row, or null. NOT the full row: id / label / revokedAt / expiresAt /
+// createdAt / updatedAt are deliberately not returned, because nothing consumes them — so reaching
+// for share.expiresAt here is a typecheck error rather than a runtime surprise. Global-unique token
+// index → a single row; a revoked or expired token resolves to null so its URL 404s.
+//
+// 0027: the lookup moved into the `resolve_share_link` SECURITY DEFINER function
+// (src/db/token-resolvers.ts). The revoked/expiry predicate that used to sit here is now inside
+// that function, so it is enforced once instead of being copy-pasted at three call sites — the
+// semantics are unchanged (H6: NULL expiry = never expires, an expired token 404s like a revoked
+// one), except that the clock is the database transaction's rather than this process's.
 export async function getShareByToken(token: string) {
-  const [row] = await db
-    .select()
-    .from(shareLink)
-    .where(
-      and(
-        eq(shareLink.token, token),
-        isNull(shareLink.revokedAt),
-        // H6: expired tokens 404 like revoked ones. NULL expiry = never expires (grandfathered).
-        or(isNull(shareLink.expiresAt), gt(shareLink.expiresAt, new Date())),
-      ),
-    )
-    .limit(1)
-  return row ?? null
+  return resolveShareLink(token)
 }
 
 // P4-2 EXCEPTION: NO AuthContext here. `tenantId`/`studentId` come from a token-resolved
@@ -169,23 +166,14 @@ export async function getStudentScheduleForShare(
   return scheduleForSectionIds(tenantId, sectionIds, window)
 }
 
-// 功能2 — section mirror of getShareByToken. Resolve a capability token to its (non-revoked)
-// sectionShareLink row, or null. Global-unique token index → a single row; a revoked token → null
-// so its URL 404s.
+// 功能2 — section mirror of getShareByToken. Resolves to { tenantId, sectionId, label, token },
+// again a projection rather than the row. `label` IS carried here, unlike the student share above,
+// because /api/calendar/section/[token] names the .ics calendar after it; `share_link.label` has no
+// consumer and so is omitted. Global-unique token index → a single row; a revoked or expired token
+// → null so its URL 404s.
+// 0027: see getShareByToken — the lookup is now `resolve_section_share_link`.
 export async function getSectionShareByToken(token: string) {
-  const [row] = await db
-    .select()
-    .from(sectionShareLink)
-    .where(
-      and(
-        eq(sectionShareLink.token, token),
-        isNull(sectionShareLink.revokedAt),
-        // H6: expired tokens 404 like revoked ones. NULL expiry = never expires (grandfathered).
-        or(isNull(sectionShareLink.expiresAt), gt(sectionShareLink.expiresAt, new Date())),
-      ),
-    )
-    .limit(1)
-  return row ?? null
+  return resolveSectionShareLink(token)
 }
 
 // 功能2 — section mirror of getStudentScheduleForShare. Same P4-2 public-read exception: NO

@@ -42,11 +42,16 @@ export const ALLOWLIST: readonly string[] = [
   // ── Public token reads: resolve a capability token to its row WITHOUT an AuthContext, then read
   // STRICTLY scoped by that token-resolved tenant/section/student — never by a request param. forTenant
   // needs an AuthContext that does not exist on these public routes.
-  'src/lib/share.ts',
-  'src/lib/ical-feed.ts',
-  'src/app/api/calendar/[token]/route.ts',
-  'src/app/s/[token]/page.tsx',
-  'src/app/sec/[token]/page.tsx',
+  //
+  // 0027 shrank this group from five entries to two. The token→(tenant, subject) lookups now go
+  // through three SECURITY DEFINER functions concentrated in src/db/token-resolvers.ts (rule 1 still
+  // matches its `db.execute(`), so src/lib/share.ts, src/app/api/calendar/[token]/route.ts and the
+  // two public pages no longer touch raw `db` at all and were removed from this list. Keep it that
+  // way: an entry here that no longer needs to be here permanently un-guards that file for future
+  // edits, and main()'s staleness check only catches entries whose FILE is missing, never entries
+  // that have become unnecessary.
+  'src/db/token-resolvers.ts', // the three resolve_*() calls; the ONLY sanctioned RLS-bypassing reads
+  'src/lib/ical-feed.ts', // unrelated: an inArray() lesson select, scoped by a token-resolved tenantId
 
   // ── Documented forTenant bulk-write exceptions: forTenant has no bulk/upsert helper, so these use raw
   // db writes that FORCE an explicit tenantId in every row + the conflict target, so the write can never
@@ -267,9 +272,33 @@ export function importsAdminDb(src: string): boolean {
   return ADMIN_DB_IMPORT.test(src)
 }
 
-// The application surface this second rule covers. `src/db/` is excluded: `admin.ts` is the module
-// being guarded and `index.ts` is its RLS-constrained counterpart, and neither imports the other.
-const APP_DIRS = ['src/app/', 'src/auth/', 'src/lib/', 'src/mcp/', 'src/components/'] as const
+// The application surface this second rule covers.
+//
+// `src/db/` USED to be excluded wholesale, on the reasoning that "admin.ts is the module being
+// guarded and index.ts is its RLS-constrained counterpart, and neither imports the other". That was
+// true of the two files that existed when it was written, and it silently stopped being a safe rule
+// the moment a third file appeared: 0027 added `src/db/token-resolvers.ts`, which ADR 0004 calls the
+// only sanctioned RLS-bypassing read surface in the application. Excluding the directory meant the
+// strongest of the three rules did not cover the most sensitive module in it — and because the
+// token lookups previously lived in src/lib/ and src/app/, moving them here REDUCED coverage.
+// (Confirmed by inserting an `@/db/admin` import into token-resolvers.ts: the guard exited 0.)
+//
+// So: scan `src/db/` too, and exempt exactly the one file that must import itself.
+const APP_DIRS = [
+  'src/app/',
+  'src/auth/',
+  'src/lib/',
+  'src/mcp/',
+  'src/components/',
+  'src/db/',
+] as const
+
+// `src/db/admin.ts` IS the admin client — it necessarily matches ADMIN_DB_IMPORT's own re-export
+// line. Nothing else under src/db/ may import it: not index.ts (the constrained counterpart), not
+// tenant.ts (the forTenant spine), and above all not token-resolvers.ts, where swapping the module
+// `db` for the superuser client would turn three narrow definer lookups into a BYPASSRLS connection
+// for the whole request — and would otherwise pass every test in the suite.
+const ADMIN_IMPORT_EXEMPT: ReadonlySet<string> = new Set(['src/db/admin.ts'])
 
 export function findAdminDbImports(root: string = process.cwd()): string[] {
   const srcRoot = join(root, 'src')
@@ -278,6 +307,7 @@ export function findAdminDbImports(root: string = process.cwd()): string[] {
   for (const abs of walk(srcRoot)) {
     const rel = relative(root, abs).split(sep).join('/')
     if (!APP_DIRS.some((d) => rel.startsWith(d))) continue
+    if (ADMIN_IMPORT_EXEMPT.has(rel)) continue
     if (importsAdminDb(readFileSync(abs, 'utf8'))) hits.push(rel)
   }
   return hits.sort()

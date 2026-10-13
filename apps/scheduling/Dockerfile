@@ -64,6 +64,14 @@ RUN node_modules/.bin/esbuild scripts/purge-tenant.ts \
       --bundle --platform=node --format=esm --target=node24 \
       --banner:js="import { createRequire as __cr } from 'module'; const require = __cr(import.meta.url);" \
       --external:cloudflare:sockets --outfile=dist/purge-tenant.mjs
+# Post-migrate verification that token resolution actually works on THIS database (adr/0004). Run by
+# the entrypoint right after migrate, fail-closed. Imports @/db/rls-role so the `-c role=app_rt` string
+# cannot drift from the one src/db/index.ts uses — that module `import 'server-only'`, hence the extra
+# --conditions=react-server (same trick as seed-admin below). Otherwise the same postgres + dotenv shape.
+RUN node_modules/.bin/esbuild scripts/verify-token-resolvers.ts \
+      --bundle --platform=node --format=esm --target=node24 --conditions=react-server \
+      --banner:js="import { createRequire as __cr } from 'module'; const require = __cr(import.meta.url);" \
+      --external:cloudflare:sockets --outfile=dist/verify-token-resolvers.mjs
 # Self-contained admin seed: bundle better-auth + drizzle + postgres into one .mjs. Unlike migrate,
 # seed-admin reuses @/db & @/auth/auth, which transitively `import 'server-only'` — the extra
 # --conditions=react-server resolves that to an empty module (same trick as db:seed:e2e) so the bundle
@@ -107,6 +115,7 @@ COPY --from=build --chown=nextjs:nodejs /app/dist/migrate.mjs ./dist/migrate.mjs
 COPY --from=build --chown=nextjs:nodejs /app/dist/cleanup-orphan-tenants.mjs ./dist/cleanup-orphan-tenants.mjs
 COPY --from=build --chown=nextjs:nodejs /app/dist/cleanup-room-overlaps.mjs ./dist/cleanup-room-overlaps.mjs
 COPY --from=build --chown=nextjs:nodejs /app/dist/purge-tenant.mjs ./dist/purge-tenant.mjs
+COPY --from=build --chown=nextjs:nodejs /app/dist/verify-token-resolvers.mjs ./dist/verify-token-resolvers.mjs
 COPY --from=build --chown=nextjs:nodejs /app/dist/seed-admin.mjs ./dist/seed-admin.mjs
 COPY --from=build --chown=nextjs:nodejs /app/drizzle ./drizzle
 COPY --from=build --chown=nextjs:nodejs /app/docker/entrypoint.sh ./entrypoint.sh

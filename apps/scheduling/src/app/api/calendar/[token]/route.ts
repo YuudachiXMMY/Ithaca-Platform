@@ -1,6 +1,4 @@
-import { and, eq, gt, isNull, or } from 'drizzle-orm'
-import { db } from '@/db'
-import { calendarFeed } from '@/db/schema'
+import { resolveCalendarFeed } from '@/db/token-resolvers'
 import { getFeedLessons, buildIcs } from '@/lib/ical-feed'
 import { env } from '@/env'
 
@@ -11,18 +9,14 @@ export const dynamic = 'force-dynamic'
 // dashboard/ auth-guard layout wraps it — a bad token gets 404, never a login redirect.
 export async function GET(_req: Request, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params // Next 16: params is a Promise
-  const [feed] = await db
-    .select()
-    .from(calendarFeed)
-    .where(
-      and(
-        eq(calendarFeed.token, token),
-        isNull(calendarFeed.revokedAt),
-        // H6: an expired feed 404s like a revoked one. NULL expiry = never expires (grandfathered).
-        or(isNull(calendarFeed.expiresAt), gt(calendarFeed.expiresAt, new Date())),
-      ),
-    )
-    .limit(1)
+  // 0027: resolved through the `resolve_calendar_feed` SECURITY DEFINER function
+  // (src/db/token-resolvers.ts), which carries the revoked/expiry predicate that used to be inlined
+  // here — H6 semantics unchanged: NULL expiry = never expires, an expired feed 404s like a revoked
+  // one.
+  //
+  // Branch on ROW ABSENCE, never on `feed.teacherId` being null: a null teacherId is the meaningful
+  // whole-tenant-feed case (P3-7), not a missing token.
+  const feed = await resolveCalendarFeed(token)
   if (!feed) return new Response('Not found', { status: 404 })
 
   // 评审 Slice D（B6/B45）：按 feed 行的归属维度取数——feed.teacherId 非空（section-scoped 教师自己的

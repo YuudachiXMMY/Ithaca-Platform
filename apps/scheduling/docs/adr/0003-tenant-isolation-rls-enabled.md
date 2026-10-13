@@ -67,9 +67,18 @@ Consequences, all intended:
   orchestrator's own health signal stayed green while every request died at connect time, which
   turned a fail-closed design back into a fail-open deployment.
 - That probe reads a **table** (`select 1 from "organization" limit 0`), not a bare `select 1`,
-  because §1 (create the role) and §2 (grant it table access) of migration `0026` are separate steps
-  and therefore separate failure modes — a migration that aborts between them leaves a role that
-  exists and can read nothing. `select 1` touches no relation, so it needs no GRANT and succeeds in
+  because "the role exists but can read nothing" is a reachable state: **a role is cluster-global
+  while a `GRANT` is database-local.** `CREATE ROLE app_rt` (§1) in one database makes the role
+  visible from every other database in the cluster, with no privileges there at all.
+  **Correction (ADR 0004, 2026-10-13):** this bullet originally justified the table read by saying
+  §1 and §2 "are separate steps and therefore separate failure modes — a migration that aborts
+  between them leaves a role that exists and can read nothing". That mechanism does not exist: the
+  drizzle migrator applies a whole pending set inside ONE transaction and PostgreSQL DDL is
+  transactional, so `0026` cannot half-apply from a mid-file abort. The probe is right; the stated
+  reason was wrong. Observed in the wild, which is how the error was found: the developer database
+  at `course-scheduling-postgres-1` had `app_rt` present, `pg_policies` empty and 26 of 27
+  migrations applied — `0026` had never run against it while the role existed from elsewhere in the
+  cluster. `select 1` touches no relation, so it needs no GRANT and succeeds in
   exactly that state: assuming the role is not sufficient to detect it. `limit 0` still runs the
   privilege check, since PostgreSQL checks table ACLs at executor start, before the first tuple is
   fetched. Verified on Postgres 17: with `SELECT` revoked from `app_rt`, the table probe fails with
@@ -110,7 +119,15 @@ justifies it; `withTenantScope` already makes a shared-transaction path expressi
 
 ## Residual risks
 
-**1. Token-resolution tables are readable across tenants.** `share_link`, `section_share_link` and
+**1. ~~Token-resolution tables are readable across tenants.~~ CLOSED by
+[ADR 0004](0004-token-resolver-functions.md)** (migrations `0027` + `0028`, 2026-10-13). The three
+`token_lookup` policies are gone; the lookups go through `SECURITY DEFINER` functions in
+`src/db/token-resolvers.ts`. The reduction is from "list every tenant's tokens" to "exchange a token
+you already hold" — 0004 says what remains unfixed. The original text is kept below because the
+constraint it describes (a token must resolve before the tenant is known) is still true and still
+shapes the design.
+
+`share_link`, `section_share_link` and
 `calendar_feed` carry an extra `FOR SELECT USING (true)` policy. They are looked up *by token*, and
 that lookup must happen before the tenant is known — there is no session on `/s/<token>`,
 `/sec/<token>` or the iCal feeds, and the token itself is the credential. A pure `tenant_isolation`
@@ -121,8 +138,8 @@ read access to the schedule it points at. Writes to those tables remain tenant-s
 PII-bearing table (`student`, `lesson`, `note`, `progress_report`, …) remains fully fail-closed. This
 is strictly better than the pre-0026 state, where such a query read everything directly — but it is
 **not total**. The complete fix is a `SECURITY DEFINER` resolver function per token table, so the
-lookup bypasses RLS for exactly one narrow query instead of for the whole table. Deliberately left as
-a follow-up rather than rushed in alongside this change.
+lookup bypasses RLS for exactly one narrow query instead of for the whole table. ~~Deliberately left
+as a follow-up rather than rushed in alongside this change.~~ Done — see ADR 0004.
 
 **2. `RESET ROLE` escapes the constraint.** `session_user` is still the superuser, so code that
 deliberately issues `RESET ROLE` or `SET ROLE app` regains BYPASSRLS. This protects against honest
@@ -159,6 +176,7 @@ The plumbing was not the hard part; the **silent** failures around it were.
 ## Revisit when
 
 - A hot page's latency is traced to the per-query transaction → consider per-request scoping there.
-- The token-table `SECURITY DEFINER` resolvers land → remove the `token_lookup` policies.
+- ~~The token-table `SECURITY DEFINER` resolvers land → remove the `token_lookup` policies.~~
+  Done, 2026-10-13: [ADR 0004](0004-token-resolver-functions.md), migrations `0027` + `0028`.
 - The runtime gets its own database credential → drop the `-c role=app_rt` startup option and
   residual risk 2 with it.
