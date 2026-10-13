@@ -202,6 +202,7 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
 | `npm run test:e2e` / `:ui` / `:headed` / `:report` | Playwright，需要跑着的 app + 迁移过的库 |
 | `npm run db:generate` | drizzle-kit 生成迁移 SQL |
 | `npm run db:migrate` | 应用迁移（advisory lock 保护） |
+| `npm run db:verify:resolvers` | 校验 0027/0028 的 token 解析在当前库上真的生效（只读；容器启动时自动跑） |
 | `npm run db:studio` | drizzle studio |
 | `npm run db:seed:admin` | 按 `ADMIN_*` 建平台超管（幂等） |
 | `npm run db:seed:e2e` | 重建 e2e 固定租户（幂等，先清后建） |
@@ -213,6 +214,7 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
 |---|---|
 | `check-tenant-db-access.ts` | **CI 守卫**，三条规则：① allowlist 外的文件碰裸 `db` CRUD 就红；② app 代码 import 绕过 RLS 的 `@/db/admin` 就红；③ `src/` 里 `postgres(...)` 不带 `RLS_ROLE_OPTIONS` 就红（前两条都假定连接已受 RLS 约束，第三条才管连接本身） |
 | `migrate.ts` | 迁移执行器（幂等 + advisory lock；非零退出就绝不服务半迁移的 schema） |
+| `verify-token-resolvers.ts` | **启动守卫**，entrypoint 第 4 步跑。只读、无锁、fail-closed。断言逻辑在 `token-resolver-checks.ts`（分开是为了入口能无条件执行 —— 条件式入口自检一旦判错就是「什么都没验还 exit 0」）。它要两条连接：超级用户读 `pg_proc`/`pg_policies` 并取一个活 token，`app_rt` 连接证明**应用真正用的角色**调得通 |
 | `cleanup-orphan-tenants.ts` | 0016 加 `tenant_id` 外键前必须先跑，否则容器 crash-loop |
 | `cleanup-room-overlaps.ts` | 0015 加 EXCLUDE 约束前必须先跑；`--fix` 会**取消重叠课节中较晚的那一节** |
 | `purge-tenant.ts` | 彻底删除一个租户 |
@@ -303,8 +305,13 @@ calendar / teach-notes / users / rbac / smoke）`portal/` `public/`。
 2. cleanup-room-overlaps.mjs --fix ← 必须在 migrate 前：0015 加 EXCLUDE 约束，
                                       pre-0015 的同房间重叠课节会 crash-loop
 3. migrate.mjs                     ← 幂等 + advisory lock；非零退出就绝不服务半迁移的 schema
-4. seed-admin.mjs                  ← 幂等；ADMIN_* 未设则跳过（exit 0），真错误才中止
-5. exec node /app/server.js
+4. verify-token-resolvers.mjs      ← 必须在 migrate 后：只读校验 0027/0028 在**这个库**上真的生效
+                                      （owner 绕 RLS、app_rt 有 EXECUTE、PUBLIC 没有、token_lookup
+                                      策略已消失、有活 token 时端到端解析得通）。配错不会报错也不会
+                                      记日志，只是让每个 /s、/sec、.ics 静默 404，连 /api/health 都
+                                      是绿的 —— 所以这里 fail-closed：崩溃循环好过静默服务
+5. seed-admin.mjs                  ← 幂等；ADMIN_* 未设则跳过（exit 0），真错误才中止
+6. exec node /app/server.js
 ```
 
 这三个前置脚本都是幂等的、advisory-locked 的、对全新库安全的（0 行 / 还没有 schema 时空转）。

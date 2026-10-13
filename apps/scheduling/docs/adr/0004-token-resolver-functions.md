@@ -109,7 +109,35 @@ there is no down migration — so the only way to roll back is to revert the app
 a database that has already dropped `token_lookup`, pre-0027 code's plain `SELECT` returns **0 rows
 rather than an error**: every `/s/<token>`, `/sec/<token>` and `.ics` subscription 404s, nothing
 logs, and `/api/health` stays green because its probe deliberately reads `organization` (no
-`tenant_id`, hence no policy). Applying 0027 one release ahead of 0028 keeps a code rollback safe.
+`tenant_id`, hence no policy).
+
+Keeping the two files in separate releases would preserve a safe code rollback, because 0027 alone
+changes nothing observable.
+
+### Decision: both migrations ship in ONE release
+
+**They are both registered in `drizzle/meta/_journal.json` and apply in the same deployment.** The
+expand/contract split above is therefore structural, not a release schedule — it still means 0027 is
+applied before 0028 within that single transaction, but there is no release in between.
+
+What that costs, stated plainly: a code-only rollback is no longer safe by itself. Revert the
+application and the database still sits at 0028, so every token route silently 404s until the three
+statements below are pasted in. That is accepted, with the safety net being mechanical rather than
+procedural:
+
+`scripts/verify-token-resolvers.ts` runs on every boot from `docker/entrypoint.sh`, immediately
+after `migrate.mjs`, and **fails the container** unless token resolution actually works on that
+database — the functions exist, are `SECURITY DEFINER`, are owned by a role that bypasses RLS,
+`PUBLIC` holds no `EXECUTE` while `app_rt` does, no `token_lookup` policy survives, and (whenever a
+live token exists) `app_rt` really does resolve one through the definer while reading 0 rows from the
+same table directly. Those last two together are the actual proof; either alone returns 0 rows for
+both a healthy and a broken deployment.
+
+This closes the gap that the one-release choice opens: the misconfiguration it guards against —
+wrong owner, missing GRANT, or 0028 applied without 0027 — is otherwise invisible, since nothing
+errors, nothing logs, `/api/health` cannot see it, and CI proving it is meaningless (a role is
+cluster-global, a `GRANT` is database-local). `tests/verify-token-resolvers.test.ts` breaks each
+invariant in turn to prove the guard is not vacuous.
 
 ### Rolling back
 

@@ -15,6 +15,15 @@ node /app/dist/cleanup-room-overlaps.mjs --fix  # F4: idempotent (skips once 001
                                                 # later lesson of each overlap; no-op on a clean DB.
 echo "[entrypoint] applying migrations"
 node /app/dist/migrate.mjs           # idempotent + advisory-locked; non-zero abort => never serve a half-migrated schema
+echo "[entrypoint] verifying token resolvers (post-migrate)"
+node /app/dist/verify-token-resolvers.mjs  # read-only; MUST run after migrate: 0027 creates the three
+                                           # SECURITY DEFINER resolvers and 0028 drops the permissive
+                                           # token_lookup policies in the SAME release, so a bad owner
+                                           # or a missing GRANT makes every /s/<token>, /sec/<token> and
+                                           # .ics feed return 0 rows -> 404, with nothing logged and
+                                           # /api/health still green (its probe reads `organization`).
+                                           # Fail-closed: crash-loop beats serving that silently. No
+                                           # advisory lock needed (no writes). See adr/0004.
 echo "[entrypoint] seeding default admin (idempotent)"
 node /app/dist/seed-admin.mjs        # idempotent + advisory-locked; skips (exit 0) if ADMIN_* unset, aborts on real error
 echo "[entrypoint] starting next standalone server"
