@@ -46,12 +46,27 @@ Last reviewed: 2026-09-29 · Status: **not ready** (workstreams in progress)
 > `/programs/ev-team`, which is what `lighthouserc.json` actually measures. Renamed throughout.
 > The medians have also been re-measured — the previous ones predated the CJK font being enabled.
 
-- [x] 🔴 **Every route is inside its `lighthouserc.json` LCP ratchet.** It was not before
-      2026-10-13: five of seven were over, `/zh/programs/ev-team` by 2.3s against a ceiling the
-      config describes as one it "came back under unaided" — so the weekly red was never purely
-      runner variance. `outputStructure: 'locale-modules'` fixed all seven; the mechanism and the
-      numbers are in `DECISIONS.md`, 2026-10-13. **Ratchets can now be tightened** — that is the
-      documented protocol (down only, never up).
+- [ ] 🔴 **`web Lighthouse` is still red on the runner — 3 of 7 routes over their LCP ratchet,
+      down from 4.** `outputStructure: 'locale-modules'` (2026-10-13) improved every route and
+      brought all seven inside their ratchets **on localhost**, but the ratchets were calibrated on
+      localhost and the GitHub runner is ~2× slower on CPU, so three remain over there. See the
+      table below. `/`'s 22 ms is inside the variance this harness is documented to have
+      (`web-lighthouse.yml` records `/` at 6304 / 6509 / 10420 ms on three consecutive samples); the
+      two ev-team routes are a real remaining gap. **Do not close this box by raising a ratchet** —
+      that is forbidden in five places; the ratchets may only come down.
+
+LCP medians of 3, mobile, simulated. Runner figures from run 38401256331:
+
+| route                  | ratchet | runner before | runner after             | localhost after |
+| ---------------------- | ------- | ------------- | ------------------------ | --------------- |
+| `/`                    | 4500    | 6252          | **4522** (over by 22)    | 4155 ✅         |
+| `/about-us`            | 4500    | 4152          | **3184** ✅              | 3474 ✅         |
+| `/programs`            | 4500    | 3972          | **3365** ✅              | 3476 ✅         |
+| `/contact-us`          | 4500    | 3701          | **3353** ✅              | 3098 ✅         |
+| `/zh`                  | 5800    | 11349         | **5543** ✅              | 5424 ✅         |
+| `/programs/ev-team`    | 7800    | 9686          | **8465** (over by 665)   | 5873 ✅         |
+| `/zh/programs/ev-team` | 7800    | 11642         | **10600** (over by 2800) | 7299 ✅         |
+
 - [ ] 🔴 **LCP ≤ 2500ms is still unmet on every route, which is what keeps this section red.**
       The 2.5s PRD target is a different and much harder bar than the ratchets. LCP medians of 3,
       localhost mobile — **before → after** the 2026-10-13 change, against each route's ratchet:
@@ -72,11 +87,11 @@ Last reviewed: 2026-09-29 · Status: **not ready** (workstreams in progress)
       dependency graph.
 - [ ] 🔴 Lighthouse mobile on `/`, `/programs/ev-team`, `/contact-us`:
       Performance ≥ 90 · Accessibility ≥ 95 · SEO ≥ 95 · Best Practices ≥ 95
-      (perf medians of 3, localhost, **after** the 2026-10-13 change: `/` 83 · `/about-us` 88 ·
+      (perf medians of 3, **after** the 2026-10-13 change. localhost: `/` 83 · `/about-us` 88 ·
       `/programs` 88 · `/programs/ev-team` 75 · `/contact-us` 91 · `/zh` 70 ·
-      `/zh/programs/ev-team` 66. The **GitHub runner** measured the PRE-change build at
-      60 · 81 · 79 · 37 · 82 · 57 · 34 — it is ~2× slower on CPU, which is why
-      `web-lighthouse.yml` is not a per-PR gate. The runner has not re-measured since.)
+      `/zh/programs/ev-team` 66. **GitHub runner**, same build: 60 · 90 · 87 · 45 · 88 · 65 · 41 —
+      every route improved on the runner too, but it is ~2× slower on CPU, which is why
+      `web-lighthouse.yml` is not a per-PR gate.)
 - [ ] 🔴 `/programs/ev-team` remains the worst route (5.9s localhost) and still needs its own pass.
       Its LCP element is the hero photograph. Every route-specific cause proposed so far has been
       measured and refuted — including the missing `fetchpriority="high"`, which is real but worth

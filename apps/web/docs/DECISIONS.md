@@ -383,6 +383,31 @@ on `/about-us`), because a locale module is the union of the messages any route 
 `_app/immutable/*` — hashed, edge-cached — so a returning visitor pays nothing, and 18 fewer
 requests is the other side of the trade.
 
+### What the CI runner says, which is not the same thing
+
+The table above is localhost, because that is what the ratchets were calibrated on. `web Lighthouse`
+was then dispatched on the branch (run 38401256331). Every route improved there too, but the runner
+is ~2× slower on CPU and **three routes are still over**, so the workflow is still red — down from
+four failures, not to zero:
+
+| route                  | ratchet | runner before | runner after | verdict         |
+| ---------------------- | ------- | ------------- | ------------ | --------------- |
+| `/`                    | 4500    | 6252          | 4522         | over by 22 ms   |
+| `/about-us`            | 4500    | 4152          | 3184         | pass            |
+| `/programs`            | 4500    | 3972          | 3365         | pass            |
+| `/contact-us`          | 4500    | 3701          | 3353         | pass            |
+| `/zh`                  | 5800    | 11349         | **5543**     | pass (−5.8 s)   |
+| `/programs/ev-team`    | 7800    | 9686          | 8465         | over by 665 ms  |
+| `/zh/programs/ev-team` | 7800    | 11642         | 10600        | over by 2800 ms |
+
+`/`'s 22 ms is inside this harness's documented variance (`web-lighthouse.yml` records `/` at
+6304 / 6509 / 10420 ms on three consecutive samples). The two ev-team routes are a real remaining
+gap and the ratchets stay where they are — they may only come down.
+
+Worth noting what moved most: `/zh` fell **5.8 seconds** on the runner. Its previous 11.3 s was
+mostly the pre-paint request graph, not the CJK webfont the docs had been blaming — the font's
+measured +1.28 s (D-8) is real but was never the dominant term.
+
 **Rejected — bundler chunk merging.** `build.rollupOptions.output.advancedChunks` with `minSize:
 20000` or `minShareCount: 20` changes **nothing** (54 hints, byte-identical). These chunks are small
 _because_ they are shared across routes, and the bundler will not duplicate-inline them on request.
