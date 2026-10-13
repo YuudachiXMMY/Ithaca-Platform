@@ -43,6 +43,12 @@ current_setting('app.tenant_id', true))` 在 GUC 未设时求值为 NULL，**失
 那些用 `withTenantScope(tenantId, fn)`，它开一个事务并把作用域设成你指定的那**一个**租户。
 它不给任何额外权限，也**不是**跨租户读取的途径。
 
+那条链的**第一步**（token → 它属于哪个租户）连 `withTenantScope` 都用不了，因为租户正是要查的
+东西。它走 `src/db/token-resolvers.ts` 的三个 `SECURITY DEFINER` 函数（迁移 `0027`+`0028`，
+`docs/adr/0004-token-resolver-functions.md`），**那是全 app 唯一一处合法绕过 RLS 的读**。
+对 `share_link` / `section_share_link` / `calendar_feed` 自己写裸 SELECT 现在返回 0 行 ——
+不报错，**无声**。拿到 `tenantId` 之后再用 `withTenantScope` 读实际数据。
+
 ⚠️ **`SET LOCAL` 在事务外是静默空操作。** Postgres 接受它、告警、然后丢弃。任何新的作用域
 设置路径都必须在事务里，否则后续查询静默读到 0 行 —— 这个坑在实现时真的踩到了，见
 `src/db/tenant.ts` 里 `callerOwnsTx` 那段注释。
@@ -86,7 +92,7 @@ tenant 与 role，并且显式 `disableCookieCache: true` 绕过 Better Auth 的
 | AI | `@anthropic-ai/sdk`（默认）或 MiniMax（`REPORT_PROVIDER=minimax`），用于报告起草 |
 | MCP | `mcp-handler` + `@modelcontextprotocol/server`，挂在 `/api/[transport]` |
 | 导出 | `@react-pdf/renderer`（PDF）、Playwright（PNG）、`archiver`（ZIP）、`ical-generator` |
-| 测试 | vitest（96 个单测文件，**要一个跑着的 Postgres**）+ Playwright e2e |
+| 测试 | vitest（99 个单测文件，**要一个跑着的 Postgres**）+ Playwright e2e |
 
 ## 两套权限宇宙，别混
 

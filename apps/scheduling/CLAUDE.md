@@ -58,9 +58,10 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
  └─ api/
      ├─ auth/[...all]     Better Auth handler
      ├─ health            {"ok":true}；探针自建连接但**同样降为 `app_rt`**，且**读一张真表**
-     │                    （`select 1 from "organization" limit 0`）—— 角色缺失和授权掉了是
-     │                    0026 的两个独立失败模式，裸 `select 1` 不碰任何表、不需要授权，
-     │                    在后者下仍返回绿（见 ADR 0003 的 consequences）
+     │                    （`select 1 from "organization" limit 0`）—— 角色是集群级的而 GRANT 是
+     │                    库级的，所以「角色有、授权没有」是真实可达的状态；裸 `select 1` 不碰任何
+     │                    表、不需要授权，在那个状态下仍返回绿（见 ADR 0003 的 consequences，
+     │                    以及 ADR 0004 对其原理由的更正）
      ├─ [transport]       MCP Streamable HTTP（静态 bearer，恒定时间比对）
      ├─ cron/reminders    课前 24h / 1h 提醒派发（CRON_SECRET 把门，外部调度器 curl）
      ├─ calendar/[token]              iCal feed（学生）
@@ -86,8 +87,8 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
 | `src/lib/site/` | 官网控制台与写入端点的后端：`ingest-auth` `ingest-core` `admin-core` `campaigns-core` `recipients` `popup-active` `csv` `schemas` `authz` … |
 | `src/mcp/` | `register-tools.ts`（8 个 MCP 工具）+ `message.ts` |
 | `scripts/` | 运维与守卫脚本（见下） |
-| `drizzle/` | 27 个**单向**迁移 + `meta/`。`0026` 是 RLS 那一笔 |
-| `tests/` | 97 个 vitest 单测 + `tests/e2e/` 的 Playwright 套件 |
+| `drizzle/` | 29 个**单向**迁移 + `meta/`。`0026` 启用 RLS，`0027`+`0028` 把 token 解析收进 SECURITY DEFINER 函数 |
+| `tests/` | 99 个 vitest 单测 + `tests/e2e/` 的 Playwright 套件 |
 | `docker/entrypoint.sh` | 容器启动序列（见「Docker」） |
 | `.claude/PRPs`、`.claude/reviews` | PRD / plan / report / 安全审计 —— **历史记录**，与代码冲突时代码赢 |
 
@@ -139,9 +140,28 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
 3. **`scripts/` 与 `tests/` 走 `@/db/admin`**（超级用户，绕过策略）—— 迁移、跨租户清理、租户
    purge、以及"建第二个租户来证明两者隔离"的 fixture，都必须能跨租户。
 
-`token_lookup` 是一条刻意的例外：`share_link` / `section_share_link` / `calendar_feed` 额外有
-一条**仅 SELECT** 的宽松策略，因为按 token 查必须先于知道租户。代价与完整修法见 ADR 0003
-的「Residual risks」。
+**token 表的例外已经收口**（迁移 `0027`+`0028`，`docs/adr/0004-token-resolver-functions.md`）。
+`share_link` / `section_share_link` / `calendar_feed` 曾各带一条**仅 SELECT 且 `USING (true)`**
+的宽松策略 `token_lookup`，因为按 token 查必须先于知道租户 —— 代价是任何**忘记** `forTenant`
+的查询都能枚举全部租户的 token。现在这三张表和别的租户表一样 fail closed，按 token 解析走
+`src/db/token-resolvers.ts` 里的三个 `SECURITY DEFINER` 函数。
+
+你需要记住的三件事：
+
+- **`src/db/token-resolvers.ts` 是全 app 唯一一处合法绕过 RLS 的读**（写侧的对应物是
+  `src/db/admin.ts`）。要在无会话的公开路由上按 token 取数，调它，不要自己写裸 SELECT ——
+  裸 SELECT 现在返回 0 行而不是报错，**无声**。
+- 函数上的 `SET search_path = ''` **不能删**，但要知道它管的是什么：**只有** definer 加固
+  （不加它，函数体里任何未限定的引用都可能被调用方控制的 schema 遮蔽、然后以 owner 权限执行，
+  所以body 里每张表都写 `public.<t>`、每个函数都写 `pg_catalog.<f>`）。阻止 planner 内联
+  `LANGUAGE sql` 函数的是 `SECURITY DEFINER` 本身，不是这个子句 —— 实测 PG 17.11：definer
+  函数带不带 SET 都是 `Function Scan`，而 invoker 变体会内联成 `Seq Scan`。这条区分很要紧：
+  一个维护者去验证「SET 阻止内联」这个说法、发现是假的，很可能顺手把子句一起删掉，连真正的
+  加固一起删。
+- 函数的 OUT 参数是**加引号的 camelCase**（`"tenantId"`）。`db.execute` 原样返回驱动的列名，
+  drizzle 的 `casing: 'snake_case'` 不作用于裸 SQL；写成 snake_case 会让每个
+  `share.tenantId` 读到 `undefined`，一路流进 `withTenantScope(undefined, …)`，渲染出一张空
+  课表而不是 404。
 
 ### `src/lib` 的业务核心
 

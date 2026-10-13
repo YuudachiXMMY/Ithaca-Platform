@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { existsSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import {
   ALLOWLIST,
   buildsBarePgClient,
@@ -104,6 +106,29 @@ describe('findViolations (current tree)', () => {
   it('every allowlist entry still exists', () => {
     // A stale allowlist entry silently weakens the guard; keep it honest.
     expect(ALLOWLIST.length).toBeGreaterThan(0)
+    // This used to assert only the length, which is not what the name claims — the real existence
+    // check lived solely in the script's main() and so never ran under vitest.
+    // ALLOWLIST paths are relative to the app root (apps/scheduling), one level above tests/.
+    const appRoot = fileURLToPath(new URL('..', import.meta.url))
+    const missing = ALLOWLIST.filter((rel) => !existsSync(appRoot + rel))
+    expect(missing).toEqual([])
+  })
+
+  // 0027 moved the three token→(tenant, subject) lookups behind SECURITY DEFINER functions
+  // concentrated in src/db/token-resolvers.ts, so these four files stopped touching raw `db` and
+  // left the allowlist. Reverting that by re-adding an entry silently re-widens the guard while
+  // findViolations() stays green, and main()'s staleness check cannot see it (it only fails on
+  // entries whose FILE is missing, never on entries that are merely unnecessary).
+  it('the token-lookup allowlist entries are gone — the resolvers replaced them', () => {
+    expect(ALLOWLIST).toContain('src/db/token-resolvers.ts')
+    for (const gone of [
+      'src/lib/share.ts',
+      'src/app/api/calendar/[token]/route.ts',
+      'src/app/s/[token]/page.tsx',
+      'src/app/sec/[token]/page.tsx',
+    ]) {
+      expect(ALLOWLIST).not.toContain(gone)
+    }
   })
 })
 
