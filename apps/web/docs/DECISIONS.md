@@ -336,3 +336,110 @@ subsystem exists.
 row in the defect table, both reference `AdminUser` and `/admin/*`. They are **correct history**:
 this file is an append-only decision log, and rewriting a past entry to match the present would
 destroy the record of why the change happened. Only forward-looking instructions were corrected.
+
+---
+
+## 2026-10-13 — The LCP debt: what it actually was
+
+The weekly `web Lighthouse` workflow went red on its first scheduled run (2026-10-12, run
+38258795442): four of seven routes failed their `lighthouserc.json` LCP ratchets. This section
+records the investigation, because almost every intuitive explanation turned out to be wrong and
+re-deriving that is expensive.
+
+### What the metric is actually measuring
+
+Lighthouse runs `throttlingMethod: 'simulate'` here. In the same traces that report a 4.7–10.1 s
+**simulated** LCP, `observedLargestContentfulPaint` is **82–117 ms** on every route. The
+unthrottled browser was never slow. Render Delay — not TTFB, not image download — is 55–90% of the
+simulated LCP, and it is **not CPU-bound**: on a machine where TBT is 3–19 ms and main-thread work
+is 513–1159 ms (vs the CI runner's 98–1764 ms / 1787–7417 ms), `/about-us` still showed 4009 ms of
+render delay on a text LCP element with zero image requests in its graph.
+
+What dominates instead is **how many requests sit in the pre-first-paint dependency graph**.
+Paraglide's default `outputStructure: 'message-modules'` compiles one module per message — 768 of
+them, each inlining both locales (the smallest resulting chunk is 143 B). Each route imports a
+different subset, so the bundler gave ~21 of them their own chunk, and `hooks.server.ts`'s
+`preload` filter (`type === 'js'`) emitted a `<link rel=modulepreload>` for every one: **50–60
+hints per route, 41–47 of them under 3 KB — 23% of the bytes but 87% of the requests.** All ~55
+script fetches therefore begin before first paint and are swept into Lantern's graph.
+
+### The fix, and the two that were rejected
+
+`outputStructure: 'locale-modules'` (one module per locale). Hints 54 → 36, and every route lands
+inside its ratchet for the first time — localhost, mobile, median of 3:
+
+| route                  | ratchet | before | after    |
+| ---------------------- | ------- | ------ | -------- |
+| `/`                    | 4500    | 4677   | **4155** |
+| `/about-us`            | 4500    | 4462   | **3474** |
+| `/programs`            | 4500    | 4817   | **3476** |
+| `/contact-us`          | 4500    | 3990   | **3098** |
+| `/zh`                  | 5800    | 6092   | **5424** |
+| `/programs/ev-team`    | 7800    | 8718   | **5873** |
+| `/zh/programs/ev-team` | 7800    | 10143  | **7299** |
+
+Cost, stated rather than buried: **+18.6 KB brotli** in each route's preload set (90.4 → 109.0 KB
+on `/about-us`), because a locale module is the union of the messages any route uses. They are
+`_app/immutable/*` — hashed, edge-cached — so a returning visitor pays nothing, and 18 fewer
+requests is the other side of the trade.
+
+**Rejected — bundler chunk merging.** `build.rollupOptions.output.advancedChunks` with `minSize:
+20000` or `minShareCount: 20` changes **nothing** (54 hints, byte-identical). These chunks are small
+_because_ they are shared across routes, and the bundler will not duplicate-inline them on request.
+An `advancedChunks.groups` test on `/paraglide/` does work — 35 hints — but costs +21.6 KB, strictly
+worse than `locale-modules` for the same mechanism. Note also that Vite 8 bundles with **rolldown**,
+which silently ignores Rollup's `experimentalMinChunkSize`: the build succeeds and nothing moves.
+
+**Rejected — suppressing the hints.** Stripping the sub-3 KB `modulepreload` hints from the
+prerendered HTML measured _better_ than any of the above (LCP −1215 ms on `/`, −1210 on `/programs`,
+−911 on `/zh`; removing all hints was faster still). It was rejected on purpose: it trades 55
+parallel fetches for a serial import waterfall off the bottom-of-body entry script — a real cost to
+real users for a gain that exists mainly inside the simulator, since production sits behind
+Cloudflare on HTTP/2/3 where the lab harness's 6-socket serialisation does not exist. Fewer chunks
+is strictly better than fewer hints.
+
+### Hypotheses that were measured and refuted
+
+Recorded so nobody pays for them twice. Each was a plausible, code-cited finding; each died on the
+question _does this delay the PAINT of the LCP element, or merely consume bytes/CPU?_
+
+- **`HeroSection.svelte`'s `.quote-line` starts at `opacity: 0`.** True, and it is the one unchecked
+  gate in `LAUNCH-CHECKLIST.md`. A/B measured: **+10 ms**, i.e. noise. The hero quote is not the LCP
+  element on `/` — the header logo is. Worth fixing for correctness, not for the metric.
+- **The ev-team hero `<img>` carries neither `fetchpriority="high"` nor `loading`,** unlike the LCP
+  image on `/`, `/programs` and `/contact-us`. True, and it gives that route the worst Load Delay on
+  the site (1305 ms CI / 2331 ms local). Still ~0 ms of LCP: the image is fully available at ~1896 ms
+  and paints at 9686 ms, so recovering the entire Load Delay moves nothing.
+- **`uses-responsive-images` / `offscreen-images`** (Lighthouse claims 520–2690 ms). Byte-weight
+  opportunities on pages whose LCP-image Load Time is already 65–297 ms. They cannot reach Render
+  Delay.
+- **The CJK stylesheet is render-blocking on `/zh`.** True (it is in the critical request chain with
+  both 137/140 KB woff2 behind it), but the face is `font-display: optional` and locale-gated, so it
+  cannot swap in or re-record LCP. The +1.28 s cost of _having_ the typeface is a recorded owner
+  decision (D-8) and was not reopened.
+- Also refuted: the 29 KB favicon, the latin font preloads, `three.js` mounting during hydration,
+  the `feTurbulence` grain overlay, the Vimeo iframe, `$env/dynamic/public` forcing an extra
+  `_app/env.js` hop, `Reveal`'s forced layout read, and the three `cssCodeSplit` stylesheets.
+  **`Reveal.svelte`'s above-the-fold guard is load-bearing** — its `$effect` deliberately refuses to
+  arm reveals already in view, for accessibility (axe caught reveal-wrapped text at 3.14:1 mid-fade)
+  as well as LCP. Do not "simplify" it.
+
+### Two corrections to the record
+
+The `lighthouserc.json` ratchets were set _at_ measured values on the author's localhost. Re-measured
+on the same machine before any change, **every red route was above its ratchet** —
+`/zh/programs/ev-team` by 2.3 s against a ceiling the config calls one it "came back under unaided".
+So the redness was never purely the runner: there was a regression on top of the known debt.
+
+`docs/LAUNCH-CHECKLIST.md` and `docs/DESIGN-TOKENS.md` both named `/programs/ev-challenge`, which has
+been a 308 redirect stub to `/programs/ev-team` for some time, and `DESIGN-TOKENS.md` annotated two
+text nodes as "the LCP element" when the measured LCP element is an `<img>` on every route except
+`/about-us`. Both corrected; `DESIGN-TOKENS.md`'s dead `ev-challenge/*` paths are flagged in place
+rather than renamed, because re-deriving their line numbers is its own mechanical pass.
+
+### Known flake, not caused by this change
+
+`e2e/smoke.spec.ts:397` ("a dark-hero route flips to the light bar on scroll") fails intermittently
+under full-suite parallel load — reproduced on the **unmodified** build as well as this one. It
+passes in isolation on both. Worth stabilising separately; it is the only check that can detect a
+header that never hydrates, so it should not be left flaky.

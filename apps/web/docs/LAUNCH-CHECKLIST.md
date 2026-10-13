@@ -41,23 +41,52 @@ Last reviewed: 2026-09-29 · Status: **not ready** (workstreams in progress)
 
 ## Performance
 
-- [ ] 🔴 **`/programs/ev-challenge` LCP is 7.2s against a 2.5s target.** This is pre-existing
-      debt, not a redesign regression: measured on the same localhost setup at commit `12e2629`
-      (before the palette work) it was **6.94s / perf 70 / 2120 KiB**, versus 7.24s / 68 after —
-      run-to-run noise on a seven-second page. It only became visible because that route had
-      **never been in the Lighthouse URL list** and was added during the CI work. `lighthouserc.json`
-      holds it at a 7800ms ceiling so it cannot get worse; the ceiling comes down as the page does.
-      The LCP element is the hero photograph, and the page ships ~4.3 MB of its own assets in
-      production — roughly 4.6× the homepage. Needs its own pass.
-- [ ] 🔴 Lighthouse mobile on `/`, `/programs/ev-challenge`, `/contact-us`:
+> **Route naming, 2026-10-13.** The lines below used to say `/programs/ev-challenge`. That path is
+> now a 308 redirect stub (`src/routes/programs/ev-challenge/+page.ts`) to the canonical
+> `/programs/ev-team`, which is what `lighthouserc.json` actually measures. Renamed throughout.
+> The medians have also been re-measured — the previous ones predated the CJK font being enabled.
+
+- [x] 🔴 **Every route is inside its `lighthouserc.json` LCP ratchet.** It was not before
+      2026-10-13: five of seven were over, `/zh/programs/ev-team` by 2.3s against a ceiling the
+      config describes as one it "came back under unaided" — so the weekly red was never purely
+      runner variance. `outputStructure: 'locale-modules'` fixed all seven; the mechanism and the
+      numbers are in `DECISIONS.md`, 2026-10-13. **Ratchets can now be tightened** — that is the
+      documented protocol (down only, never up).
+- [ ] 🔴 **LCP ≤ 2500ms is still unmet on every route, which is what keeps this section red.**
+      The 2.5s PRD target is a different and much harder bar than the ratchets. LCP medians of 3,
+      localhost mobile — **before → after** the 2026-10-13 change, against each route's ratchet:
+      | route | ratchet | before | after |
+      | --- | --- | --- | --- |
+      | `/` | 4500 | 4677 | **4155** |
+      | `/about-us` | 4500 | 4462 | **3474** |
+      | `/programs` | 4500 | 4817 | **3476** |
+      | `/contact-us` | 4500 | 3990 | **3098** |
+      | `/zh` | 5800 | 6092 | **5424** |
+      | `/programs/ev-team` | 7800 | 8718 | **5873** |
+      | `/zh/programs/ev-team` | 7800 | 10143 | **7299** |
+      **CLS is 0.000 on every route** — no work needed there.
+      Read these as _simulated_ numbers: Lighthouse runs `throttlingMethod: 'simulate'`, and the
+      same traces report `observedLargestContentfulPaint` of **82–117 ms** on every route. The
+      unthrottled browser is not slow; the ratchets measure a modelled mobile connection, and on
+      this project that model is dominated by how many requests sit in the pre-first-paint
+      dependency graph.
+- [ ] 🔴 Lighthouse mobile on `/`, `/programs/ev-team`, `/contact-us`:
       Performance ≥ 90 · Accessibility ≥ 95 · SEO ≥ 95 · Best Practices ≥ 95
-      (current medians, localhost: `/` 84 · `/about-us` 88 · `/programs` 84 ·
-      `/programs/ev-challenge` 68 · `/contact-us` 90 · `/zh` 83 · `/zh/programs/ev-challenge` 73)
-- [ ] 🔴 LCP ≤ 2500ms, CLS ≤ 0.1, INP ≤ 200ms
-      (current LCP medians: `/` 3.93s · `/about-us` 3.32s · `/programs` 4.21s · `/contact-us` 3.16s ·
-      `/zh` 4.07s. **CLS is 0.000 on every route** — no work needed there.)
+      (perf medians of 3, localhost, **after** the 2026-10-13 change: `/` 83 · `/about-us` 88 ·
+      `/programs` 88 · `/programs/ev-team` 75 · `/contact-us` 91 · `/zh` 70 ·
+      `/zh/programs/ev-team` 66. The **GitHub runner** measured the PRE-change build at
+      60 · 81 · 79 · 37 · 82 · 57 · 34 — it is ~2× slower on CPU, which is why
+      `web-lighthouse.yml` is not a per-PR gate. The runner has not re-measured since.)
+- [ ] 🔴 `/programs/ev-team` remains the worst route (5.9s localhost) and still needs its own pass.
+      Its LCP element is the hero photograph. Every route-specific cause proposed so far has been
+      measured and refuted — including the missing `fetchpriority="high"`, which is real but worth
+      ~0ms because the image is available 6.8s before it paints. See `DECISIONS.md`, 2026-10-13.
 - [ ] 🔴 No LCP element starts at `opacity: 0` — Chrome excludes such elements from LCP
-      candidacy, which both hides the real metric and delays the paint users perceive
+      candidacy, which both hides the real metric and delays the paint users perceive.
+      (Still unchecked: `src/lib/components/home/HeroSection.svelte`'s `.quote-line` keyframe does
+      start at `opacity: 0`. It was A/B-measured on 2026-10-13 and moving it changed LCP by +10 ms,
+      i.e. noise — the hero quote is not the LCP element on `/`; the header logo is. Fix it for
+      correctness, not for the metric.)
 - [ ] 🟡 The `/admissions` booking embed is lazy-loaded and has a plain-link fallback
 - [ ] 🟡 Fonts self-hosted and subset; no layout shift on font load
 

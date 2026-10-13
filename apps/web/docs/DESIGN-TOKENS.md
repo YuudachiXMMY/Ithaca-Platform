@@ -10,6 +10,22 @@ report it** (§8). Do not invent a value.
 and `.claude/PRPs/reviews/design-tokens-review-round2.md` (25 findings).
 Every ratio printed anywhere in this document was recomputed in those passes — see §4 for the method.
 
+> ### ⚠ AMENDMENT 2026-10-13 — **two kinds of staleness in this file, read before using it as a map**
+>
+> 1. **The `ev-challenge` paths below no longer exist.** `src/routes/programs/ev-challenge/` now
+>    contains only a `+page.ts` 308 redirect to `/programs/ev-team`; the page and its components
+>    live under `programs/ev-team/`. Every `ev-challenge/+page.svelte` and
+>    `components/programs/ev-challenge/*` reference in this document is a dead path, and the line
+>    numbers beside them do not survive the move either. Renaming them properly means re-deriving
+>    the line refs, which is its own mechanical pass — not done here, so treat those rows as
+>    "the right tokens, the wrong coordinates".
+> 2. **The "LCP element" annotations are wrong.** This file marks `HeroSection.svelte:49` as "the
+>    homepage LCP element" and the ev hero `<p>` as "the page's LCP element". Measured on
+>    2026-10-13 (Lighthouse mobile, median of 3): the LCP element on `/` and `/zh` is the **header
+>    logo `<img>`** (`Header.svelte`), and on both ev-team routes it is the hero **photograph**
+>    `EV26-1`. No text node is the LCP element on any measured route except `/about-us`. Do not use
+>    these annotations to decide what to optimise — see `DECISIONS.md`, 2026-10-13.
+
 > ### ⚠ AMENDMENT 2026-09-29 — **the EV Challenge stretch is LIGHT, not BAND**
 >
 > Every revision of this document up to and including the one above treated
