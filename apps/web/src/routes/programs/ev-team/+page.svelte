@@ -259,8 +259,11 @@
 			bind:this={heroImgEl}
 			class="absolute inset-0 origin-center scale-[1.15] will-change-transform"
 		>
-			<!-- The LCP element. Eager + high priority on purpose: every other image on this page is
-			     lazy, so this is the only one competing for bandwidth before first paint. -->
+			<!-- The LCP element on this route, hence eager + high priority while every other image
+			     here is lazy. It is NOT the only thing at top priority though: Header.svelte's logo
+			     is eager + fetchpriority="high" too (it is the LCP element on /, not here), so the
+			     two share the front of the queue. The CJK font does not join them — +layout.svelte
+			     deliberately leaves it unpreloaded for this exact reason. -->
 			<enhanced:img
 				src={heroImg}
 				alt="Ithaca EV team racing at the Waterloo EV Challenge"
