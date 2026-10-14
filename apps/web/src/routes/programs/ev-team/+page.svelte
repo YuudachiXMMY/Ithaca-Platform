@@ -259,10 +259,16 @@
 			bind:this={heroImgEl}
 			class="absolute inset-0 origin-center scale-[1.15] will-change-transform"
 		>
+			<!-- The LCP element on this route, hence eager + high priority while every other image
+			     here is lazy. It is NOT the only thing at top priority though: Header.svelte's logo
+			     is eager + fetchpriority="high" too (it is the LCP element on /, not here), so the
+			     two share the front of the queue. The CJK font does not join them — +layout.svelte
+			     deliberately leaves it unpreloaded for this exact reason. -->
 			<enhanced:img
 				src={heroImg}
 				alt="Ithaca EV team racing at the Waterloo EV Challenge"
 				sizes="100vw"
+				fetchpriority="high"
 				class="absolute inset-0 h-full w-full object-cover"
 			/>
 		</div>
@@ -360,6 +366,7 @@
 							src={missionImg}
 							alt="Students assembling radiator and fan components together"
 							sizes="(max-width: 1024px) 100vw, 50vw"
+							loading="lazy"
 							class="absolute inset-0 h-full w-full object-cover"
 						/>
 					</div>
@@ -410,6 +417,7 @@
 							src={detailsImg}
 							alt="Students collaborating during an EV build session"
 							sizes="(max-width: 1024px) 100vw, 60vw"
+							loading="lazy"
 							class="absolute inset-0 h-full w-full object-cover"
 						/>
 					</div>
@@ -459,6 +467,7 @@
 							src={gainsImg}
 							alt="Students hands-on with EV mechanical assembly in the workshop"
 							sizes="(max-width: 1024px) 100vw, 40vw"
+							loading="lazy"
 							class="absolute inset-0 h-full w-full object-cover"
 						/>
 					</div>
@@ -473,6 +482,7 @@
 			src={competitionImg}
 			alt="Ithaca EV driver celebrating during the race at Waterloo"
 			sizes="(max-width: 1024px) 100vw, 80vw"
+			loading="lazy"
 			class="absolute inset-0 h-full w-full object-cover"
 		/>
 		<div
@@ -610,10 +620,14 @@
 							</a>
 						</div>
 						<div class="relative mt-8 hidden h-[200px] overflow-hidden lg:block">
+							<!-- `hidden lg:block` keeps this out of the mobile layout, but display:none does
+							     NOT stop an eager fetch — mobile was downloading the page's heaviest asset
+							     (232 KB) to never paint it. lazy is what actually skips it. -->
 							<enhanced:img
 								src={ctaImg}
 								alt="Full Ithaca EV team at the Waterloo competition"
 								sizes="35vw"
+								loading="lazy"
 								class="absolute inset-0 h-full w-full object-cover"
 							/>
 						</div>

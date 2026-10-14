@@ -98,10 +98,14 @@
 		>
 			{#each PHOTOS as photo, i (i)}
 				<div class="relative overflow-hidden {photo.span}">
+					<!-- Six photos, none of them ever above the fold: this grid sits below the hero and
+					     the mission section. Eager, they were ~650 KB competing with the hero image for
+					     bandwidth before first paint. -->
 					<enhanced:img
 						src={photo.src}
 						alt={photo.alt}
 						sizes="(max-width: 768px) 50vw, 33vw"
+						loading="lazy"
 						class="absolute inset-0 h-full w-full object-cover"
 					/>
 				</div>
