@@ -48,7 +48,7 @@
 			"carry both a warn and an error threshold in the same set — hence assertMatrix, whose",
 			"patterns below are mutually exclusive so exactly one entry applies per URL.",
 			"",
-			"/programs/ev-team carries a looser ceiling because it ALREADY failed 4500ms before",
+			"The ev-team routes carried a looser ceiling because they ALREADY failed 4500ms before",
 			"any of this work: measured on the same localhost setup at commit 12e2629 (pre-palette) it",
 			"was LCP 6.94s / perf 70 / 2120 KiB, against 7.24s / 68 after. That is run-to-run noise on",
 			"a 7-second page, not a regression. The failure only became visible because that route was",
@@ -56,12 +56,56 @@
 			"above the observed value so the page cannot get WORSE while the debt is outstanding; it",
 			"is a ratchet, not an exemption. Tracked in docs/LAUNCH-CHECKLIST.md.",
 			"",
-			"As each route is measured under a tighter bound, move its pattern into a stricter entry."
+			"As each route is measured under a tighter bound, move its pattern into a stricter entry.",
+			"Done once so far: on 2026-10-15 the single .*ev-team.* entry was split per locale, so the",
+			"EN route could come down to 6100 while the ZH one stays at 7800. See the two entries below."
 		],
 		"assert": {
 			"assertMatrix": [
 				{
-					"matchingUrlPattern": ".*ev-team.*",
+					"//ev-team-en": [
+						"Tightened 7800 -> 6100 on 2026-10-15, after the EVScene import was gated on",
+						"visibility. This is the ratchet doing what the //assert note above says it should:",
+						"tracking the measured value downward.",
+						"",
+						"Two INDEPENDENT runs of this workflow on the same commit (4f995c2) measured this",
+						"route at 5785 / 5790 / 5792 (run 38665890866) and 5711 / 5713 / 5789",
+						"(run 38672786207). Six samples spanning 81 ms (1.4%), so the number is a property",
+						"of the page and not of the runner — which is the only reason it is safe to gate on.",
+						"Compare /, whose samples on those same two runs spanned 4055-9509 and 4591-9386.",
+						"",
+						"6100 = the WORSE of the two asserted values (5785, run 1) plus ~5%. lhci asserts on",
+						"the optimistic best-of-3, so taking the worse run's figure is the conservative base.",
+						"The ~5% matches /zh's ratchet (5800 over a measured 5537, 4.7%), which is the",
+						"tightest precedent in this file. Headroom over the worst single sample: 308 ms.",
+						"",
+						"Split per locale because the old .*ev-team.* pattern covered BOTH routes and the ZH",
+						"one is still at 8221 — the pair could not be lowered together."
+					],
+					"matchingUrlPattern": "^(?!.*/zh($|/)).*ev-team.*$",
+					"assertions": {
+						"categories:performance": ["warn", { "minScore": 0.85 }],
+						"largest-contentful-paint": ["error", { "maxNumericValue": 6100 }],
+						"first-contentful-paint": ["warn", { "maxNumericValue": 3000 }],
+						"total-blocking-time": ["warn", { "maxNumericValue": 600 }],
+						"cumulative-layout-shift": ["error", { "maxNumericValue": 0.05 }],
+						"categories:accessibility": ["warn", { "minScore": 0.9 }],
+						"categories:seo": ["warn", { "minScore": 0.9 }]
+					}
+				},
+				{
+					"//ev-team-zh": [
+						"Held at 7800 and still failing by ~420 ms (8215 on run 38665890866, 8221 on run",
+						"38672786207). That gap is the CJK webfont, not anything specific to this route:",
+						"with the main thread freed by the EVScene gate, this route minus /programs/ev-team",
+						"is ~2440 ms on an otherwise identical page, and the font is already at its floor",
+						"(see the /zh entry below for why). Closing it by making the ZH route faster would",
+						"mean over-delivering on the EN route by the same ~2.4s.",
+						"",
+						"So this one does NOT come down yet — and it does not go up either. Raising it is",
+						"forbidden; the red is the debt being measured, which is the point."
+					],
+					"matchingUrlPattern": ".*/zh($|/).*ev-team.*$",
 					"assertions": {
 						"categories:performance": ["warn", { "minScore": 0.85 }],
 						"largest-contentful-paint": ["error", { "maxNumericValue": 7800 }],
