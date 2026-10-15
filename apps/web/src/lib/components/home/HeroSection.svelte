@@ -20,7 +20,13 @@
 	class="relative flex min-h-[100dvh] w-full flex-col justify-end overflow-hidden"
 	aria-label={m.home_hero_ariaLabel()}
 >
-	<!-- Static poster background — the LCP element (no autoplay video bytes). -->
+	<!-- Static poster background (no autoplay video bytes). NOT the LCP element, despite what this
+	     comment said until 2026-10-15: across three Lighthouse runs the LCP element on `/` and
+	     `/zh` is the header logo in all 18 samples. This poster finishes downloading inside the
+	     first ~220 ms and is never the candidate. WHY it is skipped has not been established —
+	     the plausible reason is that it covers the full viewport, which Chrome treats as a
+	     background, but that was not tested. Keep `fetchpriority="high"` regardless: it is still
+	     the largest thing a visitor actually looks at first, whatever the metric attributes. -->
 	<img
 		src="/media/videos/hero-poster.jpg"
 		alt=""
@@ -82,8 +88,14 @@
 
 <style>
 	/* Hero quote mask-reveal. Pure CSS (no Svelte transition) so it runs during initial render
-	   at ~FCP instead of waiting on client hydration — the largest line is the LCP element.
-	   `both` fill-mode holds the pre-reveal (masked) state through the per-line delay. */
+	   at ~FCP instead of waiting on client hydration. `both` fill-mode holds the pre-reveal
+	   (masked) state through the per-line delay.
+	   The largest line is NOT the LCP element — this comment claimed it was until 2026-10-15.
+	   Starting at `opacity: 0` makes these lines ineligible for LCP candidacy, and measurement
+	   agrees: the header logo is the LCP element in all 18 `/` and `/zh` samples across three
+	   runs. A 2026-10-13 A/B of removing the masked start moved LCP by +10 ms (noise). The
+	   masked start is still worth fixing for correctness — see LAUNCH-CHECKLIST's `opacity: 0`
+	   box — just do not expect it to move the metric while the logo is the candidate. */
 	.quote-line {
 		animation: quote-reveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 		animation-delay: 0ms; /* overridden per line via style:animation-delay */
