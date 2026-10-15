@@ -46,26 +46,59 @@ Last reviewed: 2026-09-29 · Status: **not ready** (workstreams in progress)
 > `/programs/ev-team`, which is what `lighthouserc.json` actually measures. Renamed throughout.
 > The medians have also been re-measured — the previous ones predated the CJK font being enabled.
 
-- [ ] 🔴 **`web Lighthouse` is still red on the runner — 3 of 7 routes over their LCP ratchet,
-      down from 4.** `outputStructure: 'locale-modules'` (2026-10-13) improved every route and
-      brought all seven inside their ratchets **on localhost**, but the ratchets were calibrated on
-      localhost and the GitHub runner is ~2× slower on CPU, so three remain over there. See the
-      table below. `/`'s 22 ms is inside the variance this harness is documented to have
-      (`web-lighthouse.yml` records `/` at 6304 / 6509 / 10420 ms on three consecutive samples); the
-      two ev-team routes are a real remaining gap. **Do not close this box by raising a ratchet** —
-      that is forbidden in five places; the ratchets may only come down.
+- [ ] 🔴 **`web Lighthouse` is down to 1 of 7 routes over its LCP ratchet — only
+      `/zh/programs/ev-team`, and only by 415 ms.** Two changes got it here. (1) The 2026-10-13
+      `outputStructure: 'locale-modules'` work improved every route. (2) On 2026-10-15 the EVScene
+      dynamic import was gated on visibility: `{#if browser}` is the THRELTE_LAZY_BOUNDARY and is
+      about correctness, so it was still fetching and parsing 799 KB of three.js during hydration
+      on a route whose section sits only ~0.6 screens below the fold. Gating it took
+      `/programs/ev-team` from **8007 → 5785 ms** (−2222) and its TBT from **1762 → 257 ms**.
+      That one route-specific cause had NOT been refuted — see the correction two boxes down.
+      **Do not close this box by raising a ratchet** — that is forbidden in five places; the
+      ratchets may only come down. **The remaining 415 ms is now almost entirely the CJK
+      webfont**: with the main thread freed, `/zh/programs/ev-team` (8215) minus
+      `/programs/ev-team` (5785) is a 2430 ms gap on an otherwise identical page, and the two
+      routes share one 7800 ms ceiling. Closing it by making the ZH route faster means
+      over-delivering on the EN route by ~2.4 s, because the font cost itself is already at its
+      floor (917 Han glyphs, two weights, subset, `font-display: optional`, deliberately
+      unpreloaded) and is a cost the institution chose knowingly.
+- [ ] 🟡 **`/programs/ev-team` now has 2015 ms of unused slack under its ratchet and should be
+      tightened.** The rule is that ratchets track the measured value downward, and this one no
+      longer does: measured 5785 ms against a 7800 ms ceiling. It cannot simply be lowered, because
+      `lighthouserc.json`'s `matchingUrlPattern: ".*ev-team.*"` covers BOTH ev-team routes and the
+      ZH one is still at 8215. Tightening therefore needs the split the config comment already
+      anticipates ("As each route is measured under a tighter bound, move its pattern into a
+      stricter entry"): an EN-only `^(?!.*/zh/).*ev-team.*` entry at the measured value plus the
+      ~5% headroom this project's other ratchets carry, with `.*/zh/.*ev-team.*` left at 7800.
+      Deliberately not done in the same change that produced the number — one run is thin evidence
+      for a permanent gate, even a trustworthy one.
 
-LCP medians of 3, mobile, simulated. Runner figures from run 38401256331:
+LCP, mobile, simulated. Runner figures from **run 38665890866** (2026-10-15).
 
-| route                  | ratchet | runner before | runner after             | localhost after |
-| ---------------------- | ------- | ------------- | ------------------------ | --------------- |
-| `/`                    | 4500    | 6252          | **4522** (over by 22)    | 4155 ✅         |
-| `/about-us`            | 4500    | 4152          | **3184** ✅              | 3474 ✅         |
-| `/programs`            | 4500    | 3972          | **3365** ✅              | 3476 ✅         |
-| `/contact-us`          | 4500    | 3701          | **3353** ✅              | 3098 ✅         |
-| `/zh`                  | 5800    | 11349         | **5543** ✅              | 5424 ✅         |
-| `/programs/ev-team`    | 7800    | 9686          | **8465** (over by 665)   | 5873 ✅         |
-| `/zh/programs/ev-team` | 7800    | 11642         | **10600** (over by 2800) | 7299 ✅         |
+> **These are lhci's reported values, which are OPTIMISTIC (best of 3), not medians.** Earlier
+> revisions of this table said "medians of 3" for the runner column; that was wrong, and it
+> matters, because lhci's default `aggregationMethod` is what the gate asserts on. The median
+> column below is computed separately and is the honest read for any route whose samples scatter.
+
+| route                  | ratchet | runner before | runner after (asserted) | median of 3 | all 3 samples        |
+| ---------------------- | ------- | ------------- | ----------------------- | ----------- | -------------------- |
+| `/`                    | 4500    | 4522          | **4055** ✅             | 6097 ⚠️     | 4055 / 9509 / 6097   |
+| `/about-us`            | 4500    | 3184          | **3185** ✅             | 3194        | 3778 / 3194 / 3185   |
+| `/programs`            | 4500    | 3365          | **3378** ✅             | 3379        | 3421 / 3378 / 3379   |
+| `/contact-us`          | 4500    | 3353          | **3339** ✅             | 3344        | 3339 / 3353 / 3344   |
+| `/zh`                  | 5800    | 5543          | **5537** ✅             | 11123 ⚠️    | 5537 / 11134 / 11123 |
+| `/programs/ev-team`    | 7800    | 8465          | **5785** ✅             | 5790        | 5790 / 5792 / 5785   |
+| `/zh/programs/ev-team` | 7800    | 10600         | **8215** (over by 415)  | 8230        | 8249 / 8230 / 8215   |
+
+**Read the ✅ on `/` and `/zh` with suspicion, and the ev-team rows with confidence.** `/` scatters
+across 4055–9509 ms (134% of its own low) and `/zh` across 5537–11134; both clear their ratchet only
+on their best sample, and their medians are 1597 ms and 5323 ms _over_. The two ev-team rows span
+7 ms and 34 ms respectively — those pages are genuinely stable on this harness, so their numbers can
+be acted on. This is the same runner variance `web-lighthouse.yml` documents (`/` at
+6304 / 6509 / 10420 ms) and the reason that workflow is not a per-PR gate.
+
+**CLS is 0.000 on all seven routes.** TBT is now inside its 600 ms budget on all seven as well
+(worst: `/zh` at 518, `/` at 446) — before the EVScene gate the two ev-team routes were at 1762 and 1702.
 
 - [ ] 🔴 **LCP ≤ 2500ms is still unmet on every route, which is what keeps this section red.**
       The 2.5s PRD target is a different and much harder bar than the ratchets. LCP medians of 3,
@@ -87,15 +120,25 @@ LCP medians of 3, mobile, simulated. Runner figures from run 38401256331:
       dependency graph.
 - [ ] 🔴 Lighthouse mobile on `/`, `/programs/ev-team`, `/contact-us`:
       Performance ≥ 90 · Accessibility ≥ 95 · SEO ≥ 95 · Best Practices ≥ 95
-      (perf medians of 3, **after** the 2026-10-13 change. localhost: `/` 83 · `/about-us` 88 ·
+      (perf medians of 3. localhost, after the 2026-10-13 change: `/` 83 · `/about-us` 88 ·
       `/programs` 88 · `/programs/ev-team` 75 · `/contact-us` 91 · `/zh` 70 ·
-      `/zh/programs/ev-team` 66. **GitHub runner**, same build: 60 · 90 · 87 · 45 · 88 · 65 · 41 —
-      every route improved on the runner too, but it is ~2× slower on CPU, which is why
+      `/zh/programs/ev-team` 66. **GitHub runner**, run 38665890866 after the 2026-10-15 EVScene
+      gate: 58 · 90 · 84 · **69** · 86 · 56 · **63** — the two ev-team routes gained the most
+      (45 → 69 and 41 → 63), which is the same main-thread recovery the LCP table shows. The
+      runner is still ~2× slower on CPU on the routes that remain red, which is why
       `web-lighthouse.yml` is not a per-PR gate.)
-- [ ] 🔴 `/programs/ev-team` remains the worst route (5.9s localhost) and still needs its own pass.
-      Its LCP element is the hero photograph. Every route-specific cause proposed so far has been
-      measured and refuted — including the missing `fetchpriority="high"`, which is real but worth
-      ~0ms because the image is available 6.8s before it paints. See `DECISIONS.md`, 2026-10-13.
+- [x] ✅ **`/programs/ev-team` is no longer the worst route, and the cause was the main thread.**
+      Corrects this box's previous claim that "every route-specific cause proposed so far has been
+      measured and refuted". One had not been tested: main-thread contention. The refutations were
+      all _network_ hypotheses, and they were right to be refuted — the observation that killed
+      them, that the hero image is available **6.8 s before it paints**, was in fact the clue. An
+      already-downloaded image that will not paint is not waiting on bandwidth; it is waiting for
+      the main thread, which was busy parsing 799 KB of eagerly-imported three.js. Gating that
+      import on visibility (2026-10-15) moved the route from 8465 → **5785 ms** on the runner,
+      which now matches the 5873 ms this route had always measured on localhost — i.e. the
+      runner's documented ~2× CPU penalty on this route _was_ that parse. TBT fell 1762 → 257 ms.
+      Its LCP element is unchanged: the hero photograph (`EV26-1`). `fetchpriority="high"` on it
+      (c787431) remains worth ~0 ms for the reason originally measured. See `DECISIONS.md`.
 - [ ] 🔴 No LCP element starts at `opacity: 0` — Chrome excludes such elements from LCP
       candidacy, which both hides the real metric and delays the paint users perceive.
       (Still unchecked: `src/lib/components/home/HeroSection.svelte`'s `.quote-line` keyframe does
