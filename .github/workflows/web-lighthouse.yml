@@ -67,9 +67,19 @@ jobs:
       - name: Run Lighthouse CI
         run: lhci autorun
 
+      # include-hidden-files is REQUIRED, not a nicety: `.lighthouseci` is a dot-directory,
+      # and upload-artifact v4 (>=4.4) excludes hidden paths by default. Without it this step
+      # reported `No files were found with the provided path` and uploaded NOTHING on every run
+      # — verified zero artifacts on runs 38258795442, 38401256331 and 38660741710 — while
+      # still reporting success, because `if: always()` plus `if-no-files-found: warn` makes the
+      # miss a warning. The job's own red (assertion failures) hid the fact that the evidence
+      # for that red was never retrievable: every verdict had to be scraped out of the raw log,
+      # and the per-route LCP *element* and the TBT breakdown are only in the uploaded HTML
+      # report. Do not drop this input without checking the artifact count on the next run.
       - name: Upload Lighthouse results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: web-lighthouse-results
           path: apps/web/.lighthouseci
+          include-hidden-files: true
