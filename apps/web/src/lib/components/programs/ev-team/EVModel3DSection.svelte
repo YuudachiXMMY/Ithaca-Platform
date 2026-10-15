@@ -8,7 +8,10 @@
 	    render loop → the trike couples its spin to scroll);
 	  • the "The Machine" (0–0.35) → "Two Tracks" (0.35–0.70) DOM overlay timeline;
 	  • a lazy, client-only EVScene mount (THRELTE_LAZY_BOUNDARY) so `three` stays
-	    out of the SSR/prerender pass and off the static-page bundle;
+	    out of the SSR/prerender pass and off the static-page bundle, gated a
+	    SECOND time on visibility so the chunk is not parsed during first paint
+	    (the boundary is about correctness, the gate is about scheduling — see the
+	    `sceneNear` comment);
 	  • under `prefersReducedMotion.current`, the current static stacked layout
 	    (poster + Two Tracks split) — motion is additive, the static branch is the
 	    Phase-1 fallback unchanged.
@@ -21,6 +24,7 @@
 	import { browser } from '$app/environment';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { loadGsap } from '$lib/motion/gsap';
+	import { inview } from '$lib/actions/inview';
 	import * as m from '$lib/paraglide/messages';
 	import machineImg from '$lib/assets/programs/ev-team/EV26-6.jpg?enhanced';
 
@@ -58,6 +62,37 @@
 
 	// Scroll→3D bridge: written by GSAP onUpdate, read by EVScene's render loop.
 	let scrollProgress = $state(0);
+
+	// Visibility gate for the EVScene chunk (three.js + Threlte, 164 KB over the
+	// wire / 799 KB parsed — measured from its resource timing, not from `ls`).
+	//
+	// `{#if browser}` below is the THRELTE_LAZY_BOUNDARY, and it is about
+	// CORRECTNESS: it keeps `three` out of the SSR/prerender pass and off the
+	// static-page bundle. It is NOT a scheduling gate — on hydration it begins
+	// fetching and parsing the chunk immediately. On the GitHub runner (~2x slower
+	// CPU than localhost) that parse is the bulk of both ev-team routes' ~1.76s
+	// TBT against a 600ms budget, while LCP sits 245ms over the 7800ms ratchet.
+	//
+	// Same shape as the image bug fixed in cea0385: `hidden lg:block` does not stop
+	// an eager <img> fetch, and `{#if browser}` does not stop an eager import().
+	// Only an explicit gate skips the work.
+	//
+	// WHY 25% AND NOT MORE. This section is NOT far below the fold: measured at a
+	// 744px viewport its top sits at 1193px, i.e. only 449px — about 0.6 of a
+	// screen — past the first fold. A roomier-looking `rootMargin: '100% 0px'`
+	// (744px) therefore exceeds that 449px gap and the observer reports the section
+	// as already intersecting AT SCROLL 0, which silently restores the old eager
+	// behaviour; that was the first attempt here and the network panel caught it.
+	// 25% of the viewport keeps the trigger clear of the initial fold while still
+	// leaving ~930px of scrolling — over a viewport — before the pin engages at
+	// 'top top' and the canvas is first expected to paint. Percent, not px, so the
+	// margin tracks short mobile viewports instead of swamping them.
+	//
+	// If this ever needs re-tuning, verify it the same way: load the route, check
+	// the chunk is absent from `performance.getEntriesByType('resource')` at
+	// scrollY 0, then scroll and check it arrives. A number that looks safe in the
+	// source can be wrong by a whole viewport.
+	let sceneNear = $state(false);
 
 	// Bound overlay elements (animated branch only).
 	let sectionEl: HTMLElement | undefined = $state();
@@ -310,13 +345,23 @@
 	<!-- Animated: scroll-pinned cinematic transition over the live 3D trike. -->
 	<section
 		bind:this={sectionEl}
+		use:inview={{ rootMargin: '25% 0px', threshold: 0, once: true }}
+		oninview={() => (sceneNear = true)}
 		class="relative min-h-[100dvh] overflow-hidden border-t border-border bg-surface-2"
 		aria-label={m.programs_evChallenge_model3d_canvasAriaLabel()}
 	>
-		<!-- Layer 0: 3D canvas (lazy, client-only) — transforms via GSAP. -->
+		<!-- Layer 0: 3D canvas (lazy, client-only) — transforms via GSAP.
+		     GSAP animates THIS wrapper, never EVScene, and the only coupling is the
+		     `scrollProgress` $state the render loop reads — so a late scene mount
+		     cannot desync the pin timeline, it just starts reading progress midway.
+		     All three non-scene branches render the same full-height placeholder:
+		     the canvas is absolutely positioned, so an empty one costs no layout
+		     shift (CLS is 0.000 on every route and must stay there). -->
 		<div bind:this={canvasEl} class="absolute inset-0 z-0 origin-center">
-			{#if browser}
-				{#await import('./EVScene.svelte') then { default: EVScene }}
+			{#if browser && sceneNear}
+				{#await import('./EVScene.svelte')}
+					<div class="min-h-[100dvh]" aria-hidden="true"></div>
+				{:then { default: EVScene }}
 					<EVScene {scrollProgress} />
 				{:catch}
 					<div class="min-h-[100dvh]" aria-hidden="true"></div>
