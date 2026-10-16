@@ -29,6 +29,14 @@
 			alt: m.home_mission_pillar3Alt
 		}
 	];
+
+	// Two alternating image|text rows read as rhythm; a third reads as a template, and by the third
+	// the reader has stopped looking at the layout. So the last pillar closes the section as a
+	// full-bleed band instead of repeating the row. It reuses PageHero's established language
+	// verbatim — photograph under the same legibility gradient, copy in the measured `band-*` token
+	// family — so this is a new composition, not a new visual vocabulary.
+	const ROW_PILLARS = PILLARS.slice(0, 2);
+	const CLOSING_PILLAR = PILLARS[2];
 </script>
 
 <section class="bg-surface-0" aria-label={m.home_mission_eyebrow()}>
@@ -69,7 +77,7 @@
 		</Reveal>
 	</div>
 
-	{#each PILLARS as pillar, i (i)}
+	{#each ROW_PILLARS as pillar, i (i)}
 		<div
 			class="mx-auto grid max-w-[1400px] items-center gap-6 px-5 py-14 sm:px-8 md:grid-cols-2 md:gap-12 md:px-[6vw] md:py-20"
 		>
@@ -102,4 +110,35 @@
 			</div>
 		</div>
 	{/each}
+
+	<!-- Closing band. `min-h` + `justify-end` anchors the copy bottom-left where the gradient is
+	     heaviest, which is the same arrangement (and the same measured `band-*` tokens) that
+	     `e2e/header-contrast.spec.ts` already guards on PageHero. On mobile the band simply gets
+	     shorter; the copy stays overlaid rather than stacking, because the gradient carries it. -->
+	<div
+		class="relative flex min-h-[clamp(24rem,55vh,34rem)] w-full flex-col justify-end overflow-hidden"
+	>
+		<enhanced:img
+			src={CLOSING_PILLAR.img}
+			alt={CLOSING_PILLAR.alt()}
+			sizes="100vw"
+			loading="lazy"
+			class="absolute inset-0 h-full w-full object-cover"
+		/>
+		<div
+			class="absolute inset-0 bg-gradient-to-tr from-overlay/95 via-overlay/72 to-overlay/55"
+			aria-hidden="true"
+		></div>
+		<div class="relative mx-auto w-full max-w-[1400px] px-5 pb-12 sm:px-8 md:px-[6vw] md:pb-16">
+			<Reveal y={24}>
+				<h2 class="max-w-[20ch] text-2xl font-bold text-band-foreground md:text-3xl lg:text-4xl">
+					{CLOSING_PILLAR.title()}
+				</h2>
+				<div class="mt-4 h-px w-10 bg-band-brand/40" aria-hidden="true"></div>
+				<p class="mt-4 max-w-md text-base leading-relaxed text-band-foreground-muted">
+					{CLOSING_PILLAR.description()}
+				</p>
+			</Reveal>
+		</div>
+	</div>
 </section>
