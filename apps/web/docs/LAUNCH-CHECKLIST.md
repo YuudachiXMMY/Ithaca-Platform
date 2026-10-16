@@ -46,15 +46,16 @@ Last reviewed: 2026-09-29 · Status: **not ready** (workstreams in progress)
 > `/programs/ev-team`, which is what `lighthouserc.json` actually measures. Renamed throughout.
 > The medians have also been re-measured — the previous ones predated the CJK font being enabled.
 
-- [ ] 🔴 **`web Lighthouse` is over its LCP ratchet on 1–2 of 7 routes, depending on the run.**
-      Corrects this box's previous claim of "down to 1 of 7 — only `/zh/programs/ev-team`, and only
-      by 415 ms", which was true of run 38665890866 and **not** of run 38672786207 on the same
-      commit: there `/` asserted **4591 ms against its 4500 ratchet** and failed too, while
-      `/zh/programs/ev-team` failed again at 8221. `/` is the scatter case this section already
-      warns about two boxes down — 4055 / 9509 / 6097 on one run, 4591 / 9386 / 6158 on the next —
-      so whether it clears 4500 is decided by which sample happens to be its best. Treat `/` as
-      **unresolved, not passing**; `/zh/programs/ev-team` is the only route that fails
-      _reproducibly_, and only by ~420 ms. Two changes got the figures here. (1) The 2026-10-13
+- [ ] 🔴 **`web Lighthouse` is over its LCP ratchet on 1–2 of 7 routes — and across three runs it
+      has not been the same 1–2 twice.** Run 38665890866 failed only `/zh/programs/ev-team`; run
+      38672786207 failed that plus `/` (**4591 ms against its 4500 ratchet**); run 38744512711
+      failed that plus **`/zh` (7254 ms against 5800)** while `/` passed again at 4325.
+      **`/zh/programs/ev-team` is the only route that fails in all three**, and only by ~420 ms.
+      The other two are the scatter cases this section warns about below: `/` spans 4055–9873 and
+      `/zh` spans 5536–11628 across nine samples each, so whether either clears its ratchet is
+      decided by which sample happens to be its best. Treat **both `/` and `/zh` as unresolved,
+      not passing** — `/` because it has already flipped twice, `/zh` because its two green runs
+      were green on their best sample alone. Two changes got the figures here. (1) The 2026-10-13
       `outputStructure: 'locale-modules'` work improved every route. (2) On 2026-10-15 the EVScene
       dynamic import was gated on visibility: `{#if browser}` is the THRELTE_LAZY_BOUNDARY and is
       about correctness, so it was still fetching and parsing 799 KB of three.js during hydration
@@ -80,51 +81,100 @@ Last reviewed: 2026-09-29 · Status: **not ready** (workstreams in progress)
       `4f995c2`, measured 5711 / 5713 / 5789 against run 38665890866's 5785 / 5790 / 5792. Six
       samples spanning **81 ms (1.4%)** — the number is a property of the page, not the runner,
       which is the only thing that makes it safe to gate on. 6100 is the _worse_ of the two
-      asserted values (5785) plus ~5%, the same headroom `/zh` carries over its measured value;
-      308 ms of margin over the worst single sample. All four `assertMatrix` patterns were
-      re-verified as mutually exclusive against all seven `collect.url` entries, with no dead rule.
+      asserted values (5785) plus ~5%; 308 ms of margin over the worst single sample. All four
+      `assertMatrix` patterns were re-verified as mutually exclusive against all seven
+      `collect.url` entries, with no dead rule.
+      **Confirmed under live enforcement.** Run **38744512711** (2026-10-15, commit `77e468f`) is
+      the first run where 6100 was the active gate rather than a replayed assertion, and the route
+      passed at **5788 / 5788 / 5791**. Nine samples across three runs now span 5711–5792 — still
+      81 ms, still 1.4% — and 5788 lands 312 ms under the ceiling. This row is the only one in the
+      table whose verdict has never depended on which sample lhci picked.
 
-LCP, mobile, simulated. **Two independent runs of the same commit `4f995c2`**: run
-**38665890866** and run **38672786207** (both 2026-10-15). Ratchets are post-split.
+LCP, mobile, simulated. **Three independent runs**: **38665890866** and **38672786207** on commit
+`4f995c2`, **38744512711** on `77e468f` (all 2026-10-15). The third is a different commit but the
+same site — `4f995c2..77e468f` touches only `lighthouserc.json` and this file, no shippable code —
+so all three are comparable measurements of one build. Ratchets are post-split.
 
 > **These are lhci's reported values, which are OPTIMISTIC (best of 3), not medians.** Earlier
 > revisions of this table said "medians of 3" for the runner column; that was wrong, and it
 > matters, because lhci's default `aggregationMethod` is what the gate asserts on. The median
 > column below is computed separately and is the honest read for any route whose samples scatter.
-> Having two runs is what makes this table worth anything: a single run cannot tell a fast page
-> from a lucky sample, and on three of these seven routes that is the whole story.
+> Having three runs is what makes this table worth anything: a single run cannot tell a fast page
+> from a lucky sample, two runs cannot tell a stable page from two lucky samples, and on two of
+> these seven routes that is the whole story. The third run is what turned `/zh`'s "best-only"
+> warning into an actual failure.
 
-| route                  | ratchet | run 1 asserted | run 2 asserted | reproducible? | run 2 samples        |
-| ---------------------- | ------- | -------------- | -------------- | ------------- | -------------------- |
-| `/`                    | 4500    | **4055** ✅    | **4591** ❌    | **no** ⚠️     | 4591 / 6158 / 9386   |
-| `/about-us`            | 4500    | **3185** ✅    | **3172** ✅    | yes           | 3172 / 3767 / 3772   |
-| `/programs`            | 4500    | **3378** ✅    | **3368** ✅    | yes           | 3368 / 3371 / 3378   |
-| `/contact-us`          | 4500    | **3339** ✅    | **3333** ✅    | yes           | 3333 / 3338 / 3361   |
-| `/zh`                  | 5800    | **5537** ✅    | **5536** ✅    | best-only ⚠️  | 5536 / 10957 / 11075 |
-| `/programs/ev-team`    | 6100    | **5785** ✅    | **5711** ✅    | **yes**       | 5711 / 5713 / 5789   |
-| `/zh/programs/ev-team` | 7800    | 8215 ❌        | 8221 ❌        | **yes**       | 8221 / 8222 / 8226   |
+| route                  | ratchet | run 1       | run 2       | run 3       | reproducible? | run 3 samples       |
+| ---------------------- | ------- | ----------- | ----------- | ----------- | ------------- | ------------------- |
+| `/`                    | 4500    | **4055** ✅ | **4591** ❌ | **4325** ✅ | **no** ⚠️     | 4325 / 6315 / 9873  |
+| `/about-us`            | 4500    | **3185** ✅ | **3172** ✅ | **3177** ✅ | yes           | 3177 / 3184 / 3770  |
+| `/programs`            | 4500    | **3378** ✅ | **3368** ✅ | **3371** ✅ | yes           | 3371 / 3387 / 3457  |
+| `/contact-us`          | 4500    | **3339** ✅ | **3333** ✅ | **3336** ✅ | yes           | 3336 / 3343 / 3352  |
+| `/zh`                  | 5800    | **5537** ✅ | **5536** ✅ | **7254** ❌ | **no** ⚠️     | 7254 / 7282 / 11628 |
+| `/programs/ev-team`    | 6100    | **5785** ✅ | **5711** ✅ | **5788** ✅ | **yes**       | 5788 / 5788 / 5791  |
+| `/zh/programs/ev-team` | 7800    | 8215 ❌     | 8221 ❌     | 8227 ❌     | **yes**       | 8227 / 8229 / 8251  |
 
-**Read `/` and `/zh` with suspicion; read the ev-team rows with confidence.** `/` is the one row the
-second run actually flipped — 4055 ✅ then 4591 ❌ — because it scatters across 4055–9509 and then
-4591–9386, so its verdict is decided by which sample happens to be best. `/zh` "passes" both times
-but only ever on its best sample: its medians are ~11 s against a 5800 ratchet. The ev-team rows span
-81 ms (EN, six samples) and 34 ms (ZH) across both runs — those pages are genuinely stable on this
-harness, which is why the EN ratchet could be tightened on their evidence and the others could not.
-This is the same runner variance `web-lighthouse.yml` documents (`/` at 6304 / 6509 / 10420 ms) and
-the reason that workflow is not a per-PR gate.
+**Read `/` and `/zh` with suspicion; read the other five rows with confidence.** Those two are the
+rows whose verdict is decided by which sample lhci happens to pick, and both have now been caught at
+it. `/` has flipped twice (4055 ✅ → 4591 ❌ → 4325 ✅) across samples spanning 4055–9873. `/zh` is
+the more instructive case: it "passed" runs 1 and 2 at 5537 and 5536 — one millisecond apart, which
+looks like the most reproducible number in the table — while its medians sat at ~11 s. Run 3 produced
+no sample near 5.5 s at all (7254 / 7282 / 11628) and it failed by 1454 ms. **Its two green runs were
+not evidence that the page is fast; they were evidence that this page sometimes emits a fast sample.**
+Nine samples now span 5536–11628 with no stable mode.
 
-**CLS is 0.000 on all seven routes**, both runs. **TBT** is inside its 600 ms budget on all seven as
-well — worst _median_ `/zh` 518 → `/` 297 across the two runs (the two figures previously quoted
-here, 518 and 446, were medians, not the asserted best-of-3 the LCP table above reports; the
-conventions differ and the TBT ones are the stricter read). Before the EVScene gate the two ev-team
-routes sat at 1762 and 1702; they are now 147 and 80.
+> **Where that scatter actually lives: render delay, not the network.** Breaking all nine `/` and
+> nine `/zh` samples into LCP phases puts the whole spread in one of the four. TTFB is **455–460 ms
+> in every one of the eighteen samples**; load time stays under 1.2 s; the LCP resource finishes
+> downloading inside the first ~220 ms of the page. **Render delay is what moves: 2790–8419 ms on
+> `/` and 3817–10192 ms on `/zh`**, and it clusters — `/` at ~2.8 / ~5.2 / ~8.2 s, `/zh` at ~3.9 /
+> ~6.2 / ~9.8 s. Three discrete steps, not a smear, which is why "best of 3" can land anywhere.
+> The LCP element in all eighteen samples is the **header logo** (`logo.BaxRrMv6.avif`), as the
+> `opacity: 0` box further down already notes for `/` — it holds for `/zh` too. So these two routes
+> have an already-downloaded element waiting seconds to paint: the same signature, and probably the
+> same class of cause, as the ev-team route before the EVScene gate. **Anyone picking up `/` or
+> `/zh` should start at what blocks paint between 1.5 s and 10 s, not at bytes or TTFB.**
 
-> One caveat the aggregation hides: run 38665890866 produced a single `/` sample at **2937 ms** TBT,
-> ~5× the budget, invisible in both that route's median (446) and its optimistic value (359). Run
-> 38672786207 did not reproduce it — its worst `/` sample is 390 — so it reads as a one-off runner
-> stall rather than a page property. Noted because `/` is already the route whose samples cannot be
-> trusted individually, and TBT is warn-level, so nothing would have failed either way.
+The other five rows span 81 ms (`/programs/ev-team`, nine samples), 36 ms (`/zh/programs/ev-team`,
+nine), and under 600 ms for the three static EN pages — genuinely stable on this harness, which is
+why the EN ev-team ratchet could be tightened on their evidence and the others could not. Note that
+run 2 was a faster machine (its worst TBT median is the lowest of the three runs, and its perf score
+is higher on six of the seven routes — `/about-us` is the exception at 90 → 86 → 90 — with
+`/programs/ev-team` at 74 on all three samples versus 69 in runs 1 and 3), and the ev-team LCP
+spread still did not move — further reason to trust those rows. This is the same runner variance
+`web-lighthouse.yml` documents (`/` at 6304 / 6509 / 10420 ms) and the reason that workflow is not
+a per-PR gate.
 
+**CLS is 0.000 on all seven routes, all three runs** — 63 samples, not one of them non-zero. **TBT**
+medians are inside the 600 ms budget on all seven: worst median is `/zh` 518 (run 1) → `/` 297
+(run 2) → `/` 526 (run 3). (Figures previously quoted here as 518 and 446 were medians, not the
+asserted best-of-3 the LCP table reports; the conventions differ and the TBT ones are the stricter
+read.) Before the EVScene gate the two ev-team routes sat at 1762 and 1702; their run-3 medians are
+245 and 174.
+
+> **Correction — the `/` TBT spike is reproducible, and this box previously said it was not.** Run
+> 38665890866 produced a single `/` sample at **2937 ms** TBT, ~5× the budget, invisible in that
+> route's median (446) and its optimistic value (359). The earlier reading was that run 38672786207
+> "did not reproduce it — its worst `/` sample is 390 — so it reads as a one-off runner stall rather
+> than a page property." **Run 38744512711 reproduced it: worst `/` sample 3051 ms.** Two of three
+> runs, so it is a property of the page that run 2's faster machine masked, not a stall. `/` is
+> therefore suspect on TBT for the same reason it is suspect on LCP, and from the same direction:
+> its bad samples are hidden by both aggregations the gate and this table use. Nothing failed
+> either way — TBT is warn-level — but the next person to work on `/` should expect a real
+> main-thread problem there, not noise.
+
+- [ ] 🔴 **`/zh`'s 5800 ms ratchet has never actually been met, and run 38744512711 is where that
+      stopped being hideable.** It read green twice on a best-of-3 sample at ~5537 ms while its
+      medians were ~11 s; run 3 produced nothing near that and failed at 7254. **Do not respond by
+      raising 5800** — forbidden in five places, and the number is sound: it was set on a real
+      measurement and ratchets may only come down. The honest options are (a) make `/zh` genuinely
+      faster, or (b) stop letting the gate reward luck. On (b): `lighthouserc.json` sets
+      `numberOfRuns: 3` and does not set `aggregationMethod`, so lhci defaults to **optimistic** —
+      the gate asserts each route's _best_ sample. Switching to `median` is a tightening, which the
+      ratchet rule permits, and would make this table honest in one line. It would also turn `/`
+      and `/zh` permanently red (medians ~6.3 s and ~11 s), which is a real decision about what
+      this workflow is for, not a config tweak to slip in. **Whoever picks this up: decide (a) or
+      (b) explicitly and record it here.** Until then both routes are unresolved, not passing.
 - [ ] 🔴 **LCP ≤ 2500ms is still unmet on every route, which is what keeps this section red.**
       The 2.5s PRD target is a different and much harder bar than the ratchets. LCP medians of 3,
       localhost mobile — **before → after** the 2026-10-13 change, against each route's ratchet:
@@ -149,11 +199,16 @@ routes sat at 1762 and 1702; they are now 147 and 80.
       `/programs` 88 · `/programs/ev-team` 75 · `/contact-us` 91 · `/zh` 70 ·
       `/zh/programs/ev-team` 66. **GitHub runner** after the 2026-10-15 EVScene gate, same route
       order — run 38665890866: 58 · 90 · 84 · **69** · 86 · 56 · **63**; run 38672786207:
-      69 · 86 · 88 · **74** · 88 · 61 · **65**. The two ev-team routes gained the most
-      (45 → 69 → 74 and 41 → 63 → 65), which is the same main-thread recovery the LCP table shows,
-      and `/programs/ev-team` scored 74 on all three samples of run 2 — the same stability its LCP
-      has. No route yet meets the ≥ 90 bar on the runner. It is still ~2× slower on CPU on the
-      routes that remain red, which is why `web-lighthouse.yml` is not a per-PR gate.)
+      69 · 86 · 88 · **74** · 88 · 61 · **65**; run 38744512711: 56 · 90 · 85 · **69** · 86 · 59 ·
+      **63**. The two ev-team routes gained the most from the gate (45 → 69 and 41 → 63), which is
+      the same main-thread recovery the LCP table shows. Run 2's higher figures on six of the seven
+      routes — including `/programs/ev-team` at 74 on all three of its samples — were the machine,
+      not the site: run 3 lands back on run 1's numbers almost exactly. `/about-us` is the one route
+      run 2 scored _lower_ on (90 → 86 → 90), so the "faster machine" reading covers six of seven,
+      not all seven. Treat run 2 as the optimistic bound of what this harness reports, not as
+      progress that was later lost. No route yet meets the ≥ 90 bar on the runner, which is still
+      ~2× slower on CPU on the routes that remain red, and is why `web-lighthouse.yml` is not a
+      per-PR gate.)
 - [x] ✅ **`/programs/ev-team` is no longer the worst route, and the cause was the main thread.**
       Corrects this box's previous claim that "every route-specific cause proposed so far has been
       measured and refuted". One had not been tested: main-thread contention. The refutations were
@@ -172,6 +227,12 @@ routes sat at 1762 and 1702; they are now 147 and 80.
       start at `opacity: 0`. It was A/B-measured on 2026-10-13 and moving it changed LCP by +10 ms,
       i.e. noise — the hero quote is not the LCP element on `/`; the header logo is. Fix it for
       correctness, not for the metric.)
+      Reconfirmed on 2026-10-15 across three runs: the LCP element is the header logo in **all nine
+      `/` samples and all nine `/zh` samples**. Neither thing that file's comments claimed to be the
+      LCP element is: the poster is fetched and complete by ~220 ms yet is never the candidate, and
+      the quote lines start masked. Both comments have been corrected in the component. What this
+      box is for stands — the `opacity: 0` start is still wrong on its own terms — but note that
+      fixing it will not move LCP until the logo stops being the candidate.
 - [ ] 🟡 The `/admissions` booking embed is lazy-loaded and has a plain-link fallback
 - [ ] 🟡 Fonts self-hosted and subset; no layout shift on font load
 
