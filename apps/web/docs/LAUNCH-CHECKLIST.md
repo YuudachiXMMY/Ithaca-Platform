@@ -138,10 +138,12 @@ Nine samples now span 5536–11628 with no stable mode.
 The other five rows span 81 ms (`/programs/ev-team`, nine samples), 36 ms (`/zh/programs/ev-team`,
 nine), and under 600 ms for the three static EN pages — genuinely stable on this harness, which is
 why the EN ev-team ratchet could be tightened on their evidence and the others could not. Note that
-run 2 was a uniformly faster machine (every route's TBT and perf score improved, `/programs/ev-team`
-scored 74 on all three samples versus 69 in runs 1 and 3), and the ev-team LCP spread still did not
-move — further reason to trust those rows. This is the same runner variance `web-lighthouse.yml`
-documents (`/` at 6304 / 6509 / 10420 ms) and the reason that workflow is not a per-PR gate.
+run 2 was a faster machine (its worst TBT median is the lowest of the three runs, and its perf score
+is higher on six of the seven routes — `/about-us` is the exception at 90 → 86 → 90 — with
+`/programs/ev-team` at 74 on all three samples versus 69 in runs 1 and 3), and the ev-team LCP
+spread still did not move — further reason to trust those rows. This is the same runner variance
+`web-lighthouse.yml` documents (`/` at 6304 / 6509 / 10420 ms) and the reason that workflow is not
+a per-PR gate.
 
 **CLS is 0.000 on all seven routes, all three runs** — 63 samples, not one of them non-zero. **TBT**
 medians are inside the 600 ms budget on all seven: worst median is `/zh` 518 (run 1) → `/` 297
@@ -199,12 +201,14 @@ read.) Before the EVScene gate the two ev-team routes sat at 1762 and 1702; thei
       order — run 38665890866: 58 · 90 · 84 · **69** · 86 · 56 · **63**; run 38672786207:
       69 · 86 · 88 · **74** · 88 · 61 · **65**; run 38744512711: 56 · 90 · 85 · **69** · 86 · 59 ·
       **63**. The two ev-team routes gained the most from the gate (45 → 69 and 41 → 63), which is
-      the same main-thread recovery the LCP table shows. Run 2's higher figures across _every_
-      route — including `/programs/ev-team` at 74 on all three of its samples — were the machine,
-      not the site: run 3 lands back on run 1's numbers almost exactly. Treat run 2 as the
-      optimistic bound of what this harness reports, not as progress that was later lost. No route
-      yet meets the ≥ 90 bar on the runner, which is still ~2× slower on CPU on the routes that
-      remain red, and is why `web-lighthouse.yml` is not a per-PR gate.)
+      the same main-thread recovery the LCP table shows. Run 2's higher figures on six of the seven
+      routes — including `/programs/ev-team` at 74 on all three of its samples — were the machine,
+      not the site: run 3 lands back on run 1's numbers almost exactly. `/about-us` is the one route
+      run 2 scored _lower_ on (90 → 86 → 90), so the "faster machine" reading covers six of seven,
+      not all seven. Treat run 2 as the optimistic bound of what this harness reports, not as
+      progress that was later lost. No route yet meets the ≥ 90 bar on the runner, which is still
+      ~2× slower on CPU on the routes that remain red, and is why `web-lighthouse.yml` is not a
+      per-PR gate.)
 - [x] ✅ **`/programs/ev-team` is no longer the worst route, and the cause was the main thread.**
       Corrects this box's previous claim that "every route-specific cause proposed so far has been
       measured and refuted". One had not been tested: main-thread contention. The refutations were
