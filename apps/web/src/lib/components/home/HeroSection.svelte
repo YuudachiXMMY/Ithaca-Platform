@@ -90,23 +90,34 @@
 	/* Hero quote mask-reveal. Pure CSS (no Svelte transition) so it runs during initial render
 	   at ~FCP instead of waiting on client hydration. `both` fill-mode holds the pre-reveal
 	   (masked) state through the per-line delay.
-	   The largest line is NOT the LCP element — this comment claimed it was until 2026-10-15.
-	   Starting at `opacity: 0` makes these lines ineligible for LCP candidacy, and measurement
-	   agrees: the header logo is the LCP element in all 18 `/` and `/zh` samples across three
-	   runs. A 2026-10-13 A/B of removing the masked start moved LCP by +10 ms (noise). The
-	   masked start is still worth fixing for correctness — see LAUNCH-CHECKLIST's `opacity: 0`
-	   box — just do not expect it to move the metric while the logo is the candidate. */
+
+	   The `opacity: 0` start was REMOVED on 2026-10-16 (LAUNCH-CHECKLIST's `opacity: 0` box).
+	   Chrome excludes a fully transparent element from LCP candidacy, which is a correctness
+	   problem on its own terms: it hides the real metric for whatever the reveal is covering.
+	   The reveal itself is unchanged visually — the lines still rise out of a clipped track,
+	   because `transform: translateY(110%)` inside the parent's `overflow: hidden` is what
+	   produces the mask effect; the opacity ramp was only ever riding along with it.
+
+	   Do not expect this to move LCP, and do not read that as the fix being pointless. The
+	   header logo is the LCP element in all 18 `/` and `/zh` samples across three runs, and a
+	   2026-10-13 A/B of this exact change measured +10 ms (noise). The translate keeps each line
+	   clipped out of view until its delay elapses, so it does not become an earlier candidate
+	   either — what changes is that the element is no longer INELIGIBLE, only not-yet-visible,
+	   which is an honest description of what it is.
+
+	   Related finding, 2026-10-16: when /zh's FCP was experimentally pulled forward (by deferring
+	   the CJK stylesheet), this element DID become the LCP element and the metric got both worse
+	   and unstable. That is recorded in docs/LAUNCH-CHECKLIST.md, with the measurements — the
+	   short version is that the cause was font repaint, not this animation. */
 	.quote-line {
 		animation: quote-reveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 		animation-delay: 0ms; /* overridden per line via style:animation-delay */
 	}
 	@keyframes quote-reveal {
 		from {
-			opacity: 0;
 			transform: translateY(110%);
 		}
 		to {
-			opacity: 1;
 			transform: translateY(0);
 		}
 	}
