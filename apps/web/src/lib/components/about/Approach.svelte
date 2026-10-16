@@ -10,11 +10,8 @@
 		<!-- Section kicker -->
 		<Reveal y={20} duration={500}>
 			<div class="mb-10">
-				<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
-					{m.about_approach_eyebrow()}
-				</p>
 				<div
-					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+					class="h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 					aria-hidden="true"
 				></div>
 				<h2 class="mt-6 text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">

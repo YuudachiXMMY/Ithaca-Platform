@@ -111,12 +111,9 @@
 <section class="bg-surface-0 py-14 md:py-20" aria-labelledby="highlights-heading">
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={20} duration={500}>
-			<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
-				{m.about_highlights_eyebrow()}
-			</p>
 			<h2
 				id="highlights-heading"
-				class="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-4xl"
+				class="text-2xl font-bold tracking-tight text-foreground md:text-4xl"
 			>
 				{m.about_highlights_heading()}
 			</h2>

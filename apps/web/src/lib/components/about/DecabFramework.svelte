@@ -36,12 +36,9 @@
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={20} duration={500}>
 			<div>
-				<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
-					{m.about_decab_eyebrow()}
-				</p>
 				<h2
 					id="decab-heading"
-					class="mt-6 text-2xl leading-tight font-bold tracking-tight text-foreground md:text-4xl"
+					class="text-2xl leading-tight font-bold tracking-tight text-foreground md:text-4xl"
 				>
 					{m.about_decab_heading()}
 				</h2>
