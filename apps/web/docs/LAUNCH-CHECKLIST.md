@@ -173,8 +173,38 @@ read.) Before the EVScene gate the two ev-team routes sat at 1762 and 1702; thei
       the gate asserts each route's _best_ sample. Switching to `median` is a tightening, which the
       ratchet rule permits, and would make this table honest in one line. It would also turn `/`
       and `/zh` permanently red (medians ~6.3 s and ~11 s), which is a real decision about what
-      this workflow is for, not a config tweak to slip in. **Whoever picks this up: decide (a) or
-      (b) explicitly and record it here.** Until then both routes are unresolved, not passing.
+      this workflow is for, not a config tweak to slip in.
+      **Decision, 2026-10-16: (a) — make `/zh` genuinely faster.** What that bought, and what it
+      ran into, is the box immediately below. The short version: the only unambiguous win was the
+      header logo, and the CJK font cost survived three separate attempts to move it. (b) is
+      therefore still open and is the honest next question, but it was not taken here.
+
+- [ ] 🔴 **`/zh`'s remaining cost is the CJK font, and three ways of moving it were measured and
+      rejected on 2026-10-16.** Recorded so nobody re-runs them. All figures localhost, mobile,
+      simulated, 3 samples per arrangement, LCP / FCP on `/zh`:
+      | arrangement | LCP | FCP | verdict |
+      | --- | --- | --- | --- |
+      | both faces in `<head>` (shipped) | **5347-5351** | 4055 | the baseline |
+      | `media="print"` + `onload` | 6019 | 3930 | **worse**: −125 ms FCP, **+667 ms LCP** |
+      | whole stylesheet deferred past `load` | 6618-8742 | **2406** | **worse and unstable** |
+      | only the 700 face deferred | 6543-10697 | 3305 | **worse and unstable** |
+      The pattern is one thing, and it is already written up in `scripts/build-cjk-subset.ts`'s
+      `font-display` comment under the name `swap`: **anything that makes the face apply after
+      first paint causes a repaint, and Chrome re-records LCP at the repaint.** Deferring a
+      stylesheet does exactly that — the `@font-face` is new to the document, so `optional`'s
+      block period restarts and the face is applied when it lands, instead of being skipped.
+      In both deferred arrangements the LCP element moved from the header logo to the hero quote
+      and the spread blew out to >2 s. Dropping the stylesheet to the lowest priority
+      (`media="print"`) fails differently and more cheaply: the faces stop queueing ahead of first
+      paint and start competing with the LCP element for throttled bandwidth, which is the same
+      objection the no-preload decision in `+layout.svelte` already makes, approached from the
+      other side.
+      **CLS stayed 0.000 in all twelve samples**, so none of this was a layout-stability problem.
+      What is left, for whoever picks this up: the cost is ~1650 ms of FCP on `/zh` against `/`,
+      it is 276 KB of font in the critical path, the bytes are already at their floor, and
+      `font-display: optional` means a first-time visitor never sees that font anyway. The
+      remaining honest moves are to stop shipping the typeface (a product decision the owner has
+      already made the other way), or (b) above.
 - [ ] 🔴 **LCP ≤ 2500ms is still unmet on every route, which is what keeps this section red.**
       The 2.5s PRD target is a different and much harder bar than the ratchets. LCP medians of 3,
       localhost mobile — **before → after** the 2026-10-13 change, against each route's ratchet:
@@ -221,30 +251,73 @@ read.) Before the EVScene gate the two ev-team routes sat at 1762 and 1702; thei
       runner's documented ~2× CPU penalty on this route _was_ that parse. TBT fell 1762 → 257 ms.
       Its LCP element is unchanged: the hero photograph (`EV26-1`). `fetchpriority="high"` on it
       (c787431) remains worth ~0 ms for the reason originally measured. See `DECISIONS.md`.
-- [ ] 🔴 No LCP element starts at `opacity: 0` — Chrome excludes such elements from LCP
-      candidacy, which both hides the real metric and delays the paint users perceive.
-      (Still unchecked: `src/lib/components/home/HeroSection.svelte`'s `.quote-line` keyframe does
-      start at `opacity: 0`. It was A/B-measured on 2026-10-13 and moving it changed LCP by +10 ms,
-      i.e. noise — the hero quote is not the LCP element on `/`; the header logo is. Fix it for
-      correctness, not for the metric.)
-      Reconfirmed on 2026-10-15 across three runs: the LCP element is the header logo in **all nine
-      `/` samples and all nine `/zh` samples**. Neither thing that file's comments claimed to be the
-      LCP element is: the poster is fetched and complete by ~220 ms yet is never the candidate, and
-      the quote lines start masked. Both comments have been corrected in the component. What this
-      box is for stands — the `opacity: 0` start is still wrong on its own terms — but note that
-      fixing it will not move LCP until the logo stops being the candidate.
+- [x] ✅ **No LCP element starts at `opacity: 0`.** Fixed 2026-10-16: the `quote-reveal` keyframe
+      in `src/lib/components/home/HeroSection.svelte` no longer ramps opacity — it animates
+      `transform` alone. The reveal looks the same, because the mask effect was always the
+      `translateY(110%)` inside the parent's `overflow: hidden`; the opacity ramp was riding along.
+      Measured after the change: `/` **4068 / 4070 / 4071 ms**, `/zh` **5347 / 5348 / 5351 ms**,
+      LCP element still the header logo. So this moved nothing, exactly as the 2026-10-13 A/B
+      (+10 ms) predicted — it is a correctness fix, and the box was always about correctness.
+      History, which the previous revision of this box recorded and is worth keeping: across three
+      runs the LCP element was the header logo in **all nine `/` and all nine `/zh` samples**, and
+      neither element that file's comments once claimed to be the LCP element is — the poster is
+      complete by ~220 ms yet never a candidate, and the quote lines started masked.
+- [x] ✅ **The header logo — the LCP element on `/` and `/zh` — was still shipping its 1809×1823
+      original to phones, behind a `sizes` attribute that did nothing.** Fixed 2026-10-16.
+      `?enhanced` with no `w=` list makes enhanced:img emit an **x-descriptor** srcset
+      (`1x, 1.9988x`), and `sizes` is ignored for x descriptors — it only applies to `w`
+      descriptors. So `sizes="200px"` was inert and a dsf-1.75 phone took the `1.9988x` entry, the
+      full-resolution file, to paint a box **79×80 CSS px**. An earlier pass had already identified
+      the 1809×1823 decode as ~85% of this route's LCP and added that `sizes` to fix it; the fix
+      was right in intent and silently did nothing.
+      Naming the widths (`?enhanced&w=96;192;288`) switches the srcset to `w` descriptors, which is
+      what makes `sizes` load-bearing. Measured, 3 samples each: `/zh` **5423/5424/5428 →
+      5347/5348/5351**, `/` **4070/4145/4145 → 4068/4070/4071**. Small in milliseconds, and the
+      second number is the more interesting one — `/`'s spread collapsed from 75 ms to 3 ms.
+      Note for anyone adding a width list elsewhere: `@sveltejs/enhanced-img` declares only
+      `*?enhanced`, so any directive makes the import untyped and `svelte-check` fails with
+      "Cannot find module". `src/enhanced-img.d.ts` carries the declaration, one block per width
+      list (TypeScript's module wildcard allows exactly one `*`).
 - [ ] 🟡 The `/admissions` booking embed is lazy-loaded and has a plain-link fallback
 - [ ] 🟡 Fonts self-hosted and subset; no layout shift on font load
 
 ## SEO and social
 
-- [ ] 🔴 Every page has a distinct OG image (verify by sharing three different pages into
-      WeChat and iMessage and confirming three different thumbnails)
+> **Verified in code on 2026-10-16.** The four boxes below were ticked after reading the
+> implementation and the tests that pin it, not after a release. They had been sitting unticked
+> while the code had been there for some time, which is its own kind of wrong: an unticked box on
+> a go/no-go list is a claim that work is outstanding, and three separate reviews re-investigated
+> these. What remains genuinely unticked in this section is the part a repository cannot check —
+> whether a real WeChat client renders the card.
+
+- [x] ✅ `Course` + `CourseInstance` JSON-LD generated from `Season`; `BreadcrumbList` on
+      inner pages; `Organization` on the homepage.
+      `courseJsonLd()` in `src/lib/program-season.ts:137,149`, which also omits the
+      `CourseInstance` for a season with no usable dates rather than inventing one
+      (`src/lib/program-season.test.ts:143-167`, `src/lib/season-contract.test.ts:219-272`).
+      `breadcrumbJsonLd()` in `src/lib/seo.ts:108` is emitted once from `+layout.svelte` for every
+      public inner page, so a new route gets its trail with nothing to remember; `orgJsonLd` is
+      `src/lib/seo.ts:135`. `e2e/seo.spec.ts` covers all three, with its route list derived from
+      `/sitemap.xml`.
+- [x] ✅ `sitemap.xml` includes the new routes in both locales, with hreflang + x-default.
+      `src/routes/sitemap.xml/+server.ts:23-26` emits one `<xhtml:link>` per locale plus an
+      `x-default` pointing at the English URL. Routes are enumerated by `import.meta.glob`, so the
+      "includes the new routes" half is structural rather than a thing to re-check per route.
+- [x] ✅ `robots.txt` correct; `/admin` and `/dev/*` excluded from sitemap and index.
+      `src/routes/robots.txt/+server.ts` disallows `/admin` and `/api` and derives the `Sitemap:`
+      host from `PUBLIC_SITE_URL` (so a preview origin cannot advertise production's sitemap).
+      Indexing is actually held by the `noindex` meta in `+layout.svelte`, which that file's own
+      comment is careful to distinguish from the crawl directive. **`/dev/*` does not exist** —
+      there is no such route in `src/routes/`, so that clause is satisfied by absence, not by a
+      rule. If a `/dev` route is ever added, this box goes back to red.
+- [x] ✅ Every page has a distinct OG image — as far as generation goes. `src/lib/og/cards.ts`
+      registers 21 routes and the build prerenders **42 PNGs** (21 × 2 locales) into
+      `build/prerendered/og/`. One table feeds both the PNG endpoint and `Seo.svelte`'s
+      `og:image`, so the card and the tag cannot disagree.
+      **This does NOT close the next two boxes**, which are about what a client does with them.
+- [ ] 🔴 Confirm three different pages produce three different thumbnails **in WeChat and in
+      iMessage**. Generation is verified (box above); rendering is not, and cannot be from here.
 - [ ] 🔴 OG images still readable when centre-cropped to 1:1 (WeChat thumbnails)
-- [ ] 🔴 `Course` + `CourseInstance` JSON-LD generated from `Season`; `BreadcrumbList` on
-      inner pages; `Organization` on the homepage
-- [ ] 🔴 `sitemap.xml` includes the new routes in both locales, with hreflang + x-default
-- [ ] 🔴 `robots.txt` correct; `/admin` and `/dev/*` excluded from sitemap and index
 - [ ] 🔴 Sitemap submitted to Google Search Console
 - [ ] 🟡 No `noindex` on any public route in production (covered by `e2e/smoke.spec.ts`)
 

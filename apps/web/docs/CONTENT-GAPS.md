@@ -161,10 +161,15 @@ page** — the hero shows strangers at an event). Two further notes:
   the site in writing to publishing student material only with that student's and family's consent.
   A hero anchored on recognisable faces should clear the same bar, and nothing in the repo records
   that it does.
-- **Two assets are stored sideways.** `EV25-10.jpg` and `EV25-11.jpg` are landscape canvases holding
-  90°-rotated pixels with no EXIF orientation tag, so a browser renders them on their side.
-  `EV25-11.jpg` was rotated upright losslessly (`jpegtran -rotate 90`) to serve as the STEM hero;
-  it is now portrait, so a wide hero crops it hard. `EV25-10.jpg` is still sideways and unused.
+- ~~**Two assets are stored sideways.**~~ 🟢 **Both upright as of 2026-10-16.** They were landscape
+  canvases holding 90°-rotated pixels with no EXIF orientation tag, so a browser rendered them on
+  their side. `EV25-11.jpg` was rotated upright losslessly (`jpegtran -rotate 90`) earlier, to
+  serve as the STEM hero; it is now portrait, so a wide hero crops it hard. `EV25-10.jpg` was
+  rotated on 2026-10-16, also losslessly (`jpegtran -rotate 270 -copy all` — counter-clockwise,
+  and both dimensions are multiples of 16, so no edge was trimmed); it is now 1280×1920 portrait.
+  It remains **unused**: the three components that look like they use it
+  (`home/ProgramsShowcase`, `about/ProgramsBento`, `programs/ev-team/+page`) import
+  `EV25-10.s.png`, a different, already-upright file.
 
 #### 🟡 C-9e · Two pre-existing defects these pages make more visible
 
@@ -173,9 +178,10 @@ page** — the hero shows strangers at an event). Two further notes:
   `common_footerHomeAriaLabel` — all alt/aria text, so a screen-reader user hears a different
   organization name than the one every visible heading uses). Not corrected here: it is the owner's
   brand, not a typo for an implementer to settle.
-- **`src/lib/data/team.ts` hardcodes the English honorifics** "Mr." / "Ms." into the `name` field, so
-  the Chinese page renders "Mr. Joshua Wang" under a fully Chinese hero. Already logged under C-4;
-  giving `TeamGrid` its own route makes it considerably more prominent.
+- ~~**`src/lib/data/team.ts` hardcodes the English honorifics** "Mr." / "Ms." into the `name`
+  field, so the Chinese page renders "Mr. Joshua Wang" under a fully Chinese hero.~~
+  🟢 **Fixed 2026-10-16** — see C-4 above for what replaced it and what was deliberately left
+  to the owner.
 
 ## 🟡 Placeholder shipped
 
@@ -192,8 +198,12 @@ Current bios are one line each. `prd.md` R-ABOUT-5 wants expandable full bios.
 
 Also needed: the instructor list (currently absent entirely).
 
-Related defect: `src/lib/data/team.ts:15,20,25,30` hardcodes the English honorifics
-`Mr.` / `Ms.`, which render untranslated on the Chinese site.
+~~Related defect: `src/lib/data/team.ts` hardcodes the English honorifics `Mr.` / `Ms.`, which
+render untranslated on the Chinese site.~~ 🟢 **Fixed 2026-10-16.** The honorific is now a
+per-locale message (`common_team_honorificMr` / `...Ms`), rendered as "Mr. {name}" in English and
+"{name}" in Chinese. **No Chinese honorific was invented** — Chinese puts the title after the
+surname, and which form these four people take is a branding decision, not a translation. The
+`TeamMember.honorific` field is in place for when the owner picks one. See `docs/DECISIONS.md`.
 
 ### C-5 · Stat provenance (Q2) — 🟡 counters render; a precise source is still owed
 
