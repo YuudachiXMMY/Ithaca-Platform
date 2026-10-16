@@ -7,9 +7,12 @@ import type { Person } from './types';
  * This file does NOT replace `src/lib/data/team.ts`; migrating `TeamGrid.svelte` off the old
  * shape is a later workstream. Two differences are deliberate:
  *
- * 1. The English honorifics (`Mr.` / `Ms.`) that `data/team.ts` hardcodes into `name` are dropped.
- *    They render untranslated on the Chinese site (CONTENT-GAPS C-4), and `Localized` has nowhere
- *    honest to put them — Chinese puts the honorific after the surname, not before the full name.
+ * 1. No English honorific is carried in `name`. `data/team.ts` used to hardcode `Mr.` / `Ms.`
+ *    there and render them untranslated on the Chinese site (CONTENT-GAPS C-4); that was fixed on
+ *    2026-10-16 by moving the honorific into a per-locale message, which English resolves to
+ *    "Mr. {name}" and Chinese resolves to "{name}". This file still carries no honorific at all,
+ *    because `Localized` has nowhere honest to put one — Chinese puts the honorific after the
+ *    surname, not before the full name, and which form to use is the owner's call.
  * 2. `name.zh` keeps the Latin spelling. That is the policy the site's Chinese translator already
  *    applies to Western names (`Dr. Reza Moridi`, `Peter Teertstra` are left in Latin while
  *    `Hinton` / `Bengio` are transliterated) — see docs/DECISIONS.md Q12.

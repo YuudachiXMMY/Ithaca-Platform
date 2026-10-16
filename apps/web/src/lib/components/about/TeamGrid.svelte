@@ -21,13 +21,22 @@
 	};
 	const teamMsg = (key: string) => (TEAM_MESSAGE[key] ?? (() => key))();
 
-	// Enhanced-img imports keyed by member name (photos live in $lib/assets/team).
+	// Enhanced-img imports keyed by member name (photos live in $lib/assets/team). Keys lost
+	// their "Mr."/"Ms." prefix when the honorific moved out of TeamMember.name — see team.ts.
 	const TEAM_IMAGE: Record<string, typeof joshuaWang> = {
-		'Mr. Joshua Wang': joshuaWang,
-		'Mr. Jadyn Wu': jadynWu,
-		'Ms. Kristen Perry': kristenPerry,
-		'Mr. Grant Bourne': grantBourne
+		'Joshua Wang': joshuaWang,
+		'Jadyn Wu': jadynWu,
+		'Kristen Perry': kristenPerry,
+		'Grant Bourne': grantBourne
 	};
+
+	// The honorific is a per-locale message, not part of the name: English renders "Mr. Joshua
+	// Wang", Chinese renders "Joshua Wang". Previously the English form was baked into the data
+	// and appeared verbatim under a fully Chinese hero (CONTENT-GAPS C-4).
+	const displayName = (member: { name: string; honorific: 'mr' | 'ms' }) =>
+		member.honorific === 'ms'
+			? m.common_team_honorificMs({ name: member.name })
+			: m.common_team_honorificMr({ name: member.name });
 </script>
 
 <section class="bg-surface-3 py-14 md:py-20" aria-labelledby="team-heading">
@@ -56,14 +65,14 @@
 							{#if TEAM_IMAGE[member.name]}
 								<enhanced:img
 									src={TEAM_IMAGE[member.name]}
-									alt={member.name}
+									alt={displayName(member)}
 									sizes="(max-width: 640px) 50vw, 25vw"
 									loading="lazy"
 									class="absolute inset-0 h-full w-full object-cover"
 								/>
 							{/if}
 						</div>
-						<h4 class="mt-3 text-sm font-bold text-foreground">{member.name}</h4>
+						<h4 class="mt-3 text-sm font-bold text-foreground">{displayName(member)}</h4>
 						<p class="text-xs font-medium text-brand-bright">{teamMsg(member.title)}</p>
 						<p class="mt-1 text-xs leading-relaxed text-foreground-muted">
 							{teamMsg(member.description)}
