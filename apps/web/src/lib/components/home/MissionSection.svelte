@@ -91,10 +91,7 @@
 			<!-- Text -->
 			<div class={i % 2 === 1 ? 'md:order-1' : ''}>
 				<Reveal y={24}>
-					<p class="font-mono text-[11px] tracking-[0.2em] text-brand uppercase">
-						{String(i + 1).padStart(2, '0')}
-					</p>
-					<h2 class="mt-3 text-2xl font-bold text-foreground md:text-3xl lg:text-4xl">
+					<h2 class="text-2xl font-bold text-foreground md:text-3xl lg:text-4xl">
 						{pillar.title()}
 					</h2>
 					<div class="mt-4 h-px w-10 bg-brand/30" aria-hidden="true"></div>

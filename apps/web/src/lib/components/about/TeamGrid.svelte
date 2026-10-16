@@ -34,13 +34,7 @@
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={20} duration={500}>
 			<div>
-				<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
-					{m.about_team_eyebrow()}
-				</p>
-				<h2
-					id="team-heading"
-					class="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-4xl"
-				>
+				<h2 id="team-heading" class="text-2xl font-bold tracking-tight text-foreground md:text-4xl">
 					{m.about_team_heading()}
 				</h2>
 				<div

@@ -32,12 +32,9 @@
 		<!-- Section heading -->
 		<Reveal y={20} duration={500}>
 			<div class="mb-10 lg:mb-14">
-				<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
-					{m.about_mission_eyebrow()}
-				</p>
 				<h2
 					id="mission-heading"
-					class="mt-6 text-2xl leading-tight font-bold tracking-tight text-foreground md:text-4xl"
+					class="text-2xl leading-tight font-bold tracking-tight text-foreground md:text-4xl"
 				>
 					{m.about_mission_heading()}
 				</h2>

@@ -107,19 +107,10 @@
 				{m.home_highlights_subheading()}
 			</p>
 		</div>
-		<!-- Desktop-only index strip. `aria-hidden` because every string in it is repeated verbatim
-		     by the cards below; exposing it would put the six tags in the a11y tree twice, which is
-		     the duplication R-HOME-6 is about. -->
-		<div class="hidden gap-6 overflow-x-auto py-2.5 md:flex" aria-hidden="true">
-			{#each HIGHLIGHTS as h, i (i)}
-				<span
-					class="shrink-0 font-mono text-[9px] tracking-[0.15em] text-foreground-subtle uppercase"
-				>
-					{String(i + 1).padStart(2, '0')}
-					{h.tag()}
-				</span>
-			{/each}
-		</div>
+		<!-- The desktop index strip that used to sit here (`01 FIELD VISIT  02 ACADEMIC …`) was
+		     removed on 2026-10-16. It was `aria-hidden` precisely because every string in it is
+		     repeated verbatim by the cards below, so it carried no information for anyone; what it
+		     did carry was a numbered-label rhythm this redesign pass is retiring site-wide. -->
 	</div>
 
 	<!-- At md+ this is a native horizontal scroll-snap track (no GSAP pin). tabindex+role make the

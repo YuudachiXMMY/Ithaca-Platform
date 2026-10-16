@@ -46,12 +46,9 @@
 		<!-- Section heading -->
 		<Reveal y={20} duration={500}>
 			<div>
-				<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
-					{m.about_outcomes_eyebrow()}
-				</p>
 				<h2
 					id="outcomes-heading"
-					class="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-4xl"
+					class="text-2xl font-bold tracking-tight text-foreground md:text-4xl"
 				>
 					{m.about_outcomes_heading()}
 				</h2>
