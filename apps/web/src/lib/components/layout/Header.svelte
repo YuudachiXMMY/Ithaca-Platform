@@ -17,8 +17,14 @@
 	import * as m from '$lib/paraglide/messages';
 	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
 	import { focustrap } from '$lib/actions/focus-trap';
-	import logoOnDark from '$lib/assets/site/logo.png?enhanced';
-	import logoOnLight from '$lib/assets/site/logo-ink.png?enhanced';
+	// `?enhanced` with no `w=` emits an x-descriptor srcset ("1x, 1.9988x") derived from the
+	// 1809x1823 source, and `sizes` is IGNORED for x descriptors — so the `sizes="200px"` on the
+	// tag below was inert and a dsf-1.75 phone picked the 1.9988x entry: the full 1809px original.
+	// Naming the widths switches enhanced:img to a w-descriptor srcset, which is what makes
+	// `sizes` load-bearing. 96px is the largest CSS width the logo ever occupies (`lg:h-24` on a
+	// ~1:1 source); 288px covers it at 3x.
+	import logoOnDark from '$lib/assets/site/logo.png?enhanced&w=96;192;288';
+	import logoOnLight from '$lib/assets/site/logo-ink.png?enhanced&w=96;192;288';
 
 	// Split nav items: left group / center logo / right group. WHICH hrefs sit on the right, and
 	// why, is `RIGHT_NAV_HREFS` in $lib/data/nav — both groups keep NAV_ITEMS order, so the mobile
@@ -338,15 +344,20 @@
 			class="shrink-0 justify-self-center"
 			aria-label={m.common_nav_homeLink()}
 		>
-			<!-- The header logo is the homepage LCP element, so it's eager + fetchpriority=high.
-			     enhanced:img serves a small AVIF/WebP instead of the 128KB full-res PNG whose
-			     decode of a 1809x1823 source was ~85% of the LCP (4s render delay). The static
-			     PNG is retained for seo.ts og:image / Organization JSON-LD (absolute-URL refs). -->
+			<!-- The header logo is the LCP element on `/` and `/zh` (measured: all 18 samples
+			     across three Lighthouse runs), so it's eager + fetchpriority=high. The widths are
+			     named at the import above — without them `sizes` does nothing, which is how the
+			     1809px original was still being served to phones. `sizes` mirrors the classes
+			     below: 96px at `lg:` (`h-24`), 80px under it (`h-20`). The scrolled state is
+			     smaller still (`h-12`), and deliberately not expressed here — `sizes` cannot
+			     track a runtime state, and naming the LARGER value is the safe direction (it
+			     over-fetches slightly rather than upscaling a too-small file).
+			     The static PNG is retained for seo.ts og:image / Organization JSON-LD. -->
 			<enhanced:img
 				src={logo}
 				alt={m.common_logoAlt()}
 				fetchpriority="high"
-				sizes="200px"
+				sizes="(min-width: 1024px) 96px, 80px"
 				class={cn(
 					'w-auto transition-all duration-500 ease-out',
 					scrolled ? 'h-12' : 'h-20 lg:h-24'

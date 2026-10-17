@@ -161,6 +161,20 @@ Playwright 跑**生产构建**（`node build/index.js`，`:4321`），不是 `vi
 | `seo.spec.ts`               | 规范链接 / OG / JSON-LD，覆盖范围同样由 sitemap 推导                                                                                                                                                           |
 | `locale-suggestion.spec.ts` | 中文入口的可发现性（header 语言切换下沉到 footer 之后的补偿）                                                                                                                                                  |
 
+**本地直接 `npm run test:e2e` 会红 19 条，而 CI 是绿的 —— 这不是 flake。** `analytics.spec.ts`
+整套（外加 `locale-suggestion` 的 `locale_switch` 和 `admissions-funnel` 的中文提交）断言的是
+`dataLayer` 里的 GA4 事件，而 GA 片段只在 `PUBLIC_GA_TRACKING_ID` 有值时才注入；它是**构建期
+内联**的，CI 在 `npm run build` 前设了它，本地 `.env` 没有就等于在测一个没有 GA 的站。
+复现 CI 的条件要连 build 一起带上：
+
+```bash
+PUBLIC_GA_TRACKING_ID=G-675W5PPJEJ PUBLIC_SITE_URL=https://ithacateens.com npm run build
+npm run test:e2e
+```
+
+`header-contrast.spec.ts:282`（「still legible once the bar paints its own background」）在满负载
+跑全套时偶发失败，单独跑和重跑全套都过 —— 2026-10-16 实测过三次。看到它红先重跑，别先改代码。
+
 **CI**（在仓库根，不在这个目录）：
 
 - `web-ci.yml` —— PR 门禁：lint、check、i18n 对齐、单测、构建、Playwright、axe

@@ -468,3 +468,55 @@ rather than renamed, because re-deriving their line numbers is its own mechanica
 under full-suite parallel load — reproduced on the **unmodified** build as well as this one. It
 passes in isolation on both. Worth stabilising separately; it is the only check that can detect a
 header that never hydrates, so it should not be left flaky.
+
+---
+
+## 2026-10-16 — `/zh` LCP 攻坚、logo 的 srcset、以及中文页的英文敬称
+
+### 中文页不再渲染 `Mr.` / `Ms.`，而且**没有**替换成中文敬称
+
+`src/lib/data/team.ts` 把英文敬称硬编码在 `name` 里（`'Mr. Joshua Wang'`），于是一个完全中文的
+hero 底下写着 "Mr. Joshua Wang"。`CONTENT-GAPS.md` C-4 记了这件事，`content/people.ts` 的注释也
+早就点名了它。
+
+敬称现在走 Paraglide 的参数化词条：`common_team_honorificMr` 在 en 是 `"Mr. {name}"`，在 zh 是
+`"{name}"`。所以中文页只剩姓名。
+
+**刻意没有发明中文敬称。** 中文的称谓放在姓氏之后而不是全名之前（王先生，不是先生王某某），而
+这四个人在机构语境里该叫"老师"、"先生/女士"还是不加称谓，是机构方的品牌决策，不是实现者可以
+替它选的 —— 这和 `content/people.ts` 一直以来的立场一致。要加的时候，改那两条词条即可，
+`TeamMember.honorific` 这个字段已经在那里了。
+
+附带：`TEAM_IMAGE` 的 key 随之去掉了敬称前缀，它和 `TeamMember.name` 必须逐字对齐。
+
+### `/zh` 选了 (a)「让它真的变快」，结果是一个小胜和三条死路
+
+`LAUNCH-CHECKLIST.md` 的 `/zh` 棘轮 box 要求在 (a) 让页面变快和 (b) 把 lhci 的
+`aggregationMethod` 从 optimistic 改成 median 之间明确选一个并记录。**选了 (a)。**
+
+拿到的是 header logo 那一个修复（`/zh` −76 ms，`/` −50 ms 且抖动从 75 ms 收到 3 ms）。根因是
+`?enhanced` 不带 `w=` 时发的是 x 描述符 srcset，而 **`sizes` 对 x 描述符无效** —— 前人加的
+`sizes="200px"` 一直是失效的，手机照样在下 1809×1823 的原图来画 80 px 的盒子。
+
+CJK 字体那 ~1650 ms 的 FCP 差距**没有**攻下来。三种搬运方式都实测更差，数字在
+`LAUNCH-CHECKLIST.md` 的表里。它们失败的是同一个机制，而这个机制 `build-cjk-subset.ts` 的
+`font-display` 注释早以 `swap` 的名义写过：**任何让字体在首屏之后才应用的安排都会触发重绘，
+而 Chrome 会在重绘处重新记录 LCP。** 延后注入 stylesheet 正是这件事 —— `@font-face` 对文档是
+新的，`optional` 的 block period 从注入时刻重新开始，字体到了就应用。
+
+所以 (b) 仍然悬着，而且它现在是更诚实的下一个问题。
+
+### `.quote-line` 的 `opacity: 0` 修了，而且确认它不值钱
+
+keyframe 不再动 opacity，只动 transform。观感不变（遮罩效果本来就是父级 `overflow: hidden` 加
+`translateY(110%)` 做的）。实测 LCP 没动，和 2026-10-13 那次 A/B 的 +10 ms 一致 —— 这是正确性
+修复，这个 box 本来也只为正确性而设。
+
+有一个反直觉的旁证值得留着：在把 CJK stylesheet 延后、`/zh` 的 FCP 被拉到 2406 ms 的那次实验里，
+这个元素**确实**变成了 LCP 元素。所以"它永远不是候选"是当前配置的性质，不是它的性质。
+
+### 又一个同类 flake
+
+`e2e/header-contrast.spec.ts:282`（"still legible once the bar paints its own background"）在满负载
+跑全套时偶发红，单独跑、双 project 跑、重跑全套各验一次都绿。和上面记的
+`smoke.spec.ts:397` 是同一类问题，同样值得单独稳定化。
