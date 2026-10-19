@@ -13,8 +13,8 @@ export interface InviewOptions {
  * Reveal-on-scroll action. Dispatches an `inview` CustomEvent when the node
  * enters the viewport and (unless `once`) an `outview` when it leaves.
  *
- * Generalizes the one-shot IntersectionObserver `$effect` in
- * `AdaptiveVideo.svelte` so every Tier-0 reveal shares one implementation.
+ * Generalizes the one-shot IntersectionObserver `$effect` the Tier-0 reveals
+ * each used to inline, so they all share one implementation.
  *
  * Usage: `<div use:inview={{ threshold: 0.2 }} oninview={() => (shown = true)}>`
  *

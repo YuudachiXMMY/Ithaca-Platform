@@ -41,11 +41,6 @@ export function assertTlsConfigSafe(host: string | undefined, tlsInsecure: boole
 	}
 }
 
-// Exposed so the admin campaign-send handler can hard-fail (503) instead of writing a phantom
-// delivery ledger and marking the campaign 'sent' when SMTP is unset. Single-send callers
-// (subscribe/contact) still rely on sendMail's graceful no-op below.
-export const isMailConfigured = isConfigured;
-
 if (isConfigured) {
 	if (Number.isNaN(SMTP_PORT)) {
 		console.error(`[mail] SMTP_PORT is not a number ("${env.SMTP_PORT}") — sends will fail`);
