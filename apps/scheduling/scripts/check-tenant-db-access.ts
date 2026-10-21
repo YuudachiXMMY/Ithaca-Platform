@@ -57,7 +57,9 @@ export const ALLOWLIST: readonly string[] = [
   // db writes that FORCE an explicit tenantId in every row + the conflict target, so the write can never
   // touch another tenant's row (see the comment at each call site).
   'src/lib/lesson-insert.ts', // bulk lesson insert (shared by materialize + add-sessions), onConflictDoNothing, tenantId: ctx.tenantId per row (asserted by callers)
-  'src/lib/push-core.ts', // push_subscription upsert, tenantId: ctx.tenantId in values + conflict target
+  // src/lib/push-core.ts 曾在此:它的 push_subscription upsert 已改走 forTenant/withTenantScope,
+  // 裸 `db` 导入成了 eslint 报的未使用变量。按上面那段的规矩，不再需要的条目就该摘掉 ——
+  // 留着它等于永久给这个文件开后门，而 main() 的 staleness 检查只认"文件不存在",认不出这种。
 
   // ── 官网(ithacateens.com)运营数据 —— PLATFORM-GLOBAL 表，**没有 tenant_id 列**，所以
   // forTenant() 的 TenantTable 约束套不上，它也不该套上:市场站只有一个，把询盘按机构分片没有

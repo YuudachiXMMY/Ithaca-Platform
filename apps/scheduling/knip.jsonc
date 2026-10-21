@@ -1,0 +1,33 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+
+  // knip 的 Next 插件在这个 app 上能自动激活，所以路由与组件的检测是可信的。但它读不到
+  // **Dockerfile 和 npm script 里的 `node --import tsx` 调用**，于是 scripts/ 下的运维脚本
+  // 整批显示成「未使用文件」。下面的 entry 把它们登记进来。
+  //
+  // 三个必须记住的误报，照报告删任何一个都会出事故：
+  //   • `esbuild` —— Dockerfile 里被调用 6 次（`node_modules/.bin/esbuild scripts/*.ts`,
+  //     把 entrypoint 要用的脚本预编译成 .mjs）。删掉它生产镜像直接构建失败。
+  //   • `public/sw.js` —— 由 src/app/sw-register.tsx 按字符串 `/sw.js` 注册，没有 import。
+  //   • `postcss` —— 报成 unlisted，实际声明的是 `@tailwindcss/postcss`（见 postcss.config.mjs）。
+  //
+  // 另外 knip 会把 70+ 个 server action 的 input/result 类型报成「未使用导出类型」。那是
+  // 本项目的导出约定（`*-core.ts` 的纯函数与 action 共用类型），不是死代码。
+  "entry": [
+    "src/app/**/{page,layout,route,error,not-found,loading,template,default,global-error}.{ts,tsx}",
+    "src/app/**/{actions,*-actions}.ts",
+    "src/proxy.ts",
+    "scripts/*.ts",
+    "tests/**/*.test.ts",
+    "tests/e2e/**/*.spec.ts",
+    "*.config.{ts,mjs}",
+  ],
+  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.ts", "tests/**/*.ts"],
+
+  // Better Auth 生成的 schema —— 改它要跑 `npm run auth:generate`，不要手改也不要按报告裁剪。
+  "ignore": ["src/db/auth-schema.ts"],
+
+  // esbuild/postcss 见上。tailwindcss 是第三个同类误报：它经 globals.css 的
+  // `@import "tailwindcss"` 进来，而 knip 不解析 CSS 里的 import。
+  "ignoreDependencies": ["esbuild", "postcss", "tailwindcss"],
+}

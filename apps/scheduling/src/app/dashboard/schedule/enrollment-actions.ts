@@ -6,7 +6,6 @@ import { and, eq } from 'drizzle-orm'
 import { requireAuthContext } from '@/auth/context'
 import { requirePermission } from '@/auth/authorize'
 import { actorOwnsSection, actorOwnsStudent } from '@/auth/scope'
-import { db } from '@/db'
 import { forTenant, withTenantScope } from '@/db/tenant'
 import { enrollment, classSection } from '@/db/schema'
 

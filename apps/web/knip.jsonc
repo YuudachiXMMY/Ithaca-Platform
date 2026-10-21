@@ -1,0 +1,37 @@
+{
+	"$schema": "https://unpkg.com/knip@5/schema.json",
+
+	// knip cannot auto-detect this app's framework: there is no svelte.config.js (SvelteKit is
+	// configured inline in vite.config.ts — see AGENTS.md), so knip's SvelteKit plugin never
+	// activates and every route file looks like an unreachable orphan. Without the explicit
+	// `entry` list below, a run reports ~76 "unused files" including src/routes/+page.svelte and
+	// src/hooks.server.ts, plus tailwindcss/three as "unused dependencies". Keep the list in sync
+	// when a new entry convention is added.
+	//
+	// Two blind spots remain even with this config — knip reports both as dead. Verify any
+	// "unused" hit with a plain grep before deleting it:
+	//   • `{#await import('./X.svelte')}` inside Svelte markup. EVScene.svelte is loaded that way
+	//     by EVModel3DSection.svelte, which makes the 4 ev-team files AND three / @threlte/* look
+	//     unused. They are not.
+	//   • `require_.resolve('@fontsource/...')` template strings in src/lib/server/og/fonts.ts and
+	//     scripts/build-cjk-subset.ts — hence the @fontsource/* entry in ignoreDependencies.
+	"entry": [
+		"src/routes/**/+*.{js,ts,svelte}",
+		"src/hooks.ts",
+		"src/hooks.server.ts",
+		"scripts/*.ts",
+		"e2e/**/*.spec.ts",
+		"src/**/*.test.ts"
+	],
+	"project": ["src/**/*.{js,ts,svelte}", "scripts/**/*.ts", "e2e/**/*.ts"],
+
+	// Paraglide compiles into src/lib/paraglide — generated and gitignored.
+	"ignore": ["src/lib/paraglide/**"],
+
+	// SvelteKit's virtual modules have no on-disk source for knip to resolve.
+	"ignoreUnresolved": ["^\\$app/", "^\\$env/"],
+
+	// @fontsource/*: resolved by template string, see above. tailwindcss: reached via
+	// `@import 'tailwindcss'` in src/app.css, and knip does not parse CSS imports.
+	"ignoreDependencies": ["@fontsource/.*", "tailwindcss"]
+}

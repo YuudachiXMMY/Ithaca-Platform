@@ -60,8 +60,6 @@ export const createCampaignSchema = z.object({
   body: z.string().min(1, '正文不能为空').max(100_000, '正文过长'),
 })
 
-export const campaignIdSchema = z.object({ id: z.string().min(1, '缺少邮件 ID') })
-
 // ── 官网写入端点(/api/site/*)─────────────────────────────────────────────────────────────
 // 这两个 schema 是**第二道**校验:官网自己已经校验过一遍(含 Turnstile、限流、程序 slug 枚举)，
 // 但被密钥信任的调用方依然不能免检 —— 共享密钥证明"是官网在调"，不证明"官网没出 bug"。
