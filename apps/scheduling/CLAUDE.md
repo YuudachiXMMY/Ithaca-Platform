@@ -88,7 +88,7 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
 | `src/mcp/` | `register-tools.ts`（8 个 MCP 工具）+ `message.ts` |
 | `scripts/` | 运维与守卫脚本（见下） |
 | `drizzle/` | 29 个**单向**迁移 + `meta/`。`0026` 启用 RLS，`0027`+`0028` 把 token 解析收进 SECURITY DEFINER 函数 |
-| `tests/` | 99 个 vitest 单测 + `tests/e2e/` 的 Playwright 套件 |
+| `tests/` | 100 个 vitest 单测 + `tests/e2e/` 的 19 个 Playwright spec |
 | `docker/entrypoint.sh` | 容器启动序列（见「Docker」） |
 | `.claude/PRPs`、`.claude/reviews` | PRD / plan / report / 安全审计 —— **历史记录**，与代码冲突时代码赢 |
 
@@ -200,8 +200,8 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
 | `npm run dev` | `next dev`，`:3000` |
 | `npm run build` | Next 16 Turbopack → `.next/standalone/server.js` |
 | `npm run check` | `typecheck` + `lint`（提交前至少跑这个） |
-| `npm run typecheck` / `lint` / `format` | `tsc --noEmit` / `eslint .` / `prettier --write .` |
-| `npm test` | vitest，97 个文件。**需要一个跑着的 Postgres** |
+| `npm run typecheck` / `lint` / `format` | `tsc --noEmit` / `eslint . --max-warnings=0` / `prettier --write .` |
+| `npm test` | vitest，100 个文件。**需要一个跑着的 Postgres** |
 | `npm run test:e2e` / `:ui` / `:headed` / `:report` | Playwright，需要跑着的 app + 迁移过的库 |
 | `npm run db:generate` | drizzle-kit 生成迁移 SQL |
 | `npm run db:migrate` | 应用迁移（advisory lock 保护） |
@@ -267,7 +267,7 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
 
 ## 测试
 
-**单测**（`npm test`，96 个文件）跑在 `environment: 'node'`，并且：
+**单测**（`npm test`，100 个文件）跑在 `environment: 'node'`，并且：
 
 - `server-only` 被 alias 成 `tests/server-only-stub.ts` —— 否则它这颗毒丸会在 import `@/db`
   时直接中止测试，`forTenant()` 就根本测不了。
@@ -295,8 +295,17 @@ npm run test:e2e
 calendar / teach-notes / users / rbac / smoke）`portal/` `public/`。
 **写新 spec 前读 `tests/e2e/AUTHORING.md`。**
 
-**CI**：`.github/workflows/scheduling-ci.yml`（在仓库根，按 `apps/scheduling/**` 过滤触发）——
-装依赖 → **租户隔离守卫** → 容器内迁移+单测 → 起生产镜像 → Playwright → 失败时上传报告与日志。
+**CI**：`.github/workflows/scheduling-ci.yml`（在仓库根，按 `apps/scheduling/**` 过滤触发；
+分支是 `main` 与 `prod-scheduling`，另有 `workflow_dispatch`）——
+装依赖 → **租户隔离守卫** → **lint** → **typecheck** → 容器内迁移+单测 → 起生产镜像 →
+Playwright → 失败时上传报告与日志。
+
+lint 和 typecheck 这两步**都不是** docker build 的重复：Next 16 砍掉了构建期 ESLint，而
+`next build` 的类型检查会在判定失败前**丢掉测试文件的诊断**（`runTypeCheck.js` 按
+`__tests__` / `*.spec.*` / `*.test.*` 过滤），所以 `tests/**` 那 119 个文件只在独立的
+typecheck 步骤里被检查。lint 的 `--max-warnings=0` 写在 package.json 的 script 里而不是 CI
+步骤里，目的是让本地 `npm run check` 和 CI 拒绝同一份输入 —— 裸 `eslint .` 遇 warning 退出码
+是 0，`fcac42d` 摘掉的那两个未使用导入就是这么放了几周的。
 
 ## Docker
 
