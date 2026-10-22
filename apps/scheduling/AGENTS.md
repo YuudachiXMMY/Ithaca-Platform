@@ -96,7 +96,7 @@ tenant 与 role，并且显式 `disableCookieCache: true` 绕过 Better Auth 的
 | AI | `@anthropic-ai/sdk`（默认）或 MiniMax（`REPORT_PROVIDER=minimax`），用于报告起草 |
 | MCP | `mcp-handler` + `@modelcontextprotocol/server`，挂在 `/api/[transport]` |
 | 导出 | `@react-pdf/renderer`（PDF）、Playwright（PNG）、`archiver`（ZIP）、`ical-generator` |
-| 测试 | vitest（99 个单测文件，**要一个跑着的 Postgres**）+ Playwright e2e |
+| 测试 | vitest（100 个单测文件，**要一个跑着的 Postgres**）+ Playwright e2e |
 
 ## 两套权限宇宙，别混
 
