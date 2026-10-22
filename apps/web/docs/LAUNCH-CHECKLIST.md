@@ -17,7 +17,14 @@ Last reviewed: 2026-09-29 · Status: **not ready** (workstreams in progress)
 - [ ] 🔴 Tuition and policy text in place, or an explicit "inquire" posture signed off (C-3)
 - [ ] 🟡 Full team bios (C-4)
 - [ ] 🟡 Every `Stat` carries a `source`; stats without one are omitted, never rendered as `0`
-- [ ] 🔴 The five known copy defects are fixed (`CONTENT-GAPS.md`, "Known copy defects")
+- [ ] 🔴 The known copy defects are fixed — 5 of 8 done, 3 open (`CONTENT-GAPS.md`, "Known copy
+      defects"). "Five" was the count on 2026-09-29 and the table has grown since; stating a bare
+      number here just goes stale again, so the table is the source of truth. Still open: **4**
+      (`page_hello_body`'s ZH asserts the opposite of its EN), **7** (`home_highlights_item6Alt`
+      describes students in what is a screenshot of a student-built app — a real a11y defect), and
+      **8** (`home_highlights_item1Alt` says "production line" for a lobby group shot, which that
+      row itself resolves as "flagged rather than changed"). So closing this box needs 4 and 7, and
+      an explicit owner sign-off that 8 stays as framed.
 - [ ] 🔴 Consent verified for every `Result` / `Testimonial` / `Highlight` naming or picturing
       a minor. Default is `false` and must stay `false` until confirmed — do not bypass
 
