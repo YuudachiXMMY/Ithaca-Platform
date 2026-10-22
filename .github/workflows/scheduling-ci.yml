@@ -8,16 +8,33 @@
 name: scheduling CI
 
 on:
+  # `prod-scheduling` is listed because it had never run this workflow even once
+  # (`gh run list --branch prod-scheduling` was empty at tip 93d4e3a, pushed 2026-10-13) while
+  # web-ci.yml has covered `prod` all along. To be precise about what that did and did not risk:
+  # that tip is a pure fast-forward of main with no commits of its own, and main's runs already
+  # build the test+runtime targets of the very same Dockerfile the server builds live
+  # (DEPLOY_TYPE=git-source), so released code was not untested. What was unguarded is the branch
+  # itself — no ruleset, no run — so any direct push or hotfix that skips main would have become
+  # the server's build input with nothing in between. Listing it on `pull_request` too covers the
+  # hotfix-PR-into-the-release-branch shape of the same hole. Accepted cost: a fast-forward
+  # release now re-runs the full ~8-minute docker+e2e job on a commit main already proved green.
   push:
-    branches: [main]
+    branches: [main, prod-scheduling]
     paths:
       - 'apps/scheduling/**'
       - '.github/workflows/scheduling-ci.yml'
   pull_request:
-    branches: [main]
+    branches: [main, prod-scheduling]
     paths:
       - 'apps/scheduling/**'
       - '.github/workflows/scheduling-ci.yml'
+  # Needed because `paths:` has a sharp edge on release pushes: when a push introduces no new
+  # commits (creating/re-creating `prod-scheduling` at a commit that already exists on main —
+  # GitHub reports `before` as all-zeros and so an empty changed-file set), no path matches and
+  # this workflow silently does not run. web-release.yml added workflow_dispatch for exactly that
+  # (see its header). Here it is also the ONLY way to prove the release tip is green on demand:
+  # scheduling has no release workflow at all, the server clones this branch and builds it.
+  workflow_dispatch:
 
 # Was missing before the merge: two quick pushes used to run two full 8-minute jobs.
 concurrency:
@@ -100,6 +117,36 @@ jobs:
       - name: Tenant-isolation guard
         run: npx tsx scripts/check-tenant-db-access.ts
 
+      # ESLint — this app had no lint step at all until now. Placed here because it costs ~6s,
+      # i.e. it fails before the Playwright download and the two docker builds below.
+      #
+      # `--max-warnings=0` lives in the package.json `lint` script rather than in this step, so
+      # that the prescribed pre-commit gate (`npm run check` — root CLAUDE.md § 命令速查, this
+      # app's README.md § Validation and CLAUDE.md § 命令; NOT any AGENTS.md) and this
+      # job reject the same input. It is the whole point of the step: eslint exits 0 on warnings,
+      # so a bare `eslint .` would be decoration — fcac42d removed two unused bare-`db` imports
+      # that had been warning for weeks precisely because `npm run check` stayed green. Cost of
+      # putting it in the script: a warning mid-edit now blocks local `check` too; run
+      # `npx eslint .` while iterating. Baseline on main is 0 warnings.
+      #
+      # Lint is NOT part of the docker builds below — Next 16 dropped build-time ESLint
+      # (`next lint` is gone), so this step is the only thing that runs it in CI at all.
+      - name: Lint
+        run: npm run lint
+
+      # Typecheck, even though the docker build below runs `next build` with
+      # `typescript: { ignoreBuildErrors: false }` over the same file set (tsconfig `include` is
+      # `**/*.ts(x)`). Not redundant: Next THROWS AWAY test-file diagnostics before deciding to
+      # fail — node_modules/next/dist/lib/typescript/runTypeCheck.js filters `allDiagnostics`
+      # through /[\\/]__(?:tests|mocks)__[\\/]|(?<=[\\/.])(?:spec|test)\.[^\\/]+$/, which exempts
+      # all 119 of this app's `tests/**/*.test.ts` + `tests/e2e/**/*.spec.ts`. Nothing else here
+      # covered them either: vitest.config.ts sets no `test.typecheck` (esbuild transpiles without
+      # checking) and Playwright is the same, so until this step a type error in a test file
+      # reached main with no gate at all. Costs ~5s (`tsc --noEmit --incremental false` measured
+      # 4.6s on a checkout with no `.next/`, i.e. this job's exact state), same order as lint.
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
 
@@ -113,7 +160,12 @@ jobs:
       # apps' release layers evicted each other, and the LRU victim was whichever ref is touched
       # least often, i.e. the release branches that go straight to production.
       #
-      # PR events read the cache but never write it, so a PR cannot evict main's warm layers.
+      # Only `main` writes it. The `cache-to` guard below tests `github.ref`, not the event name,
+      # because GHA cache entries are REF-SCOPED: a write from `prod-scheduling` or from a
+      # workflow_dispatch on a topic branch is not readable by main's runs anyway — it would just
+      # park a second copy of the same layers inside that same 10 GB. So PRs, the release branch
+      # and topic-branch dispatches all read and never write, and none of them can evict main's
+      # warm layers.
       - name: Build test image
         uses: docker/build-push-action@v6
         with:
@@ -122,7 +174,7 @@ jobs:
           load: true
           tags: app:test
           cache-from: type=gha,scope=scheduling
-          cache-to: ${{ github.event_name == 'pull_request' && '' || 'type=gha,mode=min,scope=scheduling' }}
+          cache-to: ${{ github.ref == 'refs/heads/main' && 'type=gha,mode=min,scope=scheduling' || '' }}
 
       - name: Build runtime image
         uses: docker/build-push-action@v6
@@ -134,7 +186,7 @@ jobs:
           build-args: |
             NEXT_PUBLIC_APP_URL=${{ env.NEXT_PUBLIC_APP_URL }}
           cache-from: type=gha,scope=scheduling
-          cache-to: ${{ github.event_name == 'pull_request' && '' || 'type=gha,mode=min,scope=scheduling' }}
+          cache-to: ${{ github.ref == 'refs/heads/main' && 'type=gha,mode=min,scope=scheduling' || '' }}
 
       # Migrate + run the vitest suite against the postgres service, inside the image.
       - name: Migrate + test (in-container)
