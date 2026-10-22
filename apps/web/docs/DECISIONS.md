@@ -590,3 +590,35 @@ own locale"）那个 box 打勾。** 那是生产端到端事实，要真实 SMT
 （`api/contact/+server.ts:149-158` 的 `m.email_enquiry_*({}, { locale: mailLocale })`，这次一个
 字节都没动）。所以这次移除的是**订阅那半边**的代码侧阻碍：只有把那个 box 读成覆盖整节（含订阅）
 时，它才算被推进了一半。
+
+---
+
+## 2026-10-22 — 中文机构名统一为「伊萨卡家族学院」
+
+### 裁定本身记在 `CONTENT-GAPS.md`，不在这里
+
+`CONTENT-GAPS.md` 的 "Known copy defects" 第 3 条从 2026-09-29 起就挂着 **Owner to pick one**：
+目录里两种写法并存，`伊萨卡家族学院` 32 处对 `伊萨卡家庭学院` 4 处。业主裁定前者，4 处已全部
+改过来（`messages/zh.json` 现在 36 处「家族」、0 处「家庭」）。
+
+记在那边而不是这边，是照 C-8（`伊萨卡菁英访谈`）立下的先例：**业主对内容的裁定归
+`CONTENT-GAPS.md`，本文件记的是偏离 PRD 的工程决策。** 这条不是偏离，是一个内容缺口被关掉。
+
+值得单独点一句那 4 处为什么能躲过四轮文案审计：它们全是 alt / aria 文案
+（`common_logoAlt`、`common_nav_homeLink`、`common_footerHomeAriaLabel`、`about_hero_imageAlt`）。
+看得见的标题早就统一了，所以**只有屏幕阅读器用户听到的是另一个机构名**。这也是一条无障碍缺陷，
+不只是品牌不一致 —— 下次审文案时，alt/aria 要和可见文案一起过。
+
+字体足迹没变：「庭」在别处的「家庭」一词里仍在用，所以 CJK 子集仍是 984 个 Han
+（预渲染 `/zh` 页上渲染到的 917 个全覆盖）。
+
+### 第三个同类 flake
+
+`e2e/analytics.spec.ts` 的 "wechat_qr_view tells the three placements apart" 在
+**mobile-chrome** 上满负载跑全套时偶发红：同一棵树上两次全套绿（184 passed）、中间一次这条红，
+单独跑双 project 都绿。和上面记的 dark-hero、header-contrast 两条是同一类。
+
+这条的脆弱点测试自己的注释就写了：intersection observer 跨两个元素的触发顺序未定义、
+`scrollIntoViewIfNeeded` 是瞬间跳转、而 390px 视口下 contact 页的码和 footer 的码相距很远。
+它和 2026-10-22 那次机构名改动无关 —— 那次只动了四条 alt/aria 文案，而这个用例按
+`img[src*="Joshua-WeChat"]` 和按钮 role 定位，一个都不碰。**看到它红先重跑，别先改代码。**
