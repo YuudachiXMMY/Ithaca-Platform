@@ -10,10 +10,11 @@ surfaces: the official website's ingest endpoints (`/api/site/*`) and a Claude M
 (`/api/[transport]`). It also hosts the **official website's operations console** at
 `/dashboard/site` (enquiries, subscribers, email campaigns, popups).
 
-> **Working on this code?** Read **[`AGENTS.md`](AGENTS.md)** first — tenant isolation has no
-> database-level backstop, so `forTenant(ctx)` is the only sanctioned path to tenant data and
-> `proxy.ts` is explicitly *not* authorization. **[`CLAUDE.md`](CLAUDE.md)** has the full
-> architecture, directory map, and environment contract.
+> **Working on this code?** Read **[`AGENTS.md`](AGENTS.md)** first — tenant isolation is two
+> layers (`forTenant(ctx)` plus Postgres RLS, migration `0026`), but the second one is a backstop,
+> not a licence: `forTenant(ctx)` is still the only sanctioned path to tenant data, and a bare
+> `db.select()` fails *silently* on reads (0 rows). `proxy.ts` is explicitly *not* authorization.
+> **[`CLAUDE.md`](CLAUDE.md)** has the full architecture, directory map, and environment contract.
 
 ## Stack
 

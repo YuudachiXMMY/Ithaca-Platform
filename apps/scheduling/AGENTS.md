@@ -12,7 +12,8 @@
 // ✅ 唯一合法写法
 const rows = await forTenant(ctx).select(classSection)
 
-// ❌ 静默跨租户 —— 没有报错，没有空结果，只是把别人的数据端上来
+// ❌ 不要这么写 —— app 运行时下无声读到 0 行（见下）
+//    只有走超级用户连接的 scripts/ 与 tests/ 才是真的跨租户
 const rows = await db.select().from(classSection)
 ```
 
@@ -24,12 +25,15 @@ const rows = await db.select().from(classSection)
 所以上面那句 `db.select()` 实际会读到 **0 行**而不是别人的数据 —— 策略 `USING (tenant_id =
 current_setting('app.tenant_id', true))` 在 GUC 未设时求值为 NULL，**失败即关门**。
 
-但**不要因此松懈**：失败是无声的（空结果，不报错），而且它只在 app 代码里成立 ——
-`scripts/` 与 `tests/` 用的是 `@/db/admin`（超级用户，绕过全部策略）。所以 CI 里的三道机械守卫
-都还在，`scripts/check-tenant-db-access.ts`：
+但**不要因此松懈**：**读**的失败是无声的（空结果，不报错）—— 未加作用域的**写**不是，它会被
+`WITH CHECK` 直接拒掉并报 `row-level security`（`tests/rls.test.ts`）。而且这整层只在 app 代码里
+成立：`scripts/` 与 `tests/` 走的是超级用户连接（`tests/` 多数 import `@/db/admin`，`scripts/`
+多数自己 `postgres(DATABASE_URL)`），绕过全部策略。所以 CI 里的三道机械守卫都还在，
+`scripts/check-tenant-db-access.ts`：
 
-1. allowlist 外的文件碰裸 `db` 的 `select/insert/update/delete` → 红；
-2. `src/app` `src/auth` `src/lib` `src/mcp` `src/components` 里 import `@/db/admin` → 红；
+1. allowlist 外的文件碰裸 `db` 的 `select/insert/update/delete/execute` 或 `db.query.*` → 红；
+2. `src/app` `src/auth` `src/lib` `src/mcp` `src/components` `src/db`（只豁免 `admin.ts` 自己）
+   里 import `@/db/admin` → 红；
 3. `src/` 下调 `postgres(...)` 自建连接却不带 `RLS_ROLE_OPTIONS` → 红。
 
 第 3 条管的是前两条都管不到的那一层：它们都**假定**连接已经受 RLS 约束，而一条自己建出来、

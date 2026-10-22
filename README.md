@@ -59,8 +59,11 @@ GitHub **只读仓库根目录**的 `.github/`，所以它们必须在这里。�
 分层是：`AGENTS.md` 放便携的硬规矩，`CLAUDE.md` 用 `@AGENTS.md` 导入后再写工具特有的细节 ——
 同一条事实只维护一处。
 
-动手之前至少知道两件事：**官网是无状态的**（没有数据库），**排课系统的租户隔离只靠
-`forTenant(ctx)` 一条代码路径，没有 RLS 兜底**。
+动手之前至少知道两件事：**官网是无状态的**（没有数据库），**排课系统的租户隔离是两层的**：
+`forTenant(ctx)` 加 Postgres RLS（迁移 `0026`，20 张带 `tenant_id` 的表，见
+`apps/scheduling/docs/adr/0003-tenant-isolation-rls-enabled.md`）。但 RLS 只覆盖 app 运行时那条降为
+`app_rt` 的连接 —— `scripts/` 与 `tests/` 用的是绕过全部策略的超级用户客户端 —— 所以
+`forTenant(ctx)` 仍是唯一合法路径。
 
 ## 历史
 
