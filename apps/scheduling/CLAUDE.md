@@ -136,9 +136,12 @@ Next.js 16 App Router（React 19 · Turbopack · output: 'standalone'）
    `scripts/check-tenant-db-access.ts` 的第三条规则机械保证，不靠人记得）。
    `DATABASE_URL` 里的 `app` 是超级用户且有 BYPASSRLS，**会忽略策略，连 `FORCE ROW LEVEL
    SECURITY` 都拦不住** —— ADR 0001 漏了这一层，照它写会得到一个装好了却一行都没拦的 RLS。
-2. **GUC 未设时求值为 NULL ⇒ 读 0 行、写被拒。** 失败即关门，但**无声**。
-3. **`scripts/` 与 `tests/` 走 `@/db/admin`**（超级用户，绕过策略）—— 迁移、跨租户清理、租户
-   purge、以及"建第二个租户来证明两者隔离"的 fixture，都必须能跨租户。
+2. **GUC 未设时求值为 NULL ⇒ 读 0 行、写被拒。** 失败即关门，但只有读那一侧**无声** ——
+   写会抛 `row-level security`，所以"0 行"和"抛异常"是两种要分开处理的失败。
+3. **`scripts/` 与 `tests/` 走超级用户连接**（绕过策略）—— `tests/` 多数 import `@/db/admin`，
+   `scripts/` 多数自己 `postgres(DATABASE_URL)`（`migrate.ts` / `purge-tenant.ts` /
+   `cleanup-orphan-tenants.ts`）。迁移、跨租户清理、租户 purge、以及"建第二个租户来证明两者
+   隔离"的 fixture，都必须能跨租户。
 
 **token 表的例外已经收口**（迁移 `0027`+`0028`，`docs/adr/0004-token-resolver-functions.md`）。
 `share_link` / `section_share_link` / `calendar_feed` 曾各带一条**仅 SELECT 且 `USING (true)`**

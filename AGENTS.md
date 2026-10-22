@@ -96,6 +96,6 @@ git log -- apps/web/src                                   # ⚠️ 只有 1 条(
 进了子目录就以那边的 `AGENTS.md` / `CLAUDE.md` 为准，它们记的是真正会咬人的东西：
 
 - `apps/web/AGENTS.md` —— 这个 app 是**无状态**的（没有数据库），Svelte 5 runes
-- `apps/scheduling/AGENTS.md` —— 多租户隔离**只靠 `forTenant(ctx)` 这一条路**，没有 RLS 兜底
+- `apps/scheduling/AGENTS.md` —— 租户隔离两层：`forTenant(ctx)` 加 RLS，**前者仍是唯一合法路径**
 
 <!-- END:ithaca-platform-agent-rules -->

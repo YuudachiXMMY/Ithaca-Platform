@@ -50,11 +50,22 @@
 `db:migrate`、`/admin/(protected)/**` —— 那是**腐烂的**，不是你漏看了目录。实际状态去
 `apps/web/package.json` 和 `apps/web/.env.example` 确认。
 
-**排课系统的租户隔离没有数据库层兜底。** `forTenant(ctx)`（`src/db/tenant.ts`）是唯一一条
-合法路径；Postgres RLS 被延后了（`docs/adr/0001-tenant-isolation-rls.md`）。随手写一句
-`db.select().from(classSection)` 会**静默跨租户**。CI 里的
-`scripts/check-tenant-db-access.ts` 会按 allowlist 拦住这种写法 —— 它拦住你的时候，正确反应
-是改用 `forTenant`，不是往 allowlist 里加一行。
+**排课系统的租户隔离是两层的，但第二层不是许可证。** 应用层是 `forTenant(ctx)`
+（`apps/scheduling/src/db/tenant.ts`），数据库层是 Postgres RLS：迁移
+`apps/scheduling/drizzle/0026_tenant_rls.sql` 给 20 张带 `tenant_id` 的表开了 ROW LEVEL
+SECURITY，运行时连接带 `-c role=app_rt` 降为受策略约束的角色（见
+`apps/scheduling/docs/adr/0003-tenant-isolation-rls-enabled.md`；同目录的 `0001` 还写着"RLS 被
+延后"，它已被 0003 作废、而且做法本身是错的，**别照它做**）。所以随手写一句
+`db.select().from(classSection)`，在 app 代码里是读到 **0 行**、写入被拒，而不是把别人的数据端
+上来。**但这只在 app 运行时成立**：`scripts/` 与 `tests/` 用的是 `@/db/admin`（超级用户、
+BYPASSRLS），那里的裸查仍然真·跨租户；而且失败是无声的（空结果，不报错）。所以
+`forTenant(ctx)` 仍是唯一合法路径，CI 里 `apps/scheduling/scripts/check-tenant-db-access.ts`
+的三条规则也都还在：① allowlist 外的文件碰裸 `db` 的 CRUD；② app 代码 import `@/db/admin`；
+③ `src/` 下自建 `postgres(...)` 不带 `RLS_ROLE_OPTIONS`。被拦住时的正确反应分别是改用
+`forTenant`、改 import `@/db`、传 `connection: { options: RLS_ROLE_OPTIONS }` —— 不是往
+allowlist 里加一行（唯一例外是压根不在租户模型内的表：`src/db/schema/site.ts` 那 5 张官网表
+没有 `tenant_id`，`forTenant` 对它们过不了类型，只能登记进 allowlist 并写明理由，见
+`apps/scheduling/CLAUDE.md`）。
 
 **两个 app 都不能在根目录装依赖。** 见 `AGENTS.md`。
 
