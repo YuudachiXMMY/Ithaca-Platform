@@ -18,9 +18,11 @@
   URL and from nowhere else, which is precisely what keeps all 20-odd routes prerenderable. So this
   component does NOT set a locale cookie, does NOT call `setLocale()`, and does NOT redirect. It
   renders an `<a>` to the `/zh` twin of the current page, built the same way
-  `LanguageSwitcher.svelte` builds it — `deLocalizeUrl(page.url).pathname` re-localized with
+  `LanguageSwitcher.svelte` builds it — `deLocalizeHref(…)` re-localized with
   `localizeHref(…, { locale: 'zh' })`, plus `data-sveltekit-reload` so the document reloads and
-  `<html lang>` / the server render stay authoritative.
+  `<html lang>` / the server render stay authoritative. (`deLocalizeHref` and not
+  `deLocalizeUrl(page.url).pathname`, which both components used to use and which dropped the query
+  and the hash — see the derivation below.)
 
   ## Why the card is in Chinese
 
@@ -120,7 +122,7 @@
 	import { fly } from 'svelte/transition';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { page } from '$app/state';
-	import { deLocalizeUrl, getLocale, localizeHref } from '$lib/paraglide/runtime';
+	import { deLocalizeHref, deLocalizeUrl, getLocale, localizeHref } from '$lib/paraglide/runtime';
 	import { trackLocaleSwitch } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
 
@@ -136,10 +138,16 @@
 
 	let visible = $state(false);
 
-	// Same derivation as LanguageSwitcher.svelte: canonical (locale-stripped) path, re-localized to
-	// zh. Lazy — nothing reads these until `visible` flips, so they never run during prerender.
-	const canonical = $derived(deLocalizeUrl(page.url).pathname);
-	const zhHref = $derived(localizeHref(canonical, { locale: 'zh' }));
+	// Same derivation as LanguageSwitcher.svelte, including the split: `canonicalHref` keeps the
+	// query and the hash (`deLocalizeHref`, not `deLocalizeUrl(…).pathname` — a visitor nudged into
+	// Chinese from `/admissions?program=ev-team#book` must not land on a blank form), while
+	// `analyticsPath` stays route-only so the GA4 event carries no page identity.
+	// Lazy — nothing reads these until `visible` flips, so they never run during prerender.
+	const canonicalHref = $derived(
+		deLocalizeHref(page.url.pathname + page.url.search + page.url.hash)
+	);
+	const zhHref = $derived(localizeHref(canonicalHref, { locale: 'zh' }));
+	const analyticsPath = $derived(deLocalizeUrl(page.url).pathname);
 	const locale = $derived(getLocale());
 
 	/**
@@ -185,7 +193,8 @@
 	/**
 	 * `locale_switch` — `prd.md` R-SEO-5, the same `{ from, to, path }` shape
 	 * `LanguageSwitcher.svelte` sends, so this route into Chinese is counted by the one report that
-	 * exists to answer whether the bilingual path is load-bearing. `path` is already locale-stripped.
+	 * exists to answer whether the bilingual path is load-bearing. `path` is `analyticsPath`, not
+	 * `canonicalHref`: locale-stripped AND query-free, for the reason given there.
 	 *
 	 * The decision is persisted HERE, synchronously, before the navigation: `data-sveltekit-reload`
 	 * makes this a full document load, so this handler is the last code of ours that runs.
@@ -195,7 +204,7 @@
 	 */
 	function onSwitch() {
 		remember('switched');
-		trackLocaleSwitch({ from: 'en', to: 'zh', path: canonical });
+		trackLocaleSwitch({ from: 'en', to: 'zh', path: analyticsPath });
 	}
 
 	/**
