@@ -464,7 +464,7 @@ rather than renamed, because re-deriving their line numbers is its own mechanica
 
 ### Known flake, not caused by this change
 
-`e2e/smoke.spec.ts:397` ("a dark-hero route flips to the light bar on scroll") fails intermittently
+`e2e/smoke.spec.ts` 的 "a dark-hero route flips to the light bar on scroll" fails intermittently
 under full-suite parallel load — reproduced on the **unmodified** build as well as this one. It
 passes in isolation on both. Worth stabilising separately; it is the only check that can detect a
 header that never hydrates, so it should not be left flaky.
@@ -519,4 +519,74 @@ keyframe 不再动 opacity，只动 transform。观感不变（遮罩效果本�
 
 `e2e/header-contrast.spec.ts:282`（"still legible once the bar paints its own background"）在满负载
 跑全套时偶发红，单独跑、双 project 跑、重跑全套各验一次都绿。和上面记的
-`smoke.spec.ts:397` 是同一类问题，同样值得单独稳定化。
+`smoke.spec.ts` 的 dark-hero 用例是同一类问题，同样值得单独稳定化。
+（这两处原来写的是 `smoke.spec.ts:397`。行号引用在一份会持续增删用例的 spec 里保不住 ——
+那条用例现在在 `:435`，而 `:397` 落在了另一个断言上。用例名是稳定的，所以改成按名字指。）
+
+---
+
+## 2026-10-22 — 服务端的英文串不再当用户可见文案，以及订阅欢迎信的语言
+
+### 客户端按 HTTP 状态码选文案，而不是回显 `data.error`（补记一条欠账）
+
+这条决策在 2026-09-30（`102a84e`）就随 `contact/EnquiryForm.svelte` 的 `messageForStatus` 落地了，
+但从没进过这份日志 —— 那个函数的注释写的出处 `docs/DECISIONS.md §0.6-1` **在本文件里不存在**。
+`§0.6-1` 是 `.claude/PRPs/plans/ithacateens-redesign.plan.md:305`（任务 F8）里的缺陷编号，不是本
+文件的章节号。注释的指针已经改成指向本节，并点明了旧指针是什么。
+
+规则：**响应体里的 `error` 字符串一律当诊断信息，不当用户可见文案**；可见文案由客户端按状态码在
+当前 locale 里选。两条理由，少一条都不足以这么做：
+
+- 泄漏源全是英文字面量，而且分散在三个文件：`api/subscribe/+server.ts` 的 409、
+  `server/rate-limit.ts` 的 429、`server/guard.ts` 的两条 403。把它们做成双语等于把用户文案复制
+  进服务端，还要在那里拿到请求 locale。
+- 500 的响应体**刻意不带** `error`（不向访客泄内部细节），所以回显路径对 500 只能给一句"出错了"；
+  而 429（提交太快，等一分钟）和 403（刷新页面再试）本来是可区分、可行动的两件事。
+
+### 订阅链路补上同一套映射，但分支集**不等于**询盘表单那套
+
+`NewsletterForm.svelte` 挂在两处 —— 全站 footer（`layout/Footer.svelte`）和
+`about/ConnectCTA.svelte`，所以此前 `/zh` 和 `/zh/about-us` 的访客订阅失败都会看到英文。
+照抄 EnquiryForm 的分支是错的：
+
+| 状态     | 订阅表单                                                                           | 为什么                                                                                                                                                                         |
+| -------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **409**  | `newsletter_alreadySubscribed`，并且是独立的 `notice` 态（ink-2，不是 danger red） | `/api/subscribe` 独有，EnquiryForm 没有这条。"这个邮箱已经在列表里"是访客本来想要的结果，不是错误：用红字说"出错了"不对，用 success 态说"感谢订阅"也不对（这次并没有新增订阅） |
+| 429 /403 | 各自的 `newsletter_error*` 词条                                                    | 同询盘表单。这个表单没有 Turnstile，所以 403 只会是来源或 CSRF                                                                                                                 |
+| 400      | 复用 `newsletter_invalid_email`                                                    | 几乎打不到 —— 组件里的 `EMAIL_RE` 先拦并给同一句话。保留它只为"正则放过、zod `z.email()` 拒绝"这条窄缝，且不新增词条                                                           |
+| ≥500     | 复用 `newsletter_error`                                                            | 订阅是硬失败语义（没落库），而这条词条说的正是"出了点问题，请重试"。没有像询盘那样另给一条带电话/微信兜底的文案：一条丢掉的询盘是真的丢了，一次没订上的订阅重试一下就是了      |
+
+### 欢迎信：locale 随请求传，而且称呼不再是 `Hi there,`
+
+照 `api/contact` 的范式：Paraglide v2 的显式 locale 形式 `m.key({}, { locale })`（服务端渲染的邮件
+没有环境 locale 给 `getLocale()` 继承），`<p>` 包装留在代码里而不进词条。新增 `email_welcome_*`
+四条词条，`subscribeSchema` 加可选 `locale`，客户端在**提交时**读 `getLocale()` —— 不是在组件初始化
+时读，免得将来某条跨 locale 链接漏了 `data-sveltekit-reload` 就悄悄发错语言。
+
+称呼那条是另一个 bug，和语言无关：`NewsletterForm` 的 body 一直是 `JSON.stringify({ email })`，
+**从不发 `name`**，于是 `name ?? 'there'` 让站上每一个订阅者收到的都是 `Hi there,`。现在没有 name
+时发本地化的通称（`Hello,` / `您好，`），而不是干脆不写称呼：这两句在各自语言里都是得体的独立开场，
+而给中文编一个通用称谓（"朋友"之类）是机构方的品牌决策，这个端点替不了它选 —— 和
+`content/people.ts` 对敬称的立场、以及 2026-10-16 那条"没有发明中文敬称"一致。带 name 的词条留着，
+schema 仍然允许别的调用方发名字。
+
+`locale` 只用于这封信。`src/lib/server/site-api.ts` 的 `/api/site/subscribe` payload 没有这个字段，
+所以排课系统的订阅者表仍然不知道订阅者读哪种语言 —— 真要群发双语邮件的那天，缺的是那一侧的字段。
+
+### 验证只到纯函数这一层
+
+`src/routes/api/subscribe/welcome-email.test.ts` 测的是 `+server.ts` 导出的 `_welcomeEmail`
+（下划线前缀是 SvelteKit 对 `+server` 额外导出唯一允许的形式）。它的词条是从
+`messages/{en,zh}.json` 直接读出来 stub 的，不走 `$lib/paraglide`：那是 gitignore 的构建产物，
+拿它当断言对象等于在测"最后一次编译是什么时候"。
+
+**这次改动不能让 `LAUNCH-CHECKLIST.md:483`（"The submitter receives a confirmation email in their
+own locale"）那个 box 打勾。** 那是生产端到端事实，要真实 SMTP 和真实收件箱，而
+`src/lib/server/mail.ts` 在未配 SMTP 时是优雅空转（本地和 CI 都是这个状态）。
+
+而且得点清是哪封信，别让下一个读者以为它指的是这次改的信：那个 box 所在的「Forms and backend」
+节上下全是 `/api/contact` 的条目（Turnstile、"5/min on `/api/contact`"、电话 + 微信兜底），
+字面读就是询盘表单的 submitter —— 而**询盘确认信早就按 locale 发了**
+（`api/contact/+server.ts:149-158` 的 `m.email_enquiry_*({}, { locale: mailLocale })`，这次一个
+字节都没动）。所以这次移除的是**订阅那半边**的代码侧阻碍：只有把那个 box 读成覆盖整节（含订阅）
+时，它才算被推进了一半。

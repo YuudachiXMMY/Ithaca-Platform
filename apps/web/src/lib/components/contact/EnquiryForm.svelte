@@ -142,7 +142,9 @@
 	}
 
 	/**
-	 * Map an HTTP status onto a message in the ACTIVE locale — `docs/DECISIONS.md` §0.6-1.
+	 * Map an HTTP status onto a message in the ACTIVE locale — `docs/DECISIONS.md` 2026-10-22.
+	 * (This used to cite `docs/DECISIONS.md` §0.6-1, which never existed there: `§0.6-1` is a defect
+	 * id inside the redesign plan's task F8, `.claude/PRPs/plans/ithacateens-redesign.plan.md:305`.)
 	 *
 	 * The previous handler parsed the JSON and branched on `data.success` alone, so 429, 403 and 500
 	 * were all shown as one generic "something went wrong": a visitor who had simply submitted twice
