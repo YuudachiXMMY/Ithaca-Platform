@@ -78,17 +78,21 @@ test.describe('public routes', () => {
 });
 
 test.describe('locale switch', () => {
-	// The switcher is rendered twice: once in the desktop bar (`hidden md:flex`) and once in
-	// the mobile drawer. Both copies are in the DOM at every viewport, so match on `:visible`
-	// and open the drawer first when the hamburger is the thing on screen.
+	// The switcher renders in exactly two places, and NOT both at every viewport: the mobile drawer
+	// (`Header.svelte`, inside `{#if mobileOpen}` — on desktop it is not in the DOM at all) and the
+	// first footer column (`Footer.svelte`; it moved down out of the header bar when the bar grew to
+	// seven items, see the comment there). There is no desktop-bar copy. Hence `:visible` plus
+	// `.first()` rather than a header-scoped locator: on desktop the hamburger is `lg:hidden`, so
+	// nothing is clicked open and the link we hit is the footer's.
 	async function switchLocaleTo(page: import('@playwright/test').Page, href: string) {
 		const hamburger = page.locator('header button[aria-expanded]').first();
 		if (await hamburger.isVisible()) await hamburger.click();
 		await page.locator(`a[href="${href}"]:visible`).first().click();
 	}
 
-	// R-I18N-3: the switch must preserve the current path (and query), not dump the
-	// visitor on the homepage in the other language.
+	// R-I18N-3: the switch must preserve the current path, not dump the visitor on the homepage in
+	// the other language. These two cases are the PATH; the query and the hash are the two after
+	// them, which this comment used to claim in a parenthesis and nothing asserted.
 	test('preserves the current path when going en -> zh', async ({ page }) => {
 		await page.goto('/programs/ev-team');
 		await switchLocaleTo(page, '/zh/programs/ev-team');
@@ -100,6 +104,40 @@ test.describe('locale switch', () => {
 		await page.goto('/zh/programs/ev-team');
 		await switchLocaleTo(page, '/programs/ev-team');
 		await expect(page).toHaveURL(/\/programs\/ev-team$/);
+		await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+	});
+
+	/**
+	 * The query and the hash. Until now this was a parenthesis in the comment above and nothing
+	 * else — neither case asserted it, and the switcher was broken in exactly that gap: both
+	 * `LanguageSwitcher.svelte` and `LocaleSuggestion.svelte` derived their target from
+	 * `deLocalizeUrl(page.url).pathname`, which drops the search AND the hash.
+	 *
+	 * `/admissions?program=ev-team#book` is the URL a programme page's "Register" CTA produces
+	 * (`$lib/program-cta`), so it is what a visitor who switches language mid-funnel is actually on.
+	 * `?program=` is read on the client by `resolveProgramParam`, which ticks the programme's
+	 * checkbox, opens the qualification disclosure and posts the slug to `/api/contact`; `#book`
+	 * is what puts the form — the LAST of six sections — on screen. Losing them is a blank form at
+	 * the top of the page, not an untidy URL. The two path-only cases above pass either way.
+	 *
+	 * `switchLocaleTo` locates by full href, so the expected string IS most of the assertion: the
+	 * link has to be rendered with the query and the hash before it can be clicked. (Which also
+	 * means these two cases need hydration — the prerendered HTML carries the query-free href,
+	 * because prerendering has no query to see. The locator retries until it does.)
+	 */
+	test('preserves the query and the hash when going en -> zh', async ({ page }) => {
+		await page.goto('/admissions?program=ev-team#book');
+		await switchLocaleTo(page, '/zh/admissions?program=ev-team#book');
+		await expect(page).toHaveURL(/\/zh\/admissions\?program=ev-team#book$/);
+		await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
+	});
+
+	test('preserves the query and the hash when going zh -> en', async ({ page }) => {
+		await page.goto('/zh/admissions?program=ev-team#book');
+		await switchLocaleTo(page, '/admissions?program=ev-team#book');
+		await expect(page).toHaveURL(/\/admissions\?program=ev-team#book$/);
+		// The URL pattern above also matches the /zh one it started on, so this is what proves the
+		// switch happened rather than silently doing nothing — same pairing as the cases above.
 		await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 	});
 

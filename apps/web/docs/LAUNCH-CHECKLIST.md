@@ -28,7 +28,19 @@ Last reviewed: 2026-09-29 · Status: **not ready** (workstreams in progress)
       human-authored catalogue (see `DECISIONS.md` Q12)
 - [ ] 🔴 CJK typography verified: line-height 1.75, no letter-spacing, `text-wrap: balance`
       off for Chinese headings, corner brackets 「」
-- [ ] 🔴 Locale switch preserves path and query on every route (covered by `e2e/smoke.spec.ts`)
+- [ ] 🔴 Locale switch preserves path, query **and hash** on every route.
+      **The "(covered by `e2e/smoke.spec.ts`)" claim this line used to carry was false, and it was
+      hiding a live defect** — anyone who ran `npm run build && npm run test:e2e`, saw smoke green
+      and ticked this box would have shipped it. The two `locale switch` cases asserted the PATH
+      only (the query was a parenthesis in their comment), while `LanguageSwitcher.svelte` and
+      `LocaleSuggestion.svelte` both derived their target from `deLocalizeUrl(page.url).pathname`,
+      which drops search and hash: a visitor who switched language on
+      `/admissions?program=ev-team#book` — the href a programme page's "Register" CTA produces
+      (`src/lib/program-cta.ts`) — got a blank form at the top of the page, because `?program=` is
+      what preselects the programme and `#book` is what reaches the form. Both components now use
+      `deLocalizeHref()`, which returns `pathname + search + hash`, and `smoke.spec.ts` asserts the
+      query and the hash in both directions — for that ONE route, which is the shape of the defect,
+      not the "every route" this box asks for. That last step is still manual.
 - [ ] 🟡 English pages still ship zero CJK font bytes (covered by `e2e/smoke.spec.ts`)
 
 ## Accessibility

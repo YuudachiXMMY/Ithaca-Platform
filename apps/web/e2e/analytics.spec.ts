@@ -280,4 +280,34 @@ test.describe('GA4 events — R-SEO-5', () => {
 			}
 		]);
 	});
+
+	/**
+	 * R-BE-5, the half the case above cannot see: `path` must stay route-only even when the URL
+	 * carries a query and a hash.
+	 *
+	 * `LanguageSwitcher.svelte` derives TWO values from the same URL on purpose — `canonicalHref`
+	 * keeps `?program=` and `#book` so the link is worth clicking, `analyticsPath` strips them so
+	 * no page identity beyond the route reaches GA4. Collapsing them back into one is a one-line
+	 * edit that looks like a cleanup, and every assertion above would stay green: both `locale_switch`
+	 * cases in this file ran on query-free URLs, so the stripping was never actually exercised.
+	 * `?program=<slug>` is the programme a specific visitor is enquiring about.
+	 */
+	test('locale_switch reports the route only, never the query or the hash', async ({
+		page
+	}, testInfo) => {
+		test.skip(testInfo.project.name === 'mobile-chrome', 'switcher lives in the mobile drawer');
+
+		await page.goto('/admissions?program=ev-team#book');
+		await pinNavigation(page);
+
+		// Locating by the full localized href is also the proof that hydration has rewritten it —
+		// the prerendered HTML carries the query-free form, because prerendering has no query to see.
+		await page.locator('a[href="/zh/admissions?program=ev-team#book"]:visible').first().click();
+		expect((await sent(page)).filter((event) => event.name === 'locale_switch')).toEqual([
+			{
+				name: 'locale_switch',
+				params: { from: 'en', to: 'zh', path: '/admissions' }
+			}
+		]);
+	});
 });
