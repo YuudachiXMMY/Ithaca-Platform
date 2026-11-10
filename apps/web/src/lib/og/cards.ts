@@ -102,11 +102,20 @@ export const OG_CARDS: Readonly<Record<string, OgCard>> = {
 		title: m.ossd_hero_title,
 		crumb: m.nav_ossd
 	},
-	'/academics/stem': {
+	// `/academics/stem` and `/student-life` are absent, not forgotten: both are 308 stubs now
+	// (plan §3.3, §3.7). A card for a redirect would be rendered at build time, listed by
+	// `entries()`, and never requested by anything.
+	'/academics/sat-act': {
 		template: 'default',
-		eyebrow: m.stem_hero_eyebrow,
-		title: m.stem_hero_title,
-		crumb: m.nav_stem
+		eyebrow: m.academics_satAct_eyebrow,
+		title: m.academics_satAct_title,
+		crumb: m.nav_satAct
+	},
+	'/academics/university-support': {
+		template: 'default',
+		eyebrow: m.academics_universitySupport_eyebrow,
+		title: m.academics_universitySupport_title,
+		crumb: m.nav_universitySupport
 	},
 	'/academics/tutoring': {
 		template: 'default',
@@ -114,11 +123,17 @@ export const OG_CARDS: Readonly<Record<string, OgCard>> = {
 		title: m.tutoring_hero_title,
 		crumb: m.nav_tutoring
 	},
-	'/student-life': {
+	'/research': {
 		template: 'default',
-		eyebrow: m.studentLife_hero_eyebrow,
-		title: m.studentLife_hero_title,
-		crumb: m.nav_studentLife
+		eyebrow: m.research_hero_eyebrow,
+		title: m.research_hero_title,
+		crumb: m.nav_research
+	},
+	'/news': {
+		template: 'default',
+		eyebrow: m.news_hero_eyebrow,
+		title: m.news_hero_title,
+		crumb: m.nav_news
 	},
 	'/contact-us': {
 		template: 'default',
@@ -144,8 +159,9 @@ export const OG_CARDS: Readonly<Record<string, OgCard>> = {
 		title: m.programs_index_title,
 		crumb: m.nav_programs
 	},
-	// The six programmes. `eyebrow` names the programme so the headline is free to be a slogan
-	// ("Build. Race. Lead."); where the headline already names it, the eyebrow is the section.
+	// The six programme pages. `eyebrow` names the programme so the headline is free to be a
+	// slogan ("Build. Race. Lead."); where the headline already names it, the eyebrow is the
+	// section.
 	'/programs/ev-team': {
 		template: 'program',
 		eyebrow: m.programs_index_cards_evTeam_title,
@@ -158,29 +174,31 @@ export const OG_CARDS: Readonly<Record<string, OgCard>> = {
 		title: m.programs_aiCamp_hero_title,
 		crumb: m.nav_aiEntrepreneurshipCamp
 	},
+	// The URL stays plural; the card's `crumb` is singular, because that is a rendered string and
+	// the 11-04 brochure settled the brand there (plan §5). See `content/programs.ts`.
 	'/programs/ithaca-dialogues': {
 		template: 'program',
-		eyebrow: m.nav_programs,
+		eyebrow: m.nav_research,
 		title: m.programs_ithacaDialogues_hero_title,
-		crumb: m.nav_ithacaDialogues
+		crumb: m.nav_ithacaDialogue
 	},
-	'/programs/engineering-projects': {
+	'/programs/ai-investment-lab': {
 		template: 'program',
 		eyebrow: m.nav_programs,
-		title: m.programs_index_cards_engineering_title,
-		crumb: m.nav_engineeringProjects
+		title: m.programs_index_cards_aiInvestmentLab_title,
+		crumb: m.nav_aiInvestmentLab
 	},
-	'/programs/summer-winter-camps': {
+	'/programs/project-studio': {
 		template: 'program',
 		eyebrow: m.nav_programs,
-		title: m.programs_index_cards_summerWinter_title,
-		crumb: m.nav_summerWinterCamps
+		title: m.programs_index_cards_projectStudio_title,
+		crumb: m.nav_projectStudio
 	},
-	'/programs/ithaca-night': {
+	'/programs/engineering-foundations': {
 		template: 'program',
 		eyebrow: m.nav_programs,
-		title: m.programs_index_cards_ithacaNight_title,
-		crumb: m.nav_ithacaNight
+		title: m.programs_index_cards_engineeringFoundations_title,
+		crumb: m.nav_engineeringFoundations
 	}
 };
 
