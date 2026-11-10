@@ -29,12 +29,20 @@ SvelteKit 2（Svelte 5 runes · adapter-node → build/index.js · 全站预渲�
  │
  ├─ 公开页        /                      首页
  │                /about-us  /about-us/our-team
- │                /academics/{ap,ossd,stem,tutoring}
+ │                /academics/{ap,ossd,sat-act,university-support,tutoring}
  │                /admissions            招生漏斗（整站存在的理由）
- │                /programs/*            10 个项目页 + 索引
- │                /results  /success-stories  /student-life
+ │                /programs/*            6 个项目页 + 索引
+ │                /research              研究板块（2026-11 新增，单页承载三个产品）
+ │                /news                  新闻与活动（2026-11 新增，驱动首页 Featured）
+ │                /results  /success-stories
  │                /contact-us
  │                /privacy  /terms
+ │                ——— 308 跳转（只有 +page.ts，不进 sitemap）———
+ │                /student-life → /news
+ │                /academics/stem → /academics
+ │                /programs/{engineering-projects → engineering-foundations,
+ │                           summer-winter-camps → ai-investment-lab,
+ │                           ithaca-night → /news}
  │
  ├─ 生成端点      /sitemap.xml   由 import.meta.glob 枚举路由 ⇒ 新页自动进站点图
  │                /robots.txt
@@ -52,24 +60,24 @@ SvelteKit 2（Svelte 5 runes · adapter-node → build/index.js · 全站预渲�
 
 ## 目录结构
 
-| 路径                 | 职责                                                                                                                                      |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/routes`         | 页面（`+page.svelte`）、loader（`+page.ts`）、端点（`+server.ts`）                                                                        |
-| `src/lib/content`    | **内容模型**，PRD §6.1 的逐字移植：`programs` `season-data` `people` `results` `faq` `partners` `highlights` `stats` `admissions` `types` |
-| `src/lib/data`       | **展示用数据**：`nav`（含每个项目的季节状态）、`programs`（索引卡列表）、`contact`、`team`                                                |
-| `src/lib/components` | 手写组件，按页分组：`about` `admissions` `contact` `home` `layout` `media` `programs` `results` `shared`。**没有外部组件库。**            |
-| `src/lib/server`     | 服务端专属：`site-api` `popup-cache` `mail` `csrf` `guard` `validation` `rate-limit` `turnstile` `og/`（satori 字体与渲染）               |
-| `src/lib/og`         | `cards.ts` —— OG 卡注册表，**一张表两个消费者**（PNG 渲染端点 + `Seo.svelte` 的 `og:image`），不许各自为政                                |
-| `src/lib/motion`     | GSAP 封装与生命周期（`gsap-lifecycle.ts`）                                                                                                |
-| `src/lib/actions`    | Svelte action：`focus-trap` `inview`                                                                                                      |
-| `src/lib/assets`     | 构建期处理的图片（`@sveltejs/enhanced-img`）                                                                                              |
-| `src/lib/paraglide`  | Paraglide 编译产物 —— **生成的，已 gitignore**                                                                                            |
-| `src/lib/*.ts`       | 业务纯函数，就近放 `*.test.ts`：`seasons` `program-season` `program-cta` `admissions` `results` `analytics` `seo` `utils`                 |
-| `messages`           | Paraglide 扁平词条：`en.json` / `zh.json`（**一个 locale 一个文件**，不是命名空间目录）                                                   |
-| `static`             | 运行时静态资源：`media/{images,videos}`、自建的 `fonts/`                                                                                  |
-| `scripts`            | 见下方「脚本」                                                                                                                            |
-| `e2e`                | Playwright（8 个套件）                                                                                                                    |
-| `.claude/PRPs`       | PRD / plan / report / review —— **历史记录**，与代码冲突时代码赢                                                                          |
+| 路径                 | 职责                                                                                                                                                            |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/routes`         | 页面（`+page.svelte`）、loader（`+page.ts`）、端点（`+server.ts`）                                                                                              |
+| `src/lib/content`    | **内容模型**，PRD §6.1 的逐字移植：`programs` `season-data` `people` `results` `faq` `partners` `highlights` `stats` `admissions` `news` `destinations` `types` |
+| `src/lib/data`       | **展示用数据**：`nav`（含每个项目的季节状态）、`programs`（索引卡列表）、`contact`、`team`                                                                      |
+| `src/lib/components` | 手写组件，按页分组：`about` `academics` `admissions` `contact` `home` `layout` `media` `programs` `results` `shared`。**没有外部组件库。**                      |
+| `src/lib/server`     | 服务端专属：`site-api` `popup-cache` `mail` `csrf` `guard` `validation` `rate-limit` `turnstile` `og/`（satori 字体与渲染）                                     |
+| `src/lib/og`         | `cards.ts` —— OG 卡注册表，**一张表两个消费者**（PNG 渲染端点 + `Seo.svelte` 的 `og:image`），不许各自为政                                                      |
+| `src/lib/motion`     | GSAP 封装与生命周期（`gsap-lifecycle.ts`）                                                                                                                      |
+| `src/lib/actions`    | Svelte action：`focus-trap` `inview`                                                                                                                            |
+| `src/lib/assets`     | 构建期处理的图片（`@sveltejs/enhanced-img`）                                                                                                                    |
+| `src/lib/paraglide`  | Paraglide 编译产物 —— **生成的，已 gitignore**                                                                                                                  |
+| `src/lib/*.ts`       | 业务纯函数，就近放 `*.test.ts`：`seasons` `program-season` `program-cta` `admissions` `results` `analytics` `seo` `utils`                                       |
+| `messages`           | Paraglide 扁平词条：`en.json` / `zh.json`（**一个 locale 一个文件**，不是命名空间目录）                                                                         |
+| `static`             | 运行时静态资源：`media/{images,videos}`、自建的 `fonts/`                                                                                                        |
+| `scripts`            | 见下方「脚本」                                                                                                                                                  |
+| `e2e`                | Playwright（8 个套件）                                                                                                                                          |
+| `.claude/PRPs`       | PRD / plan / report / review —— **历史记录**，与代码冲突时代码赢                                                                                                |
 
 ### 根层那几个关键文件
 
@@ -150,16 +158,16 @@ Playwright 跑**生产构建**（`node build/index.js`，`:4321`），不是 `vi
 产物，而预渲染的 bug 在 dev 下看不见。`reuseExistingServer: false`：端口被占就响亮失败，而不是
 悄悄把整个套件指向别人的服务。
 
-| 套件                        | 它守住什么                                                                                                                                                                                                     |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `smoke.spec.ts`             | 路由覆盖**由 `/sitemap.xml` 推导** ⇒ 新页自动入列；外加语言切换、键盘导航、表单校验、重定向，以及 header 的滚动态（这同时是**唯一**能发现 header 没 hydrate 的检查 —— 一个冻住的 header 能通过所有对比度断言） |
-| `a11y.spec.ts`              | axe，PRD §6.4 每一页、两种语言、零 serious/critical。还没上线的路由也列着并显式 skip，落地当天自动进门禁                                                                                                       |
-| `header-contrast.spec.ts`   | 采样 header **背后**的像素，断言每个导航链接 4.5:1。axe 做不到这件事：它把图上文字的对比度报成 `incomplete`，于是 84 个元素里有 40 个低于 AA 还一路绿灯                                                        |
-| `nav-single-line.spec.ts`   | 桌面导航栏单行不折。栏目涨到七项后余量只剩约 10px，而折了之后"完全合法"——过 axe、过对比度，只是丑                                                                                                              |
-| `admissions-funnel.spec.ts` | 整条招生漏斗走通。其它套件各查一个关节，这个查关节连不连 —— 曾经 `/admissions` 只存在于 sitemap 里，这条路走不通而每个单项测试照样绿                                                                           |
-| `analytics.spec.ts`         | 六个 GA4 事件真的接在用户动作上，且 `dataLayer` 里**不含任何表单字段值**                                                                                                                                       |
-| `seo.spec.ts`               | 规范链接 / OG / JSON-LD，覆盖范围同样由 sitemap 推导                                                                                                                                                           |
-| `locale-suggestion.spec.ts` | 中文入口的可发现性（header 语言切换下沉到 footer 之后的补偿）                                                                                                                                                  |
+| 套件                        | 它守住什么                                                                                                                                                                                                                                   |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `smoke.spec.ts`             | 路由覆盖**由 `/sitemap.xml` 推导** ⇒ 新页自动入列；外加语言切换、键盘导航、表单校验、重定向，以及 header 的滚动态（这同时是**唯一**能发现 header 没 hydrate 的检查 —— 一个冻住的 header 能通过所有对比度断言）                               |
+| `a11y.spec.ts`              | axe，PRD §6.4 每一页、两种语言、零 serious/critical。还没上线的路由也列着并显式 skip，落地当天自动进门禁                                                                                                                                     |
+| `header-contrast.spec.ts`   | 采样 header **背后**的像素，断言每个导航链接 4.5:1。axe 做不到这件事：它把图上文字的对比度报成 `incomplete`，于是 84 个元素里有 40 个低于 AA 还一路绿灯                                                                                      |
+| `nav-single-line.spec.ts`   | 桌面导航栏单行不折。2026-11 改版后左列降到三项、右列多了一个带 padding 的 CTA 按钮（约 150px，而 `Admissions` 作为一个词只有 88px）——这 62px 就是 Results 进不了栏的原因，算式在 `data/nav.ts`。折了之后"完全合法"：过 axe、过对比度，只是丑 |
+| `admissions-funnel.spec.ts` | 整条招生漏斗走通。其它套件各查一个关节，这个查关节连不连 —— 曾经 `/admissions` 只存在于 sitemap 里，这条路走不通而每个单项测试照样绿                                                                                                         |
+| `analytics.spec.ts`         | 六个 GA4 事件真的接在用户动作上，且 `dataLayer` 里**不含任何表单字段值**                                                                                                                                                                     |
+| `seo.spec.ts`               | 规范链接 / OG / JSON-LD，覆盖范围同样由 sitemap 推导                                                                                                                                                                                         |
+| `locale-suggestion.spec.ts` | 中文入口的可发现性（header 语言切换下沉到 footer 之后的补偿）                                                                                                                                                                                |
 
 **本地直接 `npm run test:e2e` 会红 19 条，而 CI 是绿的 —— 这不是 flake。** `analytics.spec.ts`
 整套（外加 `locale-suggestion` 的 `locale_switch` 和 `admissions-funnel` 的中文提交）断言的是
