@@ -64,10 +64,33 @@
 	/** Grades 4–12 — the band the academy serves (`/api/contact` validates the same range). */
 	const GRADES = [4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 
-	const PROGRAM_OPTIONS = PROGRAMS.map((program) => ({
-		slug: program.slug,
-		name: program.name[locale]
-	}));
+	/**
+	 * "Programme of interest" — the six `Program` records, plus three things a family asks about
+	 * that are not programmes (2026-11 plan §3.4 lists all nine).
+	 *
+	 * The six are derived, so the three retired in the 2026-11 revamp left this list on their own
+	 * and the three added arrived on their own. Nothing here needed editing for that.
+	 *
+	 * The extra three are the gap between "what we file as a programme" and "what a parent writes
+	 * in the box". Academic tutoring is five `/academics` tracks and no `Program`; University
+	 * Support is one of those tracks and the single most likely enquiry from a university student;
+	 * Research Lab has no record at all because `/research` carries it as a section (see
+	 * `data/programs.ts`). Omitting them would route every one of those enquiries into "Other" and
+	 * lose the one field that tells us what the family actually wants.
+	 *
+	 * Their `slug`s are NOT `Program.slug`s and must not be mistaken for them — nothing resolves
+	 * these against the record set. They are prefixed `track-` so that is obvious at a glance in
+	 * the inbox and in anything that later tries to join on this value.
+	 */
+	const PROGRAM_OPTIONS = [
+		...PROGRAMS.map((program) => ({
+			slug: program.slug,
+			name: program.name[locale]
+		})),
+		{ slug: 'track-academic-tutoring', name: m.contact_form_programOption_academicTutoring() },
+		{ slug: 'track-university-support', name: m.contact_form_programOption_universitySupport() },
+		{ slug: 'track-research-lab', name: m.contact_form_programOption_researchLab() }
+	];
 
 	const LOCALE_OPTIONS: readonly { value: 'en' | 'zh'; label: string }[] = [
 		{ value: 'en', label: m.contact_form_localeEn() },

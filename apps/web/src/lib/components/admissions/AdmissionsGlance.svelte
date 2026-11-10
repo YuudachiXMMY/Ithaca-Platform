@@ -1,9 +1,12 @@
 <!--
   AdmissionsGlance — the date a parent opens `/admissions` to find, directly under the hero.
 
-  Every value is DERIVED from the same `CalendarRow[]` the season calendar further down renders, so
-  this strip cannot disagree with the table it summarises: add a season to `season-data.ts` and the
-  count, the grade span and the next window all move together (R-CONTENT-1). Nothing here is typed.
+  The next window and the season count are DERIVED from the same `CalendarRow[]` the season calendar
+  further down renders, so this strip cannot disagree with the table it summarises: add a season to
+  `season-data.ts` and both move together (R-CONTENT-1). Nothing here is typed.
+
+  The grade span is the one figure that reads `content/programs.ts` instead, and the reason is worth
+  knowing before you "fix" it for consistency — see the comment on `gradeSpan`.
 
   It sits UNDER the hero rather than inside it on purpose — a trust/fact strip stuffed into the same
   block as the headline and the CTA is the thing that makes a hero overflow the viewport. The hero
@@ -17,6 +20,7 @@
 -->
 <script lang="ts">
 	import type { CalendarRow } from '$lib/admissions';
+	import { PROGRAMS } from '$lib/content/programs';
 	import * as m from '$lib/paraglide/messages';
 
 	interface Props {
@@ -25,17 +29,37 @@
 	let { rows }: Props = $props();
 
 	/**
-	 * The widest grade band any open season accepts, across all of them.
+	 * The widest grade band the academy serves.
 	 *
-	 * A span, not a list: three seasons quoting `8 - 11`, `9 - 12`, `8 - 12` is a table, and the
-	 * question this line answers is the cruder "is my child old enough". Null when no open season
-	 * carries a `grades` record, which renders as the same "to be confirmed" an undated season gets.
+	 * A span, not a list: programmes quoting `8 - 11`, `9 - 12`, `11 - 12` is a table, and the
+	 * question this line answers is the cruder "is my child old enough".
+	 *
+	 * ## Why this reads `PROGRAMS` and not `rows`
+	 *
+	 * It used to span the open SEASONS, which sounds tighter and was in fact wrong — the 2026-11
+	 * revamp exposed it. Engineering Foundations takes grade 7 and publishes "classes form on
+	 * demand, no fixed start dates" as its actual schedule, so it has no `Season` by design (see
+	 * `content/programs.ts`). Spanning seasons therefore told a grade-7 parent the floor was 8:
+	 * the one programme aimed at their child was invisible precisely BECAUSE it is always open.
+	 *
+	 * Reading the programme records fixes that and matches what the line already claimed to
+	 * answer. It does mean the span can include a programme with no intake scheduled — which is
+	 * the right trade for a "can we even talk to you" answer, and the row directly beside this one
+	 * ("seasons taking students") is where scheduling is answered.
 	 */
 	const gradeSpan = $derived.by(() => {
-		const graded = rows.map((row) => row.grades).filter((grades) => grades !== null);
-		if (graded.length === 0) return null;
+		if (PROGRAMS.length === 0) return null;
+		const min = Math.min(...PROGRAMS.map((program) => program.grades.min));
+		const max = Math.max(...PROGRAMS.map((program) => program.grades.max));
 		// Spaced hyphen, matching what both catalogues already write for a numeric range.
-		return `${Math.min(...graded.map((g) => g.min))} - ${Math.max(...graded.map((g) => g.max))}`;
+		const span = `${min} - ${max}`;
+		// `12` is the top of a GRADE band, and three programmes run past it (AI Investment Lab,
+		// Project Studio, and the research board's university tier). "7 - 12" alone would turn a
+		// university student away at the door; see `Program.includesUniversity` for why that is a
+		// flag rather than a thirteenth grade.
+		return PROGRAMS.some((program) => program.includesUniversity)
+			? m.admissions_calendar_gradesWithUniversity({ grades: span })
+			: span;
 	});
 
 	/**
