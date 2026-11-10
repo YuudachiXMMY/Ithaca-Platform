@@ -67,7 +67,35 @@ export interface Program {
 	tagline: Localized;
 	summary: Localized;
 	category: 'engineering' | 'ai-business' | 'research' | 'stem' | 'seasonal' | 'community';
+	/**
+	 * Which of the three boards this programme belongs to (2026-11 revamp plan §2) — the one
+	 * journey the whole redesign exists to show: 01 Academic → 02 Projects → 03 Research.
+	 *
+	 * Declared rather than derived from `category`, even though the two correlate today, because
+	 * they answer different questions and have already disagreed once. `category` says what the
+	 * programme IS (`ithaca-dialogues` is `'research'`); `board` says where the site FILES it, and
+	 * the 11-04 brochure moved Project Studio from the research board to the projects board without
+	 * changing anything about the programme itself. Deriving would have made that editorial move a
+	 * code change in the wrong file — and would still be wrong for `ai-investment-lab`, whose
+	 * `category` is `'ai-business'` but which sits on the projects board next to an engineering
+	 * programme.
+	 *
+	 * The academic board has no `Program` records: its five tracks are `/academics` pages, not
+	 * programmes. So this union has two members, not three.
+	 */
+	board: 'projects' | 'research';
 	grades: { min: number; max: number };
+	/**
+	 * Does this programme also take university students? (`AI Investment Lab`, `Project Studio`
+	 * and the research board do; 2026-11 plan §4.)
+	 *
+	 * A separate boolean rather than `grades.max = 13`, which is what the shape invites. 13 is not
+	 * a grade, so every consumer would need to know the convention to avoid rendering "Grades
+	 * 11-13" to a parent, and `seasonDuration`-style arithmetic over the band would silently treat
+	 * a four-year degree as one school year. The band stays a band; this says the programme does
+	 * not end at the top of it. Renders as the "& University" the plan asks for on `/admissions`.
+	 */
+	includesUniversity?: boolean;
 	format: 'in-person' | 'online' | 'hybrid';
 	location?: Localized;
 	hero: Media;
@@ -103,6 +131,67 @@ export interface Result {
 	detail: Localized;
 	evidence?: Media;
 	consentVerified: boolean; // see §6.3
+}
+
+/**
+ * A `/news` entry — the 2026-11 plan §4.3 board, which is the on-site sink for the media matrix
+ * (interviews, campus visits, programme milestones, awards all get cut up and reused elsewhere;
+ * this site carries the text-and-image version).
+ *
+ * Separate from `Event` below rather than an extension of it. `Event` models something with a
+ * *venue and a time you can attend* — it has `start`/`end`/`location`/`rsvpUrl`, and three of
+ * those are meaningless for an interview write-up or an award announcement. A news entry is a
+ * published artefact with one date. Widening `Event` would have meant four more optional fields
+ * and no way to tell a reader which combination is valid.
+ *
+ * `kind` is the four-way tag the plan specifies, and it drives the list filter, not just a label.
+ */
+export interface NewsItem {
+	slug: string;
+	kind: 'event' | 'interview' | 'program' | 'award';
+	title: Localized;
+	/** Publication date. Reduced precision is allowed here for the same reason as `Result.date`. */
+	date: string;
+	/**
+	 * One or two paragraphs. An array so the renderer never has to split on a delimiter.
+	 *
+	 * `Localized<string[]>` — paragraphs PER LOCALE, not a localized string per paragraph. The
+	 * other shape (`Localized[]`) would force the two languages to have the same number of
+	 * paragraphs in the same order, which is a constraint on the translator that serves nobody:
+	 * Chinese copy here is consistently denser and often wants one paragraph where English wants
+	 * two.
+	 */
+	body: Localized<string[]>;
+	cover?: Media;
+	video?: VimeoRef;
+	/** Back-link to the programme this entry came out of (plan §2 rule 6). */
+	programSlug?: string;
+	/** `Result.id` this entry is the story behind — Award entries and /success-stories cross-link. */
+	resultIds?: string[];
+	/** At most one entry should set this: it is what the homepage Featured slot renders. */
+	featured?: boolean;
+}
+
+/**
+ * One line of the "where past students went" roll-up on `/success-stories` (plan §3.5).
+ *
+ * `kind` exists because of the 11-02 decision that an OFFER a student did not take and a place a
+ * student actually ATTENDS must be listed separately and labelled. Conflating them is the specific
+ * misrepresentation that decision exists to prevent, so it is a required field with no default —
+ * a record cannot be added without someone deciding which it is.
+ *
+ * `scholarship` is optional and `verified` is required and separate: the same decision says a
+ * scholarship is shown only once checked, so an unverified figure is encodable but not renderable.
+ */
+export interface Destination {
+	id: string;
+	institution: Localized;
+	/** Faculty or programme, when the published copy states one ("Financial Engineering"). */
+	field?: Localized;
+	kind: 'offer' | 'attending';
+	year?: number;
+	scholarship?: Localized;
+	verified: boolean;
 }
 
 export interface Event {

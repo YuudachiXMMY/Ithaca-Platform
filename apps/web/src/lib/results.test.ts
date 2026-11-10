@@ -25,6 +25,7 @@ const program = (slug: string, en: string, zh: string): Program =>
 		tagline: { en: '', zh: '' },
 		summary: { en: '', zh: '' },
 		category: 'engineering',
+		board: 'projects',
 		grades: { min: 8, max: 11 },
 		format: 'in-person',
 		hero: { src: '', alt: { en: '', zh: '' }, width: 1, height: 1 },

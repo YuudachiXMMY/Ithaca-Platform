@@ -31,6 +31,7 @@ function program(partial: Partial<Program> & Pick<Program, 'slug'>): Program {
 		tagline: { en: 't', zh: 't' },
 		summary: { en: 'summary', zh: '摘要' },
 		category: 'engineering',
+		board: 'projects',
 		grades: { min: 8, max: 11 },
 		format: 'in-person',
 		hero: { src: 'x', alt: { en: 'a', zh: 'a' }, width: 1, height: 1 },

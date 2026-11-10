@@ -19,13 +19,30 @@ import { AI_CAMP_RESULT_IDS, DIALOGUES_RESULT_IDS } from './results';
  * `format` is `'in-person'` everywhere. Nothing on the site states a format explicitly, but all
  * three built programs publish clock-time sessions at a physical location, so this is a reading
  * of published facts rather than a new claim.
+ *
+ * ## 2026-11 revamp
+ *
+ * Three records left and three arrived. `engineering-projects`, `summer-winter-camps` and
+ * `ithaca-night` were placeholders with no published dates, no outcomes and no FAQ (the old
+ * CONTENT-GAPS C-1), and all three are retired by decision rather than by neglect: the 10-11
+ * meeting replaced Summer & Winter Camps with AI Investment Lab, Engineering Projects is
+ * superseded by `engineering-foundations`, and Ithaca Night's content moves to `/news` as an
+ * Event entry. Their URLs 308-redirect — see the `+page.ts` files under `src/routes/programs/`.
+ *
+ * The arrivals (`ai-investment-lab`, `engineering-foundations`, `project-studio`) are the
+ * opposite case: finished copy from the 11-04 brochure, missing only photography. So they carry
+ * `TODO(asset)` and not `TODO(content)` — which matters mechanically, because every
+ * `/programs/<slug>` is a `prd.md` §6.4 page and a content marker on one of those fails
+ * `scripts/content-check.ts`.
  */
 
-// The three placeholder programs publish no grade band of their own. The academy-wide band is
-// published (`about_hero_facts_gradesValue` "4-12", and the AI Camp FAQ "Grades 4 through 12 are
-// eligible to join our programs"), so it stands in until the owner supplies per-program bands.
-const ACADEMY_GRADES = { min: 4, max: 12 };
-
+/**
+ * A hero whose IMAGE is a stand-in but whose ALT TEXT is not.
+ *
+ * The 2026-11 revamp added three programmes with finished copy and no photography of their own
+ * (see the `TODO(asset)` at each call site). The alt text describes what the borrowed frame
+ * actually shows, so a screen-reader user is never told about a picture that is not there.
+ */
 function placeholderHero(src: string, en: string, zh: string): Media {
 	return { src, alt: { en, zh }, width: 1920, height: 1280 };
 }
@@ -41,6 +58,7 @@ export const PROGRAMS: readonly Program[] = [
 			zh: '设计并制造真实的电动汽车，管理团队，参加滑铁卢 EV 挑战赛。'
 		},
 		category: 'engineering',
+		board: 'projects',
 		grades: { min: 8, max: 11 },
 		format: 'in-person',
 		location: { en: 'Greater Toronto Area', zh: '大多伦多地区' },
@@ -205,6 +223,7 @@ export const PROGRAMS: readonly Program[] = [
 			zh: '为期 13 周的项目，学生打造 AI 驱动的初创公司，开发 MVP 并向真实投资人路演。'
 		},
 		category: 'ai-business',
+		board: 'projects',
 		grades: { min: 8, max: 12 },
 		format: 'in-person',
 		hero: {
@@ -281,14 +300,25 @@ export const PROGRAMS: readonly Program[] = [
 
 	// ── Ithaca Dialogues ─────────────────────────────────────────────────────────────────────
 	{
+		// The SLUG stays plural while the NAME goes singular (plan §5 "brand naming"), and that
+		// mismatch is deliberate. The 11-04 brochure settled on the singular "Ithaca Dialogue", so
+		// every rendered string has to follow. The URL is a different kind of promise: it is the
+		// 308 target of `/programs/elite-interview` and `/programs/ai-pioneers-interview`, it is
+		// what `results.ts` back-links to, and it is in the OG card registry. Renaming it to match
+		// the brand would buy nothing a visitor can see and would cost a third redirect hop.
 		slug: 'ithaca-dialogues',
-		name: { en: 'Ithaca Dialogues', zh: '伊萨卡菁英访谈' },
+		name: { en: 'Ithaca Dialogue', zh: '伊萨卡菁英访谈' },
 		tagline: { en: 'Conversations that broaden horizons.', zh: '拓宽视野的对话。' },
 		summary: {
 			en: 'A 10-week research and documentary program where students investigate AI and Canada’s future through interviews with experts in academia, industry, and policy.',
 			zh: '为期 10 周的研究与纪录片项目，学生通过访谈学术界、行业和政策领域专家，调查 AI 与加拿大的未来。'
 		},
 		category: 'research',
+		// The 10-26 decision and the 11-04 brochure both file Dialogue under the research board, so
+		// `/research` is its primary landing page. It stays one of the four flagships, so
+		// `/programs` keeps a cross-link card for it — flagship status and board membership are
+		// different claims (plan §2 rule 5).
+		board: 'research',
 		grades: { min: 9, max: 12 },
 		format: 'in-person',
 		hero: {
@@ -425,91 +455,225 @@ export const PROGRAMS: readonly Program[] = [
 		seasonIds: ['dialogues-f26']
 	},
 
-	// ── Placeholder programs ─────────────────────────────────────────────────────────────────
-	// The three below render `PlaceholderProgram.svelte` today (CONTENT-GAPS C-1). Everything
-	// that exists — name, tag, one-line description and the index-card photo — is encoded; the
-	// rest is empty, which R-PT's "omit a section when its data is empty" rule already handles.
-	//
-	// TODO(content): Engineering Projects, Summer & Winter Camps and Ithaca Night each need, per
-	// prd.md §7.4: the grade band, when it runs (a `Season`), what students do, what they walk
-	// away with, 3-5 FAQ entries, and photographs. All three are prd.md §6.4 pages, so these are
-	// launch blockers. `grades` below falls back to the academy-wide 4-12 band.
+	// ── AI Investment Lab ────────────────────────────────────────────────────────────────────
+	// The fourth flagship (10-20), product locked 10-26, and the direct landing point of the
+	// 10-11 decision that replaced Summer & Winter Camps with it. Copy is verbatim from the
+	// 11-04 brochure via plan §4.1.
 	{
-		slug: 'engineering-projects',
-		name: { en: 'Engineering Projects', zh: '工程项目' },
+		slug: 'ai-investment-lab',
+		name: { en: 'AI Investment Lab', zh: 'AI 投资实验室' },
 		tagline: {
-			en: 'Robotics, IoT, and sustainable technology.',
-			zh: '机器人、物联网与可持续技术。'
+			en: 'A real account, finance fundamentals, and AI as a working partner.',
+			zh: '真实账户 · 金融学习 · AI 协作。'
 		},
 		summary: {
-			en: 'Real-world engineering projects covering robotics, IoT, and sustainable technology solutions.',
-			zh: '涵盖机器人、物联网和可持续技术解决方案的真实世界工程项目。'
+			en: 'Stock analysis, light modelling, risk management and an investment journal — building the background and application material a business or finance applicant needs.',
+			zh: '选股分析、简单建模、风险管理与投资日志，面向商科与金融方向的背景与申请素材积累。'
 		},
-		category: 'stem',
-		grades: ACADEMY_GRADES,
+		category: 'ai-business',
+		board: 'projects',
+		grades: { min: 9, max: 12 },
+		includesUniversity: true,
 		format: 'in-person',
+		// TODO(asset): the Lab has no photography of its own yet. The AI Bootcamp field-trip frame
+		// stands in because it is the closest published image of students working with market data;
+		// swap it when the first cohort is shot. Advisory, not blocking — §6.3's fallbacks render.
+		hero: placeholderHero(
+			'$lib/assets/programs/ai-bootcamp/AI-Entrep_05.jpg',
+			'Ithaca students working through a market analysis',
+			'伊萨卡学生进行市场分析'
+		),
+		gallery: [],
+		videos: [],
+		// Only 101 is promoted. 102 is mentioned as a one-liner and deliberately not expanded
+		// (plan §4.2 "只主推 101"), so it is a `tracks` entry with no tags rather than a second
+		// programme record — it is the same programme, one level up.
+		tracks: [
+			{
+				name: { en: 'Lab 101 · 8 weeks · 16 sessions', zh: 'Lab 101 · 8 周 · 16 课时' },
+				description: {
+					en: 'Investment theory, working with AI tools, the basics of data modelling, and simulated trading.',
+					zh: '投资理论 · AI 工具使用 · 数据建模基础 · 模拟投资操作。'
+				},
+				tags: ['Investment Theory', 'AI Tools', 'Data Modelling', 'Simulated Trading']
+			},
+			{
+				name: { en: 'Lab 102 · Advanced · 6 weeks', zh: 'Lab 102 · 进阶 · 6 周' },
+				description: {
+					en: 'Builds on 101 and moves to small-scale real investing. Details on enquiry.',
+					zh: '在 101 基础上转向真实小额投资实操。详询。'
+				},
+				tags: []
+			}
+		],
+		outcomes: [
+			{
+				title: { en: 'An investment journal and review report', zh: '投资日志与复盘报告' },
+				description: {
+					en: 'A written record of every position taken and the reasoning behind it, reviewed at the end of the cycle.',
+					zh: '每一笔持仓及其决策依据的书面记录，并在周期结束时完成复盘。'
+				}
+			},
+			{
+				title: {
+					en: 'Real investing experience you can write about',
+					zh: '一段可写入文书的真实投资经历'
+				},
+				description: {
+					en: 'Not a case study and not a simulation dressed up as one — a cycle the student actually ran.',
+					zh: '不是案例分析，也不是包装过的模拟盘，而是学生真正跑完的一个周期。'
+				}
+			},
+			{
+				title: { en: 'A method for working with AI', zh: 'AI 协作建模方法' },
+				description: {
+					en: 'How to put a model together with AI assistance, and how to check what it hands back.',
+					zh: '如何在 AI 协助下搭建模型，以及如何检验它给出的结果。'
+				}
+			}
+		],
+		faq: [],
+		mentorIds: [],
+		resultIds: [],
+		seasonIds: ['ail-101-f26']
+	},
+
+	// ── Engineering Foundations ──────────────────────────────────────────────────────────────
+	// Replaces `engineering-projects` (plan §4.4). The five ENGR courses are the brochure's full
+	// list; they are `tracks` rather than `curriculum` because they are parallel offerings a
+	// student picks from, not phases of one programme.
+	//
+	// Presentation is deliberately restrained — not on the homepage, not in the `/programs` main
+	// positions (10-20: lower grades are opportunistic intake, not an active push).
+	{
+		slug: 'engineering-foundations',
+		name: { en: 'Engineering Foundations', zh: '工程启蒙课' },
+		tagline: {
+			en: 'The direct feeder into EV Team.',
+			zh: 'EV 车队直通预备。'
+		},
+		summary: {
+			en: 'Five hands-on courses from machining and structures through to autonomous systems and a global competition capstone.',
+			zh: '五门动手课程，从机械加工与结构力学到自主系统，以全球赛事 capstone 收尾。'
+		},
+		category: 'engineering',
+		board: 'projects',
+		grades: { min: 7, max: 12 },
+		format: 'in-person',
+		// TODO(asset): no Engineering Foundations photography yet; the EV workshop frame stands in.
 		hero: placeholderHero(
 			'$lib/assets/programs/ev-team/EV26-3.jpg',
-			'Students working on an engineering project',
-			'学生进行工程项目'
+			'Students at work in the Ithaca engineering workshop',
+			'学生在伊萨卡工程工作坊中动手实践'
 		),
 		gallery: [],
 		videos: [],
+		tracks: [
+			{
+				name: { en: 'ENGR 101 Machines & Structures', zh: 'ENGR 101 机械与结构' },
+				description: {
+					en: 'Machining and structural mechanics.',
+					zh: '机械加工与结构力学。'
+				},
+				tags: ['Machining', 'Structures']
+			},
+			{
+				name: { en: 'ENGR 201 Rocketry & Aerodynamics', zh: 'ENGR 201 火箭与空气动力学' },
+				description: {
+					en: 'Aerodynamics and flight design.',
+					zh: '空气动力学与飞行设计。'
+				},
+				tags: ['Aerodynamics', 'Flight Design']
+			},
+			{
+				name: { en: 'ENGR 301 Autonomous Systems', zh: 'ENGR 301 自主系统' },
+				description: {
+					en: 'Circuits, machine vision, and an autonomous ground vehicle.',
+					zh: '电路、机器视觉与自主无人车。'
+				},
+				tags: ['Circuits', 'Machine Vision', 'Autonomy']
+			},
+			{
+				name: { en: 'ENGR 302 Aerial Robotics', zh: 'ENGR 302 空中机器人' },
+				description: {
+					en: 'Drones — flight control and aerial robotics.',
+					zh: '无人机——飞行控制与航空机器人。'
+				},
+				tags: ['Drones', 'Flight Control']
+			},
+			{
+				name: { en: 'ENGR 303 Engineering Capstone', zh: 'ENGR 303 工程 Capstone' },
+				description: {
+					en: 'STEM Racing, the global competition formerly known as F1 in Schools.',
+					zh: 'STEM Racing 全球赛事（原 F1 in Schools）。'
+				},
+				tags: ['STEM Racing', 'Competition']
+			}
+		],
 		outcomes: [],
 		faq: [],
 		mentorIds: [],
 		resultIds: [],
+		// No `Season`: the brochure states "按需成班、无固定开班日期" as the schedule, which is a
+		// real answer rather than a gap. A `Season` with invented dates would make
+		// `formatSeasonWindow()` publish a window the organisation explicitly does not commit to.
 		seasonIds: []
 	},
+
+	// ── Project Studio ───────────────────────────────────────────────────────────────────────
+	// The 11-04 brochure files Project Studio under the projects board, matching the 10-26
+	// decision (plan §4.7). The brochure's internal third column still prints it under research,
+	// which the plan flags as a layout artefact; the site follows the decision.
 	{
-		slug: 'summer-winter-camps',
-		name: { en: 'Summer & Winter Camps', zh: '暑期与冬令营' },
+		slug: 'project-studio',
+		name: { en: 'Project Studio', zh: 'Project Studio' },
 		tagline: {
-			en: 'Technology, creativity, and the outdoors.',
-			zh: '科技、创意与户外体验。'
+			en: 'Incubating one student’s own project.',
+			zh: '个人项目孵化。'
 		},
 		summary: {
-			en: 'Intensive seasonal camps blending technology, creativity, and outdoor experiences.',
-			zh: '融合科技、创意与户外体验的强化季节性营地。'
+			en: 'Secondary students incubate a real project inside a real startup environment; university students get a portfolio and an outlet for real work, with mentoring and introductions.',
+			zh: '中学段在真实创业环境中孵化真实项目；大学段获得作品集与真实项目出口，并有导师辅导与资源对接。'
 		},
-		category: 'seasonal',
-		grades: ACADEMY_GRADES,
+		category: 'ai-business',
+		board: 'projects',
+		grades: { min: 11, max: 12 },
+		includesUniversity: true,
 		format: 'in-person',
+		// TODO(asset): no Project Studio photography yet; the Innovation Day presentation frame
+		// stands in, as the closest published image of a student presenting their own project.
 		hero: placeholderHero(
-			'$lib/assets/programs/ai-bootcamp/ai-camp-HB8A5065.jpg',
-			'Students at an Ithaca seasonal camp',
-			'伊萨卡季节性营地的学生'
+			'$lib/assets/programs/ai-bootcamp/AIEC2026/OTLFInnovationDay-2026-Presentations-188.jpg',
+			'An Ithaca student presenting their own project',
+			'伊萨卡学生展示自己的项目'
 		),
 		gallery: [],
 		videos: [],
+		tracks: [
+			{
+				name: { en: 'Secondary · G11-12', zh: '中学 · G11-12' },
+				description: {
+					en: 'Incubate a real project, work inside a real startup environment, and come away with AIF material.',
+					zh: '真实项目孵化，经历真实创业环境，产出 AIF 素材。'
+				},
+				tags: ['Incubation', 'AIF Material']
+			},
+			{
+				name: { en: 'University', zh: '大学' },
+				description: {
+					en: 'A portfolio and an outlet for real project work, with mentor coaching and introductions.',
+					zh: '作品集与真实项目出口，导师辅导 + 资源对接。'
+				},
+				tags: ['Portfolio', 'Mentoring']
+			}
+		],
 		outcomes: [],
 		faq: [],
 		mentorIds: [],
 		resultIds: [],
-		seasonIds: []
-	},
-	{
-		slug: 'ithaca-night',
-		name: { en: 'Ithaca Night', zh: '伊萨卡之夜' },
-		tagline: { en: 'Where students show their work.', zh: '学生展示成果的舞台。' },
-		summary: {
-			en: 'Community showcase events where students present their work and celebrate achievements.',
-			zh: '社区展示活动，学生展示成果并庆祝成就。'
-		},
-		category: 'community',
-		grades: ACADEMY_GRADES,
-		format: 'in-person',
-		hero: placeholderHero(
-			'$lib/assets/programs/ai-bootcamp/AIEC2026/OTLFInnovationDay-2026-Awards-9.jpg',
-			'Ithaca Night community showcase',
-			'伊萨卡之夜社区展示活动'
-		),
-		gallery: [],
-		videos: [],
-		outcomes: [],
-		faq: [],
-		mentorIds: [],
-		resultIds: [],
+		// No `Season` on purpose. The previous brochure printed "12-16 weeks"; the 11-04 copy drops
+		// it, and the plan says the duration does not go on the page. Encoding a window would put
+		// back exactly the claim the latest copy removed.
 		seasonIds: []
 	}
 ];
