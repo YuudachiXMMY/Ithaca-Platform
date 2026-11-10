@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render } from 'svelte/server';
 import FeaturedSection from './FeaturedSection.svelte';
+import { NEWS } from '$lib/content/news';
 
 // Regression guard for the homepage rewrite.
 //
@@ -13,6 +14,24 @@ describe('FeaturedSection', () => {
 	it('includes the Vimeo talk in the server-rendered HTML', () => {
 		const { body } = render(FeaturedSection);
 		expect(body).toContain('player.vimeo.com/video/1201561760');
+	});
+
+	/**
+	 * The 2026-11 revamp made this section read `content/news.ts` instead of inlining the Moridi
+	 * interview (plan §3.1). The assertion above still passes either way — the featured entry
+	 * happens to be that same film — so it no longer proves what it used to. This is the test that
+	 * does: it derives the expected id from the record, so pointing the component back at a
+	 * hard-coded video, or forgetting to mark an entry `featured`, fails here.
+	 */
+	it('renders whichever news entry is marked featured, not a hard-coded film', () => {
+		const featured = NEWS.find((item) => item.featured);
+		expect(featured, 'exactly one NEWS entry should carry featured: true').toBeDefined();
+		expect(NEWS.filter((item) => item.featured)).toHaveLength(1);
+
+		const { body } = render(FeaturedSection);
+		expect(body).toContain(`player.vimeo.com/video/${featured!.video!.id}`);
+		// The headline comes from the record too, not from `home_featured_title`.
+		expect(body).toContain(featured!.title.en);
 	});
 
 	it('does not reserve a 200dvh sticky spacer (no empty scroll)', () => {
