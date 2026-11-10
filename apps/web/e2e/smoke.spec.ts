@@ -191,7 +191,10 @@ test.describe('programs dropdown', () => {
 		test.skip(testInfo.project.name === 'mobile-chrome', 'desktop nav is hidden on mobile');
 
 		await page.goto('/');
-		const GROUPS = ['/about-us', '/academics', '/programs', '/student-life'];
+		// The three boards plus About. Student Life left the bar in the 2026-11 revamp and Research
+		// joined it; `/admissions` is in the bar too but as a CTA button with no menu, so it is
+		// correctly absent here.
+		const GROUPS = ['/academics', '/programs', '/research', '/about-us'];
 
 		// The count matters as much as the members: it is what fails if a fifth group is added to
 		// NAV_ITEMS and only the data side is updated.
@@ -221,7 +224,13 @@ test.describe('programs dropdown', () => {
 		await expect(menu).toBeVisible();
 		// R-GLB-1 is "every programme", so the count IS the requirement. `not.toHaveCount(0)`
 		// passed for the three-plus-catch-all shape that requirement was written to replace.
-		await expect(menu.locator('[role="menuitem"]')).toHaveCount(6);
+		//
+		// FIVE since the 2026-11 revamp, not six, and the drop is not a regression: this menu now
+		// lists the PROJECTS board, and Ithaca Dialogue moved to the Research group (it is filed on
+		// the research board). Six programmes still exist and all six are still reachable from the
+		// bar — `src/lib/data/nav.test.ts` derives that from `Program.board` rather than trusting a
+		// number here.
+		await expect(menu.locator('[role="menuitem"]')).toHaveCount(5);
 	});
 
 	test('closes on Escape and returns focus to the trigger', async ({ page }, testInfo) => {
