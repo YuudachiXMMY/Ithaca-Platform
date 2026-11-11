@@ -30,8 +30,9 @@ const INQUIRY_TO = env.INQUIRY_TO || 'jadyn.wu@ithacafo.com';
  * to arrive pre-filled from `?program=<slug>` rather than being chosen by the visitor.
  *
  * Exported for `contact-schema.test.ts`, which asserts every box the form can tick survives this
- * schema. The `_` prefix is the only extra export SvelteKit permits from a `+server` file — same
- * device as `api/subscribe/+server.ts`'s `_welcomeEmail`.
+ * schema. The `_` prefix is required, not decorative: SvelteKit rejects any other extra export
+ * from a `+server` file. It is also not reachable over HTTP — `render_endpoint` dispatches only
+ * on the HTTP-verb exports and `fallback`, and nothing client-side imports this module.
  */
 export const _contactSchema = z.object({
 	name: z.string().min(1, 'Name is required').max(200, 'Name is too long'),
