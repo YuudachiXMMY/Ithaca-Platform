@@ -580,6 +580,24 @@ schema 仍然允许别的调用方发名字。
 `messages/{en,zh}.json` 直接读出来 stub 的，不走 `$lib/paraglide`：那是 gitignore 的构建产物，
 拿它当断言对象等于在测"最后一次编译是什么时候"。
 
+**客户端那半边一开始漏了，现在补在同一层**（`src/lib/components/newsletter-form.test.ts`）。
+上面那张状态码表当时只存在于这份文档里：`messageForStatus` 是组件内部的局部函数，没有任何测试
+驱动过 `NewsletterForm`——grep 整个 `e2e/` 与 `src/` 都只有引用它的 `Footer.svelte` 和
+`ConnectCTA.svelte`。对比之下 `EnquiryForm` 的同名函数有 `e2e/smoke.spec.ts` 的
+"surfaces the error in the active locale" 守着，所以漏的只是这一个。做法照
+`LocaleSuggestion.svelte` 的 `prefersChinese`：把函数移进 `<script module>` 导出，
+`locale-suggestion.test.ts` 怎么 import，这份就怎么 import。那个只给测试用的可选 `locale` 形参，
+理由写在函数的注释里——组件自己不传，因为预渲染页的 locale 只从 URL 来。
+
+两条断言的"牙"是实测过的，不是写完就算：把 429/403 两个分支互换，红 4 条；再把 409 路由进这个
+函数（即丢掉独立 `notice` 态那条区分），红 6 条。顺带点明 `i18n:check` 在这里帮不上忙——它校的是
+两个文件的 key 对齐，不是同一个 key 的两个值是否真的不同，所以"zh 词条是 en 的副本"这个正是本次
+修的缺陷类型，它一路绿灯。
+
+**仍然没有覆盖的是浏览器那一层**：`environment: 'node'` 下没有 DOM，`onSubmit` 的
+fetch → 状态分支 → `aria-invalid` 渲染这条链仍然只有 Playwright 能验，而 `e2e/` 至今不驱动这个
+表单。上面测的是那条链里唯一会出错的决策，不是整条链。
+
 **这次改动不能让 `LAUNCH-CHECKLIST.md:483`（"The submitter receives a confirmation email in their
 own locale"）那个 box 打勾。** 那是生产端到端事实，要真实 SMTP 和真实收件箱，而
 `src/lib/server/mail.ts` 在未配 SMTP 时是优雅空转（本地和 CI 都是这个状态）。

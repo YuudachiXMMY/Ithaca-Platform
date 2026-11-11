@@ -1,9 +1,47 @@
+<script module lang="ts">
+	import * as m from '$lib/paraglide/messages';
+
+	/**
+	 * Map an HTTP status onto a message in the ACTIVE locale — `docs/DECISIONS.md` 2026-10-22, same
+	 * decision as `contact/EnquiryForm.svelte`'s `messageForStatus`.
+	 *
+	 * The previous handler rendered `data.error` from the response body, which is English at every
+	 * source that sets it (`api/subscribe/+server.ts`'s 409, `server/rate-limit.ts`'s 429,
+	 * `server/guard.ts`'s two 403s). This form is mounted in the site-wide footer AND in
+	 * `about/ConnectCTA.svelte`, so a visitor on `/zh` or `/zh/about-us` was shown English.
+	 *
+	 * The branch set is NOT EnquiryForm's: no 409 here (that one is handled by the caller as a
+	 * success-adjacent outcome, not routed through this function), and no separate 5xx copy —
+	 * `newsletter_error` already says "something went wrong, try again", which is exactly true of a
+	 * 500 here (the subscribe write is a hard failure, so nothing was recorded).
+	 *
+	 * ## Why this lives in `<script module>` and takes an optional `locale`
+	 *
+	 * It is exported so `newsletter-form.test.ts` can assert the mapping without a browser — the
+	 * same shape as `LocaleSuggestion.svelte`'s `prefersChinese`, which `locale-suggestion.test.ts`
+	 * imports the same way. `locale` exists ONLY for that test, which has to compare the en and zh
+	 * renderings of the same status to guard the bug this function was written for. The component
+	 * deliberately calls it with no argument: on a prerendered page the locale comes from the URL
+	 * and nowhere else (`vite.config.ts` pins Paraglide to `['url', 'baseLocale']`), so the ambient
+	 * locale is already the right one and threading it through the call site would only invite drift.
+	 */
+	export function messageForStatus(httpStatus: number, locale?: 'en' | 'zh'): string {
+		const at = locale ? { locale } : undefined;
+		if (httpStatus === 429) return m.newsletter_errorRateLimited(undefined, at);
+		// 403 is guardPublicPost's origin or CSRF rejection. No Turnstile on this form.
+		if (httpStatus === 403) return m.newsletter_errorRejected(undefined, at);
+		// Nearly unreachable: EMAIL_RE below rejects first. It survives for the narrow gap where the
+		// regex accepts an address zod's `z.email()` does not, and costs no new catalogue entry.
+		if (httpStatus === 400) return m.newsletter_invalid_email(undefined, at);
+		return m.newsletter_error(undefined, at);
+	}
+</script>
+
 <script lang="ts">
 	// Functional subscribe form (Phase 3): posts to /api/subscribe (Zod-validated,
 	// rate-limited server-side).
 	import { getCsrfToken } from '$lib/csrf-client';
 	import { getLocale } from '$lib/paraglide/runtime';
-	import * as m from '$lib/paraglide/messages';
 
 	interface Props {
 		/** Set when the form is hosted on a mist ground (`bg-surface-2` / `bg-card-bg`).
@@ -22,30 +60,6 @@
 	// Lightweight client-side check only (drops the zod client bundle); the /api/subscribe
 	// endpoint still enforces the authoritative zod validation server-side.
 	const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-	/**
-	 * Map an HTTP status onto a message in the ACTIVE locale — `docs/DECISIONS.md` 2026-10-22, same
-	 * decision as `contact/EnquiryForm.svelte`'s `messageForStatus`.
-	 *
-	 * The previous handler rendered `data.error` from the response body, which is English at every
-	 * source that sets it (`api/subscribe/+server.ts`'s 409, `server/rate-limit.ts`'s 429,
-	 * `server/guard.ts`'s two 403s). This form is mounted in the site-wide footer AND in
-	 * `about/ConnectCTA.svelte`, so a visitor on `/zh` or `/zh/about-us` was shown English.
-	 *
-	 * The branch set is NOT EnquiryForm's: no 409 here (that one is handled by the caller as a
-	 * success-adjacent outcome, not routed through this function), and no separate 5xx copy —
-	 * `newsletter_error` already says "something went wrong, try again", which is exactly true of a
-	 * 500 here (the subscribe write is a hard failure, so nothing was recorded).
-	 */
-	function messageForStatus(httpStatus: number): string {
-		if (httpStatus === 429) return m.newsletter_errorRateLimited();
-		// 403 is guardPublicPost's origin or CSRF rejection. No Turnstile on this form.
-		if (httpStatus === 403) return m.newsletter_errorRejected();
-		// Nearly unreachable: EMAIL_RE above rejects first. It survives for the narrow gap where the
-		// regex accepts an address zod's `z.email()` does not, and costs no new catalogue entry.
-		if (httpStatus === 400) return m.newsletter_invalid_email();
-		return m.newsletter_error();
-	}
 
 	async function onSubmit(e: SubmitEvent) {
 		e.preventDefault();
