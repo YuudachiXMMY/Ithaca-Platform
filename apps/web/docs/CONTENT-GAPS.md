@@ -248,6 +248,30 @@ consent 门禁管**（Andy Song 的普林斯顿入读就在 `results.ts` 里，�
 - **G7–8 体验营 / 数学强基小组** —— 待 2027 Q1 拍板
 - **访谈视频区按剪辑进度更新** —— 西人嘉宾优先，严寒场次发布前需本人审核
 
+### 🔴 C-11 · Clossette 与「注册了真实公司」—— 需要业主确认才能发
+
+`content/news.ts` 的 `clossette-aiec-2026-grand-prize` 条目**已扣留**（`consentVerified: false`，
+所以不出现在 `/news`，也不会进首页 Featured 位），文案原样留在文件里等你拍板。
+
+扣留的原因是它比站上已发布的内容多说了两件事：
+
+|      | 已核实的 `Result`（`results.ts` · `aiec-2026-grand-prize` · `consentVerified: true`） | 这条新闻                                                           |
+| ---- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| 团队 | 不点名（「AI 创业训练营的团队」）                                                     | 点名 **Clossette**                                                 |
+| 后续 | 不提                                                                                  | 「部分成员随后**注册了真实公司**，并在 Project Studio 中继续推进」 |
+
+全仓库搜 `Clossette` 只有这个文件和 `programs/project-studio/+page.svelte` 的一行代码注释 ——
+也就是说这两处新增在仓库里没有任何依据。两者都是关于**可识别第三方**的断言，正是 §6.3 这道门
+存在的理由（`Result` 与 `Testimonial` 从一开始就带 `consentVerified`，`NewsItem` 是这次补上的）。
+
+**需要你做的是二选一：**
+
+1. **确认**团队同意被点名、且「注册公司」属实 → 把 `consentVerified` 翻成 `true`，条目即刻上线；
+2. **收窄**到 `results.ts` 已核实的措辞（不点名、不提注册公司）→ 那就和站上已有的说法一致，
+   同样可以翻成 `true` 发出去。
+
+照 C-8（伊萨卡菁英访谈）立下的先例，这类裁定记在本文件，`DECISIONS.md` 只记工程决策。
+
 ## 🟡 Placeholder shipped
 
 ### C-4 · Full team bios (Q4)

@@ -653,3 +653,70 @@ Studio 从研究板块挪到项目板块，项目本身一个字没改。推导�
 清单里的 `test.skip` 只跳 404，而 **308 不是 404**：Playwright 会跟随它，axe 分析的是**目标页**。
 所以 `/programs/ithaca-night` 和 `/student-life` 在被下架之后仍然「通过」，实际是在一个有误导性的
 测试名下把 `/news` 重测了三遍。五个已下架路由移出清单，七个真正的新页移入。
+
+### 询盘表单的「兴趣项」是一张表，不是两份字面量
+
+改版给表单加了三个 `track-` 选项（学业辅导 / 升学支持 / 研究实验室），它们**不是**
+`Program.slug` —— 组件注释当时就写明了这点，但 `/api/contact` 的枚举仍然只有
+`LIVE_PROGRAM_SLUGS`。`parseJsonBody` 对整个 body 只做一次 `safeParse`，所以勾中任意一个都
+不是「这一项被忽略」，而是**整单 400**：合法的姓名、邮箱、留言一起被拒，访客只看到
+`contact_form_errorInvalid`，页面上没有任何可改之处。同一个根因还有第二处 —— 可勾选项从 6 个
+变成 9 个，`.max(6)` 没动，勾到第 7 个同样 400。
+
+所以两边都从 `$lib/content/programs` 的 `ENQUIRY_INTEREST_SLUGS` 取，上限按它的长度派生。这是
+`og/cards.ts` 那条「一张表两个消费者，不许各自为政」的同一条规则，理由也一样：这类漂移**不会**
+表现成坏掉的页面，只表现成一个交不出去的表单。
+
+刻意**不**把三个哨兵并进 `LIVE_PROGRAM_SLUGS`：那个列表的另一个消费者是
+`scripts/content-check.ts`，它会给里面每个 slug 要一个有效 `Season`，而这三个没有 `Program`
+记录、也就没有 `Season` —— 并进去会把内容门禁弄红。`contact-schema.test.ts` 两头都钉住了。
+
+排课侧是**跨 app 契约**的一半，所以两边同一笔改：`siteContactSchema` 的 `.max(6)` 放宽到 12。
+那一侧刻意不复制官网枚举，只做形状与体积的守卫（理由写在 `schemas.ts` 里），可 `6` 这个数字
+本身就是在追踪对面的选项个数 —— 它会把官网已经放过的合法提交 400 掉，而官网对
+`/api/site/contact` 的非 2xx 是**硬失败 500**。12 是留了余量的上界，它要防的是滥用体积。
+
+### `NewsItem` 补上 §6.3 的 `consentVerified`，并且是必填
+
+`Result` 和 `Testimonial` 从内容模型写下来就带这个字段，因为两者都可能点名第三方。改版新增的
+`NewsItem` 没有 —— 而第一个需要它的条目就在同一笔提交里：AIEC 获奖条目点名团队「Clossette」
+并断言部分成员「注册了真实公司」，而它所依据的、已核实的 `Result`（`aiec-2026-grand-prize`）
+只说「AI 创业训练营的团队获奖」，不提团队名也不提注册公司。全仓库搜 `Clossette` 只有这个文件
+和一行代码注释。
+
+必填而非可选（`consentVerified?: boolean`）是刻意的：可选字段的默认值是「没设」，现存条目照旧
+全部渲染，门只对记得它的人生效。必填逼着每个条目回答一次，这正是它存在的意义。
+
+渲染侧读的是 `PUBLISHED_NEWS`（`NEWS` 过滤后的视图），**在源头过滤而不是各页自己过滤**：
+各自过滤的门就是下一个消费方会忘记的门，而这里的失败模式 —— 把一条没核实的、关于被点名第三方
+的断言发出去 —— 不会表现成坏掉的页面。`news.test.ts` 额外钉住「featured 的那条必须是已核实的」，
+否则首页 Featured 位会静默变空，那是这道门自己引入的另一个 bug。
+
+裁定本身记在 `CONTENT-GAPS.md`（C-11），照 C-8 立下的先例：**业主对内容的裁定归那边，本文件
+记的是偏离 PRD 的工程决策。**
+
+### 几处把改版自己的承诺补齐的修复
+
+- **三个共用 `ProgramPage.svelte` 的旗舰页没有 Course JSON-LD。** R-SEO-3 要求每个项目都有
+  Course + CourseInstance，而三个手写页（ev-team / ithaca-dialogues / ai-entrepreneurship-bootcamp）
+  各自调 `courseJsonLd`，共用模板的三个一次都没调。`program-season.test.ts` 只单测函数本身，
+  抓不到「路由从不调用它」。现在建在模板里 —— 组件头注释本来就承诺「一次 `Season` 编辑带动
+  包括 JSON-LD 在内的每个表面」。`seo.spec.ts` 的断言从硬编码的 `/programs/ev-team` 改为按
+  sitemap 推导，所以第七个项目页落地当天自动进门禁。
+- **`/academics` 的 meta 与首屏还在宣传四方向结构（含已退役的 STEM）。** 改版把 STEM 退成 308、
+  加了 SAT/ACT 与升学支持，这两条文案没跟上，于是搜索摘要承诺 STEM、首屏副标题就挂在一个
+  五张卡的网格正上方自相矛盾。新文案**不写数量** —— 「四个方向」这种写死的计数正是这次的病根。
+- **`academics/{ap,ossd,tutoring}` 没渲染强制商标声明。** `TrademarkNotice` 自己的注释写着
+  「每个 academics 页都渲染了它」，对五个方向里的三个是假的 —— 而 `/academics/ap` 正是最需要它
+  的那页（`ap_hero_description` 第一句就指名 College Board）。逐页添加而不是塞进
+  `PlaceholderPage`：后者在 `shared/` 下且通用，把 College Board 法务声明烘进去，下一个用它的
+  非 academics 页就会莫名其妙带上。
+- **五个新 308 桩零覆盖。** `smoke.spec.ts` 的 `LEGACY_SLUGS` 停在三条，而路由树里有十个桩；
+  另外两个（`/programs/ev-challenge`、`/results`）从来就没被覆盖过。补齐十条之外，加了一条
+  **按路由树推导的完备性断言** —— 「记得加一行」正是已经失败过的那个机制。这些桩刻意不进
+  sitemap，所以顶上那条 sitemap 推导的扫描永远不会访问它们，而它们的 `prerender = false` 是
+  承重的：预渲染一个重定向会写出 200 的 meta-refresh 页而不是真正的 308。
+- **桌面下拉宣称 `role="menu"` 的方向键遍历，实际做不到。** 处理函数每次 `ArrowDown` 都
+  `querySelector`（取**第一个**）menuitem，所以菜单能进不能走；也完全没有 `ArrowUp`/`Home`/`End`。
+  axe 看不见这件事 —— 它校的是 role 写得对不对，不是 role 所承诺的行为存不存在。现在按 APG
+  的菜单模式实现（含环绕），`smoke.spec.ts` 里按两次 ArrowDown：按一次在修复前也是绿的。
