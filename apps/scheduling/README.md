@@ -54,15 +54,21 @@ npm run dev                     # http://localhost:3000
 ```bash
 npm run check       # typecheck + lint — the minimum before a commit
 npm run typecheck   # tsc --noEmit
-npm run lint        # eslint .
+npm run lint        # eslint . --max-warnings=0 — the flag is the point; eslint exits 0 on warnings
 npm run build       # Next 16 Turbopack -> .next/standalone/server.js
-npm run test        # vitest — 96 files incl. the tenant-isolation suite (needs a running Postgres)
+npm run test        # vitest — 100 files incl. the tenant-isolation suite (needs a running Postgres)
 ```
 
-CI additionally runs `npx tsx scripts/check-tenant-db-access.ts` — the **tenant-isolation
-guard**, which fails the build if any file outside a small audited allowlist reaches for the raw
-`db` handle's CRUD verbs. It is the mechanical half of the invariant the vitest suite tests
-behaviourally. See [`AGENTS.md`](AGENTS.md).
+CI runs `lint` and `typecheck` as their own steps, plus
+`npx tsx scripts/check-tenant-db-access.ts` — the **tenant-isolation guard**, which fails the
+build if any file outside a small audited allowlist reaches for the raw `db` handle's CRUD verbs,
+imports `@/db/admin`, or hand-rolls a `postgres(...)` connection without `RLS_ROLE_OPTIONS`. It is
+the mechanical half of the invariant the vitest suite tests behaviourally. See
+[`AGENTS.md`](AGENTS.md).
+
+Neither `lint` nor `typecheck` is covered by the docker build the same job runs: Next 16 dropped
+build-time ESLint, and `next build`'s type check discards diagnostics from test files — so all 119
+`tests/**` files type-check only in that separate step.
 
 ### End-to-end (Playwright)
 

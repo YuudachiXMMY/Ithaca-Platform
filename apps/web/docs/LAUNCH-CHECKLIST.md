@@ -17,7 +17,14 @@ Last reviewed: 2026-09-29 · Status: **not ready** (workstreams in progress)
 - [ ] 🔴 Tuition and policy text in place, or an explicit "inquire" posture signed off (C-3)
 - [ ] 🟡 Full team bios (C-4)
 - [ ] 🟡 Every `Stat` carries a `source`; stats without one are omitted, never rendered as `0`
-- [ ] 🔴 The five known copy defects are fixed (`CONTENT-GAPS.md`, "Known copy defects")
+- [ ] 🔴 The known copy defects are fixed — 5 of 8 done, 3 open (`CONTENT-GAPS.md`, "Known copy
+      defects"). "Five" was the count on 2026-09-29 and the table has grown since; stating a bare
+      number here just goes stale again, so the table is the source of truth. Still open: **4**
+      (`page_hello_body`'s ZH asserts the opposite of its EN), **7** (`home_highlights_item6Alt`
+      describes students in what is a screenshot of a student-built app — a real a11y defect), and
+      **8** (`home_highlights_item1Alt` says "production line" for a lobby group shot, which that
+      row itself resolves as "flagged rather than changed"). So closing this box needs 4 and 7, and
+      an explicit owner sign-off that 8 stays as framed.
 - [ ] 🔴 Consent verified for every `Result` / `Testimonial` / `Highlight` naming or picturing
       a minor. Default is `false` and must stay `false` until confirmed — do not bypass
 
@@ -28,7 +35,19 @@ Last reviewed: 2026-09-29 · Status: **not ready** (workstreams in progress)
       human-authored catalogue (see `DECISIONS.md` Q12)
 - [ ] 🔴 CJK typography verified: line-height 1.75, no letter-spacing, `text-wrap: balance`
       off for Chinese headings, corner brackets 「」
-- [ ] 🔴 Locale switch preserves path and query on every route (covered by `e2e/smoke.spec.ts`)
+- [ ] 🔴 Locale switch preserves path, query **and hash** on every route.
+      **The "(covered by `e2e/smoke.spec.ts`)" claim this line used to carry was false, and it was
+      hiding a live defect** — anyone who ran `npm run build && npm run test:e2e`, saw smoke green
+      and ticked this box would have shipped it. The two `locale switch` cases asserted the PATH
+      only (the query was a parenthesis in their comment), while `LanguageSwitcher.svelte` and
+      `LocaleSuggestion.svelte` both derived their target from `deLocalizeUrl(page.url).pathname`,
+      which drops search and hash: a visitor who switched language on
+      `/admissions?program=ev-team#book` — the href a programme page's "Register" CTA produces
+      (`src/lib/program-cta.ts`) — got a blank form at the top of the page, because `?program=` is
+      what preselects the programme and `#book` is what reaches the form. Both components now use
+      `deLocalizeHref()`, which returns `pathname + search + hash`, and `smoke.spec.ts` asserts the
+      query and the hash in both directions — for that ONE route, which is the shape of the defect,
+      not the "every route" this box asks for. That last step is still manual.
 - [ ] 🟡 English pages still ship zero CJK font bytes (covered by `e2e/smoke.spec.ts`)
 
 ## Accessibility

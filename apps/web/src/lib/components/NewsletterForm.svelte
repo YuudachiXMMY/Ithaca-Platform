@@ -1,8 +1,47 @@
+<script module lang="ts">
+	import * as m from '$lib/paraglide/messages';
+
+	/**
+	 * Map an HTTP status onto a message in the ACTIVE locale — `docs/DECISIONS.md` 2026-10-22, same
+	 * decision as `contact/EnquiryForm.svelte`'s `messageForStatus`.
+	 *
+	 * The previous handler rendered `data.error` from the response body, which is English at every
+	 * source that sets it (`api/subscribe/+server.ts`'s 409, `server/rate-limit.ts`'s 429,
+	 * `server/guard.ts`'s two 403s). This form is mounted in the site-wide footer AND in
+	 * `about/ConnectCTA.svelte`, so a visitor on `/zh` or `/zh/about-us` was shown English.
+	 *
+	 * The branch set is NOT EnquiryForm's: no 409 here (that one is handled by the caller as a
+	 * success-adjacent outcome, not routed through this function), and no separate 5xx copy —
+	 * `newsletter_error` already says "something went wrong, try again", which is exactly true of a
+	 * 500 here (the subscribe write is a hard failure, so nothing was recorded).
+	 *
+	 * ## Why this lives in `<script module>` and takes an optional `locale`
+	 *
+	 * It is exported so `newsletter-form.test.ts` can assert the mapping without a browser — the
+	 * same shape as `LocaleSuggestion.svelte`'s `prefersChinese`, which `locale-suggestion.test.ts`
+	 * imports the same way. `locale` exists ONLY for that test, which has to compare the en and zh
+	 * renderings of the same status to guard the bug this function was written for. The component
+	 * deliberately calls it with no argument: on a prerendered page the locale comes from the URL
+	 * and nowhere else (`vite.config.ts` pins Paraglide to `['url', 'baseLocale']`), so the ambient
+	 * locale is already the right one and threading it through the call site would only invite drift.
+	 */
+	export function messageForStatus(httpStatus: number, locale?: 'en' | 'zh'): string {
+		const at = locale ? { locale } : undefined;
+		if (httpStatus === 429) return m.newsletter_errorRateLimited(undefined, at);
+		// 403 is guardPublicPost's origin or CSRF rejection. No Turnstile on this form.
+		if (httpStatus === 403) return m.newsletter_errorRejected(undefined, at);
+		// Nearly unreachable: EMAIL_RE below rejects first. It survives for the narrow gap where the
+		// regex accepts an address zod's `z.email()` does not, and costs no new catalogue entry.
+		if (httpStatus === 400) return m.newsletter_invalid_email(undefined, at);
+		return m.newsletter_error(undefined, at);
+	}
+</script>
+
 <script lang="ts">
 	// Functional subscribe form (Phase 3): posts to /api/subscribe (Zod-validated,
 	// rate-limited server-side).
 	import { getCsrfToken } from '$lib/csrf-client';
-	import * as m from '$lib/paraglide/messages';
+	import { getLocale } from '$lib/paraglide/runtime';
 
 	interface Props {
 		/** Set when the form is hosted on a mist ground (`bg-surface-2` / `bg-card-bg`).
@@ -13,7 +52,9 @@
 	let { onMist = false }: Props = $props();
 
 	let email = $state('');
-	let status = $state<'idle' | 'submitting' | 'success' | 'error'>('idle');
+	/** `notice` is 409 — a valid address that is already on the list. Not an error (nothing went
+	 *  wrong and nothing for the visitor to fix), so it is neither red nor `aria-invalid`. */
+	let status = $state<'idle' | 'submitting' | 'success' | 'notice' | 'error'>('idle');
 	let message = $state('');
 
 	// Lightweight client-side check only (drops the zod client bundle); the /api/subscribe
@@ -33,12 +74,28 @@
 			const res = await fetch('/api/subscribe', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json', 'x-csrf-token': getCsrfToken() },
-				body: JSON.stringify({ email })
+				// `locale` drives the welcome mail's language. Read at SUBMIT time rather than captured
+				// at init, so it cannot go stale on a client-side navigation into the other locale.
+				body: JSON.stringify({ email, locale: getLocale() })
 			});
-			const data = await res.json();
-			if (!data.success) {
+			// 409 = already subscribed. Its own copy, and its own state: telling someone in red that
+			// something went wrong, when their address is on the list exactly as they wanted, is wrong.
+			if (res.status === 409) {
+				status = 'notice';
+				message = m.newsletter_alreadySubscribed();
+				return;
+			}
+			if (!res.ok) {
 				status = 'error';
-				message = data.error ?? m.newsletter_error();
+				message = messageForStatus(res.status);
+				return;
+			}
+			// A 200 that is not `success: true` should not happen; the generic message beats claiming
+			// a subscription that was not recorded.
+			const data = (await res.json().catch(() => null)) as { success?: boolean } | null;
+			if (!data?.success) {
+				status = 'error';
+				message = m.newsletter_error();
 				return;
 			}
 			status = 'success';
@@ -71,8 +128,14 @@
 			{m.newsletter_subscribeButton()}
 		</button>
 	</div>
+	<!-- `notice` (409) is ink-2: AAA on both grounds this form is mounted on (10.31 on white,
+	     9.60 on the footer's mist — docs/DESIGN-TOKENS.md §4), and not the danger red. -->
 	<p
-		class="text-xs {status === 'success' ? 'text-success' : 'text-danger'}"
+		class="text-xs {status === 'success'
+			? 'text-success'
+			: status === 'notice'
+				? 'text-foreground-muted'
+				: 'text-danger'}"
 		role="alert"
 		aria-live="polite"
 	>
