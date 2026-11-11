@@ -24,7 +24,10 @@
 	import { getLocale } from '$lib/paraglide/runtime';
 	import { getCsrfToken } from '$lib/csrf-client';
 	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
-	import { PROGRAMS, LIVE_PROGRAM_SLUGS } from '$lib/content/programs';
+	// `LIVE_PROGRAM_SLUGS` (not the wider `ENQUIRY_INTEREST_SLUGS`) stays the allowlist for the
+	// `?program=` deep link below: R-ADM-7 is about arriving from a programme page, and every such
+	// link in the codebase carries a real `Program.slug`.
+	import { PROGRAMS, LIVE_PROGRAM_SLUGS, ENQUIRY_TRACK_SLUGS } from '$lib/content/programs';
 	import { resolveProgramParam, resolveTopicParam, type Topic } from '$lib/admissions';
 	import { trackInquirySubmit, trackPhoneTap } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
@@ -81,15 +84,22 @@
 	 * Their `slug`s are NOT `Program.slug`s and must not be mistaken for them — nothing resolves
 	 * these against the record set. They are prefixed `track-` so that is obvious at a glance in
 	 * the inbox and in anything that later tries to join on this value.
+	 *
+	 * The slugs live in `$lib/content/programs` rather than here because `/api/contact` validates
+	 * `programs` against the same list. They were literals in this file once, and the endpoint's
+	 * enum did not know about them, so ticking any of the three 400'd the whole submission.
 	 */
+	const TRACK_OPTION_NAMES: Record<(typeof ENQUIRY_TRACK_SLUGS)[number], string> = {
+		'track-academic-tutoring': m.contact_form_programOption_academicTutoring(),
+		'track-university-support': m.contact_form_programOption_universitySupport(),
+		'track-research-lab': m.contact_form_programOption_researchLab()
+	};
 	const PROGRAM_OPTIONS = [
 		...PROGRAMS.map((program) => ({
 			slug: program.slug,
 			name: program.name[locale]
 		})),
-		{ slug: 'track-academic-tutoring', name: m.contact_form_programOption_academicTutoring() },
-		{ slug: 'track-university-support', name: m.contact_form_programOption_universitySupport() },
-		{ slug: 'track-research-lab', name: m.contact_form_programOption_researchLab() }
+		...ENQUIRY_TRACK_SLUGS.map((slug) => ({ slug, name: TRACK_OPTION_NAMES[slug] }))
 	];
 
 	const LOCALE_OPTIONS: readonly { value: 'en' | 'zh'; label: string }[] = [

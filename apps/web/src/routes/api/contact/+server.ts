@@ -6,7 +6,7 @@ import { guardPublicPost } from '$lib/server/guard';
 import { parseJsonBody } from '$lib/server/validation';
 import { sendMail } from '$lib/server/mail';
 import { verifyTurnstile } from '$lib/server/turnstile';
-import { LIVE_PROGRAM_SLUGS } from '$lib/content/programs';
+import { ENQUIRY_INTEREST_SLUGS } from '$lib/content/programs';
 import { escapeHtml } from '$lib/utils';
 import * as m from '$lib/paraglide/messages';
 import type { ApiResponse } from '$lib/types';
@@ -28,8 +28,12 @@ const INQUIRY_TO = env.INQUIRY_TO || 'jadyn.wu@ithacafo.com';
  * redesign PRD is that every additional required field costs completions (30–50% in higher-ed
  * funnels past four fields), so the qualification fields are all optional. `program` is expected
  * to arrive pre-filled from `?program=<slug>` rather than being chosen by the visitor.
+ *
+ * Exported for `contact-schema.test.ts`, which asserts every box the form can tick survives this
+ * schema. The `_` prefix is the only extra export SvelteKit permits from a `+server` file — same
+ * device as `api/subscribe/+server.ts`'s `_welcomeEmail`.
  */
-const contactSchema = z.object({
+export const _contactSchema = z.object({
 	name: z.string().min(1, 'Name is required').max(200, 'Name is too long'),
 	email: z.email('Please enter a valid email address'),
 	phone: z.string().max(50, 'Phone is too long').optional(),
@@ -42,13 +46,21 @@ const contactSchema = z.object({
 	/** Grades 4–12 — the band the academy serves. Coerced because a <select> submits a string. */
 	grade: z.coerce.number().int().min(4).max(12).optional(),
 	/**
-	 * Programme slugs. Validated against the live set rather than accepted as free text: this
+	 * Programme slugs. Validated against a closed set rather than accepted as free text: this
 	 * column is what the conversion hypothesis is measured on, so an arbitrary string would make
 	 * the metric meaningless, and it is also user-controlled data heading for an admin table.
+	 *
+	 * The set is `ENQUIRY_INTEREST_SLUGS`, NOT `LIVE_PROGRAM_SLUGS` — the form offers three
+	 * `track-` options that resolve against no `Program` record (see that constant for why), and
+	 * an enum without them rejects the entire body, valid name and email included.
+	 *
+	 * `max` is derived rather than written as a literal for the same reason the enum is shared: it
+	 * was `6` while the form offered six boxes, and stayed `6` when the 2026-11 revamp made it
+	 * nine, so ticking a seventh was a 400 with nothing on the page to explain it.
 	 */
 	programs: z
-		.array(z.enum(LIVE_PROGRAM_SLUGS as [string, ...string[]]))
-		.max(6)
+		.array(z.enum(ENQUIRY_INTEREST_SLUGS as [string, ...string[]]))
+		.max(ENQUIRY_INTEREST_SLUGS.length)
 		.default([]),
 	topic: z.enum(['program', 'join', 'general']).optional(),
 	source: z.string().max(200, 'Source is too long').optional(),
@@ -64,7 +76,7 @@ export const POST: RequestHandler = async (event) => {
 	if (guard) return guard;
 
 	try {
-		const parsed = await parseJsonBody(request, contactSchema);
+		const parsed = await parseJsonBody(request, _contactSchema);
 		if (!parsed.success) return parsed.response;
 
 		const { name, email, phone, message, subscribe, locale, grade, programs, topic, source } =

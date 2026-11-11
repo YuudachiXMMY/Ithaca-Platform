@@ -680,3 +680,36 @@ export const PROGRAMS: readonly Program[] = [
 
 /** Programs whose seasons `content:check` must validate — every program is live today. */
 export const LIVE_PROGRAM_SLUGS: readonly string[] = PROGRAMS.map((program) => program.slug);
+
+/**
+ * Enquiry-form interest values that are deliberately NOT `Program.slug`s. See
+ * `contact/EnquiryForm.svelte`'s `PROGRAM_OPTIONS` for why each one earns a box: they are the gap
+ * between "what we file as a programme" and "what a parent writes in the box". The `track-`
+ * prefix is load-bearing — it is what makes clear, in the inbox and in anything that later joins
+ * on this column, that these resolve against no record.
+ *
+ * NOT folded into `LIVE_PROGRAM_SLUGS`: that list's other consumer is `scripts/content-check.ts`,
+ * which demands a valid `Season` for every slug in it, and these three have no `Program` record
+ * and therefore no seasons. Putting them there would turn a green content gate red.
+ */
+export const ENQUIRY_TRACK_SLUGS = [
+	'track-academic-tutoring',
+	'track-university-support',
+	'track-research-lab'
+] as const;
+
+/**
+ * Everything `/api/contact` accepts in `programs`, and the single source `EnquiryForm.svelte`
+ * builds its checkboxes from.
+ *
+ * One table, two consumers — the same rule `src/lib/og/cards.ts` states for OG cards, and for the
+ * same reason. When the form listed the three `track-` options on its own, the endpoint's enum
+ * still only held `LIVE_PROGRAM_SLUGS`, so ticking any of them failed `safeParse` on the WHOLE
+ * body: a valid name, email and message were rejected along with it, and the visitor got
+ * `contact_form_errorInvalid` with nothing to fix. Deriving both sides from here is what makes
+ * that class of drift unrepresentable rather than merely fixed.
+ */
+export const ENQUIRY_INTEREST_SLUGS: readonly string[] = [
+	...LIVE_PROGRAM_SLUGS,
+	...ENQUIRY_TRACK_SLUGS
+];
