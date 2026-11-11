@@ -23,8 +23,19 @@ on:
     paths:
       - 'apps/scheduling/**'
       - '.github/workflows/scheduling-ci.yml'
+  # No `branches:` filter here, deliberately — unlike `push:` above, which is correctly pinned to
+  # the two branches whose tips must stay green. A `pull_request` filter matches the BASE branch,
+  # so pinning it to [main, prod-scheduling] silently drops every STACKED PR. That is not
+  # hypothetical: the PR that added the lint and typecheck steps below targeted
+  # `worktree-docs-reconcile-rls-lhci-deploy` (PR #14's branch) and changed this workflow plus
+  # `apps/scheduling/package.json` — and got zero `pull_request` runs. `gh pr checks` listed only
+  # `web CI`, because web-ci.yml's `pull_request` carries no `branches:` filter at all. The only
+  # `scheduling CI` run on that branch was a manual `workflow_dispatch` on an earlier commit, so
+  # the gate this file exists to install was never proven on the head that installed it.
+  #
+  # Accepted cost: a PR targeting a throwaway branch now runs the full ~8-minute docker+e2e job
+  # too. That is the correct trade — a gate that skips the stacked case is not a gate.
   pull_request:
-    branches: [main, prod-scheduling]
     paths:
       - 'apps/scheduling/**'
       - '.github/workflows/scheduling-ci.yml'
