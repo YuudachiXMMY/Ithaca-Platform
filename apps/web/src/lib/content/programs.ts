@@ -554,7 +554,7 @@ export const PROGRAMS: readonly Program[] = [
 		},
 		summary: {
 			en: 'Five hands-on courses from machining and structures through to autonomous systems and a global competition capstone.',
-			zh: '五门动手课程，从机械加工与结构力学到自主系统，以全球赛事 capstone 收尾。'
+			zh: '五门动手课程，从机械加工与结构力学到自主系统，最后以一场全球赛事作为结业项目。'
 		},
 		category: 'engineering',
 		board: 'projects',
