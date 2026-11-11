@@ -40,6 +40,9 @@ export const NEWS: readonly NewsItem[] = [
 	// driven by this file (plan §3.1) instead of hard-coding the same Vimeo id in a component.
 	{
 		slug: 'moridi-ai-in-ontario',
+		// The film is already published on the `ithaca-dialogues` record and has been the
+		// homepage's featured video since launch; this entry restates what the site shows.
+		consentVerified: true,
 		kind: 'interview',
 		title: {
 			en: 'Dr. Reza Moridi on AI in Ontario',
@@ -68,6 +71,8 @@ export const NEWS: readonly NewsItem[] = [
 	},
 	{
 		slug: 'teertstra-interview',
+		// Published film on the `ithaca-dialogues` record.
+		consentVerified: true,
 		kind: 'interview',
 		title: {
 			en: 'A student interview with Dr. Peter Teertstra',
@@ -93,6 +98,8 @@ export const NEWS: readonly NewsItem[] = [
 	},
 	{
 		slug: 'scotiabank-interview',
+		// Published film on the `ithaca-dialogues` record.
+		consentVerified: true,
 		kind: 'interview',
 		title: {
 			en: 'Andy Song interviews Scotiabank executives',
@@ -119,6 +126,8 @@ export const NEWS: readonly NewsItem[] = [
 	// §3.7), and this is where its content lands.
 	{
 		slug: 'honda-production-line-visit',
+		// Published film on the `ev-team` record; the entry names an institution, not a person.
+		consentVerified: true,
 		kind: 'event',
 		title: {
 			en: 'The EV team visits the Honda production line',
@@ -150,6 +159,18 @@ export const NEWS: readonly NewsItem[] = [
 	// `resultIds` field is what the two surfaces agree through.
 	{
 		slug: 'clossette-aiec-2026-grand-prize',
+		// HELD BACK until the owner confirms. This entry goes further than anything the site
+		// already publishes: the consent-verified `Result` it is the story behind
+		// (`results.ts`, `aiec-2026-grand-prize`) says only "Teams from the AI Entrepreneurship
+		// Bootcamp ... won the AIEC 2026 Grand Prize" — it names no team and makes no
+		// company-formation claim. Grepping the repo for "Clossette" finds this file and one code
+		// comment, i.e. nothing backs the specific claim. Both additions are about identifiable
+		// third parties, which is exactly what §6.3 exists for.
+		//
+		// Flip to `true` once the owner confirms the team is happy to be named AND that the
+		// incorporation is accurate — or cut the two additions back to what `results.ts` verifies,
+		// at which point it is the same claim the site already makes and can ship.
+		consentVerified: false,
 		kind: 'award',
 		title: {
 			en: 'Clossette takes the AIEC 2026 Grand Prize',
@@ -169,3 +190,16 @@ export const NEWS: readonly NewsItem[] = [
 		// is stable. Left unset rather than guessed — a dangling id renders as a missing link.
 	}
 ];
+
+/**
+ * What the site actually renders — `NEWS` minus anything still waiting on §6.3 sign-off.
+ *
+ * Every surface that shows news reads THIS, not `NEWS`: `/news` and the homepage Featured slot
+ * today. `NEWS` stays exported because the unverified copy has to remain reviewable (and the
+ * tests assert over the full table), but an entry only reaches a visitor by passing through here.
+ *
+ * Filtering at the source rather than in each page is the point. A gate each consumer applies for
+ * itself is a gate the next consumer forgets, and the failure mode — publishing an unverified
+ * claim about a named third party — is not one that shows up as a broken page.
+ */
+export const PUBLISHED_NEWS: readonly NewsItem[] = NEWS.filter((item) => item.consentVerified);

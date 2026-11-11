@@ -162,6 +162,19 @@ export interface NewsItem {
 	 * two.
 	 */
 	body: Localized<string[]>;
+	/**
+	 * §6.3, the same gate `Result` and `Testimonial` carry, and for the same reason: an entry here
+	 * can name a third party — a guest, a school, a student team — and the site must not publish
+	 * such a claim on the owner's behalf without someone having checked it.
+	 *
+	 * Required rather than optional (`consentVerified?: boolean`) on purpose. An optional flag
+	 * defaults to "not set", every existing entry keeps rendering, and the gate only applies to
+	 * whoever remembers it. Required forces the question once per entry, which is the whole point.
+	 *
+	 * `false` does not delete the entry — `PUBLISHED_NEWS` in `content/news.ts` is what the
+	 * surfaces render, so the copy stays in the file, reviewable, until someone can say yes.
+	 */
+	consentVerified: boolean;
 	cover?: Media;
 	video?: VimeoRef;
 	/** Back-link to the programme this entry came out of (plan §2 rule 6). */

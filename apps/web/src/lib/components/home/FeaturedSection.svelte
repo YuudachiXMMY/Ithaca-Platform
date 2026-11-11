@@ -4,7 +4,7 @@
 	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 	import VimeoEmbed from '$lib/components/media/VimeoEmbed.svelte';
-	import { NEWS } from '$lib/content/news';
+	import { PUBLISHED_NEWS } from '$lib/content/news';
 
 	// The featured slot. The former build wrapped the Vimeo player in an `h-[200dvh]` spacer with a
 	// `sticky top-0 h-[100dvh]` child — so ~100dvh of empty scroll trailed the video — and gated the
@@ -17,7 +17,9 @@
 	// the paragraph in `home_featured_*` message keys. It rendered the same film for as long as
 	// nobody edited a component — which is how a "featured" slot becomes a permanent fixture.
 	//
-	// It now renders whichever `NEWS` entry carries `featured: true`. Rotating the homepage is a
+	// It now renders whichever `PUBLISHED_NEWS` entry carries `featured: true` — the consent-gated
+	// view of `NEWS`, so an entry still awaiting §6.3 sign-off can never reach the homepage even if
+	// someone marks it featured. Rotating the homepage is a
 	// one-line edit in `content/news.ts`, by someone who does not need to know Svelte, and the same
 	// entry appears at the top of `/news` — so the two surfaces cannot disagree about what is
 	// current. The copy comes from the entry, which is why `home_featured_title` and
@@ -28,7 +30,7 @@
 	// an absent one, and `/news` is reachable from the bar regardless.
 
 	const locale = $derived(getLocale());
-	const featured = $derived(NEWS.find((item) => item.featured));
+	const featured = $derived(PUBLISHED_NEWS.find((item) => item.featured));
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->

@@ -5,7 +5,7 @@
 	import Seo from '$lib/components/Seo.svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 	import VimeoEmbed from '$lib/components/media/VimeoEmbed.svelte';
-	import { NEWS } from '$lib/content/news';
+	import { PUBLISHED_NEWS } from '$lib/content/news';
 	import { PROGRAMS } from '$lib/content/programs';
 	import type { NewsItem } from '$lib/content/types';
 
@@ -33,9 +33,11 @@
 
 	const locale = $derived(getLocale());
 
-	const featured = $derived(NEWS.find((item) => item.featured));
+	const featured = $derived(PUBLISHED_NEWS.find((item) => item.featured));
 	const rest = $derived(
-		[...NEWS].filter((item) => !item.featured).sort((a, b) => b.date.localeCompare(a.date))
+		[...PUBLISHED_NEWS]
+			.filter((item) => !item.featured)
+			.sort((a, b) => b.date.localeCompare(a.date))
 	);
 
 	/** The four-way tag, localized. A closed map so a new `kind` fails the type check, not render. */
