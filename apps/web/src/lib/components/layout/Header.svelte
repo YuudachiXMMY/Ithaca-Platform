@@ -114,11 +114,33 @@
 			return;
 		}
 
-		if (event.key === 'ArrowDown') {
-			// role="menu" implies arrow-key traversal; without this the roles are a lie.
-			event.preventDefault();
-			wrapper.querySelector<HTMLAnchorElement>('[role="menuitem"]')?.focus();
-		}
+		// role="menu" implies arrow-key traversal; without this the roles are a lie.
+		//
+		// It has to be traversal and not just entry. This used to be a single
+		// `querySelector('[role="menuitem"]')` — the FIRST match — so every ArrowDown re-focused
+		// item one and the list could not be walked at all. That is worse than carrying no roles:
+		// the markup promises a menu, a screen-reader user is told it is a menu, and then the only
+		// reachable entry is the one they started on. Mouse and Tab users never saw it, which is
+		// why it survived the axe pass — axe checks that the roles are well-formed, not that the
+		// behaviour they imply exists.
+		//
+		// Wrapping, plus Home/End, follows the APG menu pattern. ArrowUp from the trigger lands on
+		// the LAST item, which is the part people reach for when the wanted entry is at the bottom.
+		if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+		event.preventDefault();
+
+		const items = [...wrapper.querySelectorAll<HTMLAnchorElement>('[role="menuitem"]')];
+		if (items.length === 0) return;
+		// -1 when focus is still on the trigger, which is the normal way in.
+		const current = items.indexOf(document.activeElement as HTMLAnchorElement);
+
+		let target: number;
+		if (event.key === 'Home') target = 0;
+		else if (event.key === 'End') target = items.length - 1;
+		else if (event.key === 'ArrowDown') target = current === -1 ? 0 : (current + 1) % items.length;
+		else target = current === -1 ? items.length - 1 : (current - 1 + items.length) % items.length;
+
+		items[target].focus();
 	}
 
 	// Mobile accordion: single expanded group at a time.
