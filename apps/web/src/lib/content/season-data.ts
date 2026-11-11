@@ -141,9 +141,34 @@ export const SEASONS: readonly Season[] = [
 			// TODO(content): Ithaca Dialogues tuition and inclusions (CONTENT-GAPS C-3).
 			includes: []
 		}
-	}
+	},
 
-	// TODO(content): seasons for engineering-projects, summer-winter-camps and ithaca-night.
-	// All three pages are placeholders with no published dates at all (CONTENT-GAPS C-1); the
-	// owner needs to supply when each runs before `prd.md` §6.4 can be satisfied.
+	// ── AI Investment Lab ────────────────────────────────────────────────────────────────────
+	// The brochure publishes three windows a year (Sep-Dec, Jan-Mar, Apr-Jun) at month precision,
+	// and `/admissions` needs one of them badged "open for registration" (plan §3.4). Only the
+	// CURRENT window is encoded: the other two are a recurring pattern, not scheduled cohorts, and
+	// `$lib/seasons` would render a 2027 window as a dated commitment the organisation has not
+	// made. When Sep-Dec closes, add the next record rather than editing this one.
+	{
+		id: 'ail-101-f26',
+		programSlug: 'ai-investment-lab',
+		label: { en: 'Lab 101 — Fall 2026', zh: 'Lab 101 —— 2026 年秋季' },
+		start: '2026-09-01',
+		end: '2026-12-31',
+		// "8 weeks, 16 sessions" stays copy rather than becoming `seasonDuration(start, end)`, for
+		// the same reason as the AI Camp's 13 weeks: the 8-week course runs *inside* a four-month
+		// window, so both numbers are true and this is the one a parent is asking for.
+		cadence: { en: '8 weeks, 16 sessions', zh: '8 周，16 课时' },
+		// `'open'` carries more weight here than elsewhere. The 10-26 intake decision is that the
+		// Lab is short-cycle and joinable at any point — a student does not wait for a term
+		// boundary — so this is not "registration happens to be open right now".
+		registration: 'open',
+		tuition: {
+			display: 'inquire',
+			currency: 'CAD',
+			// Site-wide policy is price by enquiry (plan §5), so an empty `includes` is the
+			// finished state here, not a gap: there is no published inclusion list to transcribe.
+			includes: []
+		}
+	}
 ];

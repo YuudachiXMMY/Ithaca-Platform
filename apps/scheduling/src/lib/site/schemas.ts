@@ -76,7 +76,11 @@ export const siteContactSchema = z.object({
   subscribe: z.boolean().default(false),
   locale: z.enum(['en', 'zh']).optional().nullable(),
   grade: z.coerce.number().int().min(4).max(12).optional().nullable(),
-  programs: z.array(programSlug).max(6).default([]),
+  // `max` 是**量级**守卫，不是业务规则 —— 跟上面不复制枚举同一个理由。它曾经写 6，恰好等于当时
+  // 官网的项目数，于是 2026-11 改版把询盘表单的可勾选项加到 9 个之后，这里就成了第二道会**悄悄
+  // 丢弃合法提交**的门：官网放过 7 个，本项目 400，而官网对 /api/site/contact 的非 2xx 是硬失败
+  // (500)。12 是留了余量的上界 —— 它要防的是滥用体积，不是追踪对面的选项个数。
+  programs: z.array(programSlug).max(12).default([]),
   topic: z.enum(['program', 'join', 'general']).optional().nullable(),
   source: z.string().max(200).optional().nullable(),
 })

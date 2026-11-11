@@ -43,7 +43,37 @@ async function sitemapPaths(request: APIRequestContext): Promise<string[]> {
 	return paths;
 }
 
-type Chrome = { what: string; color: string; box: { x: number; y: number; w: number; h: number } };
+type Chrome = {
+	what: string;
+	color: string;
+	/**
+	 * The element's own `background-color`. Non-transparent for the Admissions CTA, which is a
+	 * solid button rather than a bare link — see `opaqueOwnBackground` and the call sites.
+	 */
+	ownBg: string;
+	box: { x: number; y: number; w: number; h: number };
+};
+
+/**
+ * The element's own background, when it is opaque enough to BE the ground.
+ *
+ * `groundUnder` works by hiding the header's content and sampling what is behind it, which is
+ * right for a bare link over a hero photo and wrong for an element that paints itself: hiding the
+ * content hides the fill too, so the sample is the page underneath the header. The 2026-11 revamp
+ * made Admissions a solid CTA (`bg-action` / `bg-band-action`) and the sweep duly reported ~1.01:1
+ * on 48 routes — white label text against a page background no visitor ever sees through it.
+ *
+ * Returns null unless alpha is 1. A translucent fill genuinely composites with what is behind it,
+ * so sampling remains the correct method there and this must not short-circuit it.
+ */
+function opaqueOwnBackground(value: string): [number, number, number] | null {
+	const m = /^rgba?\(([^)]+)\)$/.exec(value.trim());
+	if (!m) return null;
+	const parts = m[1].split(',').map((part) => Number(part.trim()));
+	if (parts.length === 4 && parts[3] < 1) return null;
+	if (parts.length < 3 || parts.slice(0, 3).some(Number.isNaN)) return null;
+	return [parts[0], parts[1], parts[2]];
+}
 
 /**
  * Every visible piece of header chrome, with its box and computed colour.
@@ -76,12 +106,18 @@ async function chromeOf(page: Page): Promise<{ text: Chrome[]; logo: Chrome | nu
 			// aria-label branch.
 			if (!label) {
 				if (!el.hasAttribute('aria-expanded')) continue;
-				text.push({ what: 'hamburger', color: getComputedStyle(el).color, box: rectOf(el) });
+				text.push({
+					what: 'hamburger',
+					color: getComputedStyle(el).color,
+					ownBg: getComputedStyle(el).backgroundColor,
+					box: rectOf(el)
+				});
 				continue;
 			}
 			text.push({
 				what: label.replace(/\s+/g, ' ').slice(0, 24),
 				color: getComputedStyle(el).color,
+				ownBg: getComputedStyle(el).backgroundColor,
 				box: rectOf(el)
 			});
 		}
@@ -89,7 +125,12 @@ async function chromeOf(page: Page): Promise<{ text: Chrome[]; logo: Chrome | nu
 		const img = header.querySelector('img');
 		const logo =
 			img && visible(img)
-				? { what: img.currentSrc.split('/').pop() ?? '', color: '', box: rectOf(img) }
+				? {
+						what: img.currentSrc.split('/').pop() ?? '',
+						color: '',
+						ownBg: 'rgba(0, 0, 0, 0)',
+						box: rectOf(img)
+					}
 				: null;
 
 		return { text, logo };
@@ -209,8 +250,14 @@ test.describe('header chrome is legible on the ground it actually sits on', () =
 
 			text.forEach((el, i) => {
 				const fg = rgb(el.color);
-				const mean = contrast(fg, grounds[i].mean);
-				const patch = contrast(fg, grounds[i].bright);
+				// An element with its own OPAQUE fill is measured against that fill, not against the
+				// sampled pixels: `groundUnder` hides the header's content, which hides this
+				// element's own background too, so the sample would be the page behind the header.
+				// The Admissions CTA is the one chrome element in this bar that paints itself.
+				const own = opaqueOwnBackground(el.ownBg);
+				const ground = own ? { mean: own, bright: own } : grounds[i];
+				const mean = contrast(fg, ground.mean);
+				const patch = contrast(fg, ground.bright);
 				if (mean < AA) failures.push(`${path} · ${el.what} · ${mean.toFixed(2)}:1 on mean ground`);
 				else if (patch < AA_WORST_PATCH)
 					failures.push(`${path} · ${el.what} · ${patch.toFixed(2)}:1 on brightest tenth`);
@@ -259,7 +306,7 @@ test.describe('header chrome is legible on the ground it actually sits on', () =
 
 		const failures: string[] = [];
 		text.forEach((el, i) => {
-			const ratio = contrast(rgb(el.color), grounds[i].mean);
+			const ratio = contrast(rgb(el.color), opaqueOwnBackground(el.ownBg) ?? grounds[i].mean);
 			if (ratio < AA) failures.push(`${el.what} · ${ratio.toFixed(2)}:1`);
 		});
 		expect(failures, 'header chrome below 4.5:1 on the error page').toEqual([]);
@@ -294,7 +341,7 @@ test.describe('header chrome is legible on the ground it actually sits on', () =
 			const { text } = await chromeOf(page);
 			const grounds = await groundUnder(page, text);
 			text.forEach((el, i) => {
-				const ratio = contrast(rgb(el.color), grounds[i].mean);
+				const ratio = contrast(rgb(el.color), opaqueOwnBackground(el.ownBg) ?? grounds[i].mean);
 				if (ratio < AA) failures.push(`${path} · ${el.what} · ${ratio.toFixed(2)}:1 (scrolled)`);
 			});
 		}

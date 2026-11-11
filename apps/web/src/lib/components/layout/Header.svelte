@@ -5,6 +5,7 @@
 	import { Menu, X, ChevronDown } from 'lucide-svelte';
 	import type { NavItem } from '$lib/data/nav';
 	import {
+		CTA_HREF,
 		NAV_ITEMS,
 		RIGHT_NAV_HREFS,
 		drawerChildren,
@@ -32,6 +33,16 @@
 	const RIGHT = new Set(RIGHT_NAV_HREFS);
 	const LEFT_NAV = NAV_ITEMS.filter((item) => !RIGHT.has(item.href));
 	const RIGHT_NAV = NAV_ITEMS.filter((item) => RIGHT.has(item.href));
+	/**
+	 * The one entry rendered as a CTA button in the desktop bar.
+	 *
+	 * Resolved from `NAV_ITEMS` rather than hard-coded so the button carries the same localized
+	 * label as everything else, and so the entry cannot exist in the drawer but vanish from the
+	 * bar (or the reverse) if `CTA_HREF` and the array ever disagree. The MOBILE drawer renders it
+	 * as an ordinary row: in a vertical list a filled button is just a louder link, and the drawer
+	 * has no competing items beside it to be louder than.
+	 */
+	const ctaItem = NAV_ITEMS.find((item) => item.href === CTA_HREF);
 
 	let scrolled = $state(false);
 	let mobileOpen = $state(false);
@@ -103,11 +114,33 @@
 			return;
 		}
 
-		if (event.key === 'ArrowDown') {
-			// role="menu" implies arrow-key traversal; without this the roles are a lie.
-			event.preventDefault();
-			wrapper.querySelector<HTMLAnchorElement>('[role="menuitem"]')?.focus();
-		}
+		// role="menu" implies arrow-key traversal; without this the roles are a lie.
+		//
+		// It has to be traversal and not just entry. This used to be a single
+		// `querySelector('[role="menuitem"]')` — the FIRST match — so every ArrowDown re-focused
+		// item one and the list could not be walked at all. That is worse than carrying no roles:
+		// the markup promises a menu, a screen-reader user is told it is a menu, and then the only
+		// reachable entry is the one they started on. Mouse and Tab users never saw it, which is
+		// why it survived the axe pass — axe checks that the roles are well-formed, not that the
+		// behaviour they imply exists.
+		//
+		// Wrapping, plus Home/End, follows the APG menu pattern. ArrowUp from the trigger lands on
+		// the LAST item, which is the part people reach for when the wanted entry is at the bottom.
+		if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+		event.preventDefault();
+
+		const items = [...wrapper.querySelectorAll<HTMLAnchorElement>('[role="menuitem"]')];
+		if (items.length === 0) return;
+		// -1 when focus is still on the trigger, which is the normal way in.
+		const current = items.indexOf(document.activeElement as HTMLAnchorElement);
+
+		let target: number;
+		if (event.key === 'Home') target = 0;
+		else if (event.key === 'End') target = items.length - 1;
+		else if (event.key === 'ArrowDown') target = current === -1 ? 0 : (current + 1) % items.length;
+		else target = current === -1 ? items.length - 1 : (current - 1 + items.length) % items.length;
+
+		items[target].focus();
 	}
 
 	// Mobile accordion: single expanded group at a time.
@@ -367,10 +400,40 @@
 
 		<!-- Right slot: desktop contact + switcher + mobile toggle -->
 		<div class="flex items-center justify-end">
+			<!--
+				The right column's last entry is a BUTTON, not a link (2026-11 plan §2: "CTA 按钮
+				Admissions · 预约咨询"). `/admissions` is the page the whole site exists to reach
+				(prd.md §5), and as one of seven peer links in the bar it was competing with
+				"Contact Us" directly beside it — which is also why Contact Us dropped to the
+				footer rather than both of them staying.
+
+				It costs width: the word is ~88px, the button ~150px. `RIGHT_NAV_HREFS` in
+				$lib/data/nav carries the arithmetic and explains why that ~62px is the reason
+				Results could not stay in the bar.
+			-->
 			<nav class="hidden items-center gap-7 lg:flex xl:gap-10">
-				{#each RIGHT_NAV as item (item.href)}
+				{#each RIGHT_NAV.filter((item) => item.href !== CTA_HREF) as item (item.href)}
 					{@render navEntry(item)}
 				{/each}
+
+				{#if ctaItem}
+					<a
+						href={localizeHref(ctaItem.href)}
+						aria-current={path === ctaItem.href ? 'page' : undefined}
+						class={cn(
+							'border px-5 py-2.5 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2',
+							// Inverted on each ground rather than one fixed pair of tokens: on a dark
+							// hero the solid brand fill is the only thing in the bar with a background,
+							// so it reads as the action; once scrolled, the bar paints its own surface
+							// and the same fill would fight the logo beside it.
+							onDark
+								? 'border-band-action bg-band-action text-band-action-foreground hover:bg-band-action-hover focus-visible:outline-band-brand'
+								: 'border-action bg-action text-action-foreground hover:bg-action-hover focus-visible:outline-brand'
+						)}
+					>
+						{navLabel(ctaItem.label)}
+					</a>
+				{/if}
 			</nav>
 
 			<button

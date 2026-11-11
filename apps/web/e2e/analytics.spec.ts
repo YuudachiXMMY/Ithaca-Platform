@@ -251,13 +251,18 @@ test.describe('GA4 events — R-SEO-5', () => {
 		// `#book` so it lands on the "Talk to us" section rather than the top of a six-section page.
 		// Asserting on the full href is the point — a link that drops either part still navigates,
 		// and the thing it was built for just silently never happens.
-		await page.goto('/programs/ithaca-night');
+		// `ai-investment-lab` rather than a hand-built programme page on purpose: it renders through
+		// `components/programs/ProgramPage.svelte`, which is the shared component the 2026-11 revamp
+		// added and which three programme pages now use. Instrumenting it once there is the whole
+		// reason that component takes `program` instead of strings, so this is the call site worth
+		// pinning. (It replaced `/programs/ithaca-night`, which is a 308 stub now.)
+		await page.goto('/programs/ai-investment-lab');
 		await pinNavigation(page);
-		await page.locator('main a[href="/admissions?program=ithaca-night#book"]').first().click();
+		await page.locator('main a[href="/admissions?program=ai-investment-lab#book"]').first().click();
 		expect((await sent(page)).filter((event) => event.name === 'program_cta_click')).toEqual([
 			{
 				name: 'program_cta_click',
-				params: { program: 'ithaca-night', location: 'program_page', locale: 'en' }
+				params: { program: 'ai-investment-lab', location: 'program_page', locale: 'en' }
 			}
 		]);
 	});

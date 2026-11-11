@@ -13,25 +13,36 @@ import AxeBuilder from '@axe-core/playwright';
 // all three are where serious violations come from — so exempting it would leave the page with the
 // most axe surface area as the one page nothing checks.
 //
-// The Academics / Student Life / Our Team routes are listed for the same reason, and listed now
-// rather than when their copy arrives: four of them are stubs today, and a stub is exactly when a
+// The Academics / Research / Our Team routes are listed for the same reason, and listed now
+// rather than when their copy arrives: several are stubs today, and a stub is exactly when a
 // heading-order or contrast mistake gets baked in unnoticed.
+//
+// ## Redirect targets must NOT be on this list
+//
+// `test.skip` below only skips a 404, and a 308 is not a 404 — Playwright follows it and axe
+// analyses the TARGET. So `/programs/ithaca-night` and `/student-life` kept "passing" after the
+// 2026-11 revamp retired them while actually re-testing `/news` under a misleading test name,
+// three times over. They are removed, along with the other three retired routes, and the real
+// new pages are listed instead. If a route here starts redirecting, delete it from this list and
+// add its target.
 const SECTION_6_4 = [
 	'/',
 	'/programs',
 	'/programs/ev-team',
 	'/programs/ai-entrepreneurship-bootcamp',
 	'/programs/ithaca-dialogues',
-	'/programs/engineering-projects',
-	'/programs/summer-winter-camps',
-	'/programs/ithaca-night',
+	'/programs/ai-investment-lab',
+	'/programs/project-studio',
+	'/programs/engineering-foundations',
 	'/admissions',
 	'/academics',
 	'/academics/ap',
 	'/academics/ossd',
-	'/academics/stem',
+	'/academics/sat-act',
+	'/academics/university-support',
 	'/academics/tutoring',
-	'/student-life',
+	'/research',
+	'/news',
 	'/success-stories',
 	'/about-us',
 	'/about-us/our-team',

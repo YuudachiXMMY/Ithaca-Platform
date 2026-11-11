@@ -196,8 +196,11 @@ test.describe('the admissions funnel, on a phone', () => {
 		await page.goto('/zh/programs/ev-team');
 
 		// Header: on a phone the nav lives behind the hamburger. The drawer renders NAV_ITEMS
-		// straight through, so Success Stories sits inside the Student Life accordion rather than
-		// at the top level — expanding it is part of what "reachable" means here.
+		// straight through, so Success Stories sits inside an accordion rather than at the top
+		// level — expanding it is part of what "reachable" means here. That accordion is ABOUT
+		// since the 2026-11 revamp: Student Life left the nav, and Results is the same kind of
+		// claim as About (the plan wanted it in the bar; it does not fit beside the Admissions CTA
+		// — see `src/lib/data/nav.ts`).
 		await page.locator('header button[aria-expanded]').first().click();
 		const drawer = page
 			.getByRole('navigation')
@@ -208,7 +211,7 @@ test.describe('the admissions funnel, on a phone', () => {
 		// The group row is a BUTTON, not a link — tapping it expands rather than navigates — so it is
 		// addressed by what it controls, not by a href it no longer has. `aria-controls` carries the
 		// canonical href; only the links inside get the /zh prefix.
-		await drawer.locator('button[aria-controls="drawer-submenu-/student-life"]').click();
+		await drawer.locator('button[aria-controls="drawer-submenu-/about-us"]').click();
 		await expect(drawer.locator('a[href="/zh/success-stories"]')).toBeVisible();
 
 		await page.keyboard.press('Escape');

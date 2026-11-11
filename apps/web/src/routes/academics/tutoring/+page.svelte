@@ -2,6 +2,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import Seo from '$lib/components/Seo.svelte';
 	import PlaceholderPage from '$lib/components/shared/PlaceholderPage.svelte';
+	import TrademarkNotice from '$lib/components/academics/TrademarkNotice.svelte';
 	import hero from '$lib/assets/programs/ai-bootcamp/AI-Entrep_09.jpg?enhanced';
 
 	// Content not written yet — `docs/CONTENT-GAPS.md` C-9 lists exactly what this page is waiting
@@ -18,3 +19,7 @@
 	description={m.tutoring_hero_description()}
 	headingId="tutoring-heading"
 />
+
+<!-- Mandatory on every academics page (plan §3.3, §5) — see `academics/ap/+page.svelte` for why it
+     is rendered here rather than inside the shared `PlaceholderPage`. -->
+<TrademarkNotice />
