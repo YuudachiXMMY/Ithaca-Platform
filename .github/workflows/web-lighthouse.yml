@@ -1,8 +1,10 @@
 # ── apps/web — Lighthouse CI (mobile perf) ──────────────────────────────────────────────────
 # Builds the SvelteKit app and runs `lhci autorun` against the built site. The thresholds that
 # can actually fail the job live in apps/web/lighthouserc.json and are an assertMatrix of
-# PER-ROUTE LCP ratchets (ev-team <= 7800ms, /zh <= 5800ms, everything else <= 4500ms) plus
-# CLS <= 0.05. Everything else (performance 0.85, a11y 0.9, seo 0.9, FCP, TBT) is warn-level.
+# PER-ROUTE LCP ratchets — FOUR tiers since 2026-10-15, when the single `.*ev-team.*` pattern was
+# split per locale: EN ev-team <= 6100ms, ZH ev-team <= 7800ms, other /zh <= 5800ms, everything
+# else <= 4500ms — plus CLS <= 0.05. Everything else (performance 0.85, a11y 0.9, seo 0.9, FCP,
+# TBT) is warn-level. lighthouserc.json is the source of truth; this comment is a signpost.
 #
 # ⚠️ NO LONGER RUNS ON EVERY PR/PUSH — this is a deliberate change made during the monorepo merge.
 # Measured over 15 days before the merge, this workflow was 795 of the web repo's ~2,380 CI

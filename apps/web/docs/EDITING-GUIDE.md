@@ -273,7 +273,7 @@ npm run content:check   # 扫描这些标记并校验期次日期
 - `sizes` 要如实描述它的显示宽度，例如 `sizes="(max-width: 768px) 100vw, 50vw"`
 - 首屏之外的图加 `loading="lazy"`
 
-> 注意：**首屏大图/视频直接决定 Lighthouse 的 LCP 门槛**（按路由分三档的 LCP 棘轮 +
+> 注意：**首屏大图/视频直接决定 Lighthouse 的 LCP 门槛**（按路由分四档的 LCP 棘轮 +
 > CLS ≤ 0.05，见 `lighthouserc.json`）。换首屏素材后请跑一次性能检查，别只看着好看就提交。
 
 ---
@@ -320,8 +320,10 @@ CI 只跑前两个（`smoke` + `a11y`），所以**改配色或导航后请在�
 `header-contrast` 和 `nav-single-line` 不会在 PR 上帮你兜住。
 
 性能另有一条独立工作流 `.github/workflows/web-lighthouse.yml`（**手动触发 + 每周定时，不是
-PR 门禁**）。硬门槛是 `lighthouserc.json` 里**按路由分三档**的 LCP 棘轮 ——
-`/programs/ev-team` ≤ 7800ms、`/zh*` ≤ 5800ms、其余 ≤ 4500ms —— 外加全站 CLS ≤ 0.05。
+PR 门禁**）。硬门槛是 `lighthouserc.json` 里**按路由分四档**的 LCP 棘轮 ——
+`/programs/ev-team` ≤ 6100ms、`/zh/programs/ev-team` ≤ 7800ms、其余 `/zh*` ≤ 5800ms、
+其余 ≤ 4500ms —— 外加全站 CLS ≤ 0.05。2026-10-15 之前 ev-team 是一条 `.*ev-team.*` 盖两个
+locale 的 7800，后来按 locale 拆开，EN 那条才收到 6100；所以如果你在别处看到"三档"，那是旧的。
 其它指标（perf 0.85、a11y 0.9、seo 0.9、FCP、TBT）都只是 warn。换首屏大图或视频后要留意它。
 
 ---

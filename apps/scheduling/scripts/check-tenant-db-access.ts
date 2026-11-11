@@ -1,17 +1,36 @@
-// H5 — tenant-isolation CI guard (transitional mitigation while Postgres RLS is deferred, see
-// docs/adr/0001-tenant-isolation-rls.md). Tenant isolation currently rests on the discipline that every
-// tenant-scoped read/write goes through `forTenant(ctx)` (src/db/tenant.ts). A stray `db.select().from(
-// tenantTable)` / `db.insert(tenantTable)` anywhere else would silently cross tenants — the vitest
-// tenant-isolation suite is a behavioural regression test and CANNOT catch a NEW bypass route that no
-// test exercises. This guard closes that gap mechanically: it fails CI if any file OUTSIDE a small,
-// audited allowlist reaches for the raw `db` handle's CRUD verbs.
+// Tenant-isolation CI guard (the production audit's H5 finding, since grown to THREE rules). Each
+// rule closes a different hole; the full reasoning sits above each matcher below:
+//   1. raw `db` CRUD in a file outside the audited ALLOWLIST;
+//   2. application code importing the RLS-bypassing `@/db/admin`;
+//   3. runtime code calling `postgres(...)` without `RLS_ROLE_OPTIONS`.
 //
-// Scope: raw `db.{select,insert,update,delete}(` only — deliberately NOT `db.transaction` (the atomic-tx
-// pattern that then scopes work via `forTenant(ctx, tx)` inside) and NOT `tx.*` (a tx handle passed into
-// forTenant is fine). This mirrors the exact recon vector the production audit flagged (H5).
+// This guard is NO LONGER the only backstop, and the premise it was written on is dead: RLS was
+// deferred by ADR 0001, then ENABLED by migration 0026
+// (docs/adr/0003-tenant-isolation-rls-enabled.md — 0001 is SUPERSEDED, do not follow its recipe; it
+// misses that the superuser's BYPASSRLS ignores policies even with FORCE ROW LEVEL SECURITY, so
+// following it yields an installed-but-inert RLS). Under the `app_rt` runtime role a stray
+// `db.select().from(tenantTable)` reads 0 ROWS, not another tenant's data.
 //
-// Run: `npx tsx scripts/check-tenant-db-access.ts` (wired into .github/workflows/ci.yml). Exit 1 on any
-// violation, 0 when clean. The pure matchers are exported for tests/tenant-db-guard.test.ts.
+// Both controls stay, because each covers what the other cannot. RLS constrains only the app
+// runtime: `scripts/` and `tests/` connect as the BYPASSRLS superuser (tests/ via `@/db/admin`,
+// most of scripts/ via their own `postgres(DATABASE_URL)` — migrate.ts, purge-tenant.ts,
+// cleanup-orphan-tenants.ts), where a forgotten `forTenant(ctx)` (src/db/tenant.ts — still the ONLY
+// sanctioned path to tenant data; RLS is a backstop UNDER it, not a licence to hand-write
+// `where(eq(t.tenantId, ctx.tenantId))`) really does cross tenants. RLS also fails SILENTLY on
+// READS (empty result, no error); an unscoped WRITE is rejected outright by the policies' WITH CHECK
+// (tests/rls.test.ts asserts the `row-level security` error). And the two fail at different times:
+// this guard before merge, RLS at execution. The vitest tenant-isolation suite is neither — it is a
+// behavioural regression test and CANNOT catch a NEW bypass route that no test exercises.
+//
+// Rule 1 scope: `db.{select,insert,update,delete,execute}(` plus the `db.query.*` relational API —
+// deliberately NOT `db.transaction` (the atomic-tx pattern that then scopes work via
+// `forTenant(ctx, tx)` inside) and NOT `tx.*` (a tx handle passed into forTenant is fine).
+//
+// Run: `npx tsx scripts/check-tenant-db-access.ts` from `apps/scheduling/` (every path in this file
+// is app-relative). Wired into `.github/workflows/scheduling-ci.yml` — at the REPO ROOT, because
+// GitHub only reads workflows from there; the pre-merge original was this app's own
+// `.github/workflows/ci.yml`, which no longer exists. Exit 1 on any violation, 0 when clean. The
+// pure matchers are exported for tests/tenant-db-guard.test.ts.
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs'
 import { join, relative, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'

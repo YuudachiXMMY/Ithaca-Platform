@@ -88,9 +88,13 @@ jobs:
       - name: Install deps (host)
         run: npm ci --no-audit --no-fund
 
-      # H5: tenant-isolation guard — fail fast if raw `db.{select,insert,update,delete}(` appears
-      # outside the forTenant spine / audited allowlist (Postgres RLS is deferred per ADR 0001;
-      # this is the mechanical backstop the vitest behavioural suite cannot give for NEW routes).
+      # H5: tenant-isolation guard — three rules, all three red on violation: (1) raw
+      # `db.{select,insert,update,delete,execute}(` or `db.query.*` outside the forTenant spine /
+      # audited allowlist; (2) app code importing `@/db/admin` (the BYPASSRLS superuser client);
+      # (3) a hand-rolled `postgres(...)` under src/ without RLS_ROLE_OPTIONS.
+      # Postgres RLS IS enabled (migration 0026, ADR 0003) — this guard is not a stand-in for it.
+      # The two fail at different times: the guard before merge, RLS at execution. RLS also fails
+      # silently on reads (0 rows), which is exactly why the pre-merge half still earns its keep.
       # It validates every ALLOWLIST entry with existsSync, so it fails LOUDLY (exit 1, listing
       # the missing entries) if run from the wrong directory rather than silently passing.
       - name: Tenant-isolation guard
