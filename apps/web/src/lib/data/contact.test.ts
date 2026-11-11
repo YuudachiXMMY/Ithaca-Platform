@@ -12,8 +12,18 @@ describe('CONTACT_HREFS', () => {
 	});
 
 	it('prefixes the raw email for the mailto: href', () => {
-		expect(CONTACT_HREFS.mailto).toBe('mailto:joshua.wang@ithacafo.com');
+		expect(CONTACT_HREFS.mailto).toBe('mailto:info@ithacateens.com');
 		expect(CONTACT_HREFS.mailto).toBe('mailto:' + CONTACT_INFO.email);
+	});
+
+	// The 10-24 decision is that the site publishes one address, on its OWN domain. Asserting the
+	// literal rather than just `mailto: + CONTACT_INFO.email` is the point: a tautological
+	// assertion would still pass if someone put the personal ithacafo.com address back as the
+	// primary, which is the exact regression this pins.
+	it('publishes the ithacateens.com address as primary and keeps the legacy one alongside', () => {
+		expect(CONTACT_INFO.email).toBe('info@ithacateens.com');
+		expect(CONTACT_INFO.emailAlt).toBe('joshua.wang@ithacafo.com');
+		expect(CONTACT_HREFS.mailtoAlt).toBe('mailto:joshua.wang@ithacafo.com');
 	});
 
 	it('URL-encodes the address into a Google Maps search href', () => {

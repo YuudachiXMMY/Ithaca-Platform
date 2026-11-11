@@ -12,22 +12,20 @@ Last reviewed: 2026-10-02
 
 ## 🔴 Blocking
 
-### C-1 · Three program pages are placeholders, not pages
+### ~~C-1 · Three program pages are placeholders, not pages~~ — 🟢 解决于 2026-11-09，但不是靠补内容
 
-`prd.md` §6.4 requires all six program pages to ship complete. Three of them currently render
-`PlaceholderProgram.svelte` and contain no real content:
+这三页不是补齐了，而是**按决议下架了**（2026-11 改版方案 §3.2）：
 
-| Route                            | File                                                    | Size     |
-| -------------------------------- | ------------------------------------------------------- | -------- |
-| `/programs/engineering-projects` | `src/routes/programs/engineering-projects/+page.svelte` | 19 lines |
-| `/programs/summer-winter-camps`  | `src/routes/programs/summer-winter-camps/+page.svelte`  | 19 lines |
-| `/programs/ithaca-night`         | `src/routes/programs/ithaca-night/+page.svelte`         | 16 lines |
+| 原路由                           | 处置                                      | 依据       |
+| -------------------------------- | ----------------------------------------- | ---------- |
+| `/programs/summer-winter-camps`  | 308 → `/programs/ai-investment-lab`       | 10-11 决议 |
+| `/programs/engineering-projects` | 308 → `/programs/engineering-foundations` | 方案 §4.4  |
+| `/programs/ithaca-night`         | 308 → `/news`（它本来就是活动而非项目）   | 方案 §4.3  |
 
-For comparison, the three real pages are 512–548 lines each. Each placeholder needs, per
-`prd.md` §7.4: overview, tracks or curriculum, outcomes, FAQ, gallery, and a `Season` record.
+所以这条缺口的解法是产品决策，不是文案供给 —— 这也是它挂了很久没人能关掉的原因：没有人要为
+三个已经不打算办的项目写招生页。
 
-**Needed from owner**: for each of the three — who it is for (grade band), when it runs,
-what students do, what they walk away with, 3–5 FAQ entries, and photographs.
+**接替它的新缺口见下方 C-10。**
 
 ### ~~C-2 · Season dates conflict in three places~~ — 🟢 resolved 2026-09-29
 
@@ -99,7 +97,11 @@ debt on the page.
 
 ---
 
-### C-9 · The eight pages the Academics / Student Life / About groups added
+### C-9 · The pages the Academics / About groups added
+
+> **2026-11-09 更新**：标题里原本还有 `Student Life`。那一组已退出导航（方案 §3.7，`/student-life`
+> 308 → `/news`），`/academics/stem` 也不再是独立轨（方案 §3.3，308 → `/academics`）。本条目
+> 余下的部分只涉及仍然存在的那几页。
 
 The owner asked for a `Academics` group (AP, OSSD, STEM, Tutoring), a `Student Life` group, an
 `Our Team` page, and `/results` renamed to `/success-stories`. Six of the eight new routes ship as
@@ -183,6 +185,93 @@ page** — the hero shows strangers at an event). Two further notes:
   field, so the Chinese page renders "Mr. Joshua Wang" under a fully Chinese hero.~~
   🟢 **Fixed 2026-10-16** — see C-4 above for what replaced it and what was deliberately left
   to the owner.
+
+### C-10 · 2026-11 改版留下的内容缺口
+
+改版把方案文档里**已有原文**的部分全部落地了。下面这些是方案自己指向「文案库 / 待拍板 / 待授权」
+的部分，一条也没有被编造填充。
+
+#### 🔴 C-10a · `/news` 首批内容只到位一半
+
+落地的 5 条全部由**站上已发布**的素材构成（三条 Vimeo 访谈、本田产线参访、AIEC 2026 获奖）。
+方案 §4.3 点名的另外两条**没有**做成占位条目：
+
+| 条目              | 缺什么                                                 |
+| ----------------- | ------------------------------------------------------ |
+| 走进 TMU 11-07    | 正文、图片，或一段视频                                 |
+| 滑铁卢 Sedra 参访 | 正文与图片（站上只有一张照片在 Student Highlights 里） |
+
+刻意不占位：feed 是全站唯一一个「空条目」和「渲染坏了」长得一样的界面。已落地的 5 条里有 4 条
+带 `TODO(content)`，缺的是**一段上下文正文**（视频本身是公开的）。
+
+**需要机构方提供**：每条一到两段正文；TMU 与 Sedra 两场的照片。
+
+#### 🔴 C-10b · 五个学员故事（10-20 决议）一条都没上
+
+方案 §3.5 要的首批 5 个学员故事（Sarah 等）需要逐条取得学员与家庭授权，线索在 `client-families`。
+`/success-stories` 的 consent 门禁（`prd.md` §6.3）本来就要求这个 —— 没有 `consentVerified`
+的记录不渲染，所以这件事只能等授权，不能等排期。
+
+**需要机构方提供**：每个故事的授权 + 文案。方案自己说「不等全量、够 2–3 条即先上」。
+
+#### 🟡 C-10c · 往届去向清单的「最终去向」列是空的
+
+方案 §3.5 要求录取与入读分列，11-02 口径要求两者标注清楚。10 条院校记录全部按**保守默认**
+标为 `offer`（录取），因为三折页只给了一个不区分的清单。
+
+而「最终去向」列之所以空着，是一条边界而不是遗漏：**可发布的入读都是具名的，具名事实归
+consent 门禁管**（Andy Song 的普林斯顿入读就在 `results.ts` 里，由 timeline 渲染）。详见
+`src/lib/content/destinations.ts` 的文件头 —— 第一版把它复制进了不受门禁约束的清单，
+`results-consent.test.ts` 当场拦下。
+
+**需要机构方提供**：一份**去标识化**的入读汇总（例如「X 名学员入读滑铁卢」），而不是逐条
+确认每个 offer 的归属 —— 后者只会把问题推回 consent 门禁。另外奖学金一条都没展示（字段已就位，
+11-02 口径要求核实后才渲染）。
+
+#### 🟡 C-10d · 三个新项目页没有自己的照片
+
+`ai-investment-lab`、`engineering-foundations`、`project-studio` 的文案齐备、照片全无。三页各借
+了一张最接近的已发布照片，`alt` 写的是**那张照片实际拍了什么**，不是项目是什么 —— 所以读屏用户
+不会被告知一张不存在的图。全部标 `TODO(asset)`（advisory，不阻塞）。
+
+#### 🟡 C-10e · Registration 与 Onboarding 两步仍无实质内容
+
+五步流程里前三步的文案由 11-04 三折页补齐了（含一个原本挂着的问题：试课**收费**）。后两步三折页
+点了名没说内容，所以它们只渲染步骤名，不渲染编造的流程。见 `src/lib/content/admissions.ts`。
+
+#### 🟡 C-10f · 方案自己列的「待拍板」项
+
+这几项**刻意没做**，不是漏了：
+
+- **页脚法律主体**（是否标注 Ithaca Education Inc.）—— 待品牌口径确认（方案 §5）
+- **About 机构介绍整段重写** —— 待 Joshua 初稿；过渡期已换入三折页 About 文案
+- **申请与教育规划服务** —— 方案 §4 明确不设独立页、不公布交付与定价，只以旅程条的一行叙述呈现
+- **G7–8 体验营 / 数学强基小组** —— 待 2027 Q1 拍板
+- **访谈视频区按剪辑进度更新** —— 西人嘉宾优先，严寒场次发布前需本人审核
+
+### 🔴 C-11 · Clossette 与「注册了真实公司」—— 需要业主确认才能发
+
+`content/news.ts` 的 `clossette-aiec-2026-grand-prize` 条目**已扣留**（`consentVerified: false`，
+所以不出现在 `/news`，也不会进首页 Featured 位），文案原样留在文件里等你拍板。
+
+扣留的原因是它比站上已发布的内容多说了两件事：
+
+|      | 已核实的 `Result`（`results.ts` · `aiec-2026-grand-prize` · `consentVerified: true`） | 这条新闻                                                           |
+| ---- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| 团队 | 不点名（「AI 创业训练营的团队」）                                                     | 点名 **Clossette**                                                 |
+| 后续 | 不提                                                                                  | 「部分成员随后**注册了真实公司**，并在 Project Studio 中继续推进」 |
+
+全仓库搜 `Clossette` 只有这个文件和 `programs/project-studio/+page.svelte` 的一行代码注释 ——
+也就是说这两处新增在仓库里没有任何依据。两者都是关于**可识别第三方**的断言，正是 §6.3 这道门
+存在的理由（`Result` 与 `Testimonial` 从一开始就带 `consentVerified`，`NewsItem` 是这次补上的）。
+
+**需要你做的是二选一：**
+
+1. **确认**团队同意被点名、且「注册公司」属实 → 把 `consentVerified` 翻成 `true`，条目即刻上线；
+2. **收窄**到 `results.ts` 已核实的措辞（不点名、不提注册公司）→ 那就和站上已有的说法一致，
+   同样可以翻成 `true` 发出去。
+
+照 C-8（伊萨卡菁英访谈）立下的先例，这类裁定记在本文件，`DECISIONS.md` 只记工程决策。
 
 ## 🟡 Placeholder shipped
 

@@ -1,4 +1,6 @@
 import { test, expect, type APIRequestContext, type Page } from '@playwright/test';
+import { readdirSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 // Route coverage is DERIVED from /sitemap.xml rather than hardcoded. The sitemap endpoint
 // already enumerates routes with `import.meta.glob('/src/routes/**/+page.svelte')`, so a new
@@ -48,14 +50,36 @@ test.describe('public routes', () => {
 		expect(admin.headers()['location']).toContain('/dashboard/site');
 	});
 
-	// A map rather than a list because the three legacy slugs no longer share one destination:
-	// the two interview paths were folded into Ithaca Dialogues, while `ai-entrepreneurship-camp`
-	// is the SAME programme under its new name and must land on its own page. Asserting a single
-	// shared destination would have let the camp→bootcamp stub point anywhere and still pass.
+	// A map rather than a list because the legacy slugs do not share one destination: the two
+	// interview paths were folded into Ithaca Dialogues, while `ai-entrepreneurship-camp` is the
+	// SAME programme under its new name and must land on its own page. Asserting a single shared
+	// destination would have let the camp→bootcamp stub point anywhere and still pass.
+	//
+	// EVERY `+page.ts`-only redirect stub in `src/routes` belongs here, and the completeness test
+	// below enforces that mechanically. It is enforced rather than asked for because this map held
+	// three of ten entries until 2026-11-11: the revamp added five stubs
+	// (`/academics/stem`, `/programs/engineering-projects`, `/programs/summer-winter-camps`,
+	// `/programs/ithaca-night`, `/student-life`) and removed their old coverage from
+	// `a11y.spec.ts` — correctly, since they render no content — without adding any here. Two more
+	// (`/programs/ev-challenge`, `/results`) had never been covered at all.
+	//
+	// Nothing else reaches them: each stub sets `prerender = false` and is deliberately excluded
+	// from `/sitemap.xml`, so the sitemap-derived sweep at the top of this file never visits one.
+	// That matters because the flag is load-bearing — prerendering a redirect emits a 200
+	// meta-refresh page instead of a real 308, which is invisible to a human clicking through.
 	const LEGACY_SLUGS: Record<string, string> = {
+		// Pre-2026-11.
 		'/programs/elite-interview': '/programs/ithaca-dialogues',
 		'/programs/ai-pioneers-interview': '/programs/ithaca-dialogues',
-		'/programs/ai-entrepreneurship-camp': '/programs/ai-entrepreneurship-bootcamp'
+		'/programs/ai-entrepreneurship-camp': '/programs/ai-entrepreneurship-bootcamp',
+		'/programs/ev-challenge': '/programs/ev-team',
+		'/results': '/success-stories',
+		// Retired by the 2026-11 revamp.
+		'/academics/stem': '/academics',
+		'/programs/engineering-projects': '/programs/engineering-foundations',
+		'/programs/summer-winter-camps': '/programs/ai-investment-lab',
+		'/programs/ithaca-night': '/news',
+		'/student-life': '/news'
 	};
 
 	test('the legacy program slugs still redirect to the canonical route', async ({ request }) => {
@@ -65,6 +89,43 @@ test.describe('public routes', () => {
 			expect(res.headers()['location'], `${legacy} should point at ${canonical}`).toContain(
 				canonical
 			);
+		}
+	});
+
+	/**
+	 * The map above is only a gate if it is complete, and "someone remembers to add a line" is
+	 * what already failed. So the stub set is read off the route tree instead: every `+page.ts`
+	 * that issues a 308 must appear in `LEGACY_SLUGS`, with the destination the source actually
+	 * names.
+	 *
+	 * Reading `src/routes` from an e2e spec is deliberate and is the same instinct as deriving the
+	 * route sweep from `/sitemap.xml` — coverage that is derived cannot drift from the thing it
+	 * covers. The assertions above still carry the INTENT (that `ev-challenge` lands on EV Team
+	 * and not merely on something); this one carries the COVERAGE.
+	 */
+	test('every redirect stub in the route tree is covered by the map above', async () => {
+		const routes = fileURLToPath(new URL('../src/routes', import.meta.url));
+		const stubs: Record<string, string> = {};
+		const walk = (dir: string, urlPath: string) => {
+			for (const entry of readdirSync(dir, { withFileTypes: true })) {
+				if (entry.isDirectory()) {
+					// Skip SvelteKit groups `(…)` and params `[…]`: neither is a fixed URL to request.
+					if (/^[([]/.test(entry.name)) continue;
+					walk(`${dir}/${entry.name}`, `${urlPath}/${entry.name}`);
+				} else if (entry.name === '+page.ts') {
+					const source = readFileSync(`${dir}/${entry.name}`, 'utf8');
+					const target = /redirect\(308,\s*localizeHref\('([^']+)'/.exec(source);
+					if (target) stubs[urlPath] = target[1];
+				}
+			}
+		};
+		walk(routes, '');
+
+		// Guards the guard: a walk that finds nothing must fail, not pass vacuously.
+		expect(Object.keys(stubs).length).toBeGreaterThanOrEqual(10);
+		expect(Object.keys(stubs).sort()).toEqual(Object.keys(LEGACY_SLUGS).sort());
+		for (const [path, target] of Object.entries(stubs)) {
+			expect(LEGACY_SLUGS[path], `${path} redirects to ${target} in source`).toBe(target);
 		}
 	});
 
@@ -229,7 +290,10 @@ test.describe('programs dropdown', () => {
 		test.skip(testInfo.project.name === 'mobile-chrome', 'desktop nav is hidden on mobile');
 
 		await page.goto('/');
-		const GROUPS = ['/about-us', '/academics', '/programs', '/student-life'];
+		// The three boards plus About. Student Life left the bar in the 2026-11 revamp and Research
+		// joined it; `/admissions` is in the bar too but as a CTA button with no menu, so it is
+		// correctly absent here.
+		const GROUPS = ['/academics', '/programs', '/research', '/about-us'];
 
 		// The count matters as much as the members: it is what fails if a fifth group is added to
 		// NAV_ITEMS and only the data side is updated.
@@ -259,7 +323,50 @@ test.describe('programs dropdown', () => {
 		await expect(menu).toBeVisible();
 		// R-GLB-1 is "every programme", so the count IS the requirement. `not.toHaveCount(0)`
 		// passed for the three-plus-catch-all shape that requirement was written to replace.
-		await expect(menu.locator('[role="menuitem"]')).toHaveCount(6);
+		//
+		// FIVE since the 2026-11 revamp, not six, and the drop is not a regression: this menu now
+		// lists the PROJECTS board, and Ithaca Dialogue moved to the Research group (it is filed on
+		// the research board). Six programmes still exist and all six are still reachable from the
+		// bar — `src/lib/data/nav.test.ts` derives that from `Program.board` rather than trusting a
+		// number here.
+		await expect(menu.locator('[role="menuitem"]')).toHaveCount(5);
+	});
+
+	/**
+	 * The behaviour `role="menu"` promises. Until 2026-11-11 the handler answered every ArrowDown
+	 * with `querySelector('[role="menuitem"]')` — the FIRST item — so the menu could be entered and
+	 * never walked: a keyboard or screen-reader user was told "menu" and then pinned to entry one.
+	 *
+	 * axe cannot see this (it checks the roles are well-formed, not that the behaviour exists) and
+	 * the test above only asserted the panel opens, so nothing in the suite noticed. Pressing twice
+	 * is the whole point — one press passed before the fix too.
+	 */
+	test('arrow keys walk the menu rather than re-entering it', async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name === 'mobile-chrome', 'desktop nav is hidden on mobile');
+
+		await page.goto('/');
+		await programsTrigger(page).focus();
+		const items = page.locator('header [role="menu"] [role="menuitem"]');
+		await expect(items).toHaveCount(5);
+
+		await page.keyboard.press('ArrowDown');
+		await expect(items.nth(0)).toBeFocused();
+		await page.keyboard.press('ArrowDown');
+		await expect(
+			items.nth(1),
+			'a second ArrowDown must advance, not re-focus item one'
+		).toBeFocused();
+
+		await page.keyboard.press('ArrowUp');
+		await expect(items.nth(0)).toBeFocused();
+		// Wrapping, per the APG menu pattern.
+		await page.keyboard.press('ArrowUp');
+		await expect(items.nth(4), 'ArrowUp from the first item wraps to the last').toBeFocused();
+
+		await page.keyboard.press('Home');
+		await expect(items.nth(0)).toBeFocused();
+		await page.keyboard.press('End');
+		await expect(items.nth(4)).toBeFocused();
 	});
 
 	test('closes on Escape and returns focus to the trigger', async ({ page }, testInfo) => {

@@ -6,26 +6,54 @@
 	import Seo from '$lib/components/Seo.svelte';
 	import PageHero from '$lib/components/shared/PageHero.svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
+	import TrademarkNotice from '$lib/components/academics/TrademarkNotice.svelte';
 	import hero from '$lib/assets/programs/ai-bootcamp/AI-Entrep_30.jpg?enhanced';
 
 	/**
-	 * `/academics` — the hub the header's Academics group points at.
+	 * `/academics` — the hub the header's Academics group points at, and `01 Academic`, the
+	 * entrance to the journey.
 	 *
-	 * The four tracks below are TEXT cards, not the photo cards `/programs` uses, and that is a
-	 * decision rather than an omission. Each track page is a stub today (CONTENT-GAPS C-9), and
-	 * the photo library has nothing that depicts AP, OSSD or tutoring — their heroes are generic
-	 * event photography. Repeating those same generic photos here would make four unwritten pages
-	 * look like four finished ones, which is the single most misleading thing this page could do.
-	 * When the tracks have real content and real photographs, this grid should gain images and
-	 * start looking like `/programs`.
+	 * The tracks below are TEXT cards, not the photo cards `/programs` uses, and that is a
+	 * decision rather than an omission. Three of the five track pages are stubs today
+	 * (CONTENT-GAPS C-9), and the photo library has nothing that depicts AP, OSSD or tutoring —
+	 * their heroes are generic event photography. Repeating those same generic photos here would
+	 * make unwritten pages look finished, which is the single most misleading thing this page
+	 * could do. When the tracks have real content and real photographs, this grid should gain
+	 * images and start looking like `/programs`.
 	 *
-	 * Derived from `NAV_ITEMS` rather than re-listed: the dropdown and this grid are the same four
-	 * destinations, and `nav.test.ts` already pins every one of them to a route that exists.
+	 * ## Five tracks, not four (2026-11 plan §3.3)
+	 *
+	 * Two arrived and one left, and the one that left is the interesting case. **STEM is gone as a
+	 * track of its own**: the 11-04 brochure's academic board is AP / OSSD / IB / university
+	 * coursework plus SAT·ACT, and "STEM" was a fifth category the brochure never had. Its subject
+	 * list belongs inside AP and Tutoring, and its engineering content belongs to the projects
+	 * board — where Engineering Foundations now covers it properly, with five named courses
+	 * instead of a word. `/academics/stem` 308s here.
+	 *
+	 * SAT·ACT and University Support are the arrivals, and unlike their three older siblings they
+	 * ship with real copy from the brochure (plan §4.5, §4.6).
+	 *
+	 * The order is the arc a family actually walks: in-school results (AP, OSSD), then the
+	 * standardised test, then university, with one-to-one tutoring last as the thing that wraps
+	 * around all of them rather than a stage within it.
+	 *
+	 * Labels come from `navLabel` rather than being re-listed: the dropdown and this grid are the
+	 * same five destinations, and `nav.test.ts` already pins every one of them to a route that
+	 * exists.
 	 */
 	const TRACKS = [
 		{ label: 'ap', href: '/academics/ap', description: m.academics_ap_cardDescription },
 		{ label: 'ossd', href: '/academics/ossd', description: m.academics_ossd_cardDescription },
-		{ label: 'stem', href: '/academics/stem', description: m.academics_stem_cardDescription },
+		{
+			label: 'satAct',
+			href: '/academics/sat-act',
+			description: m.academics_satAct_cardDescription
+		},
+		{
+			label: 'universitySupport',
+			href: '/academics/university-support',
+			description: m.academics_universitySupport_cardDescription
+		},
 		{
 			label: 'tutoring',
 			href: '/academics/tutoring',
@@ -71,7 +99,23 @@
 				</div>
 			</Reveal>
 
-			<ul class="mt-10 grid grid-cols-1 gap-px bg-border sm:grid-cols-2">
+			<!--
+				The brochure's selling points, as a list rather than folded into the prose above:
+				teachers matched to how a student works, an intake diagnostic, own materials, staged
+				testing, and the subject coverage (plan §3.3, with English added in the 11-04 copy).
+				A visitor comparing tutoring providers is scanning for exactly these, and a paragraph
+				is the wrong shape for scanning.
+			-->
+			<ul class="mt-10 grid gap-x-10 gap-y-3 sm:grid-cols-2">
+				{#each [m.academics_sellingPoint_1(), m.academics_sellingPoint_2(), m.academics_sellingPoint_3(), m.academics_sellingPoint_4(), m.academics_sellingPoint_5()] as point (point)}
+					<li class="flex gap-3 text-sm leading-relaxed text-foreground-muted">
+						<span class="mt-2 h-px w-4 shrink-0 bg-brand" aria-hidden="true"></span>
+						<span>{point}</span>
+					</li>
+				{/each}
+			</ul>
+
+			<ul class="mt-12 grid grid-cols-1 gap-px bg-border sm:grid-cols-2">
 				{#each TRACKS as track, index (track.href)}
 					<li class="bg-surface-0">
 						<a
@@ -102,4 +146,7 @@
 			</ul>
 		</div>
 	</section>
+
+	<!-- Mandatory on every academics page (plan §3.3, §5) — see the component for why it is one. -->
+	<TrademarkNotice />
 </div>

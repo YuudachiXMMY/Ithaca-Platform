@@ -26,9 +26,14 @@ export const STATS: readonly Stat[] = [
 	},
 	{
 		key: 'programs',
+		// Still six after the 2026-11 revamp, which retired three programmes and added three
+		// (see content/programs.ts). The figure surviving the churn unchanged is a coincidence,
+		// so the `source` below no longer says "count the cards on /programs": that page now
+		// shows FIVE grid cards, because Ithaca Dialogue moved to the research-exit band. The
+		// authority is the record set, not any one page's layout.
 		value: 6,
 		label: { en: 'Programs', zh: '课程' },
-		source: 'Self-evident from the site: /programs lists six programmes'
+		source: 'Count of `Program` records in src/lib/content/programs.ts (verified 2026-11-09)'
 	},
 	{
 		key: 'mentors',

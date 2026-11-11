@@ -4,20 +4,38 @@
 	import { trackProgramCtaClick } from '$lib/analytics';
 	import { ArrowRight } from 'lucide-svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
+	import { PROGRAMS } from '$lib/content/programs';
+	import { SEASONS } from '$lib/content/season-data';
+	import { programSeason } from '$lib/program-season';
 	import evImg from '$lib/assets/programs/ev-team/EV25-10.s.png?enhanced';
 	import aiImg from '$lib/assets/programs/ai-bootcamp/AI-Entrep_68.jpg?enhanced';
 	import eliteImg from '$lib/assets/programs/ai-interview/carmi-levy.png?enhanced';
-	import otherImg from '$lib/assets/programs/ai-bootcamp/AIEC2026/AIEC2026-clossette_2s.png?enhanced';
+	// TODO(asset): the AI Investment Lab has no photography of its own. This is a field-trip frame
+	// from the AI Bootcamp — the closest published image of students working with market data.
+	import labImg from '$lib/assets/programs/ai-bootcamp/AI-Entrep_05.jpg?enhanced';
 
 	// Cells render UNCONDITIONALLY — present in SSR, visible with no JS. The former build mounted
 	// them only after an `inview` flip on the grid, but the empty grid collapsed to ~2px so the
 	// `threshold: 0.15` observer never fired and the whole section stayed blank. A single Reveal
 	// wraps the (already-rendered) grid for one gentle fade-up instead.
-	const PROGRAMS = [
+	//
+	// ## The fourth tile is now a programme
+	//
+	// It used to be an "Other Programs" catch-all pointing at `/programs`, which made this grid
+	// three flagships and a door. The 2026-11 plan (§3.1) replaces it with AI Investment Lab, the
+	// fourth flagship locked on 10-26 — so all four tiles are now the four flagships, and `slug`
+	// is non-nullable for the first time. That removes the analytics special case the old tile
+	// needed: every click here now carries a real `Program.slug`.
+	//
+	// Note this list is NOT the same as `/programs`'s card list, and the difference is the point.
+	// This is the four FLAGSHIPS, which includes Ithaca Dialogue (filed on the research board).
+	// `/programs` renders the five programmes on the PROJECTS board and links Dialogue as a
+	// cross-reference. One is a claim about prominence, the other about taxonomy.
+	const FLAGSHIPS = [
 		{
 			img: evImg,
 			href: '/programs/ev-team',
-			slug: 'ev-team' as string | null,
+			slug: 'ev-team',
 			title: m.home_programs_ev_title,
 			description: m.home_programs_ev_description,
 			alt: m.home_programs_ev_alt
@@ -25,7 +43,7 @@
 		{
 			img: aiImg,
 			href: '/programs/ai-entrepreneurship-bootcamp',
-			slug: 'ai-entrepreneurship-bootcamp' as string | null,
+			slug: 'ai-entrepreneurship-bootcamp',
 			title: m.home_programs_ai_title,
 			description: m.home_programs_ai_description,
 			alt: m.home_programs_ai_alt
@@ -33,36 +51,51 @@
 		{
 			img: eliteImg,
 			href: '/programs/ithaca-dialogues',
-			slug: 'ithaca-dialogues' as string | null,
+			slug: 'ithaca-dialogues',
 			title: m.home_programs_elite_title,
 			description: m.home_programs_elite_description,
 			alt: m.home_programs_elite_alt
 		},
 		{
-			img: otherImg,
-			href: '/programs',
-			// Not a programme — the "everything else" tile goes to the index. `program_cta_click`
-			// carries a Program.slug or it carries nothing; a synthetic 'all' value would sit in the
-			// same GA dimension as the real slugs and quietly corrupt every per-programme comparison.
-			// The click is already measured as a pageview on /programs.
-			slug: null as string | null,
-			// (see cell() below — the handler no-ops for a null slug)
-			title: m.home_programs_other_title,
-			description: m.home_programs_other_description,
-			alt: m.home_programs_other_alt
+			img: labImg,
+			href: '/programs/ai-investment-lab',
+			slug: 'ai-investment-lab',
+			title: m.home_programs_lab_title,
+			description: m.home_programs_lab_description,
+			alt: m.home_programs_lab_alt
 		}
 	];
 
-	/** `program_cta_click` — R-SEO-5. No-ops for the index tile, which has no programme slug. */
-	function onProgramClick(slug: string | null) {
-		if (!slug) return;
+	/**
+	 * The season window to print under each tile — plan §3.1 wants "one positioning line + the
+	 * window" on every flagship card.
+	 *
+	 * Derived here rather than typed into the list above so these four tiles cannot disagree with
+	 * the programme page, the `/programs` card and the JSON-LD about the same dates — that is the
+	 * §7.4 acceptance condition, and `src/lib/season-contract.test.ts` enforces it by shifting a
+	 * record and requiring every surface to move.
+	 *
+	 * `window` is null for Ithaca Dialogue today (its Fall 2026 dates are still `TODO(content)`),
+	 * so the line is omitted on that tile rather than rendered empty.
+	 */
+	const windows = $derived(
+		new Map(
+			FLAGSHIPS.map((flagship) => [
+				flagship.slug,
+				programSeason(SEASONS, PROGRAMS, flagship.slug, getLocale())?.window ?? null
+			])
+		)
+	);
+
+	/** `program_cta_click` — R-SEO-5. */
+	function onProgramClick(slug: string) {
 		trackProgramCtaClick({ program: slug, location: 'home_showcase', locale: getLocale() });
 	}
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
-{#snippet cell(program: (typeof PROGRAMS)[number], large: boolean)}
+{#snippet cell(program: (typeof FLAGSHIPS)[number], large: boolean)}
 	<a
 		href={localizeHref(program.href)}
 		onclick={() => onProgramClick(program.slug)}
@@ -92,6 +125,11 @@
 			<p class="mt-1.5 hidden max-w-md text-xs leading-relaxed text-band-foreground/80 sm:block">
 				{program.description()}
 			</p>
+			{#if windows.get(program.slug)}
+				<p class="mt-1.5 text-[11px] font-medium tracking-wide text-band-foreground/70">
+					{windows.get(program.slug)}
+				</p>
+			{/if}
 			<div
 				class="mt-3 flex items-center gap-1.5 text-xs font-medium text-band-brand-strong transition-colors duration-200 group-hover:text-band-foreground"
 			>
@@ -121,10 +159,10 @@
 			<div
 				class="grid gap-px overflow-hidden bg-surface-2 md:grid-cols-[2fr_1fr] md:grid-rows-[1fr_1fr_auto]"
 			>
-				<div class="md:row-span-2">{@render cell(PROGRAMS[0], true)}</div>
-				<div>{@render cell(PROGRAMS[1], false)}</div>
-				<div>{@render cell(PROGRAMS[2], false)}</div>
-				<div class="md:col-span-2">{@render cell(PROGRAMS[3], false)}</div>
+				<div class="md:row-span-2">{@render cell(FLAGSHIPS[0], true)}</div>
+				<div>{@render cell(FLAGSHIPS[1], false)}</div>
+				<div>{@render cell(FLAGSHIPS[2], false)}</div>
+				<div class="md:col-span-2">{@render cell(FLAGSHIPS[3], false)}</div>
 			</div>
 		</Reveal>
 	</div>

@@ -6,6 +6,7 @@
 	import PageHero from '$lib/components/shared/PageHero.svelte';
 	import ResultsTimeline from '$lib/components/results/ResultsTimeline.svelte';
 	import InterviewList from '$lib/components/results/InterviewList.svelte';
+	import DestinationsSection from '$lib/components/results/DestinationsSection.svelte';
 	import { dialoguesInterviews, resultsJsonLd, resultsTimeline } from '$lib/results';
 	import { RESULTS } from '$lib/content/results';
 	import { PROGRAMS } from '$lib/content/programs';
@@ -144,6 +145,18 @@
 			</div>
 		</section>
 	{/if}
+
+	<!--
+		"Where past students went" (2026-11 plan §3.5).
+
+		UNCONDITIONAL, unlike the timeline above and the films below — and the difference is not an
+		oversight. Those two render per-STUDENT records and are gated on consent, so their headings
+		have to disappear with their contents or the heading itself leaks that a withheld record
+		exists. This section lists INSTITUTIONS with no student attached to any of them, so there is
+		nothing to withhold; its own `verified` gate is about whether a fact was checked, not about
+		whose fact it is. The component omits an empty column internally.
+	-->
+	<DestinationsSection />
 
 	<!-- R-RES-1, the Dialogues films. Same rule: no records, no section. -->
 	{#if interviews.length > 0}

@@ -1,5 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
+	import { ArrowRight } from 'lucide-svelte';
+	import { localizeHref } from '$lib/paraglide/runtime';
 	import type { Picture } from 'vite-imagetools';
 	import img189 from '$lib/assets/highlights/wechat-img-189.jpg?enhanced';
 	import ev5 from '$lib/assets/programs/ev-team/EV25-5s.png?enhanced';
@@ -95,6 +97,8 @@
 	const COLUMN_WIDTH = [520, 360, 360, 440, 380, 380];
 </script>
 
+<!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
+
 <section class="bg-surface-1" aria-label={m.home_highlights_ariaLabel()}>
 	<div class="px-5 sm:px-8 md:px-[6vw]">
 		<div class="flex items-end justify-between border-b border-border pt-10 pb-4 md:pt-16 md:pb-3">
@@ -179,5 +183,34 @@
 			class="hidden md:col-start-5 md:row-span-3 md:row-start-1 md:block md:w-[2vw]"
 			aria-hidden="true"
 		></div>
+	</div>
+
+	<!--
+		Onward link to `/news` (2026-11 plan §3.1).
+
+		This band is a closed set of six hand-placed cells in a horizontal scroll region, so it can
+		never be "the latest" anything — it is a curated selection that changes when someone edits
+		the grid. `/news` is where this material accrues now (campus visits and lectures are Event
+		entries there, and `/student-life` 308s to it), so the band ends by pointing at the feed
+		rather than ending.
+
+		OUTSIDE the scroll region on purpose: inside it the link would be reachable only after
+		swiping past six cards on a phone.
+	-->
+	<div class="mx-auto max-w-[1400px] px-5 pt-8 sm:px-8 md:px-[6vw]">
+		<!--
+			NON-band tokens on this link, deliberately. The cards above sit on photographs and use
+			`band-*` ink, but this link is OUTSIDE the scroll region, on the section's own
+			`bg-surface-1` ground — a light one. The first version used `text-band-brand-strong`
+			here and measured 1.13:1 (#d9f1f1 on #fafbfc); `e2e/a11y.spec.ts` caught it. See
+			docs/DESIGN-TOKENS.md §2 for the band / non-band split.
+		-->
+		<a
+			href={localizeHref('/news')}
+			class="group inline-flex items-center gap-2 text-sm font-medium text-brand-bright transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+		>
+			<span>{m.home_highlights_viewNews()}</span>
+			<ArrowRight class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+		</a>
 	</div>
 </section>
