@@ -245,10 +245,17 @@ describe('官网写入端点的第二道校验', () => {
     )
   })
 
-  it('programs 数量超上限被拒(体积约束，不是枚举约束)', () => {
-    const many = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  it('programs 数量在上限两侧各钉一个(体积约束，不是枚举约束)', () => {
+    const slugs = (n: number) => Array.from({ length: n }, (_, i) => `p${i}`)
+    // 上一版只断言"被拒"那一半，用的 7 恰好是当时 `max(6)` 的上限 +1。上限提到 12 之后 7 成了
+    // 合法输入，这条断言就反了过来 —— 而它所在的闸门当时在 CI 里空转（正是本次
+    // scheduling-ci.yml 要修的事），所以没人看到这抹红。现在两侧都钉：上限再动一次，这里会
+    // 立刻红，而不是沉默着跟着漂。
     expect(
-      siteContactSchema.safeParse({ name: 'A', email: 'a@x.com', programs: many }).success,
+      siteContactSchema.safeParse({ name: 'A', email: 'a@x.com', programs: slugs(12) }).success,
+    ).toBe(true)
+    expect(
+      siteContactSchema.safeParse({ name: 'A', email: 'a@x.com', programs: slugs(13) }).success,
     ).toBe(false)
   })
 
