@@ -6,8 +6,11 @@
 	import { trackProgramCtaClick } from '$lib/analytics';
 	import { SEASONS } from '$lib/content/season-data';
 	import { PROGRAMS } from '$lib/content/programs';
-	import { programSeason } from '$lib/program-season';
+	import { courseJsonLd, programSeason } from '$lib/program-season';
+	import { ogCardFile, ogCardFor } from '$lib/og/cards';
+	import { SITE } from '$lib/seo';
 	import type { Program } from '$lib/content/types';
+	import JsonLd from '$lib/components/JsonLd.svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 	import * as m from '$lib/paraglide/messages';
 
@@ -97,12 +100,47 @@
 	 */
 	const schedule = $derived(season?.window ?? m.program_page_onDemand());
 
+	/**
+	 * R-SEO-3 / §7.4 acceptance — the Course entity for the three programmes this template renders.
+	 *
+	 * It belongs HERE and not in each page for the reason the header above already states: one
+	 * `Season` edit has to move every surface showing a date, "the nav badge and the JSON-LD"
+	 * included, and that only holds if the entity is built from the same `season` the visible
+	 * schedule line is. It was missing entirely until now — the three hand-built programme pages
+	 * (`ev-team`, `ithaca-dialogues`, `ai-entrepreneurship-bootcamp`) each call `courseJsonLd`
+	 * themselves because they predate this template, so three of six programmes shipped with only
+	 * the root layout's Organization + BreadcrumbList and no Course entity at all.
+	 * `program-season.test.ts` unit-tests `courseJsonLd` in isolation, so nothing caught a
+	 * programme route that simply never called it.
+	 *
+	 * A null `season` is not a gap: Engineering Foundations and Project Studio publish "classes
+	 * form on demand" as their real answer, and the base entity (name / description / url /
+	 * provider, no `hasCourseInstance`) is a valid Course worth emitting for them.
+	 *
+	 * The card path is derived from the slug because all three routes are `/programs/<slug>`, and
+	 * it is guarded by `ogCardFor` so a future page whose path does not match degrades to a Course
+	 * with no `image` rather than pointing one at an `/og` route that renders nothing.
+	 */
+	const ogPath = $derived(`/programs/${program.slug}`);
+	const jsonLd = $derived(
+		courseJsonLd(
+			season,
+			program,
+			locale,
+			SITE.url,
+			SITE.name,
+			ogCardFor(ogPath) ? SITE.url + ogCardFile(ogPath, locale) : undefined
+		)
+	);
+
 	function onRegisterClick() {
 		trackProgramCtaClick({ program: program.slug, location: 'program_page', locale });
 	}
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
+
+<JsonLd data={jsonLd} />
 
 <div class="bg-background">
 	<!-- Full-bleed hero — the LCP element, SSR-visible (no Reveal). -->

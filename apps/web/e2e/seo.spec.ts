@@ -120,6 +120,39 @@ test.describe('BreadcrumbList — R-SEO-3', () => {
 		expect(course?.image).toMatch(/\/og\/en\/programs\/ev-team\.png$/);
 		expect(course?.hasCourseInstance).toBeDefined();
 	});
+
+	/**
+	 * R-SEO-3 says "Course + CourseInstance per program", and the assertion above checked exactly
+	 * one programme — `/programs/ev-team`, which happens to be one of the three pages that build
+	 * their own entity inline. The three the 2026-11 revamp added render through the shared
+	 * `components/programs/ProgramPage.svelte`, which did not emit one at all, so half the
+	 * programmes shipped with no Course entity and this suite stayed green.
+	 *
+	 * Derived from the sitemap for the same reason the rest of this file is: a seventh programme
+	 * must not be able to arrive without being covered.
+	 *
+	 * `hasCourseInstance` is deliberately NOT asserted here. Engineering Foundations and Project
+	 * Studio publish "classes form on demand" as their real schedule and carry no `Season`, so the
+	 * base entity is the correct output for them — `courseJsonLd` omits the instance rather than
+	 * inventing a window. What every programme owes is the Course itself.
+	 */
+	test('every programme page in the sitemap carries a Course entity', async ({ request }) => {
+		const programmePaths = (await sitemapPaths(request)).filter((path) =>
+			/^\/programs\/[^/]+$/.test(path)
+		);
+		// Guards the guard: a sitemap change that stopped listing programme pages would otherwise
+		// turn this into a test that asserts nothing.
+		expect(programmePaths.length).toBeGreaterThanOrEqual(6);
+
+		for (const path of programmePaths) {
+			const blocks = jsonLd(await (await request.get(path)).text());
+			const course = blocks.find((block) => block['@type'] === 'Course');
+			expect(course, `${path} must carry a Course entity`).toBeDefined();
+			expect(course?.image, `${path}'s Course image must be its own card`).toMatch(
+				new RegExp(`/og/en${path}\\.png$`)
+			);
+		}
+	});
 });
 
 test.describe('indexing hygiene — R-SEO-4', () => {
