@@ -31,9 +31,10 @@ export const STATS: readonly Stat[] = [
 		// so the `source` below no longer says "count the cards on /programs": that page now
 		// shows FIVE grid cards, because Ithaca Dialogue moved to the research-exit band. The
 		// authority is the record set, not any one page's layout.
-		value: 6,
+		value: 7,
 		label: { en: 'Programs', zh: '课程' },
-		source: 'Count of `Program` records in src/lib/content/programs.ts (verified 2026-11-09)'
+		source:
+			'Count of cards on /programs: the six `Program` records plus Research Lab (owner ruling 2026-11-14)'
 	},
 	{
 		key: 'mentors',

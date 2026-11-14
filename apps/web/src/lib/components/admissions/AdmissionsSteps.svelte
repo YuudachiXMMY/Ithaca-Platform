@@ -6,12 +6,12 @@
   from the data (the index), never typed, so inserting a step cannot leave a "3." above a fourth box.
 
   The step NAMES come from prd.md R-ADM-1 and are real content. The SUBSTANCE arrived for the first
-  three in the 11-04 brochure (2026-11 plan §3.4) and is rendered beneath each name; Registration and
-  Onboarding still have none, so they render as a name alone. That mixed state is deliberate and is
-  why `DETAIL` below is a partial map rather than five entries with two placeholders: a step whose
-  description is "details to follow" is worse than a step with no description, because it reads as
-  an answer. The page-level note still carries the "ask us and we will walk you through it" line,
-  which is the honest version of the same thing said once instead of twice.
+  three in the 11-04 brochure (2026-11 plan §3.4), and the owner supplied Registration and
+  Onboarding on 2026-11-14, so all five now render a description beneath the name. `DETAIL` is a
+  full `Record` for that reason: a sixth step cannot be added without its description. The two
+  late arrivals are deliberately general (a form and tuition; schedule, materials, an introduction)
+  because nobody has specified durations or documents. Do not sharpen them into process detail the
+  owner has not given. The page-level note is now an invitation to ask, not an apology for gaps.
 
   LAYOUT. Five equal boxes across a full-width band was the previous shape, and with one short label
   per box it read as five empty containers — the thing §4.4 warns about, a card used where no
@@ -39,10 +39,12 @@
 	 * describes. See the note at the top of this file for why the other two are absent rather than
 	 * filled with a placeholder.
 	 */
-	const DETAIL: Partial<Record<AdmissionStepId, () => string>> = {
+	const DETAIL: Record<AdmissionStepId, () => string> = {
 		inquire: m.admissions_steps_inquire_detail,
 		consultation: m.admissions_steps_consultation_detail,
-		placement: m.admissions_steps_placement_detail
+		placement: m.admissions_steps_placement_detail,
+		registration: m.admissions_steps_registration_detail,
+		onboarding: m.admissions_steps_onboarding_detail
 	};
 </script>
 
@@ -70,11 +72,9 @@
 						<span class="text-base leading-snug font-semibold text-foreground md:text-lg">
 							{LABEL[step]()}
 						</span>
-						{#if DETAIL[step]}
-							<p class="mt-2 max-w-[52ch] text-sm leading-relaxed text-foreground-muted">
-								{DETAIL[step]!()}
-							</p>
-						{/if}
+						<p class="mt-2 max-w-[52ch] text-sm leading-relaxed text-foreground-muted">
+							{DETAIL[step]()}
+						</p>
 					</div>
 				</li>
 			{/each}

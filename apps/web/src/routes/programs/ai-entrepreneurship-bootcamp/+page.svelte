@@ -314,7 +314,7 @@
 							{m.programs_aiCamp_structure_title()}
 						</h2>
 						<div class="mt-4 mb-10 h-px w-10 bg-brand/30" aria-hidden="true"></div>
-						<div class="mb-12 grid grid-cols-1 gap-x-12 gap-y-8 md:grid-cols-2">
+						<div class="grid grid-cols-1 gap-x-12 gap-y-8 md:grid-cols-2">
 							{#each DETAILS as detail (detail.label)}
 								<div>
 									<span
@@ -327,20 +327,6 @@
 									{/each}
 								</div>
 							{/each}
-						</div>
-
-						<div class="border-l-2 border-brand/30 pl-6">
-							<h3 class="mb-3 text-xl font-bold text-foreground">
-								{m.programs_aiCamp_structure_fieldTrips_title()}
-							</h3>
-							<p class="max-w-[55ch] leading-relaxed text-foreground-muted">
-								{m.programs_aiCamp_structure_fieldTrips_description({
-									fidelity: m.programs_aiCamp_structure_fieldTrips_fidelity(),
-									vanguard: m.programs_aiCamp_structure_fieldTrips_vanguard(),
-									russell: m.programs_aiCamp_structure_fieldTrips_russell(),
-									rbc: m.programs_aiCamp_structure_fieldTrips_rbc()
-								})}
-							</p>
 						</div>
 					</div>
 				</div>

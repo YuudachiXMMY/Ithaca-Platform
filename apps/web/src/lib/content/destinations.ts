@@ -100,7 +100,7 @@ export const DESTINATIONS: readonly Destination[] = [
 		id: 'waterloo-mathematics-farm',
 		institution: { en: 'University of Waterloo', zh: '滑铁卢大学' },
 		field: {
-			en: 'Mathematics — Financial Analysis & Risk Management',
+			en: 'Mathematics/Financial Analysis and Risk Management',
 			zh: '数学 —— 金融分析与风险管理'
 		},
 		kind: 'offer',
@@ -112,22 +112,36 @@ export const DESTINATIONS: readonly Destination[] = [
 		kind: 'offer',
 		verified: true
 	},
+	// Added 2026-11-14 from the 2027 Program Guide (11-12 edition), which lists it in the same
+	// undifferentiated roll-up as the rest. `'offer'` for the reason given in the header.
+	{
+		id: 'queens-smith',
+		institution: {
+			en: "Queen's University, Smith School of Business",
+			zh: '女王大学 Smith 商学院'
+		},
+		kind: 'offer',
+		verified: true
+	},
 	{
 		id: 'western-ivey',
-		institution: { en: 'Western University — Ivey', zh: '西安大略大学 Ivey 商学院' },
+		institution: { en: 'Western University, Ivey Business School', zh: '西安大略大学 Ivey 商学院' },
 		kind: 'offer',
 		verified: true
 	},
 	{
 		id: 'york-schulich',
-		institution: { en: 'York University — Schulich', zh: '约克大学 Schulich 商学院' },
+		institution: {
+			en: 'York University, Schulich School of Business',
+			zh: '约克大学 Schulich 商学院'
+		},
 		kind: 'offer',
 		verified: true
 	},
 	{
 		id: 'ubc-sauder',
 		institution: {
-			en: 'University of British Columbia — Sauder',
+			en: 'University of British Columbia, Sauder School of Business',
 			zh: '不列颠哥伦比亚大学 Sauder 商学院'
 		},
 		kind: 'offer',

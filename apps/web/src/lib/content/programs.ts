@@ -59,7 +59,7 @@ export const PROGRAMS: readonly Program[] = [
 		},
 		category: 'engineering',
 		board: 'projects',
-		grades: { min: 8, max: 11 },
+		grades: { min: 9, max: 12 },
 		format: 'in-person',
 		location: { en: 'Greater Toronto Area', zh: '大多伦多地区' },
 		hero: {
@@ -106,11 +106,11 @@ export const PROGRAMS: readonly Program[] = [
 		videos: [
 			{
 				id: '1202133392',
-				title: { en: 'Season 2 — 2025-26 Highlights', zh: '第二赛季 2025-26 精彩回顾' }
+				title: { en: 'Season 2: 2025-26 Highlights', zh: '第二赛季 2025-26 精彩回顾' }
 			},
 			{
 				id: '1202133393',
-				title: { en: 'Season 1 — 2024-25 Highlights', zh: '第一赛季 2024-25 精彩回顾' }
+				title: { en: 'Season 1: 2024-25 Highlights', zh: '第一赛季 2024-25 精彩回顾' }
 			},
 			{ id: '1202133768', title: { en: 'EV team clip', zh: 'EV 车队短片' } },
 			{ id: '1202133767', title: { en: 'EV team clip', zh: 'EV 车队短片' } },
@@ -131,7 +131,7 @@ export const PROGRAMS: readonly Program[] = [
 			{
 				name: { en: 'Engineering', zh: '工程' },
 				description: {
-					en: 'Design, build, and test a functioning electric vehicle. CAD modeling, chassis fabrication, electrical wiring, battery systems, and iterative performance testing.',
+					en: 'Design, build, and test a functioning electric vehicle. The work covers CAD modelling, chassis fabrication, electrical wiring, battery systems, and iterative performance testing.',
 					zh: '设计、制造并测试一辆真实运行的电动汽车。CAD 建模、底盘制造、电气布线、电池系统以及迭代性能测试。'
 				},
 				tags: ['CAD Design', 'Chassis Build', 'Electrical Systems', 'Testing']
@@ -139,17 +139,17 @@ export const PROGRAMS: readonly Program[] = [
 			{
 				name: { en: 'Business', zh: '商业' },
 				description: {
-					en: 'Run the team as a real operation. Sponsorship acquisition, budget management, logistics coordination, and organizational skills that make a racing team function.',
+					en: 'Run the team as a real operation. The work covers sponsorship acquisition, budget management, logistics coordination, and the organizational skills that keep a racing team running.',
 					zh: '将团队作为真实运营来管理。赞助商开发、预算管理、后勤协调，以及让赛车队正常运转所需的组织能力。'
 				},
-				tags: ['Sponsorship', 'Budget', 'Logistics', 'Team Mgmt']
+				tags: ['Sponsorship', 'Budget', 'Logistics', 'Team Management']
 			}
 		],
 		roles: [
 			{
 				name: { en: 'Engineering Design', zh: '工程设计' },
 				description: {
-					en: 'CAD modeling, structural analysis, and electrical systems layout for the EV chassis and powertrain.',
+					en: 'CAD modelling, structural analysis, and electrical systems layout for the EV chassis and powertrain.',
 					zh: 'EV 底盘和动力系统的 CAD 建模、结构分析和电气系统布局。'
 				}
 			},
@@ -179,7 +179,7 @@ export const PROGRAMS: readonly Program[] = [
 			{
 				title: { en: 'Real engineering project experience', zh: '真实的工程项目经验' },
 				description: {
-					en: 'Design thinking, hands-on fabrication, and cross-discipline collaboration on a vehicle that actually races.',
+					en: 'Design thinking, hands-on fabrication, and cross-disciplinary collaboration on a vehicle that competes on track.',
 					zh: '在一辆真正参赛的车辆上进行设计思维、动手制造和跨学科协作。'
 				}
 			},
@@ -193,7 +193,7 @@ export const PROGRAMS: readonly Program[] = [
 			{
 				title: { en: 'Competitive university applications', zh: '竞争力强的大学申请' },
 				description: {
-					en: 'A distinctive portfolio piece for top engineering and business programs across North America.',
+					en: 'A distinctive portfolio project for applications to leading engineering and business programs across North America.',
 					zh: '北美顶尖工程与商业项目申请中独具特色的作品集亮点。'
 				}
 			}
@@ -219,12 +219,12 @@ export const PROGRAMS: readonly Program[] = [
 			zh: '13 周内，从第一个创意到投资人级别的路演。'
 		},
 		summary: {
-			en: 'A 13-week program where students build AI-powered startups, develop MVPs, and pitch to real investors.',
+			en: 'A 13-week program in which students build AI-powered startup projects, develop minimum viable products (MVPs), and pitch to investors.',
 			zh: '为期 13 周的项目，学生打造 AI 驱动的初创公司，开发 MVP 并向真实投资人路演。'
 		},
 		category: 'ai-business',
 		board: 'projects',
-		grades: { min: 8, max: 12 },
+		grades: { min: 9, max: 12 },
 		format: 'in-person',
 		hero: {
 			src: '$lib/assets/programs/ai-bootcamp/AIEC2026/OTLFInnovationDay-2026-Presentations-188.jpg',
@@ -262,28 +262,28 @@ export const PROGRAMS: readonly Program[] = [
 			{
 				title: { en: 'A portfolio-ready AI startup project', zh: '可入作品集的 AI 初创项目' },
 				description: {
-					en: 'Each team delivers a complete project package: an innovation prototype, MVP demo video, market-validation brief, pitch deck, growth report, and social-media coverage materials.',
+					en: 'Each team delivers a complete project package: an innovation prototype, an MVP demonstration video, a market validation brief, a pitch deck, a growth report, and social media coverage materials.',
 					zh: '每支团队交付完整的项目包：创新原型、MVP 演示视频、市场验证摘要、路演 PPT、增长报告和社交媒体宣传素材。'
 				}
 			},
 			{
-				title: { en: 'Highly competitive experiences and skills', zh: '极具竞争力的经历与技能' },
+				title: { en: 'Competitive experience and skills', zh: '极具竞争力的经历与技能' },
 				description: {
-					en: 'Students develop real-world entrepreneurship capabilities by working through a rigorous innovation pipeline, from problem discovery to customer validation to investor-ready pitching.',
+					en: 'Students develop practical entrepreneurship skills by working through a rigorous innovation process, from problem discovery and customer validation to an investor-ready pitch.',
 					zh: '学生通过严格的创新流程（从问题发现到客户验证再到投资人级别路演）培养真实的创业能力。'
 				}
 			},
 			{
-				title: { en: 'Substantive AI entrepreneurship exposure', zh: '深度 AI 创业体验' },
+				title: { en: 'In-depth exposure to AI entrepreneurship', zh: '深度 AI 创业体验' },
 				description: {
-					en: 'Through field trips to leading financial institutions and hands-on workshops, students gain first-hand exposure to the intersection of technology and business innovation.',
+					en: 'Through hands-on workshops, mentor sessions, and competition preparation, students gain first-hand exposure to the intersection of technology and business innovation.',
 					zh: '通过参观顶级金融机构和动手工作坊，学生亲身体验科技与商业创新交汇的前沿。'
 				}
 			},
 			{
-				title: { en: 'Access to a high-value mentor community', zh: '接触高价值导师社群' },
+				title: { en: 'Access to an experienced mentor community', zh: '接触高价值导师社群' },
 				description: {
-					en: 'Students connect with professionals from engineering, AI, and finance. Outstanding participants may receive mentor recommendation letters for university applications.',
+					en: 'Students connect with professionals from engineering, AI, and finance. Outstanding participants may be eligible for mentor recommendation letters for university applications.',
 					zh: '学生与工程、AI 和金融领域的专业人士建立连接。优秀学员可获得导师推荐信，用于大学申请。'
 				}
 			}
@@ -319,7 +319,7 @@ export const PROGRAMS: readonly Program[] = [
 		// `/programs` keeps a cross-link card for it — flagship status and board membership are
 		// different claims (plan §2 rule 5).
 		board: 'research',
-		grades: { min: 9, max: 12 },
+		grades: { min: 7, max: 12 },
 		format: 'in-person',
 		hero: {
 			src: '$lib/assets/site/about-hero.jpg',
@@ -349,7 +349,10 @@ export const PROGRAMS: readonly Program[] = [
 		videos: [
 			{
 				id: '1201561760',
-				title: { en: 'Dr. Reza Moridi - AI in Ontario', zh: 'Reza Moridi 博士 —— 安大略的人工智能' }
+				title: {
+					en: 'Dr. Reza Moridi on AI in Ontario',
+					zh: 'Reza Moridi 博士 —— 安大略的人工智能'
+				}
 			},
 			{
 				id: '1118510980',
@@ -370,7 +373,7 @@ export const PROGRAMS: readonly Program[] = [
 			{
 				name: { en: 'Policy', zh: '政策' },
 				description: {
-					en: 'From $20B in sovereign compute to “AI for All” - do government milestones actually work?',
+					en: 'From $20 billion in sovereign compute to “AI for All”: do government targets deliver results?',
 					zh: '从 200 亿的主权算力到「AI 惠及所有人」——政府里程碑真的有用吗？'
 				},
 				tags: []
@@ -378,7 +381,7 @@ export const PROGRAMS: readonly Program[] = [
 			{
 				name: { en: 'Talent', zh: '人才' },
 				description: {
-					en: 'Why does top AI talent keep flowing south? Is immigration policy a trump card or an illusion?',
+					en: 'Why does top AI talent continue to move south? Is immigration policy a genuine advantage or an illusion?',
 					zh: '为什么顶尖 AI 人才不断南流？移民政策是王牌还是幻觉？'
 				},
 				tags: []
@@ -386,7 +389,7 @@ export const PROGRAMS: readonly Program[] = [
 			{
 				name: { en: 'Capital', zh: '资本' },
 				description: {
-					en: 'World-class research, scale-up fatigue. From Element AI to Cohere.',
+					en: 'Canada produces world-class research but struggles to scale its companies. Case studies range from Element AI to Cohere.',
 					zh: '世界级的研究，规模化的疲态。从 Element AI 到 Cohere。'
 				},
 				tags: []
@@ -394,7 +397,7 @@ export const PROGRAMS: readonly Program[] = [
 			{
 				name: { en: 'Industry', zh: '行业' },
 				description: {
-					en: 'Banks, hospitals, farms still struggle to adopt AI. What is blocking real productivity gains?',
+					en: 'Banks, hospitals, and farms still struggle to adopt AI. What is holding back productivity gains?',
 					zh: '银行、医院、农场仍在挣扎于 AI 落地。是什么阻碍了真正的生产力提升？'
 				},
 				tags: []
@@ -402,7 +405,7 @@ export const PROGRAMS: readonly Program[] = [
 			{
 				name: { en: 'Education', zh: '教育' },
 				description: {
-					en: 'Is Ontario preparing high schoolers for the AI era? You are the stakeholder on this one.',
+					en: 'Is Ontario preparing high school students for the AI era? On this question, students are the stakeholders.',
 					zh: '安大略省正在为高中生的 AI 时代做准备吗？你就是这个问题的利益相关者。'
 				},
 				tags: []
@@ -410,21 +413,21 @@ export const PROGRAMS: readonly Program[] = [
 		],
 		curriculum: [
 			{
-				phase: { en: 'Research — weeks 1-3', zh: '研究 —— 第 1-3 周' },
+				phase: { en: 'Research: weeks 1 to 3', zh: '研究 —— 第 1-3 周' },
 				description: {
 					en: 'Background literature review, interview outline design, guest outreach and scheduling.',
 					zh: '背景文献综述、采访提纲设计、嘉宾邀约与日程安排。'
 				}
 			},
 			{
-				phase: { en: 'Fieldwork — weeks 4-7', zh: '田野调查 —— 第 4-7 周' },
+				phase: { en: 'Fieldwork: weeks 4 to 7', zh: '田野调查 —— 第 4-7 周' },
 				description: {
 					en: 'Lead and support interviewing, camera and audio operation, note-taking and role rotation.',
 					zh: '主导与辅助采访、摄像与录音操作、记录与角色轮换。'
 				}
 			},
 			{
-				phase: { en: 'Production — weeks 8-10', zh: '制作 —— 第 8-10 周' },
+				phase: { en: 'Production: weeks 8 to 10', zh: '制作 —— 第 8-10 周' },
 				description: {
 					en: 'Research report drafting, documentary rough-cut editing, screening and public release.',
 					zh: '研究报告撰写、纪录片初剪、放映与公开发布。'
@@ -435,7 +438,7 @@ export const PROGRAMS: readonly Program[] = [
 			{
 				title: { en: 'English Research Report', zh: '英文研究报告' },
 				description: {
-					en: 'Literature review, interview evidence, and original conclusions. Directly usable as a university application portfolio piece.',
+					en: 'Literature review, interview evidence, and original conclusions. Suitable for direct inclusion in a university application portfolio.',
 					zh: '文献综述、采访证据和原创结论。可直接作为大学申请作品集素材使用。'
 				}
 			},
@@ -467,7 +470,7 @@ export const PROGRAMS: readonly Program[] = [
 			zh: '真实账户 · 金融学习 · AI 协作。'
 		},
 		summary: {
-			en: 'Stock analysis, light modelling, risk management and an investment journal — building the background and application material a business or finance applicant needs.',
+			en: 'Stock analysis, introductory modelling, risk management, and an investment journal, building the background and application material that business and finance applicants need.',
 			zh: '选股分析、简单建模、风险管理与投资日志，面向商科与金融方向的背景与申请素材积累。'
 		},
 		category: 'ai-business',
@@ -490,17 +493,17 @@ export const PROGRAMS: readonly Program[] = [
 		// programme record — it is the same programme, one level up.
 		tracks: [
 			{
-				name: { en: 'Lab 101 · 8 weeks · 16 sessions', zh: 'Lab 101 · 8 周 · 16 课时' },
+				name: { en: 'FIN 101 · 8 weeks · 16 sessions', zh: 'Lab 101 · 8 周 · 16 课时' },
 				description: {
-					en: 'Investment theory, working with AI tools, the basics of data modelling, and simulated trading.',
+					en: 'Investment theory, AI tools, data modelling fundamentals, and simulated trading.',
 					zh: '投资理论 · AI 工具使用 · 数据建模基础 · 模拟投资操作。'
 				},
 				tags: ['Investment Theory', 'AI Tools', 'Data Modelling', 'Simulated Trading']
 			},
 			{
-				name: { en: 'Lab 102 · Advanced · 6 weeks', zh: 'Lab 102 · 进阶 · 6 周' },
+				name: { en: 'FIN 102 · Advanced · 5 weeks', zh: 'Lab 102 · 进阶 · 5 周' },
 				description: {
-					en: 'Builds on 101 and moves to small-scale real investing. Details on enquiry.',
+					en: 'Builds on FIN 101 and progresses to small-scale live investing. Details are available on request.',
 					zh: '在 101 基础上转向真实小额投资实操。详询。'
 				},
 				tags: []
@@ -516,18 +519,18 @@ export const PROGRAMS: readonly Program[] = [
 			},
 			{
 				title: {
-					en: 'Real investing experience you can write about',
+					en: 'Investing experience to draw on in applications',
 					zh: '一段可写入文书的真实投资经历'
 				},
 				description: {
-					en: 'Not a case study and not a simulation dressed up as one — a cycle the student actually ran.',
-					zh: '不是案例分析，也不是包装过的模拟盘，而是学生真正跑完的一个周期。'
+					en: 'Not just a case study or a simulation, but a complete investment cycle that the student has run personally.',
+					zh: '不只是案例分析或模拟盘，而是学生亲自跑完的一个完整投资周期。'
 				}
 			},
 			{
 				title: { en: 'A method for working with AI', zh: 'AI 协作建模方法' },
 				description: {
-					en: 'How to put a model together with AI assistance, and how to check what it hands back.',
+					en: 'How to build a model with AI assistance and how to verify its output.',
 					zh: '如何在 AI 协助下搭建模型，以及如何检验它给出的结果。'
 				}
 			}
@@ -549,11 +552,11 @@ export const PROGRAMS: readonly Program[] = [
 		slug: 'engineering-foundations',
 		name: { en: 'Engineering Foundations', zh: '工程启蒙课' },
 		tagline: {
-			en: 'The direct feeder into EV Team.',
+			en: 'The direct pathway into the EV Team.',
 			zh: 'EV 车队直通预备。'
 		},
 		summary: {
-			en: 'Five hands-on courses from machining and structures through to autonomous systems and a global competition capstone.',
+			en: 'Five hands-on courses, progressing from machining and structures to autonomous systems and a global competition capstone.',
 			zh: '五门动手课程，从机械加工与结构力学到自主系统，最后以一场全球赛事作为结业项目。'
 		},
 		category: 'engineering',
@@ -596,7 +599,7 @@ export const PROGRAMS: readonly Program[] = [
 			{
 				name: { en: 'ENGR 302 Aerial Robotics', zh: 'ENGR 302 空中机器人' },
 				description: {
-					en: 'Drones — flight control and aerial robotics.',
+					en: 'Drone flight control and aerial robotics.',
 					zh: '无人机——飞行控制与航空机器人。'
 				},
 				tags: ['Drones', 'Flight Control']
@@ -628,11 +631,11 @@ export const PROGRAMS: readonly Program[] = [
 		slug: 'project-studio',
 		name: { en: 'Project Studio', zh: 'Project Studio' },
 		tagline: {
-			en: 'Incubating one student’s own project.',
+			en: 'Incubation for a student’s own project.',
 			zh: '个人项目孵化。'
 		},
 		summary: {
-			en: 'Secondary students incubate a real project inside a real startup environment; university students get a portfolio and an outlet for real work, with mentoring and introductions.',
+			en: 'Secondary students incubate a real project within a working startup environment. University students build a portfolio and find an outlet for their project work, supported by mentoring and professional introductions.',
 			zh: '中学段在真实创业环境中孵化真实项目；大学段获得作品集与真实项目出口，并有导师辅导与资源对接。'
 		},
 		category: 'ai-business',
@@ -653,7 +656,7 @@ export const PROGRAMS: readonly Program[] = [
 			{
 				name: { en: 'Secondary · G11-12', zh: '中学 · G11-12' },
 				description: {
-					en: 'Incubate a real project, work inside a real startup environment, and come away with AIF material.',
+					en: 'Incubate a real project, work within a startup environment, and develop material for the University of Waterloo Admission Information Form (AIF).',
 					zh: '真实项目孵化，经历真实创业环境，产出 AIF 素材。'
 				},
 				tags: ['Incubation', 'AIF Material']
@@ -661,7 +664,7 @@ export const PROGRAMS: readonly Program[] = [
 			{
 				name: { en: 'University', zh: '大学' },
 				description: {
-					en: 'A portfolio and an outlet for real project work, with mentor coaching and introductions.',
+					en: 'A portfolio and an outlet for project work, with mentor coaching and professional introductions.',
 					zh: '作品集与真实项目出口，导师辅导 + 资源对接。'
 				},
 				tags: ['Portfolio', 'Mentoring']
@@ -713,3 +716,21 @@ export const ENQUIRY_INTEREST_SLUGS: readonly string[] = [
 	...LIVE_PROGRAM_SLUGS,
 	...ENQUIRY_TRACK_SLUGS
 ];
+
+/**
+ * The grades the enquiry form offers, and the only grades `/api/contact` accepts.
+ *
+ * One list for the same reason `ENQUIRY_INTEREST_SLUGS` is one list: the form's `<select>` and the
+ * endpoint's schema were two literals (`[4 … 12]` and `.min(4).max(12)`), which is the shape that
+ * drifts. It was 4-12 until 2026-11-14, when the owner narrowed it to the band the academy
+ * actually serves: every `Program.grades` now starts at 7 or later.
+ *
+ * University students are served too (`includesUniversity`), but the wire field is an integer and
+ * the scheduling app stores it as one, so "University" is not an option here. Such a visitor leaves
+ * the field at "Prefer not to say" and ticks a university interest instead. Adding the option is a
+ * cross-app contract change, not a list edit.
+ *
+ * The scheduling side still accepts 4-12. That is a superset, so nothing here can be rejected
+ * upstream, and it does not need to change in step.
+ */
+export const ENQUIRY_GRADES = [7, 8, 9, 10, 11, 12] as const;

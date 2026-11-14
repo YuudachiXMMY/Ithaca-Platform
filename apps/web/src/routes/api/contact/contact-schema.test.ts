@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { _contactSchema } from './+server';
 import {
+	ENQUIRY_GRADES,
 	ENQUIRY_INTEREST_SLUGS,
 	ENQUIRY_TRACK_SLUGS,
 	LIVE_PROGRAM_SLUGS
@@ -85,5 +86,27 @@ describe('the set is still closed', () => {
 		const tooMany = [...ENQUIRY_INTEREST_SLUGS, LIVE_PROGRAM_SLUGS[0]];
 		expect(tooMany.length).toBeGreaterThan(ENQUIRY_INTEREST_SLUGS.length);
 		expect(parse(tooMany).success).toBe(false);
+	});
+});
+
+describe('the grade the form can submit', () => {
+	// Same shape as the interest list above: the <select> and the schema both read
+	// `ENQUIRY_GRADES`, and this is what proves the schema actually does.
+	const parseGrade = (grade: unknown) =>
+		_contactSchema.safeParse({ name: 'A Parent', email: 'parent@example.com', grade });
+
+	it('accepts every option in the dropdown, as the string a <select> submits', () => {
+		for (const grade of ENQUIRY_GRADES) {
+			expect(parseGrade(String(grade)).success).toBe(true);
+		}
+	});
+
+	it('accepts no grade at all, which is what "Prefer not to say" sends', () => {
+		expect(parseGrade(undefined).success).toBe(true);
+	});
+
+	it('rejects the grades either side of the band', () => {
+		expect(parseGrade(ENQUIRY_GRADES[0] - 1).success).toBe(false);
+		expect(parseGrade(ENQUIRY_GRADES[ENQUIRY_GRADES.length - 1] + 1).success).toBe(false);
 	});
 });

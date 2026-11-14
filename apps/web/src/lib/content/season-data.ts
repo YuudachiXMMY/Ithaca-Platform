@@ -37,7 +37,14 @@ export const SEASONS: readonly Season[] = [
 		label: { en: 'Season 03', zh: '第三赛季' },
 		start: '2026-09-01',
 		end: '2027-05-31',
-		cadence: { en: 'Bi-weekly Saturdays', zh: '每两周周六' },
+		// Owner ruling 2026-11-14, matching the 2027 Program Guide ("每年 9–12 月 & 1–5 月"): the
+		// season runs as two terms. Month precision is all that is published, so each term is
+		// anchored to the first and last day of its months, the same way the window above is.
+		terms: [
+			{ start: '2026-09-01', end: '2026-12-31' },
+			{ start: '2027-01-01', end: '2027-05-31' }
+		],
+		cadence: { en: 'Every other Saturday', zh: '每两周周六' },
 		// Verbatim from the published detail strip, including its hour formatting — the Chinese
 		// copy's 中午 for noon is an editorial choice a formatter would not reproduce.
 		sessionTimes: [
@@ -152,7 +159,7 @@ export const SEASONS: readonly Season[] = [
 	{
 		id: 'ail-101-f26',
 		programSlug: 'ai-investment-lab',
-		label: { en: 'Lab 101 — Fall 2026', zh: 'Lab 101 —— 2026 年秋季' },
+		label: { en: 'FIN 101, Fall 2026', zh: 'Lab 101 —— 2026 年秋季' },
 		start: '2026-09-01',
 		end: '2026-12-31',
 		// "8 weeks, 16 sessions" stays copy rather than becoming `seasonDuration(start, end)`, for

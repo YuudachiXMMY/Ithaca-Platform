@@ -64,20 +64,31 @@ const RENDER_TIMEOUT_MS = 120_000;
  */
 const WARMUP_TIMEOUT_MS = 300_000;
 
-/** `ev-s03` as published: 2026-09-01 → 2027-05-31, nine months. */
+/** `ev-s03` as published: 2026-09-01 → 2027-05-31, taught as two terms (Sep–Dec, Jan–May). */
 const EV_SEASON_ID = 'ev-s03';
 
 /**
  * One month later. Deliberately not a wild jump: the record stays internally coherent (start before
- * end), and the 31-day shift is exactly enough to move `seasonDuration()` from 9 months to 8, which
- * is what makes a hard-coded duration visible.
+ * end), and the 31-day shift is exactly enough to change the month the first term is named after,
+ * which is what makes a hard-coded month range visible.
+ *
+ * Since 2026-11-14 the record states its start twice, once as `start` and once as the first term's
+ * `start`, because the season is published as two terms rather than as a computed "9 months".
+ * Both move together here: shifting only one would build a record no editor would write, and the
+ * page would be right to render it inconsistently.
  */
 const SHIFTED_START = '2026-10-01';
 
 function withShiftedStart(seasons: readonly Season[]): Season[] {
-	return seasons.map((season) =>
-		season.id === EV_SEASON_ID ? { ...season, start: SHIFTED_START } : season
-	);
+	return seasons.map((season) => {
+		if (season.id !== EV_SEASON_ID) return season;
+		const [first, ...rest] = season.terms ?? [];
+		return {
+			...season,
+			start: SHIFTED_START,
+			terms: first ? [{ ...first, start: SHIFTED_START }, ...rest] : season.terms
+		};
+	});
 }
 
 /**
@@ -86,7 +97,9 @@ function withShiftedStart(seasons: readonly Season[]): Season[] {
  *
  * `Sep 2026` and `9 mo` are listed because they are precisely what the hero strip used to hold as
  * bare string literals — so this list is a regression guard for the defect workstream H removed,
- * not a hypothetical.
+ * not a hypothetical. `9 mo` / `9 months` are no longer rendered at all for this season (it shows
+ * its terms instead), and they stay listed for exactly that reason: a literal put back by hand is
+ * the only way either could reappear.
  */
 const ORIGINAL_RENDERINGS: Record<Locale, string[]> = {
 	en: [
@@ -94,15 +107,16 @@ const ORIGINAL_RENDERINGS: Record<Locale, string[]> = {
 		'Sep 2026', // the abbreviation the hero strip hard-coded
 		'2026-09-01', // the raw ISO date in the CourseInstance JSON-LD
 		'9 mo', // seasonDuration(), hero-strip form
-		'9 months' // seasonDuration(), details-strip and FAQ form
+		'9 months', // seasonDuration(), details-strip and FAQ form
+		'September to December' // the first term, details-strip form
 	],
-	zh: ['2026 年 9 月', '2026-09-01', '9 个月']
+	zh: ['2026 年 9 月', '2026-09-01', '9 个月', '9 月至 12 月']
 };
 
 /** The same four surfaces, rendered from the SHIFTED record. */
 const SHIFTED_RENDERINGS: Record<Locale, { window: string; length: string; iso: string }> = {
-	en: { window: 'October 2026', length: '8 months', iso: '2026-10-01' },
-	zh: { window: '2026 年 10 月', length: '8 个月', iso: '2026-10-01' }
+	en: { window: 'October 2026', length: 'October to December', iso: '2026-10-01' },
+	zh: { window: '2026 年 10 月', length: '10 月至 12 月', iso: '2026-10-01' }
 };
 
 interface Surfaces {
@@ -211,10 +225,9 @@ describe.each(['en', 'zh'] as const)(
 				// ── present: the new value, on each of the four surfaces ──────────────────────────────
 				const body = text(programBody);
 				expect(body, 'hero strip / details strip').toContain(expected.window);
-				expect(
-					body,
-					'the computed duration, which a hard-coded "9 months" would not move'
-				).toContain(expected.length);
+				expect(body, 'the first term, which a hard-coded month range would not move').toContain(
+					expected.length
+				);
 				expect(text(indexCard), 'the /programs index card').toContain(expected.window);
 				expect(programHead, 'the CourseInstance JSON-LD').toContain(
 					`"startDate":"${expected.iso}"`

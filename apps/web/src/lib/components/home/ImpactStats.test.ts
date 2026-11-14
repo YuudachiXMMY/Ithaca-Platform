@@ -37,7 +37,7 @@ function figures(html: string): string[] {
 
 describe('ImpactStats', () => {
 	it('server-renders the final figure for every stat, never a zero', () => {
-		expect(figures(render(ImpactStats).body)).toEqual(['200+', '6', '10+', '50+']);
+		expect(figures(render(ImpactStats).body)).toEqual(['200+', '7', '10+', '50+']);
 	});
 
 	it('renders one card per sourced stat', () => {

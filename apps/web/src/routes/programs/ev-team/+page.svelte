@@ -18,7 +18,7 @@
 	import {
 		seasonGrades,
 		seasonGradesWithLocation,
-		seasonLengthShort,
+		seasonSpanShort,
 		seasonSessions,
 		seasonWindowWithLength
 	} from '$lib/season-copy';
@@ -55,9 +55,10 @@
 	 * The hero strip: label/value pairs, compact forms. `null` values are filtered out, so a record
 	 * whose dates are still `TODO(content)` loses the row instead of printing "Invalid Date".
 	 *
-	 * `9 mo` and the `(9 months)` in the details section below are the SAME computed figure rendered
-	 * two ways — `seasonDuration()` returns `{value, unit}` and each call site picks the message.
-	 * Neither number is typed anywhere.
+	 * The duration cell and the parenthesis in the details section below are the SAME fact rendered
+	 * two ways. For a season with `terms` (this one, since 2026-11-14) that fact is the terms:
+	 * `2 terms` here, the month ranges below. A season without them falls back to the computed
+	 * `seasonDuration()`, `9 mo` and `(9 months)`. Neither is typed anywhere.
 	 */
 	const STATS = season
 		? [
@@ -65,7 +66,7 @@
 				{ label: m.programs_evChallenge_stats_grades(), value: seasonGrades(season.grades) },
 				{
 					label: m.programs_evChallenge_stats_duration(),
-					value: seasonLengthShort(season.duration)
+					value: seasonSpanShort(season)
 				},
 				{ label: m.programs_evChallenge_stats_cadence(), value: season.cadence },
 				{ label: m.programs_evChallenge_stats_window(), value: season.window },

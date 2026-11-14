@@ -6,7 +6,7 @@ import { guardPublicPost } from '$lib/server/guard';
 import { parseJsonBody } from '$lib/server/validation';
 import { sendMail } from '$lib/server/mail';
 import { verifyTurnstile } from '$lib/server/turnstile';
-import { ENQUIRY_INTEREST_SLUGS } from '$lib/content/programs';
+import { ENQUIRY_GRADES, ENQUIRY_INTEREST_SLUGS } from '$lib/content/programs';
 import { escapeHtml } from '$lib/utils';
 import * as m from '$lib/paraglide/messages';
 import type { ApiResponse } from '$lib/types';
@@ -44,8 +44,13 @@ export const _contactSchema = z.object({
 	// ── Qualification (redesign) ─────────────────────────────────────────────────────────────
 	/** Which language the enquiry was written in. Drives the confirmation email's locale. */
 	locale: z.enum(['en', 'zh']).optional(),
-	/** Grades 4–12 — the band the academy serves. Coerced because a <select> submits a string. */
-	grade: z.coerce.number().int().min(4).max(12).optional(),
+	/** The band the form offers (`ENQUIRY_GRADES`). Coerced because a <select> submits a string. */
+	grade: z.coerce
+		.number()
+		.int()
+		.min(ENQUIRY_GRADES[0])
+		.max(ENQUIRY_GRADES[ENQUIRY_GRADES.length - 1])
+		.optional(),
 	/**
 	 * Programme slugs. Validated against a closed set rather than accepted as free text: this
 	 * column is what the conversion hypothesis is measured on, so an arbitrary string would make

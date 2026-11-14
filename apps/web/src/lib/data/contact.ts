@@ -1,7 +1,7 @@
 // Ported verbatim from the Next app's src/types/index.ts. `wechat` is intentionally
 // NOT rendered anywhere (no social links exist in the footer).
 export const CONTACT_INFO = {
-	address: '205 Placer Ct unit 325, North York ON',
+	address: '205 Placer Ct Unit 325, North York ON M2H 0A9',
 	/**
 	 * The one address the site publishes (10-24 decision, 2026-11 plan §5 "联系方式").
 	 *
@@ -12,7 +12,7 @@ export const CONTACT_INFO = {
 	 */
 	email: 'info@ithacateens.com',
 	emailAlt: 'joshua.wang@ithacafo.com',
-	phone: '+1(437) 226-8407',
+	phone: '+1 (437) 226-8407',
 	wechat: 'joshuawong2015'
 } as const;
 
