@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import type { Season } from './content/types';
-import { currentSeason, seasonDuration, formatSeasonWindow, isIsoDate } from './seasons';
+import {
+	currentSeason,
+	seasonDuration,
+	formatSeasonTerms,
+	formatSeasonWindow,
+	isIsoDate
+} from './seasons';
 import { SEASONS } from './content/season-data';
 
 // Minimal Season factory — every test below cares about at most four fields, and spelling out
@@ -243,6 +249,31 @@ describe('the shipped season records', () => {
 		expect(ev?.id).toBe('ev-s03');
 		expect(seasonDuration(ev!)).toEqual({ value: 9, unit: 'month' });
 		expect(formatSeasonWindow(ev!, 'en')).toBe('September 2026 – May 2027');
+	});
+
+	it('EV Season 03 is taught in two terms that tile its window exactly', () => {
+		// Owner ruling 2026-11-14. The terms are a second statement of the same nine months, so
+		// they must start where the season starts, end where it ends, and leave no gap between.
+		const ev = currentSeason(SEASONS, 'ev-team')!;
+		expect(ev.terms).toHaveLength(2);
+		expect(ev.terms![0].start).toBe(ev.start);
+		expect(ev.terms![1].end).toBe(ev.end);
+		expect(ev.terms![0].end < ev.terms![1].start).toBe(true);
+		expect(formatSeasonTerms(ev, 'en')).toEqual([
+			{ from: 'September', to: 'December' },
+			{ from: 'January', to: 'May' }
+		]);
+		expect(formatSeasonTerms(ev, 'zh')).toEqual([
+			{ from: '9 月', to: '12 月' },
+			{ from: '1 月', to: '5 月' }
+		]);
+	});
+
+	it('formats no terms for a season that has none, or whose terms are malformed', () => {
+		const camp = currentSeason(SEASONS, 'ai-entrepreneurship-bootcamp')!;
+		expect(formatSeasonTerms(camp, 'en')).toEqual([]);
+		const broken = { ...camp, terms: [{ start: '2026-09-01', end: 'TODO(content): end' }] };
+		expect(formatSeasonTerms(broken, 'en')).toEqual([]);
 	});
 
 	it('the AI Camp current season is cohort 3, on the published Sep–Dec 2026 window', () => {

@@ -187,6 +187,39 @@ export function formatSeasonWindow(season: Season, locale: Locale): string | nul
  *
  * Returns null for an undated value, so a caller omits the field rather than printing "Invalid Date".
  */
+/** One term of a season as two month names: `September` → `December` / `9 月` → `12 月`. */
+export interface SeasonTerm {
+	readonly from: string;
+	readonly to: string;
+}
+
+/**
+ * `Season.terms` as month names, with no year: the window beside it already carries the years,
+ * and "September 2026 to December 2026" twice over is noise.
+ *
+ * All or nothing. One malformed term returns `[]`, so a caller falls back to the computed length
+ * rather than printing "2 terms" above a list of one.
+ */
+export function formatSeasonTerms(season: Season, locale: Locale): readonly SeasonTerm[] {
+	// `numeric` for Chinese: a bare `long` month there is 九月, while every other date on the site
+	// is 9 月 (`formatSeasonWindow` gets digits because it formats the year alongside).
+	const format = new Intl.DateTimeFormat(INTL_LOCALE[locale], {
+		month: locale === 'zh' ? 'numeric' : 'long',
+		timeZone: SEASON_TIME_ZONE
+	});
+	const terms: SeasonTerm[] = [];
+	for (const term of season.terms ?? []) {
+		const start = torontoDate(term.start);
+		const end = torontoDate(term.end);
+		if (!start || !end || end < start) return [];
+		terms.push({
+			from: spaceCjkNumerals(format.format(start), locale),
+			to: spaceCjkNumerals(format.format(end), locale)
+		});
+	}
+	return terms;
+}
+
 export function formatSeasonMonth(iso: string, locale: Locale): string | null {
 	const date = torontoDate(iso);
 	if (!date) return null;

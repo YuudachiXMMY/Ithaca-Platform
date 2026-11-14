@@ -11,18 +11,20 @@
  * two outstanding admissions gaps have to live to be reported as launch blockers. The alternative —
  * a marker in the `.svelte` file — is invisible to the gate.
  *
- * The 11-04 brochure (2026-11 plan §3.4) answered most of this gap. Three of the five steps now
- * have published substance, rendered by `AdmissionsSteps.svelte`:
+ * The 11-04 brochure (2026-11 plan §3.4) answered most of this gap, and the owner closed the rest
+ * on 2026-11-14. All five steps now have published substance, rendered by `AdmissionsSteps.svelte`:
  *   - Inquire — the three channels (form, WeChat, info@ithacateens.com).
  *   - Consultation — free, 20-30 minutes, covering pathway planning and programme choice.
  *   - Placement & trial — an intake diagnostic, then a PAID trial with a style-matched teacher.
  *     ("Whether the trial session is charged" was an explicit question in the old version of this
  *     marker; the brochure answers it, and the answer is that it is charged.)
  *
- * TODO(content): what happens at Registration and Onboarding. The brochure names both and
- * describes neither — how long each takes, what the family has to provide, and what the first
- * week actually looks like. The two steps render as a name with no description rather than with
- * invented process text.
+ *   - Registration — a registration form and tuition payment confirm the place.
+ *   - Onboarding — schedule, materials and an introduction to the teacher or team before the
+ *     first session.
+ *
+ * NOTE: the last two are general by design. How long each takes, what documents a family provides
+ * and what the first week looks like are still unspecified, so the copy does not say.
  *
  * TODO(content): refund, attendance and safety policy text (R-ADM-4, CONTENT-GAPS C-3). The page
  * renders the three headings and says the terms are available on request; it must not paraphrase

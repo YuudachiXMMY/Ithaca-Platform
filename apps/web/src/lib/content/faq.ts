@@ -24,14 +24,14 @@ export const EV_FAQ: readonly FAQ[] = [
 	{
 		q: { en: 'Who can join the EV team?', zh: '谁可以加入 EV 车队？' },
 		a: {
-			en: 'Students in Grades 8 through 11 in the Greater Toronto Area. We welcome anyone interested in engineering, automotive technology, or team-based projects. No prior experience is required.',
+			en: 'Students in Grades 9 through 12 in the Greater Toronto Area. We welcome anyone interested in engineering, automotive technology, or team-based projects. No prior experience is required.',
 			zh: '大多伦多地区 8 至 11 年级的学生。我们欢迎任何对工程、汽车技术或团队项目感兴趣的人。无需任何先前经验。'
 		}
 	},
 	{
-		q: { en: 'Do I need engineering experience?', zh: '我需要有工程经验吗？' },
+		q: { en: 'Is engineering experience required?', zh: '我需要有工程经验吗？' },
 		a: {
-			en: 'No. The program teaches everything from the ground up. Roles span engineering design, assembly, test driving, and team operations. Every team member contributes regardless of technical background.',
+			en: 'No. The program teaches the required skills from the ground up. Roles span engineering design, assembly, test driving, and team operations. Every team member contributes regardless of technical background.',
 			zh: '不需要。项目从零开始教授一切。角色涵盖工程设计、组装、试驾和团队运营。无论技术背景如何，每位团队成员都能做出贡献。'
 		}
 	},
@@ -53,9 +53,9 @@ export const EV_FAQ: readonly FAQ[] = [
 		}
 	},
 	{
-		q: { en: 'What will my child take away?', zh: '我的孩子能带走什么？' },
+		q: { en: 'What will students take away?', zh: '我的孩子能带走什么？' },
 		a: {
-			en: 'Beyond the EV itself, students gain project management skills, technical documentation experience, presentation abilities, and real sponsorship negotiation practice. These are portfolio-ready experiences for university applications.',
+			en: 'Beyond the EV itself, students gain project management skills, technical documentation experience, presentation skills, and practical experience negotiating sponsorships. These experiences translate directly into university application portfolios.',
 			zh: '除了 EV 本身，学生还将获得项目管理技能、技术文档经验、演讲能力和真实的赞助商谈判经历。这些都是大学申请中的高质量作品集素材。'
 		}
 	}
@@ -65,15 +65,15 @@ export const AI_CAMP_FAQ: readonly FAQ[] = [
 	{
 		q: { en: 'What is Ithaca?', zh: '伊萨卡是什么？' },
 		a: {
-			en: 'Ithaca Family Academy is a youth organization empowering young people to explore the future and build the skills to thrive in the AI era. Students learn through real-world projects: building, testing, collaborating, and presenting.',
+			en: 'Ithaca Family Academy is an education organization that empowers young people to explore the future and build the skills to thrive in the AI era. Students learn through real-world projects by building, testing, collaborating, and presenting.',
 			zh: '伊萨卡家族学院是一家青少年组织，致力于赋能年轻人探索未来，培养在 AI 时代蓬勃发展所需的技能。学生通过真实项目学习：构建、测试、协作与展示。'
 		}
 	},
 	{
 		q: { en: 'Who can participate in Ithaca programs?', zh: '谁可以参加伊萨卡项目？' },
 		a: {
-			en: 'Students in Grades 4 through 12 are eligible to join our programs. We group participants by age and experience level to ensure the best learning environment for everyone.',
-			zh: '4 至 12 年级的学生均可加入我们的项目。我们按年龄和经验水平分组，确保每位学员都能获得最佳学习环境。'
+			en: 'Ithaca serves students from middle school through university, and each program page lists its own grade range. We group participants by age and experience to provide the most suitable learning environment for each student.',
+			zh: '伊萨卡服务从中学到大学阶段的学生，各项目页面列有各自的年级范围。我们按年龄和经验水平分组，确保每位学员都能获得最合适的学习环境。'
 		}
 	},
 	{
@@ -88,16 +88,16 @@ export const AI_CAMP_FAQ: readonly FAQ[] = [
 		}
 	},
 	{
-		q: { en: 'Is this only for advanced coders?', zh: '这个项目只适合高级程序员吗？' },
+		q: { en: 'Is coding experience required?', zh: '这个项目只适合高级程序员吗？' },
 		a: {
-			en: 'No. This is an entrepreneurship and product development program. Teams are cross-functional, with roles in design, business, and communication alongside technical work. Technical depth is supported but not required to participate and succeed.',
+			en: 'No. This is an entrepreneurship and product development program. Teams are cross-functional, with roles in design, business, and communication alongside technical work. Technical depth is supported but is not required to participate or succeed.',
 			zh: '不是。这是一个创业和产品开发项目。团队是跨职能的，设计、商业和沟通角色与技术工作并重。鼓励技术深度，但参与和成功并不以此为前提。'
 		}
 	},
 	{
-		q: { en: 'What exactly do students take away?', zh: '学生究竟能带走什么？' },
+		q: { en: 'What do students take away?', zh: '学生究竟能带走什么？' },
 		a: {
-			en: 'Students receive a complete six-item package: an innovation project, MVP demo video and market-validation brief, pitch deck and video, growth report, social-media coverage, and alumni-community access. Outstanding students may also receive mentor recommendation letters.',
+			en: 'Each student completes the program with a six-part package: an innovation project, an MVP demonstration video with a market validation brief, a pitch deck and pitch video, a growth report, social media coverage, and access to the alumni community. Outstanding students may also be eligible for mentor recommendation letters.',
 			zh: '学生将获得完整的六件套：创新项目、MVP 演示视频和市场验证摘要、路演 PPT 和视频、增长报告、社交媒体宣传素材，以及校友社群权限。优秀学员还可获得导师推荐信。'
 		}
 	}
@@ -124,7 +124,7 @@ export const DIALOGUES_FAQ: readonly FAQ[] = [
 	{
 		q: { en: 'How are interview contacts arranged?', zh: '采访联系人如何安排？' },
 		a: {
-			en: 'Our mentors provide guaranteed initial introductions to domain experts. Students also develop their own outreach skills through guided cold-contact exercises. All interviews follow consent and likeness-release protocols.',
+			en: 'Our mentors guarantee initial introductions to domain experts. Students also develop their own outreach skills through guided cold-outreach exercises. All interviews follow consent and likeness-release protocols.',
 			zh: '我们的导师为领域专家提供有保障的初步引荐。学生也将通过有指导的冷门联系练习培养自己的拓展技能。所有采访均遵循知情同意和肖像授权协议。'
 		}
 	},
@@ -138,7 +138,7 @@ export const DIALOGUES_FAQ: readonly FAQ[] = [
 	{
 		q: { en: 'What do students take away?', zh: '学生能带走什么？' },
 		a: {
-			en: 'Two portfolio-ready deliverables in English: a research report suitable for university applications, and an 8-12 minute documentary that is publicly released. Both demonstrate real-world research and communication skills.',
+			en: 'Two portfolio-ready deliverables in English: a research report suitable for university applications and an 8 to 12 minute documentary that is publicly released. Both demonstrate real-world research and communication skills.',
 			zh: '两份英文的可入作品集成果：适用于大学申请的研究报告，以及一部 8-12 分钟公开发布的纪录片。两者均展示真实的研究和沟通能力。'
 		}
 	}

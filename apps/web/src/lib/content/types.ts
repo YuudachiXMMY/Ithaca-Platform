@@ -45,7 +45,18 @@ export interface Season {
 	label: Localized; // 'Season 03' / '第三季'
 	start: string;
 	end: string; // ISO dates
-	cadence?: Localized; // 'Bi-weekly Saturdays'
+	/**
+	 * The terms a season is taught in, when it is taught in more than one block. EV Season 03 is
+	 * one season (one car, one race in May) delivered as two terms, September to December and
+	 * January to May. Without this the only length the site could state was the computed
+	 * "9 months", which is true and hides how the season is actually sold and scheduled.
+	 *
+	 * Optional and additive: `start`/`end` stay the season's own window and still drive the
+	 * window text, the sort order and the CourseInstance JSON-LD. Where `terms` is present, the
+	 * surfaces that would print a computed length print the terms instead.
+	 */
+	terms?: readonly { start: string; end: string }[];
+	cadence?: Localized; // 'Every other Saturday'
 	sessionTimes?: Localized[]; // '10:00–12:00', '13:00–15:00'
 	pitchDay?: string; // ISO date or null
 	registration: 'upcoming' | 'open' | 'waitlist' | 'closed';

@@ -28,7 +28,7 @@ describe('CONTACT_HREFS', () => {
 
 	it('URL-encodes the address into a Google Maps search href', () => {
 		expect(CONTACT_HREFS.mapsSearch).toBe(
-			'https://www.google.com/maps/search/?api=1&query=205%20Placer%20Ct%20unit%20325%2C%20North%20York%20ON'
+			'https://www.google.com/maps/search/?api=1&query=205%20Placer%20Ct%20Unit%20325%2C%20North%20York%20ON%20M2H%200A9'
 		);
 		expect(CONTACT_HREFS.mapsSearch).toBe(
 			`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(CONTACT_INFO.address)}`

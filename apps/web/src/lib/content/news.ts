@@ -54,8 +54,8 @@ export const NEWS: readonly NewsItem[] = [
 		date: '2026-09',
 		body: {
 			en: [
-				'Ontario’s former Minister of Research, Innovation and Science sat down with Ithaca students to talk about where provincial AI policy has actually landed — and where it has not.',
-				'The conversation was researched, outlined and led by the students themselves, which is how every Ithaca Dialogue works.'
+				'Ontario’s former Minister of Research, Innovation and Science joined Ithaca students to discuss where provincial AI policy has made progress and where gaps remain.',
+				'The conversation was researched, outlined, and led by the students themselves, as is every Ithaca Dialogue.'
 			],
 			zh: [
 				'安大略省前研究、创新与科学厅长与伊萨卡学生对谈，讨论省级人工智能政策真正落地到了哪里，又有哪些没有。',
@@ -64,7 +64,7 @@ export const NEWS: readonly NewsItem[] = [
 		},
 		video: {
 			id: '1201561760',
-			title: { en: 'Dr. Reza Moridi - AI in Ontario', zh: 'Reza Moridi 博士 —— 安大略的人工智能' }
+			title: { en: 'Dr. Reza Moridi on AI in Ontario', zh: 'Reza Moridi 博士 —— 安大略的人工智能' }
 		},
 		programSlug: 'ithaca-dialogues',
 		featured: true
@@ -83,7 +83,7 @@ export const NEWS: readonly NewsItem[] = [
 		// student led it. The film is published; the write-up is not.
 		body: {
 			en: [
-				'An Ithaca Dialogue conversation, student-led from the research through to the interview itself.'
+				'An Ithaca Dialogue conversation led by students from initial research through to the interview itself.'
 			],
 			zh: ['一场 Ithaca Dialogue 对谈，从前期调研到访谈现场均由学生主导。']
 		},
@@ -108,7 +108,7 @@ export const NEWS: readonly NewsItem[] = [
 		date: '2026-06',
 		// TODO(content): one paragraph of context for this interview.
 		body: {
-			en: ['An Ithaca Dialogue conversation inside one of Canada’s largest banks.'],
+			en: ['An Ithaca Dialogue conversation with senior leaders at one of Canada’s largest banks.'],
 			zh: ['一场在加拿大最大的银行之一内部进行的 Ithaca Dialogue 对谈。']
 		},
 		video: {
@@ -138,7 +138,7 @@ export const NEWS: readonly NewsItem[] = [
 		// paragraph of context is not.
 		body: {
 			en: [
-				'Ithaca’s EV team spent a day on a working automotive production line — the same problems they solve at a one-car scale, at the scale of a factory.'
+				'Ithaca’s EV team spent a day on a working automotive production line and saw the problems they solve on a single vehicle addressed at factory scale.'
 			],
 			zh: [
 				'伊萨卡 EV 车队在运转中的汽车生产线上度过了一天——他们在一辆车上解决的问题，在工厂规模上是什么样子。'

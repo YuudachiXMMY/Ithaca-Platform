@@ -28,7 +28,7 @@ export const HIGHLIGHTS: readonly Highlight[] = [
 		tag: { en: 'Field Visit', zh: '实地参观' },
 		title: { en: 'Honda Production Line Visit', zh: '本田生产线参观' },
 		caption: {
-			en: 'Touring the Honda EV production facility, witnessing cutting-edge manufacturing and sustainable engineering.',
+			en: "Students toured Honda's EV production facility and observed advanced manufacturing and sustainable engineering first-hand.",
 			zh: '参观本田 EV 生产设施，亲历前沿制造工艺与可持续工程实践。'
 		},
 		media: {
@@ -47,7 +47,7 @@ export const HIGHLIGHTS: readonly Highlight[] = [
 		tag: { en: 'Workshop', zh: '工作坊' },
 		title: { en: 'EV Program Workshop', zh: 'EV 课程工作坊' },
 		caption: {
-			en: 'Designing and assembling EV components, learning motor systems and energy management.',
+			en: 'Students designed and assembled EV components while learning motor systems and energy management.',
 			zh: '设计并组装 EV 零部件，学习电机系统与能源管理知识。'
 		},
 		media: {
@@ -65,11 +65,11 @@ export const HIGHLIGHTS: readonly Highlight[] = [
 		id: 'sedra-design-centre',
 		tag: { en: 'Campus Visit', zh: '校园参访' },
 		title: {
-			en: "Visiting the Sedra Student Design Centre at the University of Waterloo's Department of Engineering",
+			en: 'Sedra Student Design Centre, University of Waterloo Faculty of Engineering',
 			zh: '参观滑铁卢大学工程学院的 Sedra 学生设计中心'
 		},
 		caption: {
-			en: "Touring the student design teams' workshops, seeing how university engineering projects are built from the ground up.",
+			en: "Students toured the design teams' workshops and saw how university engineering projects are built from the ground up.",
 			zh: '走访学生设计团队的工作间，了解大学工程项目如何从零搭建。'
 		},
 		media: {
@@ -87,7 +87,7 @@ export const HIGHLIGHTS: readonly Highlight[] = [
 		tag: { en: 'Teamwork', zh: '团队合作' },
 		title: { en: 'Team Collaboration', zh: '团队协作' },
 		caption: {
-			en: 'Cross-disciplinary projects combining technical expertise with creative problem-solving.',
+			en: 'Cross-disciplinary projects that combine technical expertise with creative problem-solving.',
 			zh: '跨学科项目将技术专长与创意解题相结合，激发集体智慧。'
 		},
 		media: {
@@ -101,11 +101,11 @@ export const HIGHLIGHTS: readonly Highlight[] = [
 		id: 'hinton-lecture',
 		tag: { en: 'Guest Lecture', zh: '嘉宾讲座' },
 		title: {
-			en: 'Featuring University of Toronto Professor Geoffrey Hinton, a Nobel laureate, sharing insights on artificial intelligence',
+			en: 'Professor Geoffrey Hinton on Artificial Intelligence',
 			zh: '多伦多大学诺贝尔奖获得者辛顿教授分享人工智能洞见'
 		},
 		caption: {
-			en: 'Joining a packed University of Toronto lecture hall, hearing a Nobel laureate on the frontiers of artificial intelligence.',
+			en: 'Students attended a University of Toronto lecture by Nobel laureate Professor Geoffrey Hinton on the frontiers of artificial intelligence.',
 			zh: '走进座无虚席的多伦多大学讲堂，聆听诺贝尔奖获得者解读人工智能前沿。'
 		},
 		media: {
@@ -123,7 +123,7 @@ export const HIGHLIGHTS: readonly Highlight[] = [
 		tag: { en: 'Innovation', zh: '创新实践' },
 		title: { en: 'Hands-On Innovation', zh: '动手创新' },
 		caption: {
-			en: 'From prototyping to coding, building solutions that address real challenges in technology.',
+			en: 'From prototyping to coding, students build solutions to real technology challenges.',
 			zh: '从原型制作到编程，构建解决真实技术挑战的创新方案。'
 		},
 		media: {

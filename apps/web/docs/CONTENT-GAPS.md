@@ -234,10 +234,55 @@ consent 门禁管**（Andy Song 的普林斯顿入读就在 `results.ts` 里，�
 了一张最接近的已发布照片，`alt` 写的是**那张照片实际拍了什么**，不是项目是什么 —— 所以读屏用户
 不会被告知一张不存在的图。全部标 `TODO(asset)`（advisory，不阻塞）。
 
-#### 🟡 C-10e · Registration 与 Onboarding 两步仍无实质内容
+#### ~~C-10e · Registration 与 Onboarding 两步仍无实质内容~~ — 🟢 解决于 2026-11-14
 
-五步流程里前三步的文案由 11-04 三折页补齐了（含一个原本挂着的问题：试课**收费**）。后两步三折页
-点了名没说内容，所以它们只渲染步骤名，不渲染编造的流程。见 `src/lib/content/admissions.ts`。
+五步流程里前三步的文案由 11-04 三折页补齐了（含一个原本挂着的问题：试课**收费**）。后两步由
+业主在 2026-11-14 裁定补上：Registration 是「填写报名表并安排学费缴纳」，Onboarding 是「首次
+上课前收到课程安排、所需材料，以及老师或团队的介绍」。两句刻意写得笼统 —— 每步耗时、家庭要
+提交什么材料仍然没人给过，所以文案不写。见 `src/lib/content/admissions.ts`。
+
+同一天按《2027 学院手册》（11-12 版）对齐的还有：
+
+- **年级范围**：`/about-us` 的「4-12」改为「7-12 及大学」（与 `/admissions` 由 `PROGRAMS` 推导出的
+  跨度一致）；AI 创业营 FAQ 不再写「4 至 12 年级」；Ithaca Dialogue 的 `grades` 由 9-12 改为
+  7-12（手册标「初中｜高中」，与工程启蒙课同一口径）。
+- **AI 投资实验室**：Lab 102 为 5 周（11-07 决议，原写 6 周）；合规声明改用手册文本 ——
+  增加风险提示、「不经手学员资金」，并删去「伊萨卡协助开户」（手册写的是开户与交易由家庭自行决定）。
+- **`/research` 的「by place」**：是「名额制」的直译，改为「Limited places」。
+
+同日第二轮裁定（业主逐条答复），以下都已落到代码里：
+
+- **EV 车队与 AI 创业营统一为 9-12 年级**（原 8-11、8-12；手册标「高中」）。
+- **两期课程统一叫 FIN 101 / FIN 102**（原 Lab 101 / Lab 102）。项目名仍是 AI Investment Lab。
+- **录取院校加入女王大学 Smith 商学院**（`destinations.ts`，`kind: 'offer'`），首页成果行同步。
+- **学业辅导加入 IB**：`/academics` 首屏与 meta、Tutoring 卡片与页面、成长航线的学术一行、
+  询盘表单的兴趣项，以及商标声明（新增 IB® 归属）。没有新建 `/academics/ib` 页 —— 手册把 IB
+  放在「OSSD / AP / IB 学业辅导」这一条里，不是单独一条线。
+- **询盘表单年级下拉与 `/api/contact` 校验收窄为 7-12**，两边读同一张表 `ENQUIRY_GRADES`
+  （`content/programs.ts`）。排课系统那侧仍接受 4-12，是超集，不需要同步改。「大学」不在
+  下拉里：线上字段是整数，加这一项是跨 app 契约变更。
+- **AI 创业营删去「March Break Field Trips」一节**（当前期次是 9-12 月），成果描述里的
+  「走访金融机构」一并改掉。`partners.ts` 里四个场地记录保留，现在没有任何页面渲染它们。
+- **首页「Programs」数字 6 → 7**，口径是 `/programs` 上的卡片数（六条 `Program` 记录加
+  Research Lab）。
+- **EV 车队「Bi-weekly Saturdays」确认是每两周一次**，英文改为「Every other Saturday」。
+
+同日第三轮裁定：
+
+- **Cavafy 引文的两个译本（首页与 EV 页）保持原样，以后不再当作待办。** 这是裁定，不是遗漏。
+- **`/success-stories` 的页面标题与首页对应区块统一叫「Success Stories」**（原为「Results」），
+  与导航、页脚和 URL 一致。`results_*` 这批 key 名和 `/results` 的 308 没有动。
+- **地址定为 `205 Placer Ct Unit 325, North York ON M2H 0A9`**（补上了邮编）。
+- **EV 车队一个赛季分两期：9-12 月与 1-5 月。** `Season` 新增可选字段 `terms`，有它的赛季在
+  原本显示计算时长的地方（EV 页首屏条、详情条、`/admissions` 日历）改显示学期，
+  `start` / `end` 与 JSON-LD 不变。`season-contract.test.ts` 相应改为同时平移首期的起始月。
+
+**中文页这一轮按业主要求没有处理**，所以 `/zh` 下有几处写死的文案和上面的数据对不上，补中文时
+照这张单子改即可：`programs_aiCamp_hero_subtitle`（8 至 12 年级）、
+`programs_evChallenge_faq_items_whoCanJoin_answer` 与 `faq.ts` 对应条目（8 至 11 年级）、
+`programs.ts` / `season-data.ts` 里 `zh` 字段的「Lab 101 / Lab 102」、合规声明里的「Lab 102」、
+`home_results_item3`、学业辅导相关文案与商标声明里的 IB、AI 创业营成果描述里的「参观顶级金融机构」。
+另有上一轮留下的两处：OSSD 学分仍写 18/12、`academics_tracks_eyebrow` 仍是「四个方向」。
 
 #### 🟡 C-10f · 方案自己列的「待拍板」项
 

@@ -1,10 +1,12 @@
 import type { Locale, Program, Season } from './content/types';
 import {
-	INTL_LOCALE,
+	formatSeasonTerms,
 	formatSeasonWindow,
+	INTL_LOCALE,
 	isIsoDate,
 	seasonDuration,
-	type SeasonDuration
+	type SeasonDuration,
+	type SeasonTerm
 } from './seasons';
 
 /**
@@ -35,6 +37,8 @@ export interface CalendarRow {
 	readonly window: string | null;
 	/** Derived from the day count, never typed by hand. Null when an endpoint is unknown. */
 	readonly duration: SeasonDuration | null;
+	/** `Season.terms` as month names; empty when the season is not taught in terms. */
+	readonly terms: readonly SeasonTerm[];
 	readonly cadence: string | null;
 	readonly sessionTimes: readonly string[];
 	readonly registration: Season['registration'];
@@ -108,6 +112,7 @@ export function admissionsCalendar(
 				grades: program ? program.grades : null,
 				window: formatSeasonWindow(season, locale),
 				duration: seasonDuration(season),
+				terms: formatSeasonTerms(season, locale),
 				cadence: season.cadence ? season.cadence[locale] : null,
 				sessionTimes: (season.sessionTimes ?? []).map((time) => time[locale]),
 				registration: season.registration,

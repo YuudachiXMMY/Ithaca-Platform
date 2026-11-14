@@ -1,6 +1,6 @@
 import * as m from '$lib/paraglide/messages';
 import type { ProgramSeasonView } from '$lib/program-season';
-import type { SeasonDuration } from '$lib/seasons';
+import type { SeasonDuration, SeasonTerm } from '$lib/seasons';
 
 /**
  * The Paraglide half of the season rendering — `prd.md` R-PT-1 / R-PROG-2.
@@ -44,9 +44,32 @@ export function seasonLengthShort(duration: SeasonDuration | null): string | nul
  * (EV's is a frequency, the AI Camp's is a length), so a standalone "Length" beside a "Schedule"
  * that also states a length reads as a contradiction.
  */
+/**
+ * `2 terms: September to December; January to May` / `2 期：9 月至 12 月；1 月至 5 月`.
+ *
+ * `null` for a season with no terms, so a caller can write `seasonTerms(…) ?? seasonLength(…)`
+ * and a season taught in one block keeps its computed length.
+ */
+export function seasonTerms(terms: readonly SeasonTerm[]): string | null {
+	if (terms.length === 0) return null;
+	const list = terms
+		.map((term) => m.season_termRange({ from: term.from, to: term.to }))
+		.join(m.season_listSeparator());
+	return m.season_terms({ count: terms.length, list });
+}
+
+/** The glance form for the hero strip: `2 terms`, or the computed `9 mo` when there are none. */
+export function seasonSpanShort(view: ProgramSeasonView): string | null {
+	return view.terms.length > 0
+		? m.season_termsShort({ count: view.terms.length })
+		: seasonLengthShort(view.duration);
+}
+
 export function seasonWindowWithLength(view: ProgramSeasonView): string | null {
 	if (!view.window) return null;
-	const length = seasonLength(view.duration);
+	// Terms win over the computed length: "(9 months)" is true of EV Season 03 and says nothing
+	// about how it is taught.
+	const length = seasonTerms(view.terms) ?? seasonLength(view.duration);
 	return length ? m.season_windowWithLength({ window: view.window, length }) : view.window;
 }
 

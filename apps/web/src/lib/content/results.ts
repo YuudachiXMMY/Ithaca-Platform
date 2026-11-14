@@ -46,7 +46,7 @@ export const RESULTS: readonly Result[] = [
 			zh: 'Andy Song 入读普林斯顿大学'
 		},
 		detail: {
-			en: 'Andy interviewed Mr. Carlos Orencio Horta, Director of AI at Scotiabank, and Mr. Tanaby Zibamanzar, Director of Data Analytics. Andy graduated from high school in June 2025 and began his studies at Princeton University in September 2025.',
+			en: 'Andy interviewed Mr. Carlos Orencio Horta, Director of AI at Scotiabank, and Mr. Tanaby Zibamanzar, Director of Data Analytics. He graduated from high school in June 2025 and began his studies at Princeton University that September.',
 			zh: 'Andy 采访了丰业银行人工智能总监 Carlos Orencio Horta 先生与数据分析总监 Tanaby Zibamanzar 先生。Andy 于 2025 年 6 月高中毕业，并于 2025 年 9 月入读普林斯顿大学。'
 		},
 		// prd.md §6.3 names this item as already-published and therefore consent-verified.

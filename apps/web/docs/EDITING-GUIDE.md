@@ -92,6 +92,27 @@ npm run check        # 重新编译 Paraglide，新键才能在组件里用
 
 `src/lib/paraglide/` 是编译产物，**不要手改、不要提交**（已 gitignore）。
 
+### 英文文案约定
+
+2026-11-14 对全部英文页做过一轮措辞审校，立下几条约定。新写或改写 `en` 文案时照着来，
+否则下一轮审校又要把同样的东西再清一遍：
+
+- **不用 em dash（`—`）。** 改用逗号、冒号、括号，或者拆成两句。页面标题的站名分隔符统一用
+  `|`。这条只管英文：中文文案里的「——」是正常标点，不动。
+- **句子里的范围写 `to`**（`20 to 30 minute`、`Grades 8 to 11`）。由代码格式化出来的日期区间
+  （`September 2026 – May 2027`）保留 en dash，那是 `formatSeasonWindow()` 的输出，不是文案。
+- **拼写统一用加拿大英语**：`program`（不是 programme）、`standardized`、`organization`、
+  `inquiry`（不是 enquiry）、`modelling`、`centre`、`enrolment`。代码里的标识符、文件名
+  （`EnquiryForm.svelte`、`email_enquiry_*` 这类 key）不在此列，别为了拼写去改名。
+- **不写 `actually`，不在一句里叠两个 `real`。** 它们几乎从不承载信息。
+- **散文里不用缩写**（maths、CS、U of T、Mgmt），不用分词开头的残句
+  （`Touring the facility, …` → `Students toured the facility …`）。
+- **不在文案里写死会变的数量**（「Four Tracks」正是这样过期的），这条和 `DECISIONS.md` 里
+  `/academics` meta 那次的教训是同一条。
+
+同一句英文常常**同时**存在于 `messages/en.json` 和 `src/lib/content/*.ts` 的 `en:` 字段里
+（后者喂 JSON-LD 和内容模型）。改一处要搜另一处，两边都改。
+
 ### 中文排版
 
 `/zh` 页面的中文字距/行高由 `src/app.css` 里 `html:lang(zh)` 作用域的规则统一处理，

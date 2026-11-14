@@ -27,7 +27,12 @@
 	// `LIVE_PROGRAM_SLUGS` (not the wider `ENQUIRY_INTEREST_SLUGS`) stays the allowlist for the
 	// `?program=` deep link below: R-ADM-7 is about arriving from a programme page, and every such
 	// link in the codebase carries a real `Program.slug`.
-	import { PROGRAMS, LIVE_PROGRAM_SLUGS, ENQUIRY_TRACK_SLUGS } from '$lib/content/programs';
+	import {
+		PROGRAMS,
+		LIVE_PROGRAM_SLUGS,
+		ENQUIRY_TRACK_SLUGS,
+		ENQUIRY_GRADES
+	} from '$lib/content/programs';
 	import { resolveProgramParam, resolveTopicParam, type Topic } from '$lib/admissions';
 	import { trackInquirySubmit, trackPhoneTap } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
@@ -63,9 +68,6 @@
 	const TURNSTILE_SITE_KEY =
 		(publicEnv as Record<string, string | undefined>).PUBLIC_TURNSTILE_SITE_KEY ?? '';
 	const TURNSTILE_SCRIPT = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-
-	/** Grades 4–12 — the band the academy serves (`/api/contact` validates the same range). */
-	const GRADES = [4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 
 	/**
 	 * "Programme of interest" — the six `Program` records, plus three things a family asks about
@@ -426,7 +428,7 @@
 					<label for="{idPrefix}-grade" class={labelClass}>{m.contact_form_gradeLabel()}</label>
 					<select id="{idPrefix}-grade" bind:value={fields.grade} class={inputClass}>
 						<option value="">{m.contact_form_gradeUnset()}</option>
-						{#each GRADES as grade (grade)}
+						{#each ENQUIRY_GRADES as grade (grade)}
 							<option value={String(grade)}>{m.contact_form_gradeOption({ grade })}</option>
 						{/each}
 					</select>

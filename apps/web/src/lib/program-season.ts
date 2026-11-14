@@ -2,9 +2,11 @@ import type { Locale, Program, Season } from './content/types';
 import {
 	currentSeason,
 	formatSeasonMonth,
+	formatSeasonTerms,
 	formatSeasonWindow,
 	seasonDuration,
-	type SeasonDuration
+	type SeasonDuration,
+	type SeasonTerm
 } from './seasons';
 
 /**
@@ -55,6 +57,8 @@ export interface ProgramSeasonView {
 	readonly startMonth: string | null;
 	/** Derived from the day count, never typed by hand. Null when an endpoint is unknown. */
 	readonly duration: SeasonDuration | null;
+	/** `Season.terms` as month names; empty when the season is not taught in terms. */
+	readonly terms: readonly SeasonTerm[];
 	/**
 	 * The published cadence, as copy. NOT `duration` rendered differently: the AI Camp publishes
 	 * "13 weeks, including Pitch Day" for a programme that sits inside a ~17-week Sep–Dec window,
@@ -94,6 +98,7 @@ export function programSeason(
 		window: formatSeasonWindow(season, locale),
 		startMonth: formatSeasonMonth(season.start, locale),
 		duration: seasonDuration(season),
+		terms: formatSeasonTerms(season, locale),
 		cadence: season.cadence ? season.cadence[locale] : null,
 		sessionTimes: (season.sessionTimes ?? []).map((time) => time[locale]),
 		pitchDay: season.pitchDay ? formatSeasonMonth(season.pitchDay, locale) : null

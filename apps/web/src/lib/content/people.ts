@@ -37,7 +37,7 @@ export const PEOPLE: readonly Person[] = [
 		name: { en: 'Joshua Wang', zh: 'Joshua Wang' },
 		role: { en: 'Founder & Principal', zh: '创始人兼校长' },
 		bio: {
-			en: 'Mr. Joshua Wang was an editorial writer of leading business media, adjunct professor at universities.',
+			en: 'Mr. Joshua Wang is a former editorial writer for leading business media and a former university adjunct professor.',
 			zh: '王先生曾任知名商业媒体专栏作家、大学兼职教授。'
 		},
 		photo: {
@@ -67,7 +67,7 @@ export const PEOPLE: readonly Person[] = [
 	{
 		id: 'kristen-perry',
 		name: { en: 'Kristen Perry', zh: 'Kristen Perry' },
-		role: { en: 'Mentor of Business Module', zh: '商业模块导师' },
+		role: { en: 'Business Module Mentor', zh: '商业模块导师' },
 		bio: {
 			en: 'Ms. Kristen Perry is a founder, educator, and investor who focuses on supporting entrepreneurs looking to tackle complex global challenges.',
 			zh: 'Perry 女士是一位创始人、教育家和投资人，致力于支持解决复杂全球挑战的创业者。'
@@ -87,7 +87,7 @@ export const PEOPLE: readonly Person[] = [
 		name: { en: 'Grant Bourne', zh: 'Grant Bourne' },
 		role: { en: 'EV Program Lead & Coach', zh: 'EV 项目负责人兼教练' },
 		bio: {
-			en: '2025 Pirelli GT4 Champion',
+			en: 'Mr. Grant Bourne is a racing driver and the 2025 Pirelli GT4 champion.',
 			zh: '2025 年倍耐力 GT4 冠军'
 		},
 		photo: {

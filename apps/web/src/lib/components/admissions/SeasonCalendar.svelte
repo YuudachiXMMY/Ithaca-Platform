@@ -26,6 +26,7 @@
 	import type { Picture } from '@sveltejs/enhanced-img';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import type { CalendarRow } from '$lib/admissions';
+	import { seasonTerms } from '$lib/season-copy';
 	import * as m from '$lib/paraglide/messages';
 
 	import evImg from '$lib/assets/programs/ev-team/EV26-5.jpg?enhanced';
@@ -85,6 +86,8 @@
 	 */
 	function windowLabel(row: CalendarRow): string {
 		if (!row.window) return m.admissions_calendar_tbc();
+		const terms = seasonTerms(row.terms);
+		if (terms) return m.admissions_calendar_windowWithLength({ window: row.window, length: terms });
 		if (!row.duration) return row.window;
 		const length =
 			row.duration.unit === 'week'

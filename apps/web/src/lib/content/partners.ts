@@ -47,7 +47,7 @@ export const PARTNERS: readonly Partner[] = [
 	},
 	{
 		id: 'uwaterloo-sedra',
-		name: 'University of Waterloo — Sedra Student Design Centre',
+		name: 'University of Waterloo, Sedra Student Design Centre',
 		logo: missingLogo('University of Waterloo', '滑铁卢大学'),
 		kind: 'venue',
 		permissionVerified: true,
@@ -60,9 +60,10 @@ export const PARTNERS: readonly Partner[] = [
 		kind: 'venue',
 		permissionVerified: true
 	},
-	// The four March Break field-trip hosts named in
-	// `programs_aiCamp_structure_fieldTrips_*`. Kept as venues, not partners: the site describes
-	// visits, not a partnership.
+	// The four hosts of the cohort 2 March Break field trips. The AI Bootcamp page no longer
+	// describes those trips (section removed 2026-11-14: the current cohort runs September to
+	// December), so nothing renders these today. Kept as venues, not partners: they were visits,
+	// not a partnership.
 	{
 		id: 'fidelity',
 		name: 'Fidelity',
