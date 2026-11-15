@@ -1,24 +1,30 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
-	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
+	import { getLocale } from '$lib/paraglide/runtime';
+	import { consultHref } from '$lib/program-cta';
 	import { MapPin, Phone, Mail, ArrowRight } from 'lucide-svelte';
-	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
+	import { CONTACT_INFO, CONTACT_DISPLAY, CONTACT_HREFS } from '$lib/data/contact';
 	import { trackPhoneTap } from '$lib/analytics';
 	import { Spring, prefersReducedMotion } from 'svelte/motion';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
+	import WeChatQr from '$lib/components/contact/WeChatQr.svelte';
 
 	// `phone` flags the one row that is a tel: link, so the `phone_tap` handler below is attached
 	// by identity rather than by sniffing the href prefix at render time.
+	//
+	// Address and phone render from CONTACT_DISPLAY, not CONTACT_INFO: this row is a single
+	// horizontal run and used to wrap INSIDE those two values at narrow desktop widths. The
+	// non-breaking spaces live in `$lib/data/contact`; `href` still reads the canonical spelling.
 	const CONTACT_ITEMS = [
 		{
 			icon: MapPin,
-			value: CONTACT_INFO.address,
+			value: CONTACT_DISPLAY.address,
 			href: undefined as string | undefined,
 			phone: false
 		},
 		{
 			icon: Phone,
-			value: CONTACT_INFO.phone,
+			value: CONTACT_DISPLAY.phone,
 			href: CONTACT_HREFS.tel,
 			phone: true
 		},
@@ -165,11 +171,24 @@
 			</ul>
 		</Reveal>
 
+		<!-- The WeChat QR, in the conversion block rather than only in the footer.
+		     `Footer.svelte`'s own comment is the argument: WeChat is this site's primary arrival
+		     path, and a parent reading inside WeChat's browser can long-press the code instead of
+		     filling in a form that may fail. Until now the only in-page QR a visitor met before
+		     the footer was the enquiry form's FAILURE fallback, which is why `wechat_qr_view` was
+		     near-unmeasurable. A distinct `location` keeps this instance separable in GA from the
+		     footer baseline. -->
+		<Reveal delay={200}>
+			<div class="mt-8 flex justify-center">
+				<WeChatQr location="home_contact" locale={getLocale()} showId />
+			</div>
+		</Reveal>
+
 		<Reveal delay={240}>
 			<div class="mt-8">
 				<a
 					bind:this={ctaEl}
-					href={localizeHref('/contact-us')}
+					href={consultHref()}
 					onpointermove={prefersReducedMotion.current ? undefined : handlePointerMove}
 					onpointerleave={prefersReducedMotion.current ? undefined : handlePointerLeave}
 					style={prefersReducedMotion.current
@@ -177,7 +196,7 @@
 						: `translate: ${p.current.x}px ${p.current.y}px`}
 					class="group/cta inline-flex h-12 items-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-colors duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 				>
-					<span>{m.home_contact_cta()}</span>
+					<span>{m.common_cta_bookConsult()}</span>
 					<ArrowRight
 						class="h-4 w-4 transition-transform duration-200 group-hover/cta:translate-x-1"
 					/>

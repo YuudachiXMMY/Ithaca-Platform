@@ -3,6 +3,7 @@
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { inview } from '$lib/actions/inview';
 	import { STATS, isSourced } from '$lib/content/stats';
+	import SectionHeader from '$lib/components/shared/SectionHeader.svelte';
 
 	// ─── Where each piece of a card comes from ──────────────────────────────────────────────────
 	// Numbers, suffixes and the R-CONTENT-3 provenance gate: `$lib/content/stats` (prd.md §6.1).
@@ -55,10 +56,8 @@
 	oninview={reveal}
 >
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
-		<div class="mb-12 text-center md:mb-16">
-			<h2 class="text-2xl font-bold tracking-tight text-foreground md:text-4xl">
-				{m.home_impact_heading()}
-			</h2>
+		<div class="mb-12 md:mb-16">
+			<SectionHeader heading={m.home_impact_heading} />
 		</div>
 		<div class="grid grid-cols-2 gap-px overflow-hidden bg-surface-2 md:grid-cols-4">
 			{#each stats as stat, i (stat.key)}
@@ -71,8 +70,11 @@
 						? undefined
 						: `transform:translateY(${revealed ? 0 : 24}px);transition:transform 0.8s cubic-bezier(0.33,1,0.68,1) ${i * 250}ms`}
 				>
+					<!-- One fluid step instead of the `text-4xl md:text-5xl lg:text-6xl` ramp. Same
+					     endpoints (36px → 60px), but it stops spending two rungs of the type scale on
+					     what is really a single display-numeral role — see DESIGN-TOKENS §10.4. -->
 					<p
-						class="font-mono text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl"
+						class="font-display text-[clamp(2.25rem,4vw,3.75rem)] font-bold tracking-tight text-foreground tabular-nums"
 					>
 						{stat.value}{stat.suffix ?? ''}
 					</p>

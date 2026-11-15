@@ -134,32 +134,54 @@ test.describe('GA4 events — R-SEO-5', () => {
 		// The invariant has to be checked somewhere the QR is genuinely off-screen at load. The
 		// contact page is NOT that place any more: its code sits directly under the four channel
 		// cards, inside the first viewport on desktop, so it fires immediately and correctly.
-		// The homepage's footer code is metres down the page.
+		// Both of the homepage's codes are metres down the page.
+		//
+		// There are TWO on the homepage as of 2026-11-15: the Get In Touch block gained one (design
+		// review — the footer was the earliest a visitor met a QR outside a failed submit, and WeChat
+		// is this site's primary arrival path). So every count here is scoped BY LOCATION. A bare
+		// `filter(name === 'wechat_qr_view').length` was what this test used to assert, and adding a
+		// second placement broke it — correctly: the two codes are close enough together that one
+		// `scrollIntoViewIfNeeded` to the footer can bring both into view, and a total count cannot
+		// express "each code counted once".
+		const views = async (location: string) =>
+			(await sent(page)).filter(
+				(e) =>
+					e.name === 'wechat_qr_view' && (e.params as { location?: string }).location === location
+			);
+
 		await page.goto('/');
 		expect((await sent(page)).filter((e) => e.name === 'wechat_qr_view')).toEqual([]);
 
+		// The Get In Touch code, reached first — it is the one in document order, above the footer.
+		// Scrolled to explicitly rather than swept past, so this placement has coverage of its own:
+		// a `location` that no test ever asserts is a dimension that can silently stop being sent.
+		await page.locator('img[src*="Joshua-WeChat"]').first().scrollIntoViewIfNeeded();
+		await expect.poll(async () => (await views('home_contact')).length).toBe(1);
+
 		await page.locator('footer img[src*="Joshua-WeChat"]').scrollIntoViewIfNeeded();
-		await expect
-			.poll(async () => (await sent(page)).filter((e) => e.name === 'wechat_qr_view').length)
-			.toBe(1);
-		expect((await sent(page)).find((e) => e.name === 'wechat_qr_view')?.params).toEqual({
+		await expect.poll(async () => (await views('footer')).length).toBe(1);
+		expect((await views('footer'))[0]?.params).toEqual({
 			location: 'footer',
 			locale: 'en'
 		});
 
 		// `once` is the action's default: scrolling back past a code already counted must not
-		// inflate it, or a long page would read as repeat engagement.
+		// inflate it, or a long page would read as repeat engagement. Asserted per location, so a
+		// late-arriving impression from the OTHER code cannot be mistaken for a double count.
 		await page.evaluate(() => window.scrollTo(0, 0));
 		await page.locator('footer img[src*="Joshua-WeChat"]').scrollIntoViewIfNeeded();
 		await page.waitForTimeout(300);
-		expect((await sent(page)).filter((e) => e.name === 'wechat_qr_view').length).toBe(1);
+		expect((await views('footer')).length).toBe(1);
+		expect((await views('home_contact')).length).toBeLessThanOrEqual(1);
 	});
 
 	test('wechat_qr_view tells the three placements apart', async ({ page }) => {
 		// The QR used to exist in exactly one place — below a FAILED submit — which made this event
-		// near-unmeasurable by construction. It is now in the footer of every page and on the contact
-		// page itself, so what matters is that a passive footer impression and a deliberate look on
-		// /contact-us do not collapse into one number.
+		// near-unmeasurable by construction. It is now in the footer of every page, on the contact
+		// page itself, and (since 2026-11-15) in the homepage's Get In Touch block, so what matters
+		// is that a passive footer impression and a deliberate look on /contact-us do not collapse
+		// into one number. The homepage placement is covered by the test above; this one stays on
+		// /zh/contact-us, where the three codes asserted here are the only ones in the document.
 		//
 		// No ordering is asserted: on a desktop viewport several codes can enter view on one scroll
 		// and observer firing order is undefined.

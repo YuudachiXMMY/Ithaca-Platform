@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { brochureHref, registerHref } from './program-cta';
+import { brochureHref, consultHref, registerHref } from './program-cta';
 import { resolveProgramParam } from './admissions';
 import { LIVE_PROGRAM_SLUGS, PROGRAMS } from './content/programs';
 
@@ -51,5 +51,27 @@ describe('R-PT-1 CTA targets', () => {
 				expect(resolveProgramParam(paramsOf(href), LIVE_PROGRAM_SLUGS), href).toBe(program.slug);
 			}
 		}
+	});
+});
+
+/**
+ * The site-wide consultation CTA — added 2026-11-15 with the conversion-label unification.
+ *
+ * Pinned for the same reason the programme builders are: the `#book` fragment is the whole
+ * value. Without it the link still resolves, still returns 200, and still looks correct in a
+ * smoke test — it just drops the reader at the top of a six-section page instead of at the form
+ * they asked for. Nothing throws, so only an assertion catches it.
+ */
+describe('the site-wide consultation CTA', () => {
+	it('lands on the #book section of /admissions, with no programme attached', () => {
+		expect(consultHref()).toBe('/admissions#book');
+		expect(paramsOf(consultHref()).has('program')).toBe(false);
+	});
+
+	it('agrees with the programme primary about WHERE the form is', () => {
+		const consult = new URL(consultHref(), 'https://ithacateens.com');
+		const register = new URL(registerHref('ev-team'), 'https://ithacateens.com');
+		expect(consult.pathname).toBe(register.pathname);
+		expect(consult.hash).toBe(register.hash);
 	});
 });

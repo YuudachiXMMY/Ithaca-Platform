@@ -180,6 +180,32 @@ test.describe('the admissions funnel, on a phone', () => {
 		for (const value of Object.values(PARENT)) expect(dump).not.toContain(value);
 	});
 
+	/**
+	 * The homepage's own route into the funnel — added 2026-11-15 with the conversion-label
+	 * unification. The two in-page CTAs used to say "Get in touch" and land on /contact-us; they
+	 * now name the consultation and land on the booking section, which is the SAME destination the
+	 * programme primary uses (see `$lib/program-cta`).
+	 *
+	 * Asserted here rather than in smoke.spec because the thing worth proving is not that the link
+	 * resolves — it is that the fragment MOVES THE VIEWPORT. `#book` is the last of six sections on
+	 * /admissions; a CTA that lands at the top of that page is indistinguishable from a working one
+	 * in any test that only checks the URL, and it is exactly the failure M-4 exists to prevent.
+	 */
+	test('the homepage CTAs land on the booking section, not the top of /admissions', async ({
+		page
+	}) => {
+		await page.goto('/');
+
+		// Both of them: the hero secondary and the closing CTA are the same offer, and the point of
+		// the unification is that they cannot drift apart.
+		const ctas = page.locator('main a[href="/admissions#book"]');
+		await expect(ctas).toHaveCount(2);
+
+		await ctas.last().click();
+		await expect(page).toHaveURL(/\/admissions#book$/);
+		await expect(page.locator('#book')).toBeInViewport();
+	});
+
 	test('the brochure CTA carries the same slug to /contact-us', async ({ page }) => {
 		await page.goto('/zh/programs/ev-team');
 		await page.locator('main a[href="/zh/contact-us?program=ev-team"]').first().click();

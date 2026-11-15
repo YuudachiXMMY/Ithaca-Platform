@@ -18,7 +18,7 @@
 -->
 <script lang="ts">
 	import { MapPin, Mail, Phone } from 'lucide-svelte';
-	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
+	import { CONTACT_INFO, CONTACT_DISPLAY, CONTACT_HREFS } from '$lib/data/contact';
 	import { trackPhoneTap } from '$lib/analytics';
 	import type { Locale } from '$lib/content/types';
 	import WeChatQr from '$lib/components/contact/WeChatQr.svelte';
@@ -38,7 +38,7 @@
 		{
 			icon: MapPin,
 			label: m.contact_page_channels_address(),
-			value: CONTACT_INFO.address,
+			value: CONTACT_DISPLAY.address,
 			href: CONTACT_HREFS.mapsSearch,
 			external: true,
 			mono: false,
@@ -56,7 +56,7 @@
 		{
 			icon: Phone,
 			label: m.contact_page_channels_phone(),
-			value: CONTACT_INFO.phone,
+			value: CONTACT_DISPLAY.phone,
 			href: CONTACT_HREFS.tel,
 			external: false,
 			mono: true,

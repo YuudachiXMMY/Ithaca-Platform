@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Mail, Phone, MapPin } from 'lucide-svelte';
 	import { FOOTER_LINKS, navLabel } from '$lib/data/nav';
-	import { CONTACT_INFO, CONTACT_HREFS } from '$lib/data/contact';
+	import { CONTACT_INFO, CONTACT_DISPLAY, CONTACT_HREFS } from '$lib/data/contact';
 	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 	import { trackPhoneTap } from '$lib/analytics';
@@ -68,6 +68,22 @@
 				</div>
 			</div>
 
+			<!-- ## `pointer-coarse:min-h-11` on every link below
+			     The 2026-11-15 design review measured these at 17px tall, and the legal row at 16px,
+			     against WCAG 2.2's 24px floor. 44px is the figure it asked for.
+
+			     Gated on `pointer-coarse` rather than applied flat, because the footer is a dense
+			     four-column list and 44px rows would add ~100px of dead height on a desktop pointer
+			     that does not need it. Tailwind 4.3's variant compiles to
+			     `@media (pointer: coarse)`, so it tracks the actual input device, not the viewport —
+			     a 375px-wide desktop window keeps the compact rows and a tablet gets the big ones,
+			     which is the correct way round.
+
+			     It is `min-h` and not padding so the growth is in the TAP BOX, not in the type's own
+			     rhythm. The three contact rows also flip to `items-center` at coarse, because their
+			     leading icon is aligned to the first text line (`items-start`) and inside a 44px box
+			     that reads as a row with a hole under it. -->
+
 			<!-- Quick Links column -->
 			<div>
 				<h3 class="text-sm font-semibold tracking-wider text-foreground uppercase">
@@ -78,7 +94,7 @@
 						<li>
 							<a
 								href={localizeHref(item.href)}
-								class="text-sm text-foreground-muted transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+								class="inline-flex items-center text-sm text-foreground-muted transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand pointer-coarse:min-h-11"
 							>
 								{navLabel(item.label)}
 							</a>
@@ -96,7 +112,7 @@
 					<li>
 						<a
 							href={CONTACT_HREFS.mailto}
-							class="flex items-start gap-2.5 text-sm text-foreground-muted transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+							class="flex items-start gap-2.5 text-sm text-foreground-muted transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand pointer-coarse:min-h-11 pointer-coarse:items-center"
 						>
 							<Mail class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
 							{CONTACT_INFO.email}
@@ -108,15 +124,15 @@
 						<a
 							href={CONTACT_HREFS.tel}
 							onclick={() => trackPhoneTap({ location: 'footer', locale: getLocale() })}
-							class="flex items-start gap-2.5 text-sm text-foreground-muted transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+							class="flex items-start gap-2.5 text-sm text-foreground-muted transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand pointer-coarse:min-h-11 pointer-coarse:items-center"
 						>
 							<Phone class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-							{CONTACT_INFO.phone}
+							{CONTACT_DISPLAY.phone}
 						</a>
 					</li>
 					<li class="flex items-start gap-2.5 text-sm text-foreground-muted">
 						<MapPin class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-						{CONTACT_INFO.address}
+						{CONTACT_DISPLAY.address}
 					</li>
 				</ul>
 
@@ -158,21 +174,21 @@
 				<div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
 					<a
 						href={localizeHref('/privacy')}
-						class="transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+						class="inline-flex items-center transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand pointer-coarse:min-h-11"
 					>
 						{m.common_footer_privacy()}
 					</a>
 					<span class="hidden sm:inline" aria-hidden="true">|</span>
 					<a
 						href={localizeHref('/terms')}
-						class="transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+						class="inline-flex items-center transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand pointer-coarse:min-h-11"
 					>
 						{m.common_footer_terms()}
 					</a>
 					<span class="hidden sm:inline" aria-hidden="true">|</span>
 					<a
 						href={CONTACT_HREFS.mailto}
-						class="transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+						class="inline-flex items-center transition-colors hover:text-brand-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand pointer-coarse:min-h-11"
 					>
 						{CONTACT_INFO.email}
 					</a>

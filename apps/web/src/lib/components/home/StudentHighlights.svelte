@@ -2,6 +2,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import { ArrowRight } from 'lucide-svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
+	import SectionHeader from '$lib/components/shared/SectionHeader.svelte';
 	import type { Picture } from 'vite-imagetools';
 	import img189 from '$lib/assets/highlights/wechat-img-189.jpg?enhanced';
 	import ev5 from '$lib/assets/programs/ev-team/EV25-5s.png?enhanced';
@@ -101,15 +102,19 @@
 
 <section class="bg-surface-1" aria-label={m.home_highlights_ariaLabel()}>
 	<div class="px-5 sm:px-8 md:px-[6vw]">
-		<div class="flex items-end justify-between border-b border-border pt-10 pb-4 md:pt-16 md:pb-3">
-			<h2 class="text-xl font-bold tracking-tight text-foreground md:text-3xl">
-				{m.home_highlights_heading()}
-			</h2>
-			<p
-				class="hidden max-w-xs text-right text-[11px] leading-relaxed text-foreground-subtle md:block"
-			>
-				{m.home_highlights_subheading()}
-			</p>
+		<div class="border-b border-border pt-10 pb-4 md:pt-16 md:pb-3">
+			<SectionHeader heading={m.home_highlights_heading}>
+				{#snippet action()}
+					<!-- The supporting line rides in `action`, not `sub`: on this band it has always sat
+					     opposite the heading rather than under it, and it is hidden below md where that
+					     arrangement has no room. -->
+					<p
+						class="hidden max-w-xs text-right text-xs leading-relaxed text-foreground-subtle md:block"
+					>
+						{m.home_highlights_subheading()}
+					</p>
+				{/snippet}
+			</SectionHeader>
 		</div>
 		<!-- The desktop index strip that used to sit here (`01 FIELD VISIT  02 ACADEMIC …`) was
 		     removed on 2026-10-16. It was `aria-hidden` precisely because every string in it is
@@ -147,7 +152,7 @@
 				></div>
 
 				<span
-					class="absolute top-2 right-3 font-mono text-[48px] leading-none font-bold text-band-foreground/[0.05] select-none md:text-[64px]"
+					class="absolute top-2 right-3 font-display text-[48px] leading-none font-bold text-band-foreground/[0.05] tabular-nums select-none md:text-[64px]"
 					aria-hidden="true"
 				>
 					{String(i + 1).padStart(2, '0')}
@@ -158,19 +163,13 @@
 				     all there. The clamps keep a long title from pushing the caption out of the
 				     smallest cell (380 x 42%) — the full string stays in the DOM for AT and crawlers. -->
 				<div class="absolute inset-x-0 bottom-0 p-3 md:p-4">
-					<span
-						class="font-mono text-[10px] tracking-[0.18em] text-band-brand-strong uppercase md:text-[9px]"
-					>
+					<span class="font-display text-xs tracking-[0.18em] text-band-brand-strong uppercase">
 						{h.tag()}
 					</span>
-					<h3
-						class="mt-1 line-clamp-3 text-sm leading-tight font-bold text-band-foreground md:text-sm"
-					>
+					<h3 class="mt-1 line-clamp-3 text-sm leading-tight font-bold text-band-foreground">
 						{h.title()}
 					</h3>
-					<p
-						class="mt-1.5 line-clamp-2 text-[11px] leading-snug text-band-foreground/80 md:text-[11px]"
-					>
+					<p class="mt-1.5 line-clamp-2 text-xs leading-snug text-band-foreground/80">
 						{h.description()}
 					</p>
 				</div>

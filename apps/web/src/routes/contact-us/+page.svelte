@@ -6,6 +6,7 @@
 	import PageHero from '$lib/components/shared/PageHero.svelte';
 	import ContactChannels from '$lib/components/contact/ContactChannels.svelte';
 	import EnquiryForm from '$lib/components/contact/EnquiryForm.svelte';
+	import { consultHref } from '$lib/program-cta';
 	import * as m from '$lib/paraglide/messages';
 
 	/**
@@ -64,6 +65,8 @@
 
 <Seo title={m.contact_page_title()} description={m.contact_page_description()} />
 
+<!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
+
 <!--
   `/contact-us` — three sections, three different shapes.
 
@@ -89,6 +92,34 @@
 		description={m.contact_page_description()}
 		headingId="contact-heading"
 	/>
+
+	<!-- 1b. What this page is, versus the booking page.
+	     ────────────────────────────────────────────────────────────────────────────────────────
+	     Added 2026-11-15 with the conversion-label unification (see `$lib/program-cta`'s
+	     `consultHref`). The homepage's two in-page CTAs used to say "Get in touch" and land here,
+	     while the header button said "Admissions" and landed somewhere else — three labels, two
+	     destinations, and nothing on either page saying how they differ. The CTAs now name the
+	     consultation and go to `/admissions#book`, which only works as a division of labour if the
+	     page they were taken away from says what it is FOR. Otherwise the same confusion just
+	     moves from the button to the landing page.
+
+	     A hairline note, not a banner: a visitor who meant to land here should read one line and
+	     carry on into the form, not be intercepted. -->
+	<section class="bg-surface-0">
+		<!-- Not `containerClass`: that carries `py-14 md:py-20`, which is a section's worth of air
+		     around one line of text. Same horizontal rhythm, a fraction of the vertical. -->
+		<div class="mx-auto w-full max-w-[1400px] px-5 pt-10 sm:px-8 md:px-[6vw] md:pt-12">
+			<p class="border-l-2 border-brand/40 py-1 pl-4 text-sm leading-relaxed text-foreground-muted">
+				{m.contact_page_routingNote()}
+				<a
+					href={consultHref()}
+					class="font-medium text-brand-bright underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+				>
+					{m.common_cta_bookConsult()}
+				</a>
+			</p>
+		</div>
+	</section>
 
 	<!-- 2. The form and the direct channels, as ONE section.
 	     ────────────────────────────────────────────────────────────────────────────────────────

@@ -37,6 +37,25 @@
 	// family — so this is a new composition, not a new visual vocabulary.
 	const ROW_PILLARS = PILLARS.slice(0, 2);
 	const CLOSING_PILLAR = PILLARS[2];
+
+	// ## Vertical budget, tightened 2026-11-15
+	//
+	// The design review measured this section plus the mission spread at 2,161px on a 375px
+	// viewport — 2.7 screens — inside a 9,939px page, and called the whitespace here "length
+	// without information": three pillars, each a heading and one paragraph, spread over three
+	// full blocks.
+	//
+	// Its prescription was to move this section down the page and flatten it into a three-column
+	// row. Both halves of that were declined, and the reason is NOT taste: the three pillars are
+	// brand-locked to the 11-04 brochure, and the section order is itself a decision with an
+	// argument attached (see the note in `src/routes/+page.svelte`). So the ORDER and the
+	// COMPOSITION stand and only the empty space shrank — the rows went `py-14 md:py-20` →
+	// `py-10 md:py-14`, the closing band's `min-h` clamp came down from 24–34rem to 18–26rem, and
+	// the mission spread above lost a notch of top padding.
+	//
+	// That is the part of the finding that was true on its own terms. If the section still reads as
+	// long after this, the next move is editorial (fewer words per pillar), not another pass on the
+	// padding.
 </script>
 
 <section class="bg-surface-0" aria-label={m.home_mission_eyebrow()}>
@@ -44,9 +63,9 @@
 	     page's single <h1>, set in soft brand light. Large light display echoes the hero Cavafy
 	     quote so the mission reads as the journey's destination. SSR-safe; Reveal is opacity-only. -->
 	<div class="mission-aura">
-		<div class="mx-auto max-w-[1100px] px-5 pt-24 pb-14 sm:px-8 md:px-[6vw] md:pt-36 md:pb-20">
+		<div class="mx-auto max-w-[1100px] px-5 pt-20 pb-10 sm:px-8 md:px-[6vw] md:pt-28 md:pb-14">
 			<Reveal y={24}>
-				<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+				<p class="font-display text-xs tracking-[0.28em] text-brand-bright uppercase">
 					{m.home_mission_eyebrow()}
 				</p>
 				<h1
@@ -68,7 +87,7 @@
 	<!-- Our Approach: a short header so the three pillars no longer start cold. -->
 	<div class="mx-auto max-w-[1400px] px-5 pt-6 text-center sm:px-8 md:px-[6vw] md:pt-8">
 		<Reveal y={20}>
-			<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+			<p class="font-display text-xs tracking-[0.28em] text-brand-bright uppercase">
 				{m.home_mission_approachEyebrow()}
 			</p>
 			<p class="mx-auto mt-3 max-w-md text-lg font-medium text-foreground/80">
@@ -79,7 +98,7 @@
 
 	{#each ROW_PILLARS as pillar, i (i)}
 		<div
-			class="mx-auto grid max-w-[1400px] items-center gap-6 px-5 py-14 sm:px-8 md:grid-cols-2 md:gap-12 md:px-[6vw] md:py-20"
+			class="mx-auto grid max-w-[1400px] items-center gap-6 px-5 py-10 sm:px-8 md:grid-cols-2 md:gap-12 md:px-[6vw] md:py-14"
 		>
 			<!-- Image -->
 			<div
@@ -99,7 +118,7 @@
 			<!-- Text -->
 			<div class={i % 2 === 1 ? 'md:order-1' : ''}>
 				<Reveal y={24}>
-					<h2 class="text-2xl font-bold text-foreground md:text-3xl lg:text-4xl">
+					<h2 class="text-2xl font-bold text-foreground md:text-3xl">
 						{pillar.title()}
 					</h2>
 					<div class="mt-4 h-px w-10 bg-brand/30" aria-hidden="true"></div>
@@ -116,7 +135,7 @@
 	     `e2e/header-contrast.spec.ts` already guards on PageHero. On mobile the band simply gets
 	     shorter; the copy stays overlaid rather than stacking, because the gradient carries it. -->
 	<div
-		class="relative flex min-h-[clamp(24rem,55vh,34rem)] w-full flex-col justify-end overflow-hidden"
+		class="relative flex min-h-[clamp(18rem,42vh,26rem)] w-full flex-col justify-end overflow-hidden"
 	>
 		<enhanced:img
 			src={CLOSING_PILLAR.img}
@@ -129,9 +148,9 @@
 			class="absolute inset-0 bg-gradient-to-tr from-overlay/95 via-overlay/72 to-overlay/55"
 			aria-hidden="true"
 		></div>
-		<div class="relative mx-auto w-full max-w-[1400px] px-5 pb-12 sm:px-8 md:px-[6vw] md:pb-16">
+		<div class="relative mx-auto w-full max-w-[1400px] px-5 pb-10 sm:px-8 md:px-[6vw] md:pb-12">
 			<Reveal y={24}>
-				<h2 class="max-w-[20ch] text-2xl font-bold text-band-foreground md:text-3xl lg:text-4xl">
+				<h2 class="max-w-[20ch] text-2xl font-bold text-band-foreground md:text-3xl">
 					{CLOSING_PILLAR.title()}
 				</h2>
 				<div class="mt-4 h-px w-10 bg-band-brand/40" aria-hidden="true"></div>
