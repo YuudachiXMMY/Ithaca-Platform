@@ -2,6 +2,7 @@
 	import { ArrowRight } from 'lucide-svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
+	import SectionHeader from '$lib/components/shared/SectionHeader.svelte';
 	import * as m from '$lib/paraglide/messages';
 
 	/**
@@ -68,9 +69,10 @@
 >
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={20}>
-			<h2 id="journey-heading" class="font-display text-xs tracking-[0.28em] text-brand uppercase">
-				{m.journey_heading()}
-			</h2>
+			<!-- Was a `text-xs` uppercase label that happened to BE the h2. This strip is the
+			     clearest statement of the product model on the homepage (01 Academic → 02 Projects
+			     → 03 Research) and it was the smallest heading on the page — see SectionHeader. -->
+			<SectionHeader id="journey-heading" heading={m.journey_heading} />
 
 			<ol class="bg-hairline mt-8 grid gap-px md:grid-cols-3">
 				{#each STAGES as stage (stage.number)}

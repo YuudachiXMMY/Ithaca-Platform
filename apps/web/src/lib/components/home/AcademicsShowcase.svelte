@@ -2,6 +2,7 @@
 	import { ArrowRight } from 'lucide-svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
+	import SectionHeader from '$lib/components/shared/SectionHeader.svelte';
 	import * as m from '$lib/paraglide/messages';
 
 	/**
@@ -39,23 +40,23 @@
 <section class="bg-background py-14 md:py-20" aria-labelledby="home-academics-heading">
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={24}>
-			<div class="flex flex-wrap items-end justify-between gap-6">
-				<div>
-					<h2 id="home-academics-heading" class="text-2xl font-bold text-foreground md:text-4xl">
-						{m.home_academics_heading()}
-					</h2>
-					<p class="mt-3 max-w-2xl text-sm leading-relaxed text-foreground-subtle">
-						{m.home_academics_subheading()}
-					</p>
-				</div>
-				<a
-					href={localizeHref('/academics')}
-					class="group inline-flex items-center gap-2 text-sm font-medium text-brand-bright transition-all duration-200 group-hover:gap-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-				>
-					<span>{m.home_academics_viewAll()}</span>
-					<ArrowRight class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-				</a>
-			</div>
+			<SectionHeader
+				id="home-academics-heading"
+				heading={m.home_academics_heading}
+				sub={m.home_academics_subheading}
+			>
+				{#snippet action()}
+					<a
+						href={localizeHref('/academics')}
+						class="group inline-flex items-center gap-2 text-sm font-medium text-brand-bright transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+					>
+						<span>{m.home_academics_viewAll()}</span>
+						<ArrowRight
+							class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+						/>
+					</a>
+				{/snippet}
+			</SectionHeader>
 
 			<ul class="bg-hairline mt-10 grid gap-px md:grid-cols-2 lg:grid-cols-4">
 				{#each TRACKS as track (track.href)}

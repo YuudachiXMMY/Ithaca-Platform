@@ -4,6 +4,7 @@
 	import { trackProgramCtaClick } from '$lib/analytics';
 	import { ArrowRight } from 'lucide-svelte';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
+	import SectionHeader from '$lib/components/shared/SectionHeader.svelte';
 	import { PROGRAMS } from '$lib/content/programs';
 	import { SEASONS } from '$lib/content/season-data';
 	import { programSeason } from '$lib/program-season';
@@ -145,11 +146,10 @@
 <section class="bg-surface-4 py-8 md:py-10" aria-label={m.home_programs_ariaLabel()}>
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={24}>
-			<div class="mb-6 text-center">
-				<h2 class="text-2xl font-bold text-foreground md:text-4xl">{m.home_programs_heading()}</h2>
-				<p class="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-foreground-subtle">
-					{m.home_programs_subheading()}
-				</p>
+			<!-- Left, not centred. It was one of four centred headers against four left ones, and the
+			     alignment did not track anything — see SectionHeader. -->
+			<div class="mb-8">
+				<SectionHeader heading={m.home_programs_heading} sub={m.home_programs_subheading} />
 			</div>
 		</Reveal>
 

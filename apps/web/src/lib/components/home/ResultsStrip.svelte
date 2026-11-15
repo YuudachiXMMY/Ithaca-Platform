@@ -2,6 +2,7 @@
 	import { ArrowRight } from 'lucide-svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
+	import SectionHeader from '$lib/components/shared/SectionHeader.svelte';
 	import * as m from '$lib/paraglide/messages';
 
 	/**
@@ -32,14 +33,12 @@
 >
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={20}>
-			<h2
-				id="home-results-heading"
-				class="font-display text-xs tracking-[0.28em] text-brand uppercase"
-			>
-				{m.home_results_heading()}
-			</h2>
+			<!-- Was a `text-xs` uppercase label that happened to BE the h2. This is the only evidence
+			     block on the homepage and it was set smaller than everything around it — see the
+			     inversion note in SectionHeader. -->
+			<SectionHeader id="home-results-heading" heading={m.home_results_heading} />
 
-			<div class="mt-6 flex flex-wrap items-center gap-x-10 gap-y-4">
+			<div class="mt-8 flex flex-wrap items-center gap-x-10 gap-y-4">
 				<ul class="flex flex-wrap items-center gap-x-8 gap-y-3">
 					{#each ITEMS as item (item)}
 						<li class="text-base text-foreground">{item()}</li>

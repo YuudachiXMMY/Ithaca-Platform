@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
-	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
+	import { getLocale } from '$lib/paraglide/runtime';
+	import { consultHref } from '$lib/program-cta';
 	import { MapPin, Phone, Mail, ArrowRight } from 'lucide-svelte';
 	import { CONTACT_INFO, CONTACT_DISPLAY, CONTACT_HREFS } from '$lib/data/contact';
 	import { trackPhoneTap } from '$lib/analytics';
@@ -187,7 +188,7 @@
 			<div class="mt-8">
 				<a
 					bind:this={ctaEl}
-					href={localizeHref('/contact-us')}
+					href={consultHref()}
 					onpointermove={prefersReducedMotion.current ? undefined : handlePointerMove}
 					onpointerleave={prefersReducedMotion.current ? undefined : handlePointerLeave}
 					style={prefersReducedMotion.current
@@ -195,7 +196,7 @@
 						: `translate: ${p.current.x}px ${p.current.y}px`}
 					class="group/cta inline-flex h-12 items-center gap-2 bg-action px-8 text-sm font-semibold tracking-wide text-action-foreground transition-colors duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px active:scale-[0.97]"
 				>
-					<span>{m.home_contact_cta()}</span>
+					<span>{m.common_cta_bookConsult()}</span>
 					<ArrowRight
 						class="h-4 w-4 transition-transform duration-200 group-hover/cta:translate-x-1"
 					/>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
 	import { localizeHref } from '$lib/paraglide/runtime';
+	import { consultHref } from '$lib/program-cta';
 
 	// Minimal & flat hero: a static poster LCP image + the Cavafy quote (pure-CSS mask-reveal,
 	// no JS) + CTAs. The former cinematic build layered an autoplay <video> and a GSAP scroll-pin
@@ -95,10 +96,10 @@
 					{m.home_hero_ctaPrograms()}
 				</a>
 				<a
-					href={localizeHref('/contact-us')}
+					href={consultHref()}
 					class="inline-flex h-12 items-center justify-center border border-band-border-strong px-8 text-sm font-semibold tracking-wide text-band-foreground transition-all duration-200 hover:border-band-border-strong hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand active:translate-y-px active:scale-[0.97]"
 				>
-					{m.home_hero_ctaContact()}
+					{m.common_cta_bookConsult()}
 				</a>
 			</div>
 		</div>

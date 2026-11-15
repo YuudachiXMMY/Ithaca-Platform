@@ -2,6 +2,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import { ArrowRight } from 'lucide-svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
+	import SectionHeader from '$lib/components/shared/SectionHeader.svelte';
 	import type { Picture } from 'vite-imagetools';
 	import img189 from '$lib/assets/highlights/wechat-img-189.jpg?enhanced';
 	import ev5 from '$lib/assets/programs/ev-team/EV25-5s.png?enhanced';
@@ -101,13 +102,19 @@
 
 <section class="bg-surface-1" aria-label={m.home_highlights_ariaLabel()}>
 	<div class="px-5 sm:px-8 md:px-[6vw]">
-		<div class="flex items-end justify-between border-b border-border pt-10 pb-4 md:pt-16 md:pb-3">
-			<h2 class="text-xl font-bold tracking-tight text-foreground md:text-3xl">
-				{m.home_highlights_heading()}
-			</h2>
-			<p class="hidden max-w-xs text-right text-xs leading-relaxed text-foreground-subtle md:block">
-				{m.home_highlights_subheading()}
-			</p>
+		<div class="border-b border-border pt-10 pb-4 md:pt-16 md:pb-3">
+			<SectionHeader heading={m.home_highlights_heading}>
+				{#snippet action()}
+					<!-- The supporting line rides in `action`, not `sub`: on this band it has always sat
+					     opposite the heading rather than under it, and it is hidden below md where that
+					     arrangement has no room. -->
+					<p
+						class="hidden max-w-xs text-right text-xs leading-relaxed text-foreground-subtle md:block"
+					>
+						{m.home_highlights_subheading()}
+					</p>
+				{/snippet}
+			</SectionHeader>
 		</div>
 		<!-- The desktop index strip that used to sit here (`01 FIELD VISIT  02 ACADEMIC …`) was
 		     removed on 2026-10-16. It was `aria-hidden` precisely because every string in it is

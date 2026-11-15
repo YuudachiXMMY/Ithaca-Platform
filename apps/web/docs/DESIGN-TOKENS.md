@@ -1570,3 +1570,42 @@ footer 的链接此前 16–17px 高，低于 WCAG 2.2 的 24px。现在加 `poi
 桌面指针上多出约 100px 死高度。Tailwind 4.3 的这个变体编译成 `@media (pointer: coarse)`，跟的是
 输入设备而非视口宽度 —— 375px 宽的桌面窗口保持紧凑、平板拿到大目标。用 `min-h` 而不是 padding，
 是为了让增长落在**点击盒**上而不是排版节奏上。
+
+### 10.4 字号阶梯（2026-11-15 收敛）
+
+首页原先在用 16 种字号。现为 **8 档** 加三条写明理由的例外。
+
+| 档  | class           | 用途                                          |
+| --- | --------------- | --------------------------------------------- |
+| 1   | `text-xs`(12)   | eyebrow、标签、卡片说明 —— **下限**，见 §10.1 |
+| 2   | `text-sm`(14)   | 副文、行内链接                                |
+| 3   | `text-base`(16) | 正文                                          |
+| 4   | `text-lg`(18)   | 引导段                                        |
+| 5   | `text-xl`(20)   | 小卡标题                                      |
+| 6   | `text-2xl`(24)  | 卡片/支柱标题；**section h2 的移动端值**      |
+| 7   | `text-3xl`(30)  | 支柱标题的 md 值                              |
+| 8   | `text-4xl`(36)  | **section h2 的 md 值**                       |
+
+Section h2 一律 `text-2xl md:text-4xl`，由 `shared/SectionHeader.svelte` 统一发放，
+**不要再手写 h2 的字号**。
+
+#### 三条例外
+
+1. **`<h1>`**：`text-[clamp(2.5rem,6vw,4.5rem)]`，全站一次（`MissionSection`）。
+2. **`ContactSection` 的 h2**：`text-3xl md:text-[2.75rem]`（30/44）。44px 是 §8.2 的 h2 上限且
+   是刻意取到顶的 —— 它是首页收尾 CTA，理应比别的段落重。因此它**不用** `SectionHeader`。
+   要改它，必须同时改该文件的注释与 §8.2。
+3. **数字与纹样**：`ImpactStats` 的统计数字是 `text-[clamp(2.25rem,4vw,3.75rem)]`（一个 display
+   数字角色，不是标题阶梯的一档）；`StudentHighlights` 的 48/64px 序号是 `aria-hidden` +
+   `select-none` 的装饰，同 §10.1 的豁免。
+
+`FeaturedSection` 的 h2 保持 `text-xl md:text-2xl`，这是**第四条、但性质不同**的例外：它渲染的是
+一条新闻的标题而不是栏目名，且位于 `md:grid-cols-[auto_1fr]` 的窄左列 —— 升到 36px 会让一条新闻
+标题成为那一带最大的元素，并在窄列里换行难看。
+
+#### 迁移到 SectionHeader 时必看
+
+四个 section 用 `aria-labelledby` 指向 h2 的 id：`home-academics-heading`、
+`home-results-heading`、`journey-heading`、`home-featured-heading`。`SectionHeader` 把 `id`
+透传给 h2 就是为了这个。**漏掉 id，section 的无障碍名就没了，而 axe 不会报错**（无名 section
+是合法的），`a11y.spec.ts` 会一路绿着放行。

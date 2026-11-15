@@ -118,7 +118,7 @@
 			<!-- Text -->
 			<div class={i % 2 === 1 ? 'md:order-1' : ''}>
 				<Reveal y={24}>
-					<h2 class="text-2xl font-bold text-foreground md:text-3xl lg:text-4xl">
+					<h2 class="text-2xl font-bold text-foreground md:text-3xl">
 						{pillar.title()}
 					</h2>
 					<div class="mt-4 h-px w-10 bg-brand/30" aria-hidden="true"></div>
@@ -150,7 +150,7 @@
 		></div>
 		<div class="relative mx-auto w-full max-w-[1400px] px-5 pb-10 sm:px-8 md:px-[6vw] md:pb-12">
 			<Reveal y={24}>
-				<h2 class="max-w-[20ch] text-2xl font-bold text-band-foreground md:text-3xl lg:text-4xl">
+				<h2 class="max-w-[20ch] text-2xl font-bold text-band-foreground md:text-3xl">
 					{CLOSING_PILLAR.title()}
 				</h2>
 				<div class="mt-4 h-px w-10 bg-band-brand/40" aria-hidden="true"></div>

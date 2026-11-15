@@ -920,3 +920,54 @@ Cavafy 引言与 Our Approach 三支柱与 11-04 宣传册绑定，且 `+page.sv
 - **两张截图卡换成照片、highlight 卡逐张链到 /news 条目** —— 等摄影素材与 news 侧条目，
   和 `ProgramsShowcase` 里 AI Investment Lab 的 `TODO(asset)` 是同一份清单。
 - **「一个空的未命名 iframe」** —— 静态读码没定位到，是渲染态问题，要跑起来抓 DOM。
+
+## 2026-11-15（二）— 转化路径统一、SectionHeader 与字号阶梯
+
+接着上一节的「未做，原因不是忘了」三条做的。摄影那条按业主要求只记录不处理，见
+`CONTENT-GAPS.md` C-12 / C-13。
+
+### 转化路径：两个页内 CTA 并入 M-4 的 `#book` 机制，header 不动
+
+首页此前有三个转化标签指向两个目的地，而 `/contact-us` 不解释区别。最尖锐的一处是收尾段自己
+拆自己的台：`home_contact_subtext` 承诺「免费 20–30 分钟咨询」，紧挨着的按钮却写「立即联系」
+并打开一个通用表单 —— 页面刚给出的具体承诺，在读者据以行动的那一刻消失了。
+
+- 新增 `consultHref()`（`$lib/program-cta`）→ `/admissions#book`，与 `registerHref` 同一落点，
+  差别只是不带 programme 预选。写成构造器而非各处字面量，理由同 K-3。
+- 首屏次 CTA 与收尾 CTA 改用它 + 新文案 `common_cta_bookConsult`。
+- `home_contact_cta` / `home_hero_ctaContact` 失去调用点，已删。**这类孤儿 key 没有任何门禁会报** ——
+  `i18n:check` 只校 en/zh 对齐，knip 不扫 message 目录。
+- `/contact-us` 加一行分流说明 + 指回预约的链接。没有这句，统一标签只是把困惑从按钮挪到落地页。
+
+**header 按钮刻意保持 "Admissions"。** 它是指向一个页面的导航项，页面名就是诚实的标签；
+而且这是能放下的宽度。`nav.ts:215-222` 记着导航栏的宽度算式（`Admissions` 作为带 padding 的
+按钮约 150px，这 62px 之差正是 Results 进不了栏的原因），`e2e/nav-single-line.spec.ts` 守着桌面
+栏单行不折 —— 英文的 "Book a free consultation" 是它两倍还多，换上去这条门禁会红。
+
+### SectionHeader：统一形制，并修掉强调与说服力的倒挂
+
+首页八个 section 开头有三种形制、两种对齐。真正有代价的是中间那种：**The Journey 与
+Success Stories 被标记成 `<h2>`，却被设成 11px 大写标签** —— 全页最清楚地解释产品模型的一段和
+唯一的成果证据段，视觉权重最低，而通用统计拿到 36px 大标题。评审把这叫「强调方向与说服力倒挂」，
+它是个样式事故而非决定。
+
+新增 `shared/SectionHeader.svelte` 统一发放：section h2 一律 `text-2xl md:text-4xl`，默认左对齐，
+eyebrow 永远是 h2 上方的 `<p>` 而不是 h2 本身。已迁移 Journey、Results、Academics、Programs、
+Impact、Highlights 六处（后三处顺带由居中改左对齐 —— 原先的对齐不跟踪任何东西）。
+
+**`id` 透传是这个组件最容易被漏掉的职责**：四个 section 用 `aria-labelledby` 指向 h2 的 id。
+漏掉一个，该 section 的无障碍名就没了，**而 axe 不会报错**（无名 section 合法），
+`a11y.spec.ts` 会一路绿着放行。
+
+### 字号阶梯：16 档 → 8 档 + 三条写明理由的例外
+
+完整的表在 `docs/DESIGN-TOKENS.md` §10.4。两条值得在这里说：
+
+- **`ContactSection` 不用 SectionHeader**，保留 30/44px。44px 是 §8.2 的 h2 上限且是刻意取到顶的
+  （首页收尾 CTA 本就该比别的段落重）。一条写下来的例外，不是这个组件要解决的那种问题。
+- **`FeaturedSection` 也不迁移**，保留 20/24px。它的 h2 渲染的是**一条新闻的标题**而不是栏目名，
+  且位于 `md:grid-cols-[auto_1fr]` 的窄左列 —— 升到 36px 会让一条新闻标题成为那一带最大的元素，
+  并在窄列里换行难看。
+- `ImpactStats` 的统计数字由 `text-4xl md:text-5xl lg:text-6xl` 收成单个
+  `text-[clamp(2.25rem,4vw,3.75rem)]`：端点不变（36→60px），但不再为一个 display 数字角色占掉
+  字号阶梯的两级。

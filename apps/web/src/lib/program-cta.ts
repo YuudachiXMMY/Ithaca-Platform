@@ -39,3 +39,32 @@ export function registerHref(slug: string): string {
 export function brochureHref(slug: string): string {
 	return localizeHref(`/contact-us?program=${encodeURIComponent(slug)}`);
 }
+
+/**
+ * `/admissions#book` — the site-wide "book a consultation", with no programme attached.
+ *
+ * Same landing point as `registerHref`, same reason for existing as a builder rather than a
+ * literal at each call site (K-3): a call site that forgets `#book` drops the reader at the top of
+ * `/admissions`, six sections above the form they just asked for.
+ *
+ * ## Why the homepage CTAs point here and not at `/contact-us`
+ *
+ * Added 2026-11-15. The homepage had THREE conversion labels across TWO destinations — header
+ * "Admissions" → `/admissions`, and both "Get in touch" buttons → `/contact-us` — with nothing on
+ * `/contact-us` explaining the difference. The sharpest case was the closing section: its own
+ * subtext promises "a free 20 to 30 minute consultation", and the button beside it said
+ * "Get in touch" and opened a general form. The page made a specific offer and then dropped it at
+ * the one moment the reader acts on it.
+ *
+ * So both in-page CTAs now name that offer and land on the booking section. `/contact-us` stays,
+ * demoted to what it actually is — general enquiries — and says so on the page.
+ *
+ * The HEADER button deliberately keeps saying "Admissions". It is a nav entry pointing at a page,
+ * and the page's name is the honest label; it is also the width that fits. `nav.ts` carries the
+ * arithmetic (`Admissions` as a padded button is ~150px, and that is already why Results could not
+ * stay in the bar) and `e2e/nav-single-line.spec.ts` fails if the desktop bar wraps —
+ * "Book a free consultation" is more than twice as wide in English.
+ */
+export function consultHref(): string {
+	return localizeHref('/admissions#book');
+}
