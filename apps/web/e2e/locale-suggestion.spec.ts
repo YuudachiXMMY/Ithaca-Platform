@@ -45,6 +45,24 @@ test.describe('a Chinese-preferring browser', () => {
 		await expect(card(page)).toHaveAttribute('lang', 'zh');
 	});
 
+	test('leaves on the first real scroll instead of riding over the page', async ({ page }) => {
+		// 2026-11-15 design review: the card is `position: fixed` and, until a visitor dismissed it,
+		// tracked the viewport all the way down the homepage — covering the mission headline, a
+		// pillar heading, Journey step 03 and the University Support card in turn. It now leaves on
+		// its own once scrolled past. See the `onScroll` note in LocaleSuggestion.svelte for why the
+		// fix is this and not the slim top bar the review proposed.
+		await page.goto('/');
+		await expect(card(page)).toBeVisible();
+
+		// Under the 240px threshold: a trackpad twitch, or scroll restoration, must NOT count.
+		await page.evaluate(() => window.scrollTo(0, 120));
+		await page.waitForTimeout(300);
+		await expect(card(page)).toBeVisible();
+
+		await page.evaluate(() => window.scrollTo(0, 900));
+		await expect(card(page)).toBeHidden();
+	});
+
 	test('is not offered anything on a page that is already Chinese', async ({ page }) => {
 		await page.goto('/zh');
 		await page.waitForTimeout(800);

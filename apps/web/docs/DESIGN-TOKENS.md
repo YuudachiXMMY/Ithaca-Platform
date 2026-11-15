@@ -1523,3 +1523,50 @@ console.log("unguarded color-mix lines :", bad.length?bad.join(","):"none (expec
 | `git diff --name-only \| grep '^src/routes/admin/'`       | **0 files** — admin is §3.2/§3.6-deferred (scope box at the top, R2-22) |
 | `npm run check` + `npm run lint` + `npm run build`        | green                                                                   |
 | axe / Playwright a11y smoke (`.github/workflows` PR gate) | 0 colour-contrast violations                                            |
+
+---
+
+## 10. 字号下限与等宽字体（2026-11-15 设计评审）
+
+两条约束，加在上面的 token 体系之外，目前只覆盖**首页**那条链路
+（`src/lib/components/home/**` 加 `shared/JourneyStrip.svelte`）。其余页面还是旧状态，
+要收的话按同样规则往外推。
+
+### 10.1 正文区最小 12px
+
+首页原先有 15 处 `text-[11px]` / `text-[10px]` / `text-[9px]`（eyebrow、卡片标签、highlight
+描述），全部提到 `text-xs`。同时删掉与基准同值的 `md:` 变体 —— 收敛后 `text-xs md:text-xs`
+只是噪声。
+
+**唯一的例外**是 `StudentHighlights.svelte` 里那个 48/64px 的大序号：它是 `aria-hidden`、
+`select-none`、`text-band-foreground/[0.05]` 的装饰纹样，不是文本。
+
+新代码请直接用 `text-xs` 当下限；要写更小的字号，先说明它为什么不是正文。
+
+### 10.2 不要用 `font-mono`
+
+`app.css` 的 `@theme` 只定义了 `--font-sans`（Inter）与 `--font-display`（Manrope）。**没有
+`--font-mono`**，所以任何 `font-mono` 都落到 Tailwind 的默认系统栈
+（`ui-monospace, SFMono-Regular, Menlo, …`）—— 字形随访客的操作系统变，这不是一个设计决定。
+
+首页的 eyebrow 与统计数字已改为：
+
+- **eyebrow / 标签**：`font-display` + 原有的 `tracking-[0.2em]` 一类字距
+- **数字**：`font-display tabular-nums`
+
+选 `tabular-nums` 而不是新载一款 mono，是因为后者是一个新的字体请求，而本仓库对字体请求有
+纪律（见 DECISIONS 的 LCP 章节与 `lighthouserc.json` 的棘轮门限）；而数字等宽对齐本来就该由
+`font-variant-numeric: tabular-nums` 表达，不该由「换一种字体」顺带实现。
+
+> **注意**：`ImpactStats.test.ts` 曾用 `<p class="font-mono …">` 正则抓那四个数字。按装饰类选
+> 元素的正则在装饰改变时匹配不到任何东西，而匹配不到就是空数组对空数组 —— 断言会静默通过。
+> 现在按 `tabular-nums` 匹配。写这类测试时，选那个**因为语义而存在**的类。
+
+### 10.3 触控目标：`pointer-coarse:min-h-11`
+
+footer 的链接此前 16–17px 高，低于 WCAG 2.2 的 24px。现在加 `pointer-coarse:min-h-11`（44px）。
+
+**gate 在 `pointer-coarse` 而不是无条件加高**：footer 是四列密排列表，无条件 44px 会在不需要的
+桌面指针上多出约 100px 死高度。Tailwind 4.3 的这个变体编译成 `@media (pointer: coarse)`，跟的是
+输入设备而非视口宽度 —— 375px 宽的桌面窗口保持紧凑、平板拿到大目标。用 `min-h` 而不是 padding，
+是为了让增长落在**点击盒**上而不是排版节奏上。

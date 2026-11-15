@@ -27,11 +27,22 @@ const LABELS: Record<string, MessageFn> = {
 
 const LOCALES: Locale[] = ['en', 'zh'];
 
-/** The four `<p class="font-mono …">` figures, in DOM order, with hydration comments stripped. */
+/**
+ * The four figure `<p>`s, in DOM order, with hydration comments stripped.
+ *
+ * Matched by `tabular-nums`, not by a font utility. This used to key off `font-mono`, which broke
+ * silently on 2026-11-15 when the numerals moved off the `ui-monospace` system stack (it is not
+ * defined as a theme font here, so the typeface changed per operating system) onto Manrope with
+ * tabular figures. A regex that selects on a decorative class matches nothing the moment the
+ * decoration changes, and matching nothing makes this assertion pass vacuously — the failure mode
+ * is an empty array compared against an empty array. `tabular-nums` is at least load-bearing FOR
+ * the figures: it is on these four elements because they are numerals, not because of how they
+ * look.
+ */
 function figures(html: string): string[] {
 	const text = html.replace(/<!--[\s\S]*?-->/g, '');
-	return [...text.matchAll(/<p class="font-mono[^"]*"[^>]*>([\s\S]*?)<\/p>/g)].map((match) =>
-		match[1].replace(/\s+/g, '')
+	return [...text.matchAll(/<p class="[^"]*tabular-nums[^"]*"[^>]*>([\s\S]*?)<\/p>/g)].map(
+		(match) => match[1].replace(/\s+/g, '')
 	);
 }
 

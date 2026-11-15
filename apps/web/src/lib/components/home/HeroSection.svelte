@@ -45,6 +45,28 @@
 	<!-- Quote content — bottom-left anchored -->
 	<div class="relative z-10 px-5 pb-14 sm:px-8 md:px-[6vw] md:pb-20">
 		<div class="max-w-3xl">
+			<!-- Positioning line — added 2026-11-15, the minimum answer to the design review's first
+			     finding. The review's own prescription was to REPLACE the Cavafy quote with a
+			     positioning headline; the quote and the Approach pillars are brand-locked to the 11-04
+			     brochure (see the section-order note in `src/routes/+page.svelte`), so the lock holds
+			     and this line is added above it instead.
+
+			     It is here because of who arrives: the site's main inbound path is a WeChat share, so
+			     most visitors land with no idea what Ithaca is, and until now the only descriptor on
+			     the first screen was the words "Family Academy" baked into a 48px logo raster. One
+			     line of offer + audience + location, set well below the quote's scale so the quote
+			     keeps first read.
+
+			     A `<p>`, NOT a heading: the page's single `<h1>` is the empowerment statement in
+			     MissionSection and `e2e/a11y.spec.ts` would fail a second one. No new claim is made
+			     here — the grade range and the region are the ones already published in
+			     `academics_hero_description` and the programme FAQs. -->
+			<p
+				class="mb-6 max-w-xl text-base leading-relaxed font-medium text-band-foreground md:mb-8 md:text-lg"
+			>
+				{m.home_hero_positioning()}
+			</p>
+
 			<blockquote>
 				{#each quoteLines as line, i (line)}
 					<div class="overflow-hidden">
@@ -61,7 +83,7 @@
 				{/each}
 			</blockquote>
 
-			<p class="mt-6 font-mono text-[11px] tracking-[0.25em] text-band-foreground/80 uppercase">
+			<p class="mt-6 font-display text-xs tracking-[0.25em] text-band-foreground/80 uppercase">
 				{m.home_hero_author()}
 			</p>
 

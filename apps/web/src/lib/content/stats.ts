@@ -26,11 +26,17 @@ export const STATS: readonly Stat[] = [
 	},
 	{
 		key: 'programs',
-		// Still six after the 2026-11 revamp, which retired three programmes and added three
-		// (see content/programs.ts). The figure surviving the churn unchanged is a coincidence,
-		// so the `source` below no longer says "count the cards on /programs": that page now
-		// shows FIVE grid cards, because Ithaca Dialogue moved to the research-exit band. The
-		// authority is the record set, not any one page's layout.
+		// SEVEN: the six `Program` records in content/programs.ts plus the Research Lab, which is
+		// a programme to a reader but is not a `Program` record (owner ruling 2026-11-14). The
+		// `source` below no longer says "count the cards on /programs" because no page shows
+		// seven of anything — that page renders FIVE grid cards, since Ithaca Dialogue moved to
+		// the research-exit band, and the homepage shows four flagships. The authority is the
+		// record set plus that ruling, not any one page's layout.
+		//
+		// This comment used to open "Still six after the 2026-11 revamp" directly above `value: 7`.
+		// It was describing the `Program` record count while the figure had already been ruled up to
+		// include Research Lab, so the two contradicted each other in adjacent lines (found in the
+		// 2026-11-15 design review). The `source` string was the correct one of the two.
 		value: 7,
 		label: { en: 'Programs', zh: '课程' },
 		source:

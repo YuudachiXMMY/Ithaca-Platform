@@ -68,7 +68,7 @@
 >
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={20}>
-			<h2 id="journey-heading" class="font-mono text-[11px] tracking-[0.28em] text-brand uppercase">
+			<h2 id="journey-heading" class="font-display text-xs tracking-[0.28em] text-brand uppercase">
 				{m.journey_heading()}
 			</h2>
 
@@ -79,17 +79,17 @@
 							href={localizeHref(stage.href)}
 							class="group flex h-full flex-col p-6 transition-colors duration-200 hover:bg-surface-4/40 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand md:p-8"
 						>
-							<span class="font-mono text-3xl font-light text-brand md:text-4xl">
+							<span class="font-display text-3xl font-light text-brand tabular-nums md:text-4xl">
 								{stage.number}
 							</span>
-							<span class="mt-4 font-mono text-[11px] tracking-[0.22em] text-foreground uppercase">
+							<span class="mt-4 font-display text-xs tracking-[0.22em] text-foreground uppercase">
 								{stage.label()}
 							</span>
 							<span class="mt-4 grow text-base leading-relaxed text-foreground-subtle">
 								{stage.line()}
 							</span>
 							<span
-								class="mt-5 inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.2em] text-foreground-muted uppercase"
+								class="mt-5 inline-flex items-center gap-2 font-display text-xs tracking-[0.2em] text-foreground-muted uppercase"
 							>
 								{stage.tag()}
 								<ArrowRight
@@ -109,7 +109,7 @@
 			<p class="mt-8 max-w-3xl text-sm leading-relaxed text-foreground-subtle">
 				{m.journey_universityNote()}
 			</p>
-			<p class="mt-3 font-mono text-[11px] tracking-[0.18em] text-foreground-muted uppercase">
+			<p class="mt-3 font-display text-xs tracking-[0.18em] text-foreground-muted uppercase">
 				{m.journey_closing()}
 			</p>
 		</Reveal>

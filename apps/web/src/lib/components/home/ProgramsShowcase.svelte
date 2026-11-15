@@ -126,7 +126,7 @@
 				{program.description()}
 			</p>
 			{#if windows.get(program.slug)}
-				<p class="mt-1.5 text-[11px] font-medium tracking-wide text-band-foreground/70">
+				<p class="mt-1.5 text-xs font-medium tracking-wide text-band-foreground/70">
 					{windows.get(program.slug)}
 				</p>
 			{/if}

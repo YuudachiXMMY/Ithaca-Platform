@@ -72,7 +72,7 @@
 						: `transform:translateY(${revealed ? 0 : 24}px);transition:transform 0.8s cubic-bezier(0.33,1,0.68,1) ${i * 250}ms`}
 				>
 					<p
-						class="font-mono text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl"
+						class="font-display text-4xl font-bold tracking-tight text-foreground tabular-nums md:text-5xl lg:text-6xl"
 					>
 						{stat.value}{stat.suffix ?? ''}
 					</p>

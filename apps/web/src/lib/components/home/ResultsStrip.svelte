@@ -34,7 +34,7 @@
 		<Reveal y={20}>
 			<h2
 				id="home-results-heading"
-				class="font-mono text-[11px] tracking-[0.28em] text-brand uppercase"
+				class="font-display text-xs tracking-[0.28em] text-brand uppercase"
 			>
 				{m.home_results_heading()}
 			</h2>

@@ -190,6 +190,43 @@
 		visible = false;
 	}
 
+	/** The card's own element, so a scroll cannot close it out from under a keyboard user. */
+	let cardEl = $state<HTMLElement | null>(null);
+	/** `scrollY` at display time. Scroll is measured from here, not from 0. */
+	let shownAtY = 0;
+
+	/**
+	 * Scroll-away — the card leaves on the first real scroll instead of riding over the page.
+	 *
+	 * It is `position: fixed` (see the note at the top of this file), so until 2026-11-15 an
+	 * undismissed card tracked the viewport all the way down the homepage and covered, in order,
+	 * the mission headline, a pillar heading, Journey step 03 and the University Support card.
+	 *
+	 * The alternative the design review proposed — a slim bar above the header — was rejected: the
+	 * offsets and z-index documented above were established against four other fixed layers and one
+	 * `e2e/locale-suggestion.spec.ts` regression, and a full-width bar would also displace layout
+	 * (CLS) on the one element whose whole job is to be ignorable. Leaving on scroll needs none of
+	 * that: the position stays exactly as reasoned, it just stops being permanent.
+	 *
+	 * NOT recorded as `dismissed`. `onMount` already stored `shown`, which is what gates the card
+	 * ever appearing again, and scrolling past something is not a decision about it — so the record
+	 * stays honest and the `Decision` union does not grow a fourth outcome.
+	 *
+	 * Two guards:
+	 *  - `THRESHOLD` so a trackpad twitch, or the scroll restoration that follows a soft
+	 *    navigation, does not count as scrolling past it.
+	 *  - focus containment, because the three controls inside are reachable by keyboard and
+	 *    scrolling to them must not delete the thing being scrolled to.
+	 */
+	const SCROLL_AWAY_THRESHOLD = 240;
+
+	function onScroll() {
+		if (!visible) return;
+		if (Math.abs(window.scrollY - shownAtY) < SCROLL_AWAY_THRESHOLD) return;
+		if (cardEl?.contains(document.activeElement)) return;
+		visible = false;
+	}
+
 	/**
 	 * `locale_switch` — `prd.md` R-SEO-5, the same `{ from, to, path }` shape
 	 * `LanguageSwitcher.svelte` sends, so this route into Chinese is counted by the one report that
@@ -229,11 +266,14 @@
 		// Recorded at DISPLAY time, not only on a click, so the card appears at most once ever: a
 		// visitor who ignores it is not asked again on the next full page load.
 		remember('shown');
+		shownAtY = window.scrollY;
 		visible = true;
 	});
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal link uses Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the /zh prefix -->
+
+<svelte:window onscroll={onScroll} />
 
 {#if visible && locale === 'en'}
 	<!--
@@ -246,6 +286,7 @@
 	-->
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<aside
+		bind:this={cardEl}
 		lang="zh"
 		aria-labelledby="locale-suggestion-heading"
 		onkeydown={onKeydown}

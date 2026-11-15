@@ -845,3 +845,78 @@ Studio 从研究板块挪到项目板块，项目本身一个字没改。推导�
   `querySelector`（取**第一个**）menuitem，所以菜单能进不能走；也完全没有 `ArrowUp`/`Home`/`End`。
   axe 看不见这件事 —— 它校的是 role 写得对不对，不是 role 所承诺的行为存不存在。现在按 APG
   的菜单模式实现（含环绕），`smoke.spec.ts` 里按两次 ArrowDown：按一次在修复前也是绿的。
+
+## 2026-11-15 — 首页设计评审的落地范围（以及被驳回的部分）
+
+输入是一份外部设计评审（`project_website_design_critique_2026-11-15.md`，范围：英文首页，
+1024px 窄桌面 + 375×812 移动端）。16 条发现里 9 条落地、2 条驳回、3 条改了处方、2 条按所有者
+裁决只做折中版。记在这里的是**判断**，逐条的文件与行号在那份评审的执行方案里。
+
+### 驳回（与代码不符）
+
+- **「hero 引言没用 blockquote」** —— `HeroSection.svelte` 一直是 `<blockquote>` 包四行 `<p>`，
+  这正是 blockquote 的正确用法。无改动。
+- **「询盘表单把 Student's grade 标成必填，却放在 optional 区块里」** —— `EnquiryForm.svelte`
+  全文没有 `required` 属性，`grade` 的 `<select>` 首项是空值，`/api/contact` 的 Zod schema 里它
+  也是 optional。整条链路没有任何地方标它必填。无改动。
+
+### 改了处方（现象为真，诊断或处方错）
+
+- **「补一张 IB 卡片」** —— `/academics` 实际正好**五条**赛道（AP、OSSD、SAT/ACT、升学支持、
+  一对一辅导），所以 `home_academics_viewAll` 的「五条」是真话，首页只放四条是
+  `AcademicsShowcase` 注释里记过的刻意取舍（省掉区分度最低的一对一辅导）。IB 从来没有卡片。
+  但底下有个真问题：**三条英文文案把 IB 与 AP/OSSD/SAT 并列成独立赛道**，而站内只有五条、IB
+  只在 tutoring 内交付 —— 且三条中文孪生串根本没提 IB，所以这是英文侧单独的漂移。改的是文案
+  （IB 降为辅导科目，中英对齐），不是加卡片。另外把链接文案改成「此处四条 —— 查看全部五条」：
+  原文案 literal 为真，但压在四张卡上方读起来像数错了。
+- **「语言提示改成 header 上方的细条」** —— 改成通栏条要重做 `LocaleSuggestion.svelte` 顶部用
+  36 行记录的那套层叠（四个其它 fixed 图层 + 一条 `e2e/locale-suggestion.spec.ts` 抓过的回归：
+  偏移量取 `--nav-h` 而非 bar 的未滚动高度，会让 dismiss 按钮点不着），并且会在一个「本职就是
+  可被忽略」的元素上制造 CLS。改取评审的第二个选项：**首次滚动即自动消失**（240px 阈值 + 焦点
+  包含守卫），定位与 z-index 一字不动。
+- **「Ithaca Dialogue 的单复数要统一」** —— 面向用户的文案全站一致是单数，复数只出现在 slug 和
+  message key 里。而 slug 是承重的（`$lib/program-cta` 按它生成全部七个 CTA、
+  `season-contract.test.ts` 按它串联四个表面、sitemap 与已索引的线上 URL）。改它要加 301、吃一轮
+  SEO 波动，换来零用户可见收益。**不动。**
+
+### 所有者裁决：两条与 brand-lock 冲突的建议只做折中版
+
+评审的前两条优先建议（重写首屏定位语、把 Approach 后移并压成三列）正面推翻两项已记录决策：
+Cavafy 引言与 Our Approach 三支柱与 11-04 宣传册绑定，且 `+page.svelte` 的段落顺序本身是有论证
+的。所有者 2026-11-15 两条都选折中：
+
+- **首屏**：锁定保留，在引言**上方**新增一行 `home_hero_positioning`（offer + 受众 + 地点，
+  16/18px，`<p>` 而非标题 —— 唯一的 `<h1>` 在 MissionSection）。它存在的理由是主入口是微信分享：
+  多数访客落地时对 Ithaca 一无所知，而首屏此前唯一的描述词是烤进 48px logo 位图的「Family
+  Academy」。文案不含任何新主张，年级与地区都取自既有词条。
+- **Approach**：顺序与构成不动，只压缩空白 —— 两个图文行 `py-14 md:py-20` → `py-10 md:py-14`，
+  收尾带 `min-h` 从 24–34rem 降到 18–26rem，mission 展开区少一档上边距。评审测得这一段在
+  375px 下占 2,161px（2.7 屏），「空白成了长度而非信息」这半句是对的；如果还嫌长，下一步是
+  删字，不是再调一轮 padding。
+
+### 落地的九条里，三处值得单独记
+
+- **等宽字体根本没有 token。** `app.css` 只定义了 `--font-sans` / `--font-display`，所以每个
+  `font-mono`（eyebrow 与统计数字）都落到 Tailwind 默认系统栈，字形随操作系统变。没有新载一款
+  mono（那是一个新字体请求，要先按 LCP 纪律量），而是改用 Manrope + `tabular-nums`：零新增请求，
+  而数字对齐本来就该用 tabular figures。
+  **连带发现**：`ImpactStats.test.ts` 用 `<p class="font-mono …">` 正则抓那四个数字。这种按装饰
+  类选元素的正则，在装饰一变时匹配不到任何东西，而匹配不到就是空数组对空数组 —— 断言会**静默
+  通过**。已改为按 `tabular-nums` 匹配（它在那四个元素上是因为它们是数字，不是因为长相）。
+- **12px 字号下限**用 `text-xs` 统一替换首页的 11/10/9px（15 处），同时删掉与基准同值的 `md:`
+  变体。`StudentHighlights` 那个 48/64px 的装饰序号是 `aria-hidden`，不在此列。
+- **触控目标用 `pointer-coarse:min-h-11`，不是无条件加高。** footer 是四列密排链接，无条件 44px
+  会在不需要的桌面指针上多出约 100px 死高度。Tailwind 4.3 的这个变体编译成
+  `@media (pointer: coarse)`，跟的是输入设备而不是视口宽度 —— 375px 宽的桌面窗口保持紧凑、
+  平板拿到大目标，这个方向才是对的。
+
+### 未做，原因不是忘了
+
+- **统一转化标签（三个标签两个目的地）** —— 要定文案，且正确做法是并进 `DECISIONS.md` M-4 已有的
+  `/admissions?program=<slug>#book` 机制而不是另起一套。留给所有者。
+- **统一 section header 组件 / 字号阶梯收到 8 档** —— 这是全站 7 个 section 的重构，且最需要
+  肉眼反复比对，不适合在无法看屏的环节里推。注意 `ContactSection` 的 44px（`2.75rem`）是 §8.2
+  规定的 h2 上限且刻意取到顶，收敛时要么以它为唯一值、要么同步改那条注释和 §8.2。
+- **两张截图卡换成照片、highlight 卡逐张链到 /news 条目** —— 等摄影素材与 news 侧条目，
+  和 `ProgramsShowcase` 里 AI Investment Lab 的 `TODO(asset)` 是同一份清单。
+- **「一个空的未命名 iframe」** —— 静态读码没定位到，是渲染态问题，要跑起来抓 DOM。
