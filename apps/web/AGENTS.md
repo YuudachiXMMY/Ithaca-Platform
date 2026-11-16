@@ -42,6 +42,46 @@
 - 公开的 JSON POST 端点统一走 `src/lib/server/guard.ts` 的安全前置：
   来源白名单 → 双提交 CSRF → 滑动窗口限流，顺序固定且逐级短路。别在新端点里重新手写一遍。
 
+## 浏览器支持地板 —— 比你以为的低一截
+
+**`prd.md` §14 R-COMPAT-1 要求 iOS Safari 16+ 与微信内置浏览器（iOS WKWebView 和 Android
+X5）。`docs/DESIGN-TOKENS.md` §1.8 实测 X5/XWeb 常见为 Chromium ≤ 107。**
+微信分享是本站的主要到站路径，所以这是生产风险而不是理论问题。
+
+**有效地板 ≈ Chromium 107（2022-10）+ iOS Safari 16.0（2022-09）。**
+
+这条写在这里，是因为它在 PRD 和 DESIGN-TOKENS 里时工具链读不到 —— `vite.config.ts` 的
+`build.target` 曾经没设，于是取 Vite 8 默认的 `baseline-widely-available`
+（`chrome111 / safari16.4 / ios16.4`），比我们承诺的高出一整代。现在它被显式写成
+`['chrome107', 'safari16']`，**要抬它必须和 R-COMPAT-1 一起抬**。
+
+几个会被误判为"现代化欠账"的东西，其实是地板外、**不该动**：
+
+| 特性                                                     | 状态                                                                                |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `popover`、invoker commands（`command`/`commandfor`）    | ⛔ Safari iOS 18.3 / 26.2                                                           |
+| `::details-content`、`interpolate-size`                  | ⛔ Safari 18.4 / Chrome-only                                                        |
+| `@starting-style`、`transition-behavior: allow-discrete` | ⛔ Safari 17.4+                                                                     |
+| 滚动驱动动画（`animation-timeline`）                     | ⛔ Safari 26；降级后元素停在 `opacity: 0`，内容直接不可见                           |
+| `light-dark()`、`:user-invalid`、`field-sizing`          | ⛔                                                                                  |
+| `scrollbar-color` / `scrollbar-width`                    | ⚠️ Safari 26.2 / 18.2 —— 所以 `app.css` 的 `::-webkit-scrollbar` 回退块是**承重的** |
+| `color-mix()`                                            | ⚠️ 这就是 `app.css` 里 28 个 `@supports` 守卫存在的原因，见 DESIGN-TOKENS §1.8      |
+
+**地板内可用、值得用**的：`<dialog>` + `showModal()`（2022-03）、`<details>`、`inert`、
+独立 transform 属性（`translate`/`rotate`/`scale`，2022-08）、`aspect-ratio`、`dvh`、
+`clamp()`、容器查询、`:has()`、`overflow: clip`。
+
+**一个已查明的误报**，省得下一个人重查：设 `build.target` 之前，产物 CSS 里有 19 处
+`oklch()`（Chromium ≤ 107 不支持），全是 Tailwind 自己的默认调色板 token。它们确实被
+`.text-red-400` / `.bg-red-500/10` 这类工具类引用，**但那些类在任何预渲染页面里都出现 0 次**
+—— Tailwind 4 会扫 CSS 文件里的类名，而 `app.css:114` 的一段散文注释恰好点了四个类名。
+所以当时是死 CSS，不是渲染缺陷。
+
+设上 `build.target` 之后 Lightning CSS 把它们全部降级，产物里 `oklch(` 归零，代价是 brotli
+**+305 字节（+0.07%）**、文件数不变。所以这条配置不只是"防未来"：它顺带让 Tailwind 的默认
+调色板在 X5 上真正可用了 —— 哪天有人真用上 `text-red-500`，不会再静默失效。
+（2026-11-16 查证并实测。）
+
 ## 动手前
 
 - 读 `vite.config.ts`（配置都在里面）。

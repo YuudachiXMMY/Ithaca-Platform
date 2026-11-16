@@ -1,0 +1,22 @@
+{
+	// ## Why this file exists
+	//
+	// `npm run check` runs svelte-check against the repo's root tsconfig, whose `include` comes
+	// from the generated `.svelte-kit/tsconfig.json` — and that list is `src/**`, `test/**`,
+	// `tests/**`. `e2e/**` is in NONE of them. Playwright transpiles specs with esbuild, which
+	// does not type-check. So until now a genuine type error in a spec shipped silently: it
+	// would either blow up at run time or, worse, quietly assert the wrong thing.
+	//
+	// Found while reviewing the a11y.spec.ts change in this same branch, which added a
+	// `page.emulateMedia({ reducedMotion })` call — exactly the kind of edit where a wrong
+	// literal type would have gone unnoticed.
+	//
+	// `types: ["node"]` because the generated config targets the browser/Svelte environment and
+	// specs reach for Node globals (`process.env`) that are otherwise unresolved.
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"types": ["node"]
+	},
+	"include": ["**/*.ts"]
+}

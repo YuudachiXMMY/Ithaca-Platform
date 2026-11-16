@@ -135,8 +135,14 @@
 	// selector out of `idPrefix`, which is a prop and not guaranteed to be CSS-safe.
 	let nameEl = $state<HTMLInputElement | null>(null);
 	let emailEl = $state<HTMLInputElement | null>(null);
-	/** Ties both required fields to the one live error region via aria-describedby. */
-	const errorId = `${idPrefix}-error`;
+	/**
+	 * Ties both required fields to the one live error region via aria-describedby.
+	 * `$derived` and not `const`: `idPrefix` is a prop, so a plain const would capture only its
+	 * initial value (svelte-check flags this as `state_referenced_locally`). Both call sites
+	 * pass a literal today, but a stale id here would silently break the association rather
+	 * than fail loudly.
+	 */
+	const errorId = $derived(`${idPrefix}-error`);
 
 	/**
 	 * `?program=` / `?topic=` — `prd.md` R-ADM-7 / R-CON-1.

@@ -14,6 +14,7 @@
 		"preview:prod": "bash scripts/preview-prod.sh",
 		"prepare": "svelte-kit sync && paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide && npm run fonts:cjk || echo ''",
 		"check": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:e2e": "tsc -p e2e/tsconfig.json --noEmit",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"i18n:check": "tsx scripts/check-i18n.ts",

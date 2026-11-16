@@ -80,6 +80,32 @@ function dropUnreferencedDecoderBinaries(): Plugin {
 }
 
 export default defineConfig({
+	/**
+	 * ## Build target, stated explicitly to match the browser floor we actually promise
+	 *
+	 * Left unset, this resolves to Vite 8's default `baseline-widely-available`, which is
+	 * `chrome111, edge111, firefox114, safari16.4, ios16.4`. That is NOT what this site
+	 * supports: prd.md §14 R-COMPAT-1 requires iOS Safari 16 and the WeChat Android X5
+	 * webview, which docs/DESIGN-TOKENS.md §1.8 measures as commonly Chromium <= 107 — and
+	 * notes that WeChat-on-mobile is the primary arrival path, so it is a live risk. The CSS
+	 * in app.css carries 28 hand-written `@supports (color: color-mix(…))` guards precisely
+	 * for those engines, while the toolchain was being told it could emit chrome111+ syntax.
+	 *
+	 * Measured before setting this (2026-11-16): the only non-floor syntax in the output was
+	 * `oklch()`, 19 occurrences, ALL of them Tailwind's own default palette tokens
+	 * (`--color-red-500` and friends). Every one is referenced by a utility class
+	 * (`.text-red-400`, `.bg-red-500/10`, …) — but NONE of those classes appear in any
+	 * prerendered page, 0 hits across build/prerendered. They are dead CSS: Tailwind 4 scans
+	 * CSS files for class names and app.css:114 happens to NAME four of them inside a prose
+	 * comment. So the conflict was real on paper and inert in practice.
+	 *
+	 * That makes this declaration a guardrail rather than a fix: it keeps a future dependency
+	 * bump or a new language feature from silently shipping syntax that the X5 webview cannot
+	 * parse — which fails harder than a missing API, because a syntax error takes out the whole
+	 * chunk or rule. Raise these values only together with R-COMPAT-1.
+	 */
+	build: { target: ['chrome107', 'safari16'] },
+
 	// three (and three/addons/*) touch browser globals and ship ESM that must be
 	// bundled for SSR/prerender rather than externalized as a bare Node require.
 	ssr: { noExternal: ['three'] },
