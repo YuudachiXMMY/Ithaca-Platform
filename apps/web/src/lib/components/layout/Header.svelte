@@ -266,12 +266,16 @@
 			onfocusout={closeMenu}
 			onkeydown={(e) => handleDropdownKeydown(e, item.href)}
 		>
+			<!-- `aria-current` because the active state was signalled by colour (`linkActive`) plus a
+			     4px rule that is itself `aria-hidden` — so the only non-colour cue was hidden from
+			     exactly the users who need it. WCAG 1.4.1 + 4.1.2, and axe has no rule for it. -->
 			<a
 				href={localizeHref(item.href)}
 				class={cn(
 					'relative flex items-center gap-1.5 py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
 					active ? linkActive : linkIdle
 				)}
+				aria-current={active ? 'page' : undefined}
 				aria-expanded={open}
 				aria-haspopup="true"
 			>
@@ -321,6 +325,7 @@
 				'relative py-2 text-[13px] font-medium tracking-[0.08em] uppercase transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
 				active ? linkActive : linkIdle
 			)}
+			aria-current={active ? 'page' : undefined}
 		>
 			{#if active}
 				<span class={cn('absolute -bottom-px left-0 h-px w-4', activeRule)} aria-hidden="true"
@@ -411,7 +416,15 @@
 				$lib/data/nav carries the arithmetic and explains why that ~62px is the reason
 				Results could not stay in the bar.
 			-->
-			<nav class="hidden items-center gap-7 lg:flex xl:gap-10">
+			<!-- Named, because the bar renders TWO navigation landmarks on desktop (the left group at
+			     :364-367 is "Main navigation") and an unnamed second one shows up in a screen
+			     reader's landmark list as a bare "navigation" with no way to tell them apart —
+			     WCAG 1.3.1. Labelling is the conservative fix; merging the two into one <nav> would
+			     mean restructuring the flex split that nav-single-line.spec.ts measures. -->
+			<nav
+				class="hidden items-center gap-7 lg:flex xl:gap-10"
+				aria-label={m.common_nav_secondaryNavigation()}
+			>
 				{#each RIGHT_NAV.filter((item) => item.href !== CTA_HREF) as item (item.href)}
 					{@render navEntry(item)}
 				{/each}
@@ -520,6 +533,7 @@
 									? 'bg-brand/10 text-brand-bright'
 									: 'text-foreground-muted hover:bg-surface-2 hover:text-foreground'
 							)}
+							aria-current={active ? 'true' : undefined}
 							aria-expanded={expanded}
 							aria-controls={submenuId}
 							aria-label={m.common_nav_toggleSubmenu({ label: navLabel(item.label) })}
@@ -568,6 +582,7 @@
 									? 'bg-brand/10 text-brand-bright'
 									: 'text-foreground-muted hover:bg-surface-2 hover:text-foreground'
 							)}
+							aria-current={active ? 'page' : undefined}
 						>
 							{navLabel(item.label)}
 						</a>

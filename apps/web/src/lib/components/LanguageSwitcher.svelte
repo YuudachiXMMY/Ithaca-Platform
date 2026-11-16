@@ -2,6 +2,7 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
 	import { localizeHref, deLocalizeHref, deLocalizeUrl, getLocale } from '$lib/paraglide/runtime';
+	import * as m from '$lib/paraglide/messages';
 	import { trackLocaleSwitch } from '$lib/analytics';
 
 	/**
@@ -82,16 +83,42 @@
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
-<div class="flex items-center gap-1.5 text-[13px] font-medium tracking-[0.08em]">
+<!-- ## Three a11y fixes here, and one thing deliberately NOT done
+     1. The `aria-label`s are gone, not translated. They used to be the hardcoded strings
+        "Switch to English" / "切换为中文", and the first one BROKE WCAG 2.5.3 (Label in Name):
+        the visible label is "EN", which is not contained in "Switch to English", so a voice
+        -control user saying "click EN" matched nothing. The fix is not a longer label — the
+        visible text cannot change, `nav-single-line.spec.ts` gates the bar on staying one line
+        and "EN" is doing real work there. So the visible text becomes the accessible name and
+        the CONTAINER carries the context instead (`role="group"` + "Language").
+     2. `lang` on each link, because "中文" sitting in a `lang="en"` document is WCAG 3.1.2 —
+        a TTS engine would otherwise read those glyphs with an English voice. `hreflang` tells
+        AT and crawlers where each link goes; LocaleSuggestion.svelte:317 already did this.
+     3. `aria-current` because the active locale was signalled by COLOUR ALONE (`current` vs
+        `idle` at :61-66) — WCAG 1.4.1, and a screen-reader user had no way to know which
+        language they were already reading. Value is 'true', not 'page': these are not two
+        pages in a set, they are two renderings of the same one.
+
+     NOT done: routing those labels through Paraglide. The audit flagged the hardcoding, but
+     writing each label in its TARGET language is correct for a locale switcher — it is what
+     lets a Chinese reader on an English page read the Chinese option. Paraglide would have made
+     them follow the PAGE locale, which is the opposite. Removing them sidesteps the question. -->
+<div
+	class="flex items-center gap-1.5 text-[13px] font-medium tracking-[0.08em]"
+	role="group"
+	aria-label={m.common_languageSwitcher_label()}
+>
 	<a
 		href={enHref}
 		onclick={() => onSwitch('en')}
 		data-sveltekit-reload
+		lang="en"
+		hreflang="en"
+		aria-current={locale === 'en' ? 'true' : undefined}
 		class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand {locale ===
 		'en'
 			? current
 			: idle}"
-		aria-label="Switch to English"
 	>
 		EN
 	</a>
@@ -102,11 +129,13 @@
 		href={zhHref}
 		onclick={() => onSwitch('zh')}
 		data-sveltekit-reload
+		lang="zh"
+		hreflang="zh"
+		aria-current={locale === 'zh' ? 'true' : undefined}
 		class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand {locale ===
 		'zh'
 			? current
 			: idle}"
-		aria-label="切换为中文"
 	>
 		中文
 	</a>
