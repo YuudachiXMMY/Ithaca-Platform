@@ -131,6 +131,12 @@
 	let offerFallback = $state(false);
 	let detailsOpen = $state(false);
 	let formEl = $state<HTMLFormElement | null>(null);
+	// Bound so `fail()` can focus the offending field by reference rather than by building a
+	// selector out of `idPrefix`, which is a prop and not guaranteed to be CSS-safe.
+	let nameEl = $state<HTMLInputElement | null>(null);
+	let emailEl = $state<HTMLInputElement | null>(null);
+	/** Ties both required fields to the one live error region via aria-describedby. */
+	const errorId = `${idPrefix}-error`;
 
 	/**
 	 * `?program=` / `?topic=` — `prd.md` R-ADM-7 / R-CON-1.
@@ -196,10 +202,20 @@
 		return m.contact_form_genericError();
 	}
 
-	function fail(text: string, fallback: boolean) {
+	/**
+	 * Move focus to the field that failed.
+	 *
+	 * With native constraint validation the browser does this for you — it focuses the first
+	 * invalid control on submit. This form cannot rely on that: it calls `preventDefault()` and
+	 * carries `novalidate` (see the `<form>` tag for why), so without this the user got a single
+	 * generic error that pointed at no field, with focus left sitting on the submit button.
+	 * That is WCAG 3.3.1 (Error Identification).
+	 */
+	function fail(text: string, fallback: boolean, focus?: HTMLElement | null) {
 		status = 'error';
 		message = text;
 		offerFallback = fallback;
+		focus?.focus();
 	}
 
 	async function submit(event: SubmitEvent) {
@@ -207,8 +223,15 @@
 		message = '';
 		offerFallback = false;
 
-		if (!fields.name.trim() || !fields.email.trim()) {
-			fail(m.contact_invalid(), false);
+		// Split from one combined condition so focus can land on the field that is actually
+		// empty. The message is deliberately unchanged — same copy, same live region, so the
+		// smoke tests that assert on it still hold; only the focus target is new.
+		if (!fields.name.trim()) {
+			fail(m.contact_invalid(), false, nameEl);
+			return;
+		}
+		if (!fields.email.trim()) {
+			fail(m.contact_invalid(), false, emailEl);
 			return;
 		}
 
@@ -324,18 +347,45 @@
 		</button>
 	</div>
 {:else}
-	<form bind:this={formEl} class="flex flex-col gap-4" onsubmit={submit} aria-label={formLabel}>
+	<!-- ## `required` for the semantics, `novalidate` to keep the copy
+	     The two required fields previously had NO `required` and no `aria-required`: the only
+	     statement of required-ness was a red `*` in the label, which is a visual convention a
+	     screen reader cannot convey (WCAG 3.3.2). `required` fixes that.
+
+	     But plain `required` would also hand validation to the browser, and that breaks a
+	     guarantee this repo already tests: smoke.spec.ts:507-513 asserts "A Chinese visitor must
+	     not be shown an English validation message", and the language of a native constraint
+	     bubble follows the BROWSER locale, not the page's. An English-browser visitor on /zh
+	     would get "Please fill out this field". Native validation would also swallow the submit
+	     event entirely, so `fail(m.contact_invalid())` would never run and the live region
+	     smoke.spec.ts:493-505 checks would stay empty.
+
+	     So: `required` is here for the accessibility semantics only, `novalidate` keeps the JS
+	     path (and the Paraglide copy) in charge, and `fail()` moves focus to the offending field
+	     to replace the one genuinely useful thing native validation would have done.
+	     `novalidate` does not affect `:user-invalid` matching, so if the browser floor ever
+	     rises this can adopt it without undoing any of the above. -->
+	<form
+		bind:this={formEl}
+		class="flex flex-col gap-4"
+		onsubmit={submit}
+		aria-label={formLabel}
+		novalidate
+	>
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 			<div>
 				<label for="{idPrefix}-name" class={labelClass}>
 					{m.contact_form_nameLabel()} <span class="text-danger">*</span>
 				</label>
 				<input
+					bind:this={nameEl}
 					id="{idPrefix}-name"
 					type="text"
+					required
 					autocomplete="name"
 					bind:value={fields.name}
 					aria-invalid={status === 'error' && !fields.name.trim()}
+					aria-describedby={status === 'error' ? errorId : undefined}
 					placeholder={m.contact_form_namePlaceholder()}
 					class={inputClass}
 				/>
@@ -346,11 +396,14 @@
 					{m.contact_form_emailLabel()} <span class="text-danger">*</span>
 				</label>
 				<input
+					bind:this={emailEl}
 					id="{idPrefix}-email"
 					type="email"
+					required
 					autocomplete="email"
 					bind:value={fields.email}
 					aria-invalid={status === 'error' && !fields.email.trim()}
+					aria-describedby={status === 'error' ? errorId : undefined}
 					placeholder={m.contact_form_emailPlaceholder()}
 					class={inputClass}
 				/>
@@ -498,7 +551,13 @@
 		</div>
 
 		{#if status === 'error'}
-			<p class="text-sm text-danger" role="alert" aria-live="polite">{message}</p>
+			<!-- `role="alert"` alone. It implies aria-live="assertive"; writing aria-live="polite"
+			     alongside it DOWNGRADES that, so the pair stated two contradictory intentions and
+			     the actual behaviour was left to the AT implementation (WCAG 4.1.3). An error that
+			     the user just triggered is assertive by definition, so the role stays and the
+			     redundant attribute goes. The `id` is what the two required fields point at via
+			     aria-describedby, so an invalid field can finally say WHY. -->
+			<p id={errorId} class="text-sm text-danger" role="alert">{message}</p>
 		{/if}
 
 		<!-- R-CON-2 failure fallback: the phone number and the WeChat QR, so a server or network

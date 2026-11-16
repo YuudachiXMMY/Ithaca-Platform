@@ -489,6 +489,7 @@
 	"newsletter_errorRateLimited": "That is several attempts in quick succession. Please wait a minute, then try again.",
 	"newsletter_errorRejected": "We could not verify this submission. Please reload the page and try once more.",
 	"newsletter_invalid_email": "Please enter a valid email address.",
+	"newsletter_submittingButton": "Subscribing…",
 	"newsletter_subscribeButton": "Subscribe",
 	"newsletter_success": "Thanks for subscribing!",
 	"og_eyebrow_home": "AI, Engineering & Entrepreneurship for Teens",

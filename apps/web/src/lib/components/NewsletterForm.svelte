@@ -51,6 +51,17 @@
 	}
 	let { onMist = false }: Props = $props();
 
+	/**
+	 * Per-instance ids for the `<label for>` / `aria-describedby` wiring. This form renders more
+	 * than once per document (the footer mounts one, pages mount their own), so a literal id
+	 * would duplicate and `for` would bind to whichever came first. `$props.id()` is Svelte 5's
+	 * own per-instance generator and is SSR-stable, which matters on a fully prerendered site —
+	 * a client-generated id would differ from the server's and break hydration.
+	 */
+	const uid = $props.id();
+	const emailId = `${uid}-email`;
+	const messageId = `${uid}-message`;
+
 	let email = $state('');
 	/** `notice` is 409 — a valid address that is already on the list. Not an error (nothing went
 	 *  wrong and nothing for the visitor to fix), so it is neither red nor `aria-invalid`. */
@@ -108,37 +119,64 @@
 	}
 </script>
 
-<form class="flex w-full max-w-sm flex-col gap-2" onsubmit={onSubmit}>
+<!-- `novalidate` is a FIX here, not a consistency tweak. This input already carried `required`
+     and `type="email"`, so the browser intercepted the submit and showed its own bubble — in the
+     BROWSER's language, not the page's — which meant the Paraglide copy in `messageForStatus`
+     and the EMAIL_RE check below it never ran on an empty field. Same defect EnquiryForm has,
+     minus the e2e coverage that caught it there (smoke.spec.ts:507-513). `required` stays for
+     the semantics; validation stays in JS where the localised copy lives. -->
+<form class="flex w-full max-w-sm flex-col gap-2" onsubmit={onSubmit} novalidate>
+	<!-- A real <label>, not just aria-label. The accessible name was fine before; what was
+	     missing was a PERSISTENT VISIBLE one — `placeholder="you@example.com"` is a format
+	     example and it disappears on first keystroke, leaving sighted users (cognitive
+	     accessibility especially) with an unlabelled box. WCAG 3.3.2. The copy already existed
+	     at messages/*.json `newsletter_emailLabel`; it just was not being rendered. -->
+	<label for={emailId} class="text-xs font-medium text-foreground-muted">
+		{m.newsletter_emailLabel()}
+	</label>
 	<div class="flex items-center gap-2">
 		<input
+			id={emailId}
 			type="email"
 			bind:value={email}
 			required
 			aria-invalid={status === 'error'}
-			aria-label={m.newsletter_emailLabel()}
+			aria-describedby={message ? messageId : undefined}
 			placeholder="you@example.com"
 			class="min-w-0 flex-1 border border-border-strong px-3 py-2 text-sm text-foreground transition-colors placeholder:text-foreground-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand {onMist
 				? 'bg-surface-0'
 				: 'bg-card-bg'}"
 		/>
+		<!-- The label switches while submitting. `disabled` alone removes the button from the
+		     accessibility tree, so a user who pressed Enter with focus on it loses focus AND gets
+		     no indication anything is happening (WCAG 4.1.3). EnquiryForm.svelte already does
+		     exactly this; this form had not followed. -->
 		<button
 			type="submit"
 			disabled={status === 'submitting'}
 			class="bg-action px-4 py-2 text-sm font-medium text-action-foreground transition-colors hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-60"
 		>
-			{m.newsletter_subscribeButton()}
+			{status === 'submitting' ? m.newsletter_submittingButton() : m.newsletter_subscribeButton()}
 		</button>
 	</div>
 	<!-- `notice` (409) is ink-2: AAA on both grounds this form is mounted on (10.31 on white,
 	     9.60 on the footer's mist — docs/DESIGN-TOKENS.md §4), and not the danger red. -->
+	<!-- `aria-live="polite"` alone, with `role="alert"` removed. The two contradicted each other:
+	     the role implies aria-live="assertive" and the explicit "polite" downgrades it, so the
+	     outcome was undefined rather than a choice (WCAG 4.1.3). Polite is the right one of the
+	     two HERE because this single region carries success and notice as well as error — an
+	     "alert" is the wrong semantic for "you're subscribed". It also fixes a second-order
+	     problem: this element is always in the DOM with an empty string, and an empty
+	     role="alert" is announced by some AT on page load. -->
 	<p
+		id={messageId}
 		class="text-xs {status === 'success'
 			? 'text-success'
 			: status === 'notice'
 				? 'text-foreground-muted'
 				: 'text-danger'}"
-		role="alert"
 		aria-live="polite"
+		aria-atomic="true"
 	>
 		{message}
 	</p>

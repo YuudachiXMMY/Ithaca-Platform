@@ -489,6 +489,7 @@
 	"newsletter_errorRateLimited": "短时间内提交了多次。请稍等一分钟后再试。",
 	"newsletter_errorRejected": "本次提交未能通过验证。请刷新页面后再试一次。",
 	"newsletter_invalid_email": "请输入有效的邮箱地址。",
+	"newsletter_submittingButton": "提交中…",
 	"newsletter_subscribeButton": "订阅",
 	"newsletter_success": "感谢您的订阅！",
 	"og_eyebrow_home": "面向青少年的 AI、工程与创业教育",
