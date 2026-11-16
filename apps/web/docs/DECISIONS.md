@@ -971,3 +971,21 @@ Impact、Highlights 六处（后三处顺带由居中改左对齐 —— 原先�
 - `ImpactStats` 的统计数字由 `text-4xl md:text-5xl lg:text-6xl` 收成单个
   `text-[clamp(2.25rem,4vw,3.75rem)]`：端点不变（36→60px），但不再为一个 display 数字角色占掉
   字号阶梯的两级。
+
+### 首页 hero 改为定位句打头，Cavafy 引文下沉为独立 band（2026-11-16）
+
+11-15 的设计评审第一条建议是**用定位句替换 hero 的 Cavafy 引文**。当时只做了一半：定位句以
+16/18px 加在引文上方，引文仍占着首屏最大字号 —— 理由是引文与 Approach 三支柱同属 11-04 手册的
+brand-lock。这次按要求把另一半也做了。
+
+- hero 现在只有定位句（`home_hero_positioning`，`clamp(1.75rem,4vw,2.75rem)`，沿用原引文的
+  mask-reveal，CSS class 由 `.quote-line` 改名 `.hero-line`）+ 两个 CTA。
+- 引文搬进新的 `home/QuoteBand.svelte`，位置**不变**：仍是 hero 之后、Our Mission 之前的第一块
+  内容。brand-lock 没有被打破 —— 引文被**挪了版面，没有被删**。
+- QuoteBand 不出 `<h2>`：首页唯一的 `<h1>` 是 MissionSection 的 empowerment 句，section 用
+  `aria-label={m.home_hero_author()}` 命名。词条 key 一个没动（`home_hero_quote1..4` /
+  `home_hero_author` 仍叫原名，虽然已经不在 hero 里 —— 改 key 要动两个 locale 文件且没有收益）。
+
+为什么值得做：主入站路径是微信分享，多数访客落地时并不知道 Ithaca 是什么，而首屏除了 48px
+logo 栅格里烘着的 "Family Academy" 之外没有任何说明。一句「offer + 受众 + 地区」拿到首屏最大
+字号，引文往下退一屏，读起来是「我们是谁」→「我们凭什么这么想」。
