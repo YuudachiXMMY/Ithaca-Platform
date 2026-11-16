@@ -37,6 +37,8 @@
 	let node: HTMLDivElement | undefined = $state();
 	let armed = $state(false);
 	let visible = $state(false);
+	/** Set once the reveal transition has finished, purely so `will-change` can be released. */
+	let settled = $state(false);
 
 	$effect(() => {
 		if (prefersReducedMotion.current) return;
@@ -56,11 +58,18 @@
 	use:inview={{ once }}
 	oninview={() => (visible = true)}
 	onoutview={() => {
-		if (!once) visible = false;
+		if (!once) {
+			visible = false;
+			settled = false;
+		}
+	}}
+	ontransitionend={() => {
+		if (visible) settled = true;
 	}}
 	class="reveal"
 	class:reveal--armed={armed}
 	class:reveal--visible={visible}
+	class:reveal--settled={settled}
 	style:--reveal-x="{x}px"
 	style:--reveal-y="{y}px"
 	style:--reveal-delay="{delay}ms"
@@ -86,5 +95,19 @@
 		transition:
 			opacity var(--reveal-duration) var(--reveal-delay) cubic-bezier(0.33, 1, 0.68, 1),
 			transform var(--reveal-duration) var(--reveal-delay) cubic-bezier(0.33, 1, 0.68, 1);
+	}
+
+	/* Hand the compositor layer back once the reveal has finished.
+	   `will-change` above is set when a wrapper arms and was never cleared, so every armed
+	   Reveal kept a promoted layer for the lifetime of the page — and this is the site's
+	   generic scroll-reveal wrapper, wrapped around dozens of sections. The hint is only
+	   useful for the duration of the transition it describes.
+
+	   `transitionend` fires once per property (opacity and transform), so `settled` is simply
+	   set twice; harmless. Under reduced motion `armed` never becomes true, so neither the
+	   hint nor this reset ever applies. With `once={false}` leaving the viewport clears
+	   `settled` again, so the next entry gets the hint back. */
+	.reveal--armed.reveal--settled {
+		will-change: auto;
 	}
 </style>

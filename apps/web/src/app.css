@@ -478,6 +478,20 @@ h3 {
 	text-wrap: balance;
 }
 
+/* `pretty` for body copy — the other half of the pair above. `balance` evens out a few
+   short lines (headings); `pretty` leaves line breaking alone but reconsiders the LAST few
+   lines of a paragraph to avoid leaving a single word stranded on its own.
+   Pure progressive enhancement: outside this site's floor (prd.md §14 R-COMPAT-1 — see
+   AGENTS.md), engines without it just wrap normally, so no fallback is needed and nothing
+   shifts. Switched off for :lang(zh) below, for the reason given there. */
+p,
+li,
+blockquote,
+figcaption,
+dd {
+	text-wrap: pretty;
+}
+
 /* §8.2's display face on the heading levels. Deliberately inside @layer base,
    NOT unlayered like the rules around it: base loses to @layer utilities, so a
    `font-mono` or `font-sans` utility written on a heading still wins. (Nothing
@@ -541,10 +555,20 @@ html:lang(zh) {
 
 /* §8.2: `text-wrap: balance` off for Chinese headings. Balance re-breaks lines
    to even them out, which fights CJK's own line-breaking (every glyph is a
-   break opportunity, so "balance" just produces ragged, arbitrary breaks). */
+   break opportunity, so "balance" just produces ragged, arbitrary breaks).
+   `pretty` below is switched off for the same reason — its job is orphan
+   control, and "orphan" presupposes word boundaries that CJK does not have. */
 :lang(zh) h1,
 :lang(zh) h2,
 :lang(zh) h3 {
+	text-wrap: normal;
+}
+
+:lang(zh) p,
+:lang(zh) li,
+:lang(zh) blockquote,
+:lang(zh) figcaption,
+:lang(zh) dd {
 	text-wrap: normal;
 }
 
