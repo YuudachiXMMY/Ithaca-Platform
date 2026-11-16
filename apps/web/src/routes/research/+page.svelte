@@ -172,16 +172,24 @@
 	-->
 	<section class="border-hairline border-t bg-surface-4 py-14 md:py-16">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
+			<!-- Non-band tokens: `bg-surface-4` is #e8edf3, a NEAR-WHITE surface (app.css:169 still
+			     carries the "was #0a0c10" note from when it was the deepest DARK band). This block
+			     was the worst of the three: the CTA is an OUTLINE button, so `text-band-foreground`
+			     put white label text straight onto near-white at 1.18:1 and only filled in on
+			     hover — keyboard and touch users never saw it at all. The eyebrow was 1.12:1.
+			     Measured after, same algorithm app.css:32-35 declares: eyebrow 8.76:1, lead 15.07:1,
+			     label 15.07:1, border and focus ring 5.13:1, hover label #fff on #0b6e70 6.04:1.
+			     See docs/DESIGN-TOKENS.md §2 for the band / non-band split. -->
 			<Reveal y={24}>
-				<h2 class="font-mono text-[11px] tracking-[0.24em] text-band-foreground/70 uppercase">
+				<h2 class="font-mono text-[11px] tracking-[0.24em] text-foreground-muted uppercase">
 					{m.research_nextStep_heading()}
 				</h2>
-				<p class="mt-5 max-w-2xl text-xl font-light text-band-foreground md:text-2xl">
+				<p class="mt-5 max-w-2xl text-xl font-light text-foreground md:text-2xl">
 					{m.research_nextStep_studio()}
 				</p>
 				<a
 					href={localizeHref('/programs/project-studio')}
-					class="group mt-8 inline-flex items-center gap-2.5 border border-band-action px-6 py-3.5 text-sm font-medium text-band-foreground transition-colors duration-200 hover:bg-band-action hover:text-band-action-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand"
+					class="group mt-8 inline-flex items-center gap-2.5 border border-action px-6 py-3.5 text-sm font-medium text-foreground transition-colors duration-200 hover:bg-action hover:text-action-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 				>
 					<span>{m.nav_projectStudio()}</span>
 					<ArrowRight class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
