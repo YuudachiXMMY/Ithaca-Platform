@@ -397,7 +397,15 @@
 				fetchpriority="high"
 				sizes="(min-width: 1024px) 96px, 80px"
 				class={cn(
-					'w-auto transition-all duration-500 ease-out',
+					// `transition-[height]`, not `transition-all`. `scrolled` flips every time the
+					// reader crosses the 20px threshold, and `transition-all` animated every
+					// animatable property on the LCP element for 500ms on each flip — including the
+					// backdrop-filter and background the bar swaps at that same moment. Naming the
+					// one property that changes keeps the work proportional to the change.
+					// NOT the render-delay debt in docs/LAUNCH-CHECKLIST.md: Lighthouse never
+					// scrolls, so `scrolled` stays false there and this never fires in those
+					// measurements. This is real-user scroll smoothness, not LCP.
+					'w-auto transition-[height] duration-500 ease-out',
 					scrolled ? 'h-12' : 'h-20 lg:h-24'
 				)}
 			/>

@@ -8,6 +8,7 @@
 	import EnquiryForm from '$lib/components/contact/EnquiryForm.svelte';
 	import { consultHref } from '$lib/program-cta';
 	import * as m from '$lib/paraglide/messages';
+	import { inview } from '$lib/actions/inview';
 
 	/**
 	 * The hero photograph.
@@ -40,24 +41,11 @@
 	// identically on both pages. A second copy is how they stop doing so.
 
 	// LazyMap: IntersectionObserver-gated Google Maps iframe (mirrors LAZY_VIDEO_INTERSECTION).
-	let mapContainer = $state<HTMLDivElement | null>(null);
+	// Gated by $lib/actions/inview rather than a hand-rolled IntersectionObserver. The same
+	// one-shot `rootMargin: '200px'` observer had been transcribed four times across the tree
+	// (twice in about/Highlights, here, and in routes/contact-us) while the generic version of
+	// exactly it already existed. `{ once: true }` replaces the manual `disconnect()`.
 	let mapVisible = $state(false);
-
-	$effect(() => {
-		const el = mapContainer;
-		if (!el) return;
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				if (entry?.isIntersecting) {
-					mapVisible = true;
-					observer.disconnect();
-				}
-			},
-			{ rootMargin: '200px' }
-		);
-		observer.observe(el);
-		return () => observer.disconnect();
-	});
 
 	const containerClass = 'mx-auto w-full max-w-[1400px] px-5 py-14 sm:px-8 md:px-[6vw] md:py-20';
 	const headingClass = 'text-2xl font-bold tracking-tight text-foreground md:text-4xl';
@@ -183,7 +171,8 @@
 			<Reveal y={24}>
 				<h2 class={headingClass}>{m.contact_page_findUs()}</h2>
 				<div
-					bind:this={mapContainer}
+					use:inview={{ rootMargin: '200px', once: true }}
+					oninview={() => (mapVisible = true)}
 					class="mt-10 aspect-[16/9] max-h-[520px] w-full overflow-hidden border border-border-strong"
 					style="contain: strict"
 				>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
+	import { inview } from '$lib/actions/inview';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import community0 from '$lib/assets/highlights/screenshot-2025-09-15.png?enhanced';
@@ -40,42 +41,11 @@
 	// Lazy-gate the 4 Vimeo iframes (mirror the contact-us LazyMap pattern): each player only
 	// loads once its section nears the viewport, so the page no longer boots 4 Vimeo bundles.
 	// The aspect-ratio boxes reserve space, so gating causes no CLS.
-	let featuredRef = $state<HTMLDivElement | null>(null);
+	// Both gates use $lib/actions/inview. The observer they replace was transcribed four times
+	// across the tree — twice in this file alone — which is what "mirror the pattern" above had
+	// turned into. `{ once: true }` replaces the manual `disconnect()`.
 	let featuredVisible = $state(false);
-	let galleryRef = $state<HTMLDivElement | null>(null);
 	let galleryVisible = $state(false);
-
-	$effect(() => {
-		const el = featuredRef;
-		if (!el) return;
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				if (entry?.isIntersecting) {
-					featuredVisible = true;
-					observer.disconnect();
-				}
-			},
-			{ rootMargin: '200px' }
-		);
-		observer.observe(el);
-		return () => observer.disconnect();
-	});
-
-	$effect(() => {
-		const el = galleryRef;
-		if (!el) return;
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				if (entry?.isIntersecting) {
-					galleryVisible = true;
-					observer.disconnect();
-				}
-			},
-			{ rootMargin: '200px' }
-		);
-		observer.observe(el);
-		return () => observer.disconnect();
-	});
 
 	function handleScroll() {
 		const container = scrollRef;
@@ -126,7 +96,11 @@
 		<!-- Featured spotlight: Andy Song - prominent display -->
 		<Reveal y={24} duration={500}>
 			<div class="mt-8 grid grid-cols-1 items-end gap-5 lg:grid-cols-[5fr_2fr] lg:gap-8">
-				<div bind:this={featuredRef} class="relative aspect-video overflow-hidden bg-surface-3">
+				<div
+					use:inview={{ rootMargin: '200px', once: true }}
+					oninview={() => (featuredVisible = true)}
+					class="relative aspect-video overflow-hidden bg-surface-3"
+				>
 					{#if featuredVisible}
 						<iframe
 							class="absolute inset-0 h-full w-full"
@@ -157,7 +131,11 @@
 
 		<!-- Gallery: compact vertical video strip -->
 		<Reveal y={24} duration={500}>
-			<div bind:this={galleryRef} class="mt-8 grid max-w-[560px] grid-cols-3 gap-3">
+			<div
+				use:inview={{ rootMargin: '200px', once: true }}
+				oninview={() => (galleryVisible = true)}
+				class="mt-8 grid max-w-[560px] grid-cols-3 gap-3"
+			>
 				{#each videos as video (video.src)}
 					<div>
 						<div class="relative aspect-[9/16] overflow-hidden bg-surface-3">

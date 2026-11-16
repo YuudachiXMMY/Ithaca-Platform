@@ -14,6 +14,7 @@
 -->
 <script lang="ts">
 	import { CalendarClock, ExternalLink } from 'lucide-svelte';
+	import { inview } from '$lib/actions/inview';
 	import { getLocale } from '$lib/paraglide/runtime';
 	import { trackBookingClick } from '$lib/analytics';
 	import * as m from '$lib/paraglide/messages';
@@ -23,24 +24,11 @@
 	}
 	let { url }: Props = $props();
 
-	let container = $state<HTMLDivElement | null>(null);
+	// Gated by $lib/actions/inview rather than a hand-rolled IntersectionObserver. The same
+	// one-shot `rootMargin: '200px'` observer had been transcribed four times across the tree
+	// (twice in about/Highlights, here, and in routes/contact-us) while the generic version of
+	// exactly it already existed. `{ once: true }` replaces the manual `disconnect()`.
 	let visible = $state(false);
-
-	$effect(() => {
-		const element = container;
-		if (!element) return;
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				if (entry?.isIntersecting) {
-					visible = true;
-					observer.disconnect();
-				}
-			},
-			{ rootMargin: '200px' }
-		);
-		observer.observe(element);
-		return () => observer.disconnect();
-	});
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- the booking provider is an external origin, not an internal route -->
@@ -61,7 +49,8 @@
 	</a>
 
 	<div
-		bind:this={container}
+		use:inview={{ rootMargin: '200px', once: true }}
+		oninview={() => (visible = true)}
 		class="min-h-[640px] overflow-hidden border border-border"
 		style="contain: strict"
 	>
