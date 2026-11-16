@@ -60,8 +60,9 @@
 
 <section class="bg-surface-0" aria-label={m.home_mission_eyebrow()}>
 	<!-- Mission showcase: the empowerment statement, relocated here from the hero band as the
-	     page's single <h1>, set in soft brand light. Large light display echoes the hero Cavafy
-	     quote so the mission reads as the journey's destination. SSR-safe; Reveal is opacity-only. -->
+	     page's single <h1>, set in soft brand light. Large light display echoes the Cavafy quote in
+	     the QuoteBand above so the mission reads as the journey's destination. SSR-safe; Reveal is
+	     opacity-only. -->
 	<div class="mission-aura">
 		<div class="mx-auto max-w-[1100px] px-5 pt-20 pb-10 sm:px-8 md:px-[6vw] md:pt-28 md:pb-14">
 			<Reveal y={24}>

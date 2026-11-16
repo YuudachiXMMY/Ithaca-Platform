@@ -3,16 +3,14 @@
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import { consultHref } from '$lib/program-cta';
 
-	// Minimal & flat hero: a static poster LCP image + the Cavafy quote (pure-CSS mask-reveal,
+	// Minimal & flat hero: a static poster LCP image + the positioning line (pure-CSS mask-reveal,
 	// no JS) + CTAs. The former cinematic build layered an autoplay <video> and a GSAP scroll-pin
 	// timeline that fought the sticky/pinned sections below it; that whole choreography is gone.
 	// The empowerment statement is rendered EXACTLY ONCE, as the page's single <h1> band below.
-	const quoteLines = [
-		m.home_hero_quote1(),
-		m.home_hero_quote2(),
-		m.home_hero_quote3(),
-		m.home_hero_quote4()
-	];
+	//
+	// The Cavafy quote USED to be this band's display copy; on 2026-11-16 it moved out into
+	// QuoteBand, which sits directly below this section and above Our Mission. The quote is still
+	// brand-locked to the 11-04 brochure — it was relocated, not dropped.
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
@@ -43,50 +41,35 @@
 		aria-hidden="true"
 	></div>
 
-	<!-- Quote content — bottom-left anchored -->
+	<!-- Hero copy — bottom-left anchored -->
 	<div class="relative z-10 px-5 pb-14 sm:px-8 md:px-[6vw] md:pb-20">
 		<div class="max-w-3xl">
-			<!-- Positioning line — added 2026-11-15, the minimum answer to the design review's first
-			     finding. The review's own prescription was to REPLACE the Cavafy quote with a
-			     positioning headline; the quote and the Approach pillars are brand-locked to the 11-04
-			     brochure (see the section-order note in `src/routes/+page.svelte`), so the lock holds
-			     and this line is added above it instead.
+			<!-- Positioning line — added 2026-11-15 as a small line above the Cavafy quote, promoted
+			     on 2026-11-16 to the hero's display copy with the quote moving to its own band below.
+			     This is the design review's original first finding, now taken in full: the first
+			     screen says what Ithaca is instead of quoting a poem at a visitor who does not yet
+			     know.
 
-			     It is here because of who arrives: the site's main inbound path is a WeChat share, so
-			     most visitors land with no idea what Ithaca is, and until now the only descriptor on
-			     the first screen was the words "Family Academy" baked into a 48px logo raster. One
-			     line of offer + audience + location, set well below the quote's scale so the quote
-			     keeps first read.
+			     It matters because of who arrives: the site's main inbound path is a WeChat share, so
+			     most visitors land with no idea what Ithaca is, and the only other descriptor on the
+			     first screen is the words "Family Academy" baked into a 48px logo raster. One line of
+			     offer + audience + location.
 
 			     A `<p>`, NOT a heading: the page's single `<h1>` is the empowerment statement in
 			     MissionSection and `e2e/a11y.spec.ts` would fail a second one. No new claim is made
 			     here — the grade range and the region are the ones already published in
-			     `academics_hero_description` and the programme FAQs. -->
-			<p
-				class="mb-6 max-w-xl text-base leading-relaxed font-medium text-band-foreground md:mb-8 md:text-lg"
-			>
-				{m.home_hero_positioning()}
-			</p>
+			     `academics_hero_description` and the programme FAQs.
 
-			<blockquote>
-				{#each quoteLines as line, i (line)}
-					<div class="overflow-hidden">
-						<!-- Mask-reveal via a CSS animation that runs at CSS parse (~FCP), NOT on JS
-						     hydration, so the largest quote line (the LCP text) is never gated behind
-						     hydration. Reduced-motion falls back to the static visible rest state. -->
-						<p
-							class="quote-line font-display text-[clamp(1.75rem,5vw,3.75rem)] leading-[1.12] font-light tracking-tight text-band-foreground"
-							style:animation-delay="{i === 0 ? 0 : 150 + i * 110}ms"
-						>
-							{line}
-						</p>
-					</div>
-				{/each}
-			</blockquote>
-
-			<p class="mt-6 font-display text-xs tracking-[0.25em] text-band-foreground/80 uppercase">
-				{m.home_hero_author()}
-			</p>
+			     Mask-reveal via a CSS animation that runs at CSS parse (~FCP), NOT on JS hydration,
+			     so this (the hero's largest text, and an LCP candidate) is never gated behind
+			     hydration. Reduced-motion falls back to the static visible rest state. -->
+			<div class="overflow-hidden">
+				<p
+					class="hero-line max-w-[26ch] text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.15] font-light tracking-tight text-band-foreground"
+				>
+					{m.home_hero_positioning()}
+				</p>
+			</div>
 
 			<div class="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
 				<a
@@ -107,10 +90,11 @@
 </section>
 
 <!-- The empowerment statement (the page's single <h1>) now lives in MissionSection as the
-     "Our Mission" showcase spread, so the hero stays a pure poster + Cavafy quote + CTA unit. -->
+     "Our Mission" showcase spread, and the Cavafy quote lives in QuoteBand directly below, so the
+     hero stays a pure poster + positioning line + CTA unit. -->
 
 <style>
-	/* Hero quote mask-reveal. Pure CSS (no Svelte transition) so it runs during initial render
+	/* Hero line mask-reveal. Pure CSS (no Svelte transition) so it runs during initial render
 	   at ~FCP instead of waiting on client hydration. `both` fill-mode holds the pre-reveal
 	   (masked) state through the per-line delay.
 
@@ -132,11 +116,10 @@
 	   the CJK stylesheet), this element DID become the LCP element and the metric got both worse
 	   and unstable. That is recorded in docs/LAUNCH-CHECKLIST.md, with the measurements — the
 	   short version is that the cause was font repaint, not this animation. */
-	.quote-line {
-		animation: quote-reveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
-		animation-delay: 0ms; /* overridden per line via style:animation-delay */
+	.hero-line {
+		animation: hero-reveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 	}
-	@keyframes quote-reveal {
+	@keyframes hero-reveal {
 		from {
 			transform: translateY(110%);
 		}
@@ -146,7 +129,7 @@
 	}
 	/* Reduced motion: no animation → the line stays at its static, visible rest state. */
 	@media (prefers-reduced-motion: reduce) {
-		.quote-line {
+		.hero-line {
 			animation: none;
 		}
 	}
