@@ -819,19 +819,62 @@ html {
 }
 
 /* Custom scrollbar. The thumb uses --border-strong, not --border: on a white
-   track a 1.24:1 hairline is an invisible scrollbar. */
-::-webkit-scrollbar {
-	width: 8px;
+   track a 1.24:1 hairline is an invisible scrollbar. Measured, 8-bit composited:
+   thumb/track 3.48:1 and thumb/white-page 3.74:1 — both over WCAG 1.4.11's 3:1,
+   the second because macOS overlay scrollbars paint no track at all.
+
+   The vendor block is NOT legacy cruft here. `scrollbar-width` is Baseline
+   2024-12-11 (Safari 18.2) and `scrollbar-color` 2025-12-12 (Safari 26.2), both
+   outside this site's floor — prd.md §14 R-COMPAT-1 requires iOS Safari 16 and
+   the WeChat X5 webview (Chromium <= 107). Deleting it would hand the primary
+   arrival path a default scrollbar.
+
+   ## Why BOTH standard properties sit inside the positive @supports
+   Note the two Baseline dates above are a YEAR apart, which opens a real
+   Safari 18.2–26.1 window where `scrollbar-width` parses but `scrollbar-color`
+   does not. Declaring `scrollbar-width` unconditionally (the obvious shape, and
+   what the first draft of this rule did) breaks in exactly that window: the
+   width applies, `@supports not (scrollbar-color: auto)` is ALSO true, and the
+   element gets the standard width plus the whole vendor block at once — the
+   collision this guard exists to prevent.
+
+   Gating on `scrollbar-width` instead does not fix it either, and is worse: in
+   that same window the positive branch would win, giving `width: thin` with a
+   dead `scrollbar-color`, so the thumb falls back to the system colour and the
+   3.48:1 measured above is silently lost. For an iOS-16-floor site those
+   devices are a permanent population, not a migration tail.
+
+   So: `scrollbar-color` is the single feature tested, and BOTH standard
+   properties ride on it. Each engine therefore gets exactly one mechanism —
+   Safari 18.2–26.1 lands in the vendor branch and gets `width: 8px` with the
+   correct colours, which is visually equivalent to `thin` anyway.
+
+   The hover accent is only reachable in the fallback branch: `scrollbar-color`
+   has no hover mechanism in the spec, and `html:hover` would mean "pointer
+   anywhere in the document", which is not the same thing. So modern browsers
+   get the static 3.48:1 thumb and older WebKit additionally gets the teal
+   hover. Losing an accent is the right trade against losing the whole bar. */
+@supports (scrollbar-color: auto) {
+	html {
+		scrollbar-color: var(--border-strong) var(--surface-2);
+		scrollbar-width: thin;
+	}
 }
-::-webkit-scrollbar-track {
-	background: var(--surface-2);
-}
-::-webkit-scrollbar-thumb {
-	background: var(--border-strong);
-	border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-	background: var(--brand);
+
+@supports not (scrollbar-color: auto) {
+	::-webkit-scrollbar {
+		width: 8px;
+	}
+	::-webkit-scrollbar-track {
+		background: var(--surface-2);
+	}
+	::-webkit-scrollbar-thumb {
+		background: var(--border-strong);
+		border-radius: 4px;
+	}
+	::-webkit-scrollbar-thumb:hover {
+		background: var(--brand);
+	}
 }
 
 /* ==========================================================================

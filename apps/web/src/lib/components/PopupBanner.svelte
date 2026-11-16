@@ -70,12 +70,18 @@
 						{popup.buttonText}
 					</a>
 				{/if}
+				<!-- `p-1` takes the tap box from the icon's bare 20x20 to 28x28, clearing WCAG 2.5.8's
+				     24px floor. Matches LocaleSuggestion.svelte:300-306, which is the same control
+				     and already had it. Note the a11y gate cannot catch this one: the banner only
+				     renders when /api/popups/active returns a popup, and with no upstream configured
+				     in CI that endpoint soft-degrades to "no popup" (see AGENTS.md), so axe never
+				     sees this subtree. Measured by hand instead. -->
 				<button
 					onclick={dismiss}
 					aria-label={m.common_dismiss()}
-					class="text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+					class="p-1 text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 				>
-					<X class="h-5 w-5" />
+					<X class="h-5 w-5" aria-hidden="true" />
 				</button>
 			</div>
 		</div>

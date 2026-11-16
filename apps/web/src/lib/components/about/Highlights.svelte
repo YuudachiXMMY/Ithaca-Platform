@@ -213,7 +213,7 @@
 						role="group"
 						aria-labelledby="about-community-gallery"
 						class="flex snap-x snap-mandatory gap-3 overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-						style="scrollbar-width: none; -ms-overflow-style: none;"
+						style="scrollbar-width: none;"
 					>
 						{#each communityImages as img, i (i)}
 							<div
@@ -267,17 +267,42 @@
 					{m.about_highlights_community_caption()}
 				</p>
 
-				<!-- Thumbnail dots -->
-				<div class="mt-3 flex gap-1.5">
+				<!-- ## Thumbnail dots: 8px dot inside a 24px button
+				     The dot used to BE the button at `h-2 w-2` with `gap-1.5`, which axe reported as
+				     two separate WCAG 2.5.8 failures once `wcag22aa` joined the gate:
+				     `target-size` ("8px by 8px, should be at least 24px by 24px") and `target-offset`
+				     ("safe clickable space has a diameter of 4px instead of at least 24px").
+
+				     Both have to be answered, and that is why the visual spacing had to change.
+				     Padding the hit box out to 24px while keeping the 6px gap would have made
+				     neighbouring hit boxes OVERLAP — the 24px circles would collide, so which dot a
+				     tap near the seam selects becomes a function of DOM order. Instead the buttons
+				     are 24x24 and flush (`gap` removed): size passes, and centre-to-centre is exactly
+				     24px so offset passes too. The dots themselves are untouched at 8px; what grew is
+				     the dead space around them, from 6px to 16px.
+
+				     Not gated on `pointer-coarse` like Footer.svelte:71-85 does. That gate is right
+				     for the footer — a dense list where 44px rows would waste desktop height — but
+				     2.5.8 has no fine-pointer exemption, and axe (correctly) reports the desktop
+				     project too.
+
+				     `aria-current` because the active dot was previously distinguished by colour
+				     alone (`bg-brand` vs `bg-border-strong`), which is WCAG 1.4.1 and leaves a screen
+				     reader with no way to tell which of the five is showing. -->
+				<div class="mt-3 flex">
 					{#each communityImages, i (i)}
 						<button
 							onclick={() => scrollToIndex(i)}
 							aria-label="{m.about_highlights_community_dotAriaLabel()} {i + 1}"
-							class="h-2 w-2 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand {activeIndex ===
-							i
-								? 'bg-brand'
-								: 'bg-border-strong hover:bg-foreground-subtle'}"
-						></button>
+							aria-current={activeIndex === i ? 'true' : undefined}
+							class="group flex h-6 w-6 items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand"
+						>
+							<span
+								class="h-2 w-2 rounded-full transition-colors {activeIndex === i
+									? 'bg-brand'
+									: 'bg-border-strong group-hover:bg-foreground-subtle'}"
+							></span>
+						</button>
 					{/each}
 				</div>
 			</div>
@@ -286,7 +311,15 @@
 </section>
 
 <style>
-	[data-gallery-track]::-webkit-scrollbar {
-		display: none;
+	/* The track hides its scrollbar because the dots + arrows below already carry the
+	   affordance. Standard `scrollbar-width: none` lives on the element itself (inline,
+	   so it survives Svelte's style scoping); this vendor rule is the fallback for the
+	   browsers in prd.md §14 R-COMPAT-1 that predate it — `scrollbar-width` is Baseline
+	   2024-12-11 (Safari 18.2) and the floor here is iOS Safari 16 / X5 Chromium <= 107.
+	   Guarded so engines with both do not apply two mechanisms at once. */
+	@supports not (scrollbar-width: none) {
+		[data-gallery-track]::-webkit-scrollbar {
+			display: none;
+		}
 	}
 </style>
