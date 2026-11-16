@@ -202,7 +202,7 @@
 			<div class="relative row-span-2 overflow-hidden">
 				<enhanced:img
 					src={heroA}
-					alt="Students collaborating on AI projects"
+					alt={m.programs_aiCamp_alt_collaborating()}
 					sizes="25vw"
 					class="absolute inset-0 h-full w-full object-cover"
 				/>
@@ -210,7 +210,7 @@
 			<div class="relative overflow-hidden">
 				<enhanced:img
 					src={heroB}
-					alt="Student presenting their startup pitch"
+					alt={m.programs_aiCamp_alt_pitching()}
 					sizes="25vw"
 					class="absolute inset-0 h-full w-full object-cover"
 				/>
@@ -218,7 +218,7 @@
 			<div class="relative overflow-hidden">
 				<enhanced:img
 					src={heroC}
-					alt="Workshop session in progress"
+					alt={m.programs_aiCamp_alt_workshopSession()}
 					sizes="25vw"
 					class="absolute inset-0 h-full w-full object-cover"
 				/>
@@ -229,7 +229,7 @@
 		<div class="relative order-1 h-[40vh] lg:hidden">
 			<enhanced:img
 				src={heroMobile}
-				alt="AI Entrepreneurship Bootcamp"
+				alt={m.programs_aiCamp_alt_hero()}
 				sizes="100vw"
 				class="absolute inset-0 h-full w-full object-cover"
 			/>
@@ -261,7 +261,7 @@
 					<div class="relative h-[180px] overflow-hidden md:col-span-2 md:h-[280px]">
 						<enhanced:img
 							src={ov1}
-							alt="Students working on prototypes"
+							alt={m.programs_aiCamp_alt_prototypes()}
 							sizes="(max-width: 768px) 50vw, 66vw"
 							class="absolute inset-0 h-full w-full object-cover"
 						/>
@@ -269,7 +269,7 @@
 					<div class="relative h-[180px] overflow-hidden md:h-[280px]">
 						<enhanced:img
 							src={ov2}
-							alt="Team brainstorming session"
+							alt={m.programs_aiCamp_alt_brainstorm()}
 							sizes="(max-width: 768px) 50vw, 33vw"
 							class="absolute inset-0 h-full w-full object-cover"
 						/>
@@ -277,7 +277,7 @@
 					<div class="relative h-[180px] overflow-hidden md:h-[280px]">
 						<enhanced:img
 							src={ov3}
-							alt="Mentor coaching students"
+							alt={m.programs_aiCamp_alt_mentoring()}
 							sizes="(max-width: 768px) 50vw, 33vw"
 							class="absolute inset-0 h-full w-full object-cover"
 						/>
@@ -285,7 +285,7 @@
 					<div class="relative h-[180px] overflow-hidden md:col-span-2 md:h-[280px]">
 						<enhanced:img
 							src={ov4}
-							alt="Student demo day presentation"
+							alt={m.programs_aiCamp_alt_demoDay()}
 							sizes="(max-width: 768px) 50vw, 66vw"
 							class="absolute inset-0 h-full w-full object-cover"
 						/>
@@ -303,7 +303,7 @@
 					<div class="relative h-[300px] overflow-hidden lg:h-auto">
 						<enhanced:img
 							src={structureImg}
-							alt="Students in an AI workshop"
+							alt={m.programs_aiCamp_alt_aiWorkshop()}
 							sizes="(max-width: 1024px) 100vw, 40vw"
 							class="absolute inset-0 h-full w-full object-cover"
 						/>
@@ -384,7 +384,7 @@
 					<div class="relative h-[220px] overflow-hidden md:h-[300px]">
 						<enhanced:img
 							src={contest1}
-							alt="Students preparing competition materials"
+							alt={m.programs_aiCamp_alt_competitionPrep()}
 							sizes="(max-width: 768px) 100vw, 50vw"
 							class="absolute inset-0 h-full w-full object-cover"
 						/>
@@ -392,7 +392,7 @@
 					<div class="relative h-[220px] overflow-hidden md:h-[300px]">
 						<enhanced:img
 							src={contest2}
-							alt="Team working on pitch deck"
+							alt={m.programs_aiCamp_alt_pitchDeck()}
 							sizes="(max-width: 768px) 100vw, 50vw"
 							class="absolute inset-0 h-full w-full object-cover"
 						/>
@@ -441,7 +441,7 @@
 					<div class="relative h-[300px] overflow-hidden lg:h-auto">
 						<enhanced:img
 							src={goalsImg}
-							alt="Students presenting their final projects"
+							alt={m.programs_aiCamp_alt_finalProjects()}
 							sizes="(max-width: 1024px) 100vw, 40vw"
 							class="absolute inset-0 h-full w-full object-cover"
 						/>
@@ -463,7 +463,7 @@
 				<div class="relative mb-12 h-[260px] overflow-hidden md:h-[400px]">
 					<enhanced:img
 						src={teamImg}
-						alt="Ithaca teaching team with students"
+						alt={m.programs_aiCamp_alt_teachingTeam()}
 						sizes="(max-width: 1024px) 100vw, 80vw"
 						class="absolute inset-0 h-full w-full object-cover"
 					/>
@@ -546,7 +546,7 @@
 	<section class="relative py-14 md:py-20">
 		<enhanced:img
 			src={heroB}
-			alt="AI Entrepreneurship Bootcamp community"
+			alt={m.programs_aiCamp_alt_community()}
 			sizes="(max-width: 1024px) 100vw, 80vw"
 			class="absolute inset-0 h-full w-full object-cover"
 		/>
