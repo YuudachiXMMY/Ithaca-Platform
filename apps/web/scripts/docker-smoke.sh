@@ -66,6 +66,8 @@ trap cleanup EXIT
 # ── HTTP helpers: no -L, so redirects stay visible ──
 code() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
 location() { curl -s -o /dev/null -D - "$@" 2>/dev/null | sed -n 's/^[Ll]ocation: *//p' | tr -d '\r'; }
+ctype() { curl -s -o /dev/null -w '%{content_type}' "$@"; }
+body() { curl -s "$@"; }
 
 # ─────────────────────────────────────────────────────────────────────────────
 info "step 1/3 — cleaning up any leftovers from a previous run"
@@ -124,6 +126,46 @@ if [[ "$got" == "200" ]]; then
   ok "GET /api/popups/active → 200 (soft-degrade with no upstream)"
 else
   bad "GET /api/popups/active → ${got} (want 200 — soft-degrade is load-bearing)"
+fi
+
+# -- the prerendered OG cards are actually served ---------------------------
+# Regression guard for the font packages being devDependencies.
+# src/lib/server/og/fonts.ts resolves @fontsource/{inter,manrope,noto-sans-sc} through
+# createRequire, and those three moved out of `dependencies` — so `npm ci --omit=dev` does not
+# install them in the runner. That is only safe because /og/[...slug] is `prerender = true`:
+# the 46 cards are PNGs on disk by then and sirv just serves files, never executing the endpoint.
+# If anything ever makes that route dynamic, this assertion fails instead of production quietly
+# 500-ing on every social preview.
+#
+# Content-Type matters as much as the status: SvelteKit answers an unknown path with a 200 HTML
+# error page in some configurations, so `code` alone would be satisfied by the absence of the
+# file. The path is hardcoded; if /about-us is ever renamed, change it here too.
+OG_CARD="/og/en/about-us.png"
+got="$(code "${ORIGIN_URL}${OG_CARD}")"
+ct="$(ctype "${ORIGIN_URL}${OG_CARD}")"
+if [[ "$got" == "200" && "$ct" == image/png* ]]; then
+  ok "GET ${OG_CARD} → 200 image/png (prerendered, needs no font packages at runtime)"
+else
+  bad "GET ${OG_CARD} → ${got} ${ct} (want 200 image/png)"
+fi
+
+# -- the image's copy matches messages/en.json ------------------------------
+# Paraglide compiles messages/*.json at BUILD time and the whole site is prerendered, so the copy
+# is baked into static HTML. There is no way to refresh it in a running container; the only
+# mechanism is a rebuild. This assertion is what tells you the rebuild actually took:
+# `npm run build` does NOT run `paraglide-js compile` itself — paraglideVitePlugin does it during
+# `vite build` — so a stale src/lib/paraglide on the host (it is gitignored AND dockerignored)
+# must not be what the image ends up serving.
+#
+# `common_skipToContent` is the probe because the skip link is the first focusable element on
+# every page (+layout.svelte), so it is present in every document regardless of page content.
+EXPECTED_COPY="$(node -e "process.stdout.write(require('${PROJECT_DIR}/messages/en.json').common_skipToContent)" 2>/dev/null || true)"
+if [[ -z "$EXPECTED_COPY" ]]; then
+  bad "could not read common_skipToContent from messages/en.json"
+elif body "${ORIGIN_URL}/" | grep -qF -- "$EXPECTED_COPY"; then
+  ok "English copy in the image matches messages/en.json (\"${EXPECTED_COPY}\")"
+else
+  bad "the image serves stale English copy — messages/en.json says \"${EXPECTED_COPY}\""
 fi
 
 # -- the image must not ship a database client ------------------------------
