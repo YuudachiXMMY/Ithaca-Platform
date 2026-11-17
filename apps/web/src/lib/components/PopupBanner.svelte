@@ -64,7 +64,8 @@
      It used to be `role="dialog"` + `use:focustrap`, and the two halves disagreed. The trap
      made Tab inescapable, but without `aria-modal` a screen-reader user could still walk out
      with the virtual cursor and never learn the thing was open. Worse, `focustrap` focuses its
-     first focusable child UNCONDITIONALLY on mount (focus-trap.ts:43) and this banner mounts
+     first focusable child UNCONDITIONALLY on mount — $lib/actions/focus-trap, since deleted
+     along with the drawer that was its last consumer — and this banner mounts
      when an async `fetch` resolves — so it yanked focus to the bottom of the viewport at an
      arbitrary moment, possibly mid-read or mid-Tab. That is WCAG 3.2.1 (On Focus) and 2.4.3
      (Focus Order).

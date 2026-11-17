@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { fly, fade, slide } from 'svelte/transition';
+	import { fly, slide } from 'svelte/transition';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { Menu, X, ChevronDown } from 'lucide-svelte';
 	import type { NavItem } from '$lib/data/nav';
@@ -17,7 +17,6 @@
 	import { localizeHref, deLocalizeUrl } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
-	import { focustrap } from '$lib/actions/focus-trap';
 	// `?enhanced` with no `w=` emits an x-descriptor srcset ("1x, 1.9988x") derived from the
 	// 1809x1823 source, and `sizes` is IGNORED for x descriptors — so the `sizes="200px"` on the
 	// tag below was inert and a dsf-1.75 phone picked the 1.9988x entry: the full 1809px original.
@@ -46,14 +45,12 @@
 
 	let scrolled = $state(false);
 	let mobileOpen = $state(false);
-	// Hamburger toggle element — focus is returned here when the drawer closes via
-	// Escape or the backdrop (the focustrap destroy also restores, but these paths
-	// close the drawer without unmounting via the trap, so restore explicitly).
-	let toggleEl = $state<HTMLButtonElement | null>(null);
+	let drawerEl = $state<HTMLDialogElement | null>(null);
+	/** Drives the slide-in. Separate from `mobileOpen` for the two-frame reason below. */
+	let drawerShown = $state(false);
 
 	function closeMobile() {
 		mobileOpen = false;
-		toggleEl?.focus();
 	}
 
 	// Motion is additive: reduced-motion collapses transition durations to 0 while
@@ -220,7 +217,63 @@
 		return () => window.removeEventListener('scroll', handleScroll);
 	});
 
-	// Lock body scroll while the mobile drawer is open.
+	/**
+	 * Mirror `mobileOpen` into the <dialog>'s top-layer state.
+	 *
+	 * `showModal()` / `close()` have to be called on a ref — the element must NOT be behind an
+	 * `{#if}`. Unmounting it would give back the top layer, `::backdrop`, the native focus trap
+	 * and the native focus restore, i.e. everything this is for.
+	 *
+	 * The entry animation needs two frames. `showModal()` flips the element from
+	 * `display: none` to block, and a `translate` set in that same frame has no start value to
+	 * transition from. The platform answer is `@starting-style`, which is outside this site's
+	 * floor (Safari 17.5 — see AGENTS.md), so the floor-safe equivalent is to let one frame
+	 * paint the off-screen state and flip the class on the next.
+	 *
+	 * Exit is the mirror image: run the transition first and only `close()` on `transitionend`,
+	 * because `close()` applies `display: none` immediately and would eat the animation.
+	 */
+	$effect(() => {
+		const el = drawerEl;
+		if (!el) return;
+
+		if (mobileOpen) {
+			if (!el.open) {
+				el.showModal();
+				if (prefersReducedMotion.current) drawerShown = true;
+				else requestAnimationFrame(() => (drawerShown = true));
+			}
+			return;
+		}
+
+		if (!el.open) return;
+		drawerShown = false;
+		if (prefersReducedMotion.current) {
+			el.close();
+			return;
+		}
+		const finish = () => el.close();
+		el.addEventListener('transitionend', finish, { once: true });
+		// transitionend can be skipped entirely (hidden tab, interrupted compositing), and a
+		// drawer that never closes is worse than one that closes without animating.
+		const timer = setTimeout(finish, drawerDuration + 80);
+		return () => {
+			el.removeEventListener('transitionend', finish);
+			clearTimeout(timer);
+		};
+	});
+
+	/**
+	 * Body scroll lock stays, even with a modal <dialog>.
+	 *
+	 * `showModal()` makes the rest of the document inert but does NOT stop it scrolling — a
+	 * gesture over the backdrop still scrolls the page behind. The platform fix is
+	 * `overscroll-behavior: contain` on `dialog:modal` plus `overflow: hidden` +
+	 * `overscroll-behavior: contain` on `dialog::backdrop`, and that is Chrome 144 / Jan 2026,
+	 * far outside the floor. Locking `body` is the only thing left that works here, even though
+	 * it has known costs (it removes the scrollbar, which can shift layout, and can break
+	 * `position: sticky` behind the dialog). Revisit when the floor allows the CSS version.
+	 */
 	$effect(() => {
 		document.body.style.overflow = mobileOpen ? 'hidden' : '';
 		return () => {
@@ -237,11 +290,10 @@
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
-<svelte:window
-	onkeydown={(e) => {
-		if (mobileOpen && e.key === 'Escape') closeMobile();
-	}}
-/>
+<!-- Escape used to be a window listener. The <dialog> handles it natively now (it fires
+     `cancel` then `close`, and the `onclose` below syncs `mobileOpen` back), so the global
+     keydown hook is gone along with the coordination it forced on everything else that
+     listens for Escape. -->
 
 <!--
 	ONE renderer for both desktop nav groups.
@@ -458,7 +510,6 @@
 			</nav>
 
 			<button
-				bind:this={toggleEl}
 				onclick={() => (mobileOpen = !mobileOpen)}
 				class={cn(
 					'rounded-sm p-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand lg:hidden',
@@ -488,21 +539,45 @@
 	</div>
 </header>
 
-{#if mobileOpen}
-	<!-- Backdrop as a full-screen button (a11y: keyboard-dismissable) -->
-	<button
-		type="button"
-		class="fixed inset-0 z-40 bg-overlay/70 backdrop-blur-sm lg:hidden"
-		onclick={closeMobile}
-		aria-label={m.common_nav_closeMenu()}
-		transition:fade={{ duration: backdropDuration }}
-	></button>
+<!-- ## The drawer is a native <dialog>, and it stays in the DOM
+     What this replaces: a `role`-less `<nav>` plus a 36-line hand-rolled focus trap (deleted
+     with this change: $lib/actions/focus-trap) plus a full-screen `<button>` acting
+     as the backdrop, plus a window Escape listener, plus a manual focus restore. The platform
+     gives all four away for free — a modal <dialog> traps focus, marks the rest of the document
+     `inert` (which the hand-rolled version never did, so background content stayed clickable to
+     a screen reader's virtual cursor), restores focus to the opener on close, dismisses on
+     Escape, and paints `::backdrop` without a fake focusable element in the a11y tree.
 
+     It is NOT wrapped in `{#if mobileOpen}` on purpose: `showModal()` / `close()` drive it, and
+     unmounting would surrender every one of those behaviours. The cost is that the drawer's
+     markup ships in every prerendered page even when closed. Accepted — `display: none` keeps it
+     out of the a11y tree and out of the tab order, and the alternative is keeping the hand-rolled
+     version.
+
+     `backdrop:` is Tailwind's `::backdrop` variant, so the scrim no longer needs an element.
+     Dialog's UA styles (centred, auto margins, a border, a max-width/height) all have to be
+     unset — hence `m-0 ml-auto h-full max-h-none w-72 max-w-none border-0 bg-transparent p-0`;
+     the panel's own background moves to the inner <nav>, so the dialog box itself is just a
+     positioned container. -->
+<dialog
+	bind:this={drawerEl}
+	onclose={() => (mobileOpen = false)}
+	onclick={(event) => {
+		// A click on the backdrop targets the dialog itself; anything inside targets a child.
+		// This is the floor-safe stand-in for `closedby="any"` (Chrome 134).
+		if (event.target === drawerEl) closeMobile();
+	}}
+	class={cn(
+		'drawer m-0 ml-auto h-full max-h-none w-72 max-w-none border-0 bg-transparent p-0 backdrop:bg-overlay/70 backdrop:backdrop-blur-sm lg:hidden',
+		drawerShown && 'drawer--shown'
+	)}
+	style:--drawer-duration="{drawerDuration}ms"
+	style:--backdrop-duration="{backdropDuration}ms"
+	aria-label={m.common_nav_mobileNavigation()}
+>
 	<nav
-		use:focustrap
-		class="fixed top-0 right-0 z-50 flex h-full w-72 flex-col bg-surface-4/95 shadow-2xl backdrop-blur-xl lg:hidden"
+		class="flex h-full flex-col bg-surface-4/95 shadow-2xl backdrop-blur-xl"
 		aria-label={m.common_nav_mobileNavigation()}
-		transition:fly={{ x: 288, duration: drawerDuration }}
 	>
 		<div class="flex items-center justify-end p-4">
 			<button
@@ -603,4 +678,35 @@
 			<LanguageSwitcher />
 		</div>
 	</nav>
-{/if}
+</dialog>
+
+<style>
+	/* The slide-in. `translate` as its OWN property (not `transform: translateX`) because it is
+	   Baseline 2022-08-05 — inside this site's floor, see AGENTS.md — and keeping it separate
+	   means a `transform` applied elsewhere on the element cannot clobber the position.
+
+	   There is no `@starting-style` here (Safari 17.5, outside the floor), which is why the
+	   $effect driving this flips `drawer--shown` on the frame AFTER showModal(): the element
+	   needs one painted frame at translate: 100% for the transition to have somewhere to start.
+
+	   Durations come through custom properties so the single reduced-motion gate in the script
+	   (`drawerDuration` / `backdropDuration`) stays the one place that decides. app.css's global
+	   reduced-motion reset also neutralises both, so this is belt and braces. */
+	dialog.drawer {
+		translate: 100% 0;
+		transition: translate var(--drawer-duration) ease-out;
+	}
+
+	dialog.drawer.drawer--shown {
+		translate: 0 0;
+	}
+
+	dialog.drawer::backdrop {
+		opacity: 0;
+		transition: opacity var(--backdrop-duration) ease-out;
+	}
+
+	dialog.drawer.drawer--shown::backdrop {
+		opacity: 1;
+	}
+</style>
