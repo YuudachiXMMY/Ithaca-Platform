@@ -138,13 +138,20 @@
 
 	<section class="border-hairline border-t bg-surface-4 py-14 md:py-20">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
+			<!-- Non-band tokens: `bg-surface-4` is #e8edf3, a NEAR-WHITE surface (app.css:169 still
+			     carries the "was #0a0c10" note from when it was the deepest DARK band). The band-*
+			     family is white-ink-on-dark by construction, so `text-band-foreground` measured
+			     1.18:1 here and `outline-band-brand` 1.77:1. Measured after this change, same
+			     algorithm app.css:32-35 declares: text 15.07:1, border/fill and focus ring 5.13:1,
+			     button label #fff on #0b6e70 6.04:1, hover fill 8.83:1. See docs/DESIGN-TOKENS.md §2
+			     for the band / non-band split. -->
 			<Reveal y={24}>
-				<h2 class="max-w-2xl text-2xl font-light text-band-foreground md:text-4xl">
+				<h2 class="max-w-2xl text-2xl font-light text-foreground md:text-4xl">
 					{m.program_page_ctaHeading()}
 				</h2>
 				<a
 					href={localizeHref('/admissions')}
-					class="group mt-8 inline-flex items-center gap-2.5 border border-band-action bg-band-action px-6 py-3.5 text-sm font-medium text-band-action-foreground transition-colors duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand"
+					class="group mt-8 inline-flex items-center gap-2.5 border border-action bg-action px-6 py-3.5 text-sm font-medium text-action-foreground transition-colors duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 				>
 					<span>{m.program_page_ctaButton()}</span>
 					<ArrowRight class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />

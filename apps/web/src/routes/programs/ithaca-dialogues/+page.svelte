@@ -246,7 +246,7 @@
 		<div class="relative hidden h-full min-h-[85dvh] overflow-hidden lg:block">
 			<enhanced:img
 				src={heroImg}
-				alt="Students in professional attire discussing research topics"
+				alt={m.programs_ithacaDialogues_alt_discussing()}
 				sizes="58vw"
 				class="absolute inset-0 h-full w-full object-cover"
 			/>
@@ -256,7 +256,7 @@
 		<div class="relative order-1 h-[40vh] lg:hidden">
 			<enhanced:img
 				src={heroImg}
-				alt="Students in professional attire discussing research topics"
+				alt={m.programs_ithacaDialogues_alt_discussing()}
 				sizes="100vw"
 				class="absolute inset-0 h-full w-full object-cover"
 			/>
@@ -384,7 +384,7 @@
 				<div class="relative h-[300px] overflow-hidden lg:h-auto">
 					<enhanced:img
 						src={tracksImg}
-						alt="Mentor guiding students through research on laptops"
+						alt={m.programs_ithacaDialogues_alt_mentorGuiding()}
 						sizes="(max-width: 1024px) 100vw, 40vw"
 						class="absolute inset-0 h-full w-full object-cover"
 					/>
@@ -409,7 +409,7 @@
 			<div class="relative mt-8 mb-12 h-[240px] overflow-hidden md:h-[360px]">
 				<enhanced:img
 					src={sectorsImg}
-					alt="Students presenting research findings to an audience"
+					alt={m.programs_ithacaDialogues_alt_presentingFindings()}
 					sizes="(max-width: 1024px) 100vw, 80vw"
 					class="absolute inset-0 h-full w-full object-cover"
 				/>
@@ -584,7 +584,7 @@
 	<section class="relative py-14 md:py-20">
 		<enhanced:img
 			src={ctaImg}
-			alt="Student delivering a professional presentation"
+			alt={m.programs_ithacaDialogues_alt_delivering()}
 			sizes="(max-width: 1024px) 100vw, 80vw"
 			class="absolute inset-0 h-full w-full object-cover"
 		/>

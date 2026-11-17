@@ -478,6 +478,20 @@ h3 {
 	text-wrap: balance;
 }
 
+/* `pretty` for body copy — the other half of the pair above. `balance` evens out a few
+   short lines (headings); `pretty` leaves line breaking alone but reconsiders the LAST few
+   lines of a paragraph to avoid leaving a single word stranded on its own.
+   Pure progressive enhancement: outside this site's floor (prd.md §14 R-COMPAT-1 — see
+   AGENTS.md), engines without it just wrap normally, so no fallback is needed and nothing
+   shifts. Switched off for :lang(zh) below, for the reason given there. */
+p,
+li,
+blockquote,
+figcaption,
+dd {
+	text-wrap: pretty;
+}
+
 /* §8.2's display face on the heading levels. Deliberately inside @layer base,
    NOT unlayered like the rules around it: base loses to @layer utilities, so a
    `font-mono` or `font-sans` utility written on a heading still wins. (Nothing
@@ -541,10 +555,20 @@ html:lang(zh) {
 
 /* §8.2: `text-wrap: balance` off for Chinese headings. Balance re-breaks lines
    to even them out, which fights CJK's own line-breaking (every glyph is a
-   break opportunity, so "balance" just produces ragged, arbitrary breaks). */
+   break opportunity, so "balance" just produces ragged, arbitrary breaks).
+   `pretty` below is switched off for the same reason — its job is orphan
+   control, and "orphan" presupposes word boundaries that CJK does not have. */
 :lang(zh) h1,
 :lang(zh) h2,
 :lang(zh) h3 {
+	text-wrap: normal;
+}
+
+:lang(zh) p,
+:lang(zh) li,
+:lang(zh) blockquote,
+:lang(zh) figcaption,
+:lang(zh) dd {
 	text-wrap: normal;
 }
 
@@ -819,19 +843,62 @@ html {
 }
 
 /* Custom scrollbar. The thumb uses --border-strong, not --border: on a white
-   track a 1.24:1 hairline is an invisible scrollbar. */
-::-webkit-scrollbar {
-	width: 8px;
+   track a 1.24:1 hairline is an invisible scrollbar. Measured, 8-bit composited:
+   thumb/track 3.48:1 and thumb/white-page 3.74:1 — both over WCAG 1.4.11's 3:1,
+   the second because macOS overlay scrollbars paint no track at all.
+
+   The vendor block is NOT legacy cruft here. `scrollbar-width` is Baseline
+   2024-12-11 (Safari 18.2) and `scrollbar-color` 2025-12-12 (Safari 26.2), both
+   outside this site's floor — prd.md §14 R-COMPAT-1 requires iOS Safari 16 and
+   the WeChat X5 webview (Chromium <= 107). Deleting it would hand the primary
+   arrival path a default scrollbar.
+
+   ## Why BOTH standard properties sit inside the positive @supports
+   Note the two Baseline dates above are a YEAR apart, which opens a real
+   Safari 18.2–26.1 window where `scrollbar-width` parses but `scrollbar-color`
+   does not. Declaring `scrollbar-width` unconditionally (the obvious shape, and
+   what the first draft of this rule did) breaks in exactly that window: the
+   width applies, `@supports not (scrollbar-color: auto)` is ALSO true, and the
+   element gets the standard width plus the whole vendor block at once — the
+   collision this guard exists to prevent.
+
+   Gating on `scrollbar-width` instead does not fix it either, and is worse: in
+   that same window the positive branch would win, giving `width: thin` with a
+   dead `scrollbar-color`, so the thumb falls back to the system colour and the
+   3.48:1 measured above is silently lost. For an iOS-16-floor site those
+   devices are a permanent population, not a migration tail.
+
+   So: `scrollbar-color` is the single feature tested, and BOTH standard
+   properties ride on it. Each engine therefore gets exactly one mechanism —
+   Safari 18.2–26.1 lands in the vendor branch and gets `width: 8px` with the
+   correct colours, which is visually equivalent to `thin` anyway.
+
+   The hover accent is only reachable in the fallback branch: `scrollbar-color`
+   has no hover mechanism in the spec, and `html:hover` would mean "pointer
+   anywhere in the document", which is not the same thing. So modern browsers
+   get the static 3.48:1 thumb and older WebKit additionally gets the teal
+   hover. Losing an accent is the right trade against losing the whole bar. */
+@supports (scrollbar-color: auto) {
+	html {
+		scrollbar-color: var(--border-strong) var(--surface-2);
+		scrollbar-width: thin;
+	}
 }
-::-webkit-scrollbar-track {
-	background: var(--surface-2);
-}
-::-webkit-scrollbar-thumb {
-	background: var(--border-strong);
-	border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-	background: var(--brand);
+
+@supports not (scrollbar-color: auto) {
+	::-webkit-scrollbar {
+		width: 8px;
+	}
+	::-webkit-scrollbar-track {
+		background: var(--surface-2);
+	}
+	::-webkit-scrollbar-thumb {
+		background: var(--border-strong);
+		border-radius: 4px;
+	}
+	::-webkit-scrollbar-thumb:hover {
+		background: var(--brand);
+	}
 }
 
 /* ==========================================================================

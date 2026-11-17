@@ -4,8 +4,108 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { enhancedImages } from '@sveltejs/enhanced-img';
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import { defineConfig } from 'vitest/config';
+import type { Plugin } from 'vite';
+
+/**
+ * ## Drop the Draco / Basis decoder binaries that nothing imports
+ *
+ * `@threlte/extras` has exactly one entry point — its package `exports` is `{ ".": … }`, no
+ * subpaths — and that barrel re-exports `useGltf` / `useDraco` / `useKtx2`. Those reach
+ * three's `DRACOLoader` / `KTX2Loader`, which name their binaries as
+ * `new URL('../libs/draco/draco_decoder.wasm', import.meta.url)`. Vite reads that as an ASSET
+ * REFERENCE and emits the file **regardless of tree-shaking**, so `vite build` was writing
+ * 1.81 MB of decoder binaries — 2.81 MB once adapter-node's `precompress` adds .br/.gz twins —
+ * that no chunk, node, entry or prerendered page ever names. Verified: `grep -rl` for each
+ * filename across `build/` returns nothing.
+ *
+ * Nothing here needs them. The EV scene is 100% procedural: `trike-geometry.ts` builds 103
+ * `Line2` instances plus a 120-point `THREE.Points` cloud. No glTF is loaded and no KTX2
+ * texture is sampled anywhere in `src/`; the only symbols taken from the barrel are
+ * `OrbitControls` and `Grid` (EVSceneContents.svelte:11).
+ *
+ * ## Why this asserts instead of aliasing
+ *
+ * Deleting emitted assets is safe *today*, and that is exactly the risk: if a later
+ * threlte/three upgrade starts genuinely referencing a decoder, dropping it would break the
+ * scene at runtime with no signal at build time. So this fails the build the moment a
+ * surviving chunk still mentions one of the filenames. The loud error IS the feature — it is
+ * what a `resolve.alias` stub pointing at an empty module would NOT give you, since that
+ * degrades silently on upgrade.
+ */
+function dropUnreferencedDecoderBinaries(): Plugin {
+	const DECODER_ASSET = /^(?:draco_decoder|draco_wasm_wrapper|basis_transcoder)\./;
+
+	return {
+		name: 'ithaca:drop-unreferenced-decoder-binaries',
+		apply: 'build',
+		enforce: 'post',
+		generateBundle(_options, bundle) {
+			const doomed = Object.keys(bundle).filter((file) =>
+				DECODER_ASSET.test(file.split('/').pop() ?? '')
+			);
+			if (doomed.length === 0) return;
+
+			const basenames = doomed.map((file) => file.split('/').pop() ?? file);
+			const referenced: string[] = [];
+
+			for (const [file, entry] of Object.entries(bundle)) {
+				if (doomed.includes(file)) continue;
+				// Chunks carry code; string assets (JS/CSS/HTML) carry source. Binary assets are
+				// Uint8Array and cannot hold a build-time path reference, so they are skipped.
+				const text =
+					entry.type === 'chunk'
+						? entry.code
+						: typeof entry.source === 'string'
+							? entry.source
+							: '';
+				if (!text) continue;
+				for (const name of basenames) {
+					if (text.includes(name)) referenced.push(`${name} <- ${file}`);
+				}
+			}
+
+			if (referenced.length > 0) {
+				this.error(
+					'[ithaca] A Draco/Basis decoder binary is now genuinely referenced, so dropping ' +
+						'it would break the 3D scene at runtime. Either the scene started loading ' +
+						'glTF/KTX2 assets, or @threlte/extras changed how it re-exports its loaders. ' +
+						'Fix the import, or delete this plugin and accept the ~1.8 MB.\n  ' +
+						referenced.join('\n  ')
+				);
+			}
+
+			for (const file of doomed) delete bundle[file];
+		}
+	};
+}
 
 export default defineConfig({
+	/**
+	 * ## Build target, stated explicitly to match the browser floor we actually promise
+	 *
+	 * Left unset, this resolves to Vite 8's default `baseline-widely-available`, which is
+	 * `chrome111, edge111, firefox114, safari16.4, ios16.4`. That is NOT what this site
+	 * supports: prd.md §14 R-COMPAT-1 requires iOS Safari 16 and the WeChat Android X5
+	 * webview, which docs/DESIGN-TOKENS.md §1.8 measures as commonly Chromium <= 107 — and
+	 * notes that WeChat-on-mobile is the primary arrival path, so it is a live risk. The CSS
+	 * in app.css carries 28 hand-written `@supports (color: color-mix(…))` guards precisely
+	 * for those engines, while the toolchain was being told it could emit chrome111+ syntax.
+	 *
+	 * Measured before setting this (2026-11-16): the only non-floor syntax in the output was
+	 * `oklch()`, 19 occurrences, ALL of them Tailwind's own default palette tokens
+	 * (`--color-red-500` and friends). Every one is referenced by a utility class
+	 * (`.text-red-400`, `.bg-red-500/10`, …) — but NONE of those classes appear in any
+	 * prerendered page, 0 hits across build/prerendered. They are dead CSS: Tailwind 4 scans
+	 * CSS files for class names and app.css:114 happens to NAME four of them inside a prose
+	 * comment. So the conflict was real on paper and inert in practice.
+	 *
+	 * That makes this declaration a guardrail rather than a fix: it keeps a future dependency
+	 * bump or a new language feature from silently shipping syntax that the X5 webview cannot
+	 * parse — which fails harder than a missing API, because a syntax error takes out the whole
+	 * chunk or rule. Raise these values only together with R-COMPAT-1.
+	 */
+	build: { target: ['chrome107', 'safari16'] },
+
 	// three (and three/addons/*) touch browser globals and ship ESM that must be
 	// bundled for SSR/prerender rather than externalized as a bare Node require.
 	ssr: { noExternal: ['three'] },
@@ -103,6 +203,9 @@ export default defineConfig({
 				entries: ['*', '/zh'],
 				crawl: true
 			}
-		})
+		}),
+		// Last, and `enforce: 'post'`, so it sees the final bundle rather than racing SvelteKit's
+		// own generateBundle work. See the doc comment on the function.
+		dropUnreferencedDecoderBinaries()
 	]
 });

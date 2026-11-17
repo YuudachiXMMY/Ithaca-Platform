@@ -1,6 +1,19 @@
-import type { ClassValue } from 'clsx';
+/**
+ * What `cn` below actually accepts. This used to be `clsx`'s `ClassValue`, but that was the
+ * only reference to `clsx` in the tree — a type-only import, so the dependency contributed
+ * zero bytes to any bundle while still having to be installed and audited. (Svelte 5 depends
+ * on `clsx` itself for its `class` directive; that copy is unaffected by this.)
+ *
+ * It is also DELIBERATELY narrower than `ClassValue` was. `clsx` flattens arrays and expands
+ * `{ cls: cond }` dictionaries; `cn` does neither — it only filters falsy and joins. Accepting
+ * `ClassValue` therefore type-checked calls that would have silently produced garbage:
+ * an array joined to `"a,b"` (comma, from Array.prototype.toString) and an object to
+ * `"[object Object]"`. Listing only what the implementation handles turns those into
+ * compile errors instead.
+ */
+type ClassName = string | number | bigint | boolean | null | undefined;
 
-export function cn(...inputs: ClassValue[]) {
+export function cn(...inputs: ClassName[]) {
 	return inputs.filter(Boolean).join(' ');
 }
 

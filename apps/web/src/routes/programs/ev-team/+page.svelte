@@ -267,7 +267,7 @@
 			     deliberately leaves it unpreloaded for this exact reason. -->
 			<enhanced:img
 				src={heroImg}
-				alt="Ithaca EV team racing at the Waterloo EV Challenge"
+				alt={m.programs_evChallenge_alt_racing()}
 				sizes="100vw"
 				fetchpriority="high"
 				class="absolute inset-0 h-full w-full object-cover"
@@ -365,7 +365,7 @@
 					<div class="relative h-[300px] overflow-hidden lg:h-[400px]">
 						<enhanced:img
 							src={missionImg}
-							alt="Students assembling radiator and fan components together"
+							alt={m.programs_evChallenge_alt_radiatorAssembly()}
 							sizes="(max-width: 1024px) 100vw, 50vw"
 							loading="lazy"
 							class="absolute inset-0 h-full w-full object-cover"
@@ -416,7 +416,7 @@
 					<div class="relative h-[400px] overflow-hidden lg:h-full lg:min-h-[520px]">
 						<enhanced:img
 							src={detailsImg}
-							alt="Students collaborating during an EV build session"
+							alt={m.programs_evChallenge_alt_buildSession()}
 							sizes="(max-width: 1024px) 100vw, 60vw"
 							loading="lazy"
 							class="absolute inset-0 h-full w-full object-cover"
@@ -466,7 +466,7 @@
 					<div class="relative h-[360px] overflow-hidden lg:h-[520px]">
 						<enhanced:img
 							src={gainsImg}
-							alt="Students hands-on with EV mechanical assembly in the workshop"
+							alt={m.programs_evChallenge_alt_mechanicalAssembly()}
 							sizes="(max-width: 1024px) 100vw, 40vw"
 							loading="lazy"
 							class="absolute inset-0 h-full w-full object-cover"
@@ -481,7 +481,7 @@
 	<section class="relative flex min-h-[60dvh] items-center overflow-hidden md:min-h-[70dvh]">
 		<enhanced:img
 			src={competitionImg}
-			alt="Ithaca EV driver celebrating during the race at Waterloo"
+			alt={m.programs_evChallenge_alt_driverCelebrating()}
 			sizes="(max-width: 1024px) 100vw, 80vw"
 			loading="lazy"
 			class="absolute inset-0 h-full w-full object-cover"
@@ -626,7 +626,7 @@
 							     (232 KB) to never paint it. lazy is what actually skips it. -->
 							<enhanced:img
 								src={ctaImg}
-								alt="Full Ithaca EV team at the Waterloo competition"
+								alt={m.programs_evChallenge_alt_fullTeam()}
 								sizes="35vw"
 								loading="lazy"
 								class="absolute inset-0 h-full w-full object-cover"

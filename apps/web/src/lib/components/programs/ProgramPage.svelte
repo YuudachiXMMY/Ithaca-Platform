@@ -352,11 +352,19 @@
 	<!-- Tuition + enquiry CTA. Price is by enquiry site-wide (plan §5), so this states that. -->
 	<section class="border-hairline border-t bg-surface-4 py-14 md:py-20">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
+			<!-- Non-band tokens: `bg-surface-4` is #e8edf3, a NEAR-WHITE surface (app.css:169 still
+			     carries the "was #0a0c10" note from when it was the deepest DARK band). The band-*
+			     family is white-ink-on-dark by construction, so `text-band-foreground` measured
+			     1.18:1 here and `text-band-foreground/70` 1.12:1. The eyebrow moves to the SOLID
+			     `foreground-muted` rather than keeping a /70 alpha — app.css:178 introduces that
+			     token as exactly "the solid replacement for text-white/60". Measured after:
+			     heading 15.07:1, eyebrow 8.76:1, border/fill and focus ring 5.13:1.
+			     See docs/DESIGN-TOKENS.md §2. -->
 			<Reveal y={24}>
-				<p class="font-mono text-[11px] tracking-[0.24em] text-band-foreground/70 uppercase">
+				<p class="font-mono text-[11px] tracking-[0.24em] text-foreground-muted uppercase">
 					{m.program_page_tuitionByEnquiry()}
 				</p>
-				<h2 class="mt-5 max-w-2xl text-2xl font-light text-band-foreground md:text-4xl">
+				<h2 class="mt-5 max-w-2xl text-2xl font-light text-foreground md:text-4xl">
 					{m.program_page_ctaHeading()}
 				</h2>
 				<!-- `registerHref` localizes internally (see $lib/program-cta), so it is passed through
@@ -365,7 +373,7 @@
 				<a
 					href={registerHref(program.slug)}
 					onclick={onRegisterClick}
-					class="group mt-8 inline-flex items-center gap-2.5 border border-band-action bg-band-action px-6 py-3.5 text-sm font-medium text-band-action-foreground transition-colors duration-200 hover:bg-band-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-band-brand"
+					class="group mt-8 inline-flex items-center gap-2.5 border border-action bg-action px-6 py-3.5 text-sm font-medium text-action-foreground transition-colors duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 				>
 					<span>{m.program_page_ctaButton()}</span>
 					<ArrowRight class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
