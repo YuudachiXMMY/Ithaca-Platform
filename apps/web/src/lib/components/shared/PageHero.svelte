@@ -76,21 +76,29 @@
 		class="relative z-10 mx-auto w-full max-w-[1400px] px-5 pt-28 pb-14 sm:px-8 md:px-[6vw] md:pt-32 md:pb-20"
 	>
 		<div class="max-w-3xl">
-			<p class="font-mono text-[11px] tracking-[0.28em] text-band-brand-strong uppercase">
+			<!-- `text-xs` (rem), not `text-[11px]`: a px font-size ignores the reader's root size.
+			     Also the display face rather than mono — the mono eyebrow was the last survivor of a
+			     numbered-label idiom the rest of the site has retired. -->
+			<p class="font-display text-xs font-bold tracking-[0.24em] text-band-brand-strong uppercase">
 				{eyebrow}
 			</p>
+			<!-- Band side: the page gradient is invisible here, so the rule uses the band's own
+			     brand tone (sea-300, 7.85:1 on the scrim base). -->
 			<div
-				class="mt-6 h-px w-24 bg-gradient-to-r from-band-brand via-band-brand/40 to-transparent"
+				class="mt-6 h-[3px] w-24 rounded-sm bg-gradient-to-r from-band-brand to-band-brand/20"
 				aria-hidden="true"
 			></div>
+			<!-- Was `font-light`. Same inversion SectionHeader fixed on the homepage: the one h1 on
+			     the page was its lightest text. The clamp is untouched (1.8x, inside WCAG 1.4.4's
+			     2.5x ceiling for zoom). -->
 			<h1
 				id={headingId}
-				class="mt-6 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-light tracking-tight text-band-foreground"
+				class="b-display mt-6 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-bold tracking-tight text-band-foreground"
 			>
 				{title}
 			</h1>
 			{#if description}
-				<p class="mt-6 max-w-2xl text-base leading-relaxed text-band-foreground/80 md:text-lg">
+				<p class="mt-6 max-w-2xl text-base leading-[1.8] text-band-foreground-muted md:text-lg">
 					{description}
 				</p>
 			{/if}

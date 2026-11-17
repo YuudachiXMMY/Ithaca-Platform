@@ -35,21 +35,18 @@
 	const CLOSING_BLOCK = blocks[2];
 </script>
 
-<section class="bg-surface-0 py-14 md:py-20" aria-labelledby="mission-heading">
+<section class="bg-background py-20 md:py-28" aria-labelledby="mission-heading">
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<!-- Section heading -->
 		<Reveal y={20} duration={500}>
 			<div class="mb-10 lg:mb-14">
 				<h2
 					id="mission-heading"
-					class="text-2xl leading-tight font-bold tracking-tight text-foreground md:text-4xl"
+					class="b-display text-[1.75rem] leading-tight font-extrabold tracking-tight text-sea-900 md:text-[2.5rem]"
 				>
 					{m.about_mission_heading()}
 				</h2>
-				<div
-					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-					aria-hidden="true"
-				></div>
+				<div class="b-rule mt-6 w-28" aria-hidden="true"></div>
 				<p class="mt-6 max-w-xl text-base leading-relaxed text-foreground-muted">
 					{m.about_mission_subtitle()}
 				</p>
@@ -64,7 +61,7 @@
 					<div class="grid grid-cols-1 items-center gap-6 lg:grid-cols-2 lg:gap-10">
 						<!-- Image block -->
 						<div
-							class="relative aspect-[4/3] overflow-hidden {imageFirst
+							class="relative aspect-[4/3] overflow-clip rounded-card border border-sea-card-line {imageFirst
 								? 'lg:order-1'
 								: 'lg:order-2'}"
 						>
@@ -79,7 +76,7 @@
 
 						<!-- Text block -->
 						<div class="flex flex-col justify-center {imageFirst ? 'lg:order-2' : 'lg:order-1'}">
-							<h3 class="text-xl leading-tight font-bold text-foreground md:text-2xl">
+							<h3 class="b-display text-xl leading-tight font-extrabold text-sea-900 md:text-2xl">
 								{block.title()}
 							</h3>
 							<p class="mt-3 max-w-lg text-base leading-relaxed text-foreground-muted">

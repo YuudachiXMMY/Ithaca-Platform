@@ -65,7 +65,7 @@
 			     hydration. Reduced-motion falls back to the static visible rest state. -->
 			<div class="overflow-hidden">
 				<p
-					class="hero-line max-w-[26ch] text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.15] font-light tracking-tight text-band-foreground"
+					class="hero-line b-display max-w-[26ch] text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.15] font-bold tracking-tight text-band-foreground"
 				>
 					{m.home_hero_positioning()}
 				</p>

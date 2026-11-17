@@ -36,52 +36,58 @@
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
 {#if featured}
-	<section class="bg-surface-0 py-20 md:py-28" aria-labelledby="home-featured-heading">
+	<!--
+		2026-11-17 — the film sits BESIDE the copy, not above it.
+
+		A 16:9 player across the full 1400px wrap is a 714px-tall rectangle, and because the poster
+		only paints once Vimeo responds, the tallest thing on the homepage was also the slowest to
+		show anything. Side by side it is ~420px, the section fits one screen, and the headline is
+		readable before the iframe has done anything at all.
+	-->
+	<section class="bg-background py-20 md:py-28" aria-labelledby="home-featured-heading">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
-			{#if featured.video}
-				<Reveal y={24}>
-					<VimeoEmbed
-						videoId={featured.video.id}
-						title={featured.video.title[locale]}
-						aspectPadding="56.25%"
-						loading="lazy"
-					/>
-				</Reveal>
-			{/if}
-
-			<Reveal y={20} delay={120}>
-				<div class="mt-8 grid gap-6 md:grid-cols-[auto_1fr] md:items-start md:gap-10">
-					<div class="shrink-0">
-						<div class="mb-3 h-px w-10 bg-brand/40" aria-hidden="true"></div>
-						<p class="text-xs font-semibold tracking-[0.2em] text-brand-bright uppercase">
-							{m.home_featured_eyebrow()}
-						</p>
-						<h2
-							id="home-featured-heading"
-							class="mt-2 text-xl font-bold text-foreground md:text-2xl"
-						>
-							{featured.title[locale]}
-						</h2>
-					</div>
-
-					<div class="border-t border-border pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-10">
-						{#each featured.body[locale] as paragraph, index (paragraph)}
-							<p class="text-sm leading-relaxed text-foreground-muted {index > 0 ? 'mt-4' : ''}">
-								{paragraph}
-							</p>
-						{/each}
-						<a
-							href={localizeHref('/news')}
-							class="group mt-5 inline-flex items-center gap-2 text-sm font-medium text-brand-bright transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-						>
-							<span>{m.home_highlights_viewNews()}</span>
-							<ArrowRight
-								class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+			<div class="grid items-start gap-8 lg:grid-cols-[7fr_5fr] lg:gap-12">
+				{#if featured.video}
+					<Reveal y={24}>
+						<div class="overflow-clip rounded-card border border-sea-card-line">
+							<VimeoEmbed
+								videoId={featured.video.id}
+								title={featured.video.title[locale]}
+								aspectPadding="56.25%"
+								loading="lazy"
 							/>
-						</a>
-					</div>
-				</div>
-			</Reveal>
+						</div>
+					</Reveal>
+				{/if}
+
+				<Reveal y={20} delay={120}>
+					<p class="font-display text-xs font-bold tracking-[0.2em] text-brand uppercase">
+						{m.home_featured_eyebrow()}
+					</p>
+					<h2
+						id="home-featured-heading"
+						class="b-display mt-3 text-2xl font-extrabold text-sea-900 md:text-[1.75rem]"
+					>
+						{featured.title[locale]}
+					</h2>
+					<div class="b-rule mt-5 w-20" aria-hidden="true"></div>
+
+					{#each featured.body[locale] as paragraph, index (paragraph)}
+						<p class="text-base leading-[1.8] text-foreground-muted {index > 0 ? 'mt-4' : 'mt-5'}">
+							{paragraph}
+						</p>
+					{/each}
+					<a
+						href={localizeHref('/news')}
+						class="group mt-6 inline-flex items-center gap-2 font-display text-xs font-bold tracking-[0.18em] text-brand uppercase transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+					>
+						<span>{m.home_highlights_viewNews()}</span>
+						<ArrowRight
+							class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+						/>
+					</a>
+				</Reveal>
+			</div>
 		</div>
 	</section>
 {/if}

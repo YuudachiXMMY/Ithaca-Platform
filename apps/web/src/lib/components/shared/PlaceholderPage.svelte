@@ -72,24 +72,28 @@
 
 		<div class="relative z-10 px-5 pb-14 sm:px-8 md:px-[6vw] md:pb-20">
 			<div class="max-w-3xl">
-				<p class="font-mono text-[11px] tracking-[0.28em] text-band-brand-strong uppercase">
+				<!-- Display face at a rem size (see PageHero): the mono eyebrow was a px font-size,
+				     which ignores the reader's root size. -->
+				<p
+					class="font-display text-xs font-bold tracking-[0.24em] text-band-brand-strong uppercase"
+				>
 					{eyebrow}
 				</p>
 				<div
-					class="mt-6 h-px w-24 bg-gradient-to-r from-band-brand via-band-brand/40 to-transparent"
+					class="mt-6 h-[3px] w-24 rounded-sm bg-gradient-to-r from-band-brand to-band-brand/20"
 					aria-hidden="true"
 				></div>
 				<h1
 					id={headingId}
-					class="mt-6 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-light tracking-tight text-band-foreground"
+					class="b-display mt-6 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-bold tracking-tight text-band-foreground"
 				>
 					{title}
 				</h1>
-				<p class="mt-6 max-w-2xl text-base leading-relaxed text-band-foreground/80 md:text-lg">
+				<p class="mt-6 max-w-2xl text-base leading-[1.8] text-band-foreground-muted md:text-lg">
 					{description}
 				</p>
 				{#if note}
-					<p class="mt-3 max-w-2xl text-sm leading-relaxed text-band-foreground/80">{note}</p>
+					<p class="mt-3 max-w-2xl text-sm leading-[1.8] text-band-foreground-subtle">{note}</p>
 				{/if}
 
 				<!-- Both CTAs go somewhere that can actually answer the question this page cannot.

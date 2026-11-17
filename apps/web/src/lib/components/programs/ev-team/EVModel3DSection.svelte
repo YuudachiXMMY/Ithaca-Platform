@@ -283,7 +283,7 @@
 
 		<div class="relative overflow-hidden">
 			<h2
-				class="px-6 pt-10 pb-8 text-center text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl"
+				class="b-display px-6 pt-10 pb-8 text-center text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.25rem] lg:text-4xl"
 			>
 				{m.programs_evChallenge_model3d_twoTracksTitle()}
 			</h2>
@@ -416,7 +416,9 @@
 				bind:this={tracksHeadEl}
 				class="absolute top-20 right-0 left-0 z-30 px-6 text-center lg:top-28"
 			>
-				<h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
+				<h2
+					class="b-display text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.25rem] lg:text-4xl"
+				>
 					{m.programs_evChallenge_model3d_twoTracksTitle()}
 				</h2>
 			</div>

@@ -49,17 +49,24 @@
 
 		<div class="relative z-10 px-5 pb-14 sm:px-8 md:px-[6vw] md:pb-20">
 			<div class="max-w-3xl">
-				<p class="font-mono text-[11px] tracking-[0.28em] text-band-brand-strong uppercase">
+				<p
+					class="font-display text-xs font-bold tracking-[0.28em] text-band-brand-strong uppercase"
+				>
 					{m.research_hero_eyebrow()}
 				</p>
 				<div
-					class="mt-6 h-px w-24 bg-gradient-to-r from-band-brand via-band-brand/40 to-transparent"
+					class="mt-6 h-[3px] w-24 rounded-sm bg-gradient-to-r from-band-brand to-band-brand/20"
 					aria-hidden="true"
 				></div>
-				<h1 id="research-heading" class="mt-6 text-4xl font-light text-band-foreground md:text-6xl">
+				<h1
+					id="research-heading"
+					class="b-display mt-6 text-4xl font-bold text-band-foreground md:text-6xl"
+				>
 					{m.research_hero_title()}
 				</h1>
-				<p class="mt-5 font-mono text-xs tracking-[0.14em] text-band-foreground/75 uppercase">
+				<p
+					class="mt-5 font-display text-xs font-bold tracking-[0.14em] text-band-foreground/75 uppercase"
+				>
 					{m.research_hero_tagline()}
 				</p>
 			</div>
@@ -67,32 +74,45 @@
 	</section>
 
 	<!-- ── Ithaca Dialogue — the board's primary landing point ──────────────────────────────── -->
-	<section id="ithaca-dialogue" class="scroll-mt-24 py-14 md:py-20">
+	<section id="ithaca-dialogue" class="scroll-mt-24 bg-background py-20 md:py-28">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
-				<h2 class="text-2xl font-light text-foreground md:text-4xl">
-					{m.research_dialogue_heading()}
-				</h2>
-				<p class="mt-3 font-mono text-[11px] tracking-[0.2em] text-foreground-subtle uppercase">
-					{m.research_dialogue_audience()}
-				</p>
-				<p class="mt-8 max-w-3xl text-lg leading-relaxed text-foreground md:text-xl">
+				<!-- Ordinals here are the three offers on this board in order, not a counter — the
+				     same decorative treatment SectionHeader gives the homepage. aria-hidden. -->
+				<div class="flex items-start gap-5">
+					<span class="b-numeral mt-1 hidden text-[3.25rem] select-none sm:block" aria-hidden="true"
+						>01</span
+					>
+					<div class="min-w-0">
+						<h2 class="b-display text-[1.75rem] font-extrabold text-sea-900 md:text-[2.5rem]">
+							{m.research_dialogue_heading()}
+						</h2>
+						<p class="mt-3">
+							<span class="b-chip b-chip-brand">{m.research_dialogue_audience()}</span>
+						</p>
+					</div>
+				</div>
+				<div class="b-rule mt-7" aria-hidden="true"></div>
+
+				<p class="mt-9 max-w-3xl text-lg leading-[1.75] font-medium text-sea-900 md:text-xl">
 					{m.research_dialogue_body_1()}
 				</p>
-				<p class="mt-5 max-w-3xl text-base leading-relaxed text-foreground-subtle">
+				<p class="mt-5 max-w-3xl text-base leading-[1.8] text-foreground-muted">
 					{m.research_dialogue_body_2()}
 				</p>
 
-				<ul class="mt-8 flex flex-wrap gap-x-10 gap-y-3">
+				<!-- The three onward links as cards: as a bare inline row they read as footnotes to
+				     the paragraph above, when they are the only way off this section. -->
+				<ul class="mt-10 grid gap-4 md:grid-cols-3 md:gap-5">
 					{#each [{ label: m.research_dialogue_linkDetail(), href: '/programs/ithaca-dialogues' }, { label: m.research_dialogue_linkNews(), href: '/news' }, { label: m.research_dialogue_linkResults(), href: '/success-stories' }] as link (link.href)}
 						<li>
 							<a
 								href={localizeHref(link.href)}
-								class="group inline-flex items-center gap-2 text-base text-foreground transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+								class="b-card group flex h-full items-center justify-between gap-3 text-base font-semibold text-sea-900 transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-brand/35 hover:shadow-[0_6px_20px_-8px_rgba(28,90,140,0.28)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 							>
 								<span>{link.label}</span>
 								<ArrowRight
-									class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+									class="h-4 w-4 shrink-0 text-brand transition-transform duration-200 group-hover:translate-x-1"
 								/>
 							</a>
 						</li>
@@ -103,38 +123,44 @@
 	</section>
 
 	<!-- ── Research Lab ─────────────────────────────────────────────────────────────────────── -->
-	<section
-		id="research-lab"
-		class="border-hairline scroll-mt-24 border-t bg-surface-2 py-14 md:py-20"
-	>
+	<section id="research-lab" class="scroll-mt-24 bg-sea-tint py-20 md:py-28">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
-				<h2 class="text-2xl font-light text-foreground md:text-4xl">
-					{m.research_lab_heading()}
-				</h2>
-				<p class="mt-3 font-mono text-[11px] tracking-[0.2em] text-foreground-subtle uppercase">
-					{m.research_lab_audience()}
-				</p>
+				<div class="flex items-start gap-5">
+					<span class="b-numeral mt-1 hidden text-[3.25rem] select-none sm:block" aria-hidden="true"
+						>02</span
+					>
+					<div class="min-w-0">
+						<h2 class="b-display text-[1.75rem] font-extrabold text-sea-900 md:text-[2.5rem]">
+							{m.research_lab_heading()}
+						</h2>
+						<p class="mt-3">
+							<span class="b-chip b-chip-brand">{m.research_lab_audience()}</span>
+						</p>
+					</div>
+				</div>
+				<div class="b-rule mt-7" aria-hidden="true"></div>
 
-				<div class="mt-10 grid max-w-5xl gap-10 md:grid-cols-2">
-					<p class="text-base leading-relaxed text-foreground-subtle">
+				<!-- The two levels as two cards (the brochure's `.split .half`): as two bare columns
+				     of grey text the reader had no signal that these are alternative entry points
+				     rather than one paragraph that happens to wrap. -->
+				<div class="mt-10 grid gap-4 md:grid-cols-2 md:gap-5">
+					<p class="b-card b-card-on-tint text-base leading-[1.8] text-foreground-muted">
 						{m.research_lab_body_secondary()}
 					</p>
-					<p class="text-base leading-relaxed text-foreground-subtle">
+					<p class="b-card b-card-on-tint text-base leading-[1.8] text-foreground-muted">
 						{m.research_lab_body_university()}
 					</p>
 				</div>
 
 				<!--
-					One of the three mandatory disclosures (plan §5). It is a bordered block in the
-					page's own flow rather than a footnote, for the same reason the Investment Lab's
-					compliance text is: "we do not promise publication" is the counterweight to the
-					sentence directly above it promising a research paper, and a counterweight the
-					reader meets three screens later is not one.
+					One of the three mandatory disclosures (plan §5). It is a block in the page's own
+					flow rather than a footnote, for the same reason the Investment Lab's compliance
+					text is: "we do not promise publication" is the counterweight to the sentence
+					directly above it promising a research paper, and a counterweight the reader meets
+					three screens later is not one.
 				-->
-				<p
-					class="border-hairline mt-10 max-w-3xl border p-6 text-sm leading-relaxed text-foreground-subtle"
-				>
+				<p class="b-quote mt-5 max-w-3xl text-sm leading-[1.8] text-foreground-muted">
 					{m.research_lab_disclaimer()}
 				</p>
 			</Reveal>
@@ -142,22 +168,41 @@
 	</section>
 
 	<!-- ── Product co-creation (QuizR) — the brochure puts this at the foot of the board ────── -->
-	<section id="co-creation" class="border-hairline scroll-mt-24 border-t py-14 md:py-20">
+	<section id="co-creation" class="scroll-mt-24 bg-background py-20 md:py-28">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
-				<p class="font-mono text-[11px] tracking-[0.28em] text-brand uppercase">
-					{m.research_coCreation_eyebrow()}
-				</p>
-				<h2 class="mt-5 max-w-3xl text-2xl font-light text-foreground md:text-4xl">
-					{m.research_coCreation_heading()}
-				</h2>
-				<p class="mt-6 max-w-3xl text-base leading-relaxed text-foreground-subtle">
+				<div class="flex items-start gap-5">
+					<span class="b-numeral mt-1 hidden text-[3.25rem] select-none sm:block" aria-hidden="true"
+						>03</span
+					>
+					<div class="min-w-0">
+						<p class="font-display text-xs font-bold tracking-[0.24em] text-brand uppercase">
+							{m.research_coCreation_eyebrow()}
+						</p>
+						<h2
+							class="b-display mt-3 max-w-3xl text-[1.75rem] font-extrabold text-sea-900 md:text-[2.5rem]"
+						>
+							{m.research_coCreation_heading()}
+						</h2>
+					</div>
+				</div>
+				<div class="b-rule mt-7" aria-hidden="true"></div>
+
+				<p class="mt-9 max-w-3xl text-base leading-[1.8] text-foreground-muted">
 					{m.research_coCreation_body()}
 				</p>
-				<p class="mt-5 font-mono text-xs tracking-[0.14em] text-foreground uppercase">
-					{m.research_coCreation_tracks()}
-				</p>
-				<p class="mt-5 max-w-3xl text-base leading-relaxed text-foreground-subtle">
+				<!-- The three tracks as chips rather than a mono run-on: they are a list, and the
+				     mono + letterspacing set them as one unbroken 90-character string. -->
+				<ul class="mt-6 flex flex-wrap gap-2">
+					{#each m
+						.research_coCreation_tracks()
+						.split('·')
+						.map((t) => t.trim())
+						.filter(Boolean) as track (track)}
+						<li class="b-chip">{track}</li>
+					{/each}
+				</ul>
+				<p class="mt-6 max-w-3xl text-base leading-[1.8] text-foreground-muted">
 					{m.research_coCreation_outcome()}
 				</p>
 			</Reveal>
@@ -170,30 +215,33 @@
 		plan §2's cross-board rules: a visitor on the research board should be able to see that
 		incubating your own project is a thing Ithaca does, without this page quietly annexing it.
 	-->
-	<section class="border-hairline border-t bg-surface-4 py-14 md:py-16">
+	<section class="bg-sea-tint py-20 md:py-24">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
-			<!-- Non-band tokens: `bg-surface-4` is #e8edf3, a NEAR-WHITE surface (app.css:169 still
-			     carries the "was #0a0c10" note from when it was the deepest DARK band). This block
-			     was the worst of the three: the CTA is an OUTLINE button, so `text-band-foreground`
+			<!-- Non-band tokens throughout: this is a LIGHT ground. The block used to be the worst
+			     of the three on this page — the CTA is an OUTLINE button, so `text-band-foreground`
 			     put white label text straight onto near-white at 1.18:1 and only filled in on
-			     hover — keyboard and touch users never saw it at all. The eyebrow was 1.12:1.
-			     Measured after, same algorithm app.css:32-35 declares: eyebrow 8.76:1, lead 15.07:1,
-			     label 15.07:1, border and focus ring 5.13:1, hover label #fff on #0b6e70 6.04:1.
-			     See docs/DESIGN-TOKENS.md §2 for the band / non-band split. -->
+			     hover, meaning keyboard and touch users never saw it at all. The eyebrow was
+			     1.12:1. Measured after, same algorithm app.css declares: eyebrow 7.27:1, lead
+			     12.32:1, label 12.32:1, border and focus ring 7.27:1, hover label #fff on
+			     sea-700 7.27:1. See docs/DESIGN-TOKENS.md §2 for the band / non-band split. -->
 			<Reveal y={24}>
-				<h2 class="font-mono text-[11px] tracking-[0.24em] text-foreground-muted uppercase">
-					{m.research_nextStep_heading()}
-				</h2>
-				<p class="mt-5 max-w-2xl text-xl font-light text-foreground md:text-2xl">
-					{m.research_nextStep_studio()}
-				</p>
-				<a
-					href={localizeHref('/programs/project-studio')}
-					class="group mt-8 inline-flex items-center gap-2.5 border border-action px-6 py-3.5 text-sm font-medium text-foreground transition-colors duration-200 hover:bg-action hover:text-action-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-				>
-					<span>{m.nav_projectStudio()}</span>
-					<ArrowRight class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-				</a>
+				<div class="b-panel bg-paper">
+					<h2 class="font-display text-xs font-bold tracking-[0.22em] text-brand uppercase">
+						{m.research_nextStep_heading()}
+					</h2>
+					<p class="b-display mt-5 max-w-2xl text-xl font-extrabold text-sea-900 md:text-[1.75rem]">
+						{m.research_nextStep_studio()}
+					</p>
+					<a
+						href={localizeHref('/programs/project-studio')}
+						class="group mt-8 inline-flex items-center gap-2.5 rounded-sm border border-action px-6 py-3.5 text-sm font-semibold text-sea-900 transition-colors duration-200 hover:bg-action hover:text-action-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px"
+					>
+						<span>{m.nav_projectStudio()}</span>
+						<ArrowRight
+							class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+						/>
+					</a>
+				</div>
 			</Reveal>
 		</div>
 	</section>

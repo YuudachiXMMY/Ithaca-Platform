@@ -76,23 +76,20 @@
 		headingId="academics-heading"
 	/>
 
-	<section class="bg-surface-0 py-14 md:py-20" aria-labelledby="academics-tracks-heading">
+	<section class="bg-background py-14 md:py-20" aria-labelledby="academics-tracks-heading">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={20} duration={500}>
 				<div>
-					<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+					<p class="font-display text-xs font-bold tracking-[0.28em] text-brand-bright uppercase">
 						{m.academics_tracks_eyebrow()}
 					</p>
 					<h2
 						id="academics-tracks-heading"
-						class="mt-6 text-2xl font-bold tracking-tight text-foreground md:text-4xl"
+						class="b-display mt-6 text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.5rem]"
 					>
 						{m.academics_tracks_heading()}
 					</h2>
-					<div
-						class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-						aria-hidden="true"
-					></div>
+					<div class="b-rule mt-6 w-28" aria-hidden="true"></div>
 					<p class="mt-6 max-w-[60ch] text-base leading-relaxed text-foreground-muted">
 						{m.academics_tracks_description()}
 					</p>
@@ -122,10 +119,10 @@
 							href={localizeHref(track.href)}
 							class="group flex h-full flex-col p-6 transition-colors duration-200 hover:bg-surface-2 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand md:p-8"
 						>
-							<span class="font-mono text-sm tracking-[0.2em] text-brand">
+							<span class="font-display text-sm font-bold tracking-[0.2em] text-brand">
 								{String(index + 1).padStart(2, '0')}
 							</span>
-							<span class="mt-5 text-xl font-semibold text-foreground md:text-2xl">
+							<span class="b-display mt-5 text-xl font-extrabold text-sea-900 md:text-2xl">
 								{navLabel(track.label)}
 							</span>
 							<span class="mt-3 max-w-[48ch] grow text-sm leading-relaxed text-foreground-muted">

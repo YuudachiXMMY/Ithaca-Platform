@@ -48,7 +48,8 @@
 	let mapVisible = $state(false);
 
 	const containerClass = 'mx-auto w-full max-w-[1400px] px-5 py-14 sm:px-8 md:px-[6vw] md:py-20';
-	const headingClass = 'text-2xl font-bold tracking-tight text-foreground md:text-4xl';
+	const headingClass =
+		'b-display text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.5rem]';
 </script>
 
 <Seo title={m.contact_page_title()} description={m.contact_page_description()} />
@@ -93,7 +94,7 @@
 
 	     A hairline note, not a banner: a visitor who meant to land here should read one line and
 	     carry on into the form, not be intercepted. -->
-	<section class="bg-surface-0">
+	<section class="bg-background">
 		<!-- Not `containerClass`: that carries `py-14 md:py-20`, which is a section's worth of air
 		     around one line of text. Same horizontal rhythm, a fraction of the vertical. -->
 		<div class="mx-auto w-full max-w-[1400px] px-5 pt-10 sm:px-8 md:px-[6vw] md:pt-12">
@@ -130,7 +131,7 @@
 	     against a whole section break before.
 
 	     `id="enquiry"` stays on this section: it is an external anchor target. -->
-	<section id="enquiry" class="scroll-mt-[var(--nav-h)] bg-surface-3">
+	<section id="enquiry" class="scroll-mt-[var(--nav-h)] bg-sea-tint">
 		<div class={containerClass}>
 			<Reveal y={24}>
 				<div
@@ -166,7 +167,7 @@
 	     wide enough to pull the eye off the form; given the whole measure it can do the one thing a
 	     map is for. 16:9 with the ratio reserved before the iframe mounts, so the lazy swap cannot
 	     move the page (the Lighthouse CLS gate is 0.05). -->
-	<section class="bg-surface-0">
+	<section class="bg-background">
 		<div class={containerClass}>
 			<Reveal y={24}>
 				<h2 class={headingClass}>{m.contact_page_findUs()}</h2>

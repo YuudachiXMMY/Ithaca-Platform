@@ -159,35 +159,43 @@
 
 		<div class="relative z-10 px-5 pb-14 sm:px-8 md:px-[6vw] md:pb-20">
 			<div class="max-w-3xl">
-				<p class="font-mono text-[11px] tracking-[0.28em] text-band-brand-strong uppercase">
+				<!-- Display face at a rem size, matching PageHero. The old `font-mono text-[11px]` was
+				     both a px font-size (which ignores the reader's root size) and the last of a
+				     mono-label idiom the rest of the site has retired. -->
+				<p
+					class="font-display text-xs font-bold tracking-[0.24em] text-band-brand-strong uppercase"
+				>
 					{eyebrow}
 				</p>
 				<div
-					class="mt-6 h-px w-24 bg-gradient-to-r from-band-brand via-band-brand/40 to-transparent"
+					class="mt-6 h-[3px] w-24 rounded-sm bg-gradient-to-r from-band-brand to-band-brand/20"
 					aria-hidden="true"
 				></div>
-				<h1 class="mt-6 text-4xl font-light text-band-foreground md:text-6xl">
+				<h1 class="b-display mt-6 text-4xl font-bold text-band-foreground md:text-6xl">
 					{program.name[locale]}
 				</h1>
-				<p class="mt-4 text-lg leading-relaxed text-band-foreground/90 md:text-xl">
+				<p class="mt-5 text-lg leading-[1.7] text-band-foreground/90 md:text-xl">
 					{program.tagline[locale]}
 				</p>
-				<p class="mt-5 font-mono text-xs tracking-[0.14em] text-band-foreground/75 uppercase">
-					{audience} · {schedule}
+				<p class="mt-6 flex flex-wrap gap-2">
+					<span class="b-chip">{audience}</span>
+					<span class="b-chip">{schedule}</span>
 				</p>
 			</div>
 		</div>
 	</section>
 
-	<!-- Summary + intro paragraphs. -->
-	<section class="mx-auto max-w-[1400px] px-5 py-14 sm:px-8 md:px-[6vw] md:py-20">
+	<!-- Summary + intro paragraphs. The summary is the page's thesis, so it is set as a lede with
+	     the brand rule above it rather than as the first of N identical paragraphs. -->
+	<section class="mx-auto max-w-[1400px] px-5 py-16 sm:px-8 md:px-[6vw] md:py-24">
 		<Reveal y={24}>
-			<p class="max-w-3xl text-xl leading-relaxed text-foreground md:text-2xl">
+			<div class="b-rule w-20" aria-hidden="true"></div>
+			<p class="mt-8 max-w-3xl text-xl leading-[1.65] font-medium text-sea-900 md:text-2xl">
 				{program.summary[locale]}
 			</p>
 			{#if intro}
 				{#each intro as paragraph (paragraph)}
-					<p class="mt-5 max-w-3xl text-base leading-relaxed text-foreground-subtle">
+					<p class="mt-6 max-w-3xl text-base leading-[1.8] text-foreground-muted">
 						{paragraph}
 					</p>
 				{/each}
@@ -197,29 +205,26 @@
 
 	<!-- Tracks — the courses or tiers this programme is made of. Omitted when empty, per R-PT. -->
 	{#if program.tracks?.length}
-		<section class="border-hairline border-t bg-surface-2 py-14 md:py-20">
+		<section class="bg-sea-tint py-20 md:py-28">
 			<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 				<Reveal y={24}>
-					<h2 class="text-2xl font-light text-foreground md:text-3xl">
+					<h2 class="b-display text-[1.75rem] font-extrabold text-sea-900 md:text-[2.5rem]">
 						{m.program_page_tracksHeading()}
 					</h2>
-					<ul class="bg-hairline mt-10 grid gap-px md:grid-cols-2">
+					<div class="b-rule mt-7" aria-hidden="true"></div>
+					<ul class="mt-10 grid gap-4 md:grid-cols-2 md:gap-5">
 						{#each program.tracks as track (track.name.en)}
-							<li class="bg-surface-2 p-6 md:p-8">
-								<h3 class="text-base font-bold text-foreground md:text-lg">
+							<li class="b-card b-card-on-tint">
+								<h3 class="b-display text-lg font-extrabold text-sea-900 md:text-xl">
 									{track.name[locale]}
 								</h3>
-								<p class="mt-3 text-sm leading-relaxed text-foreground-subtle">
+								<p class="mt-3 text-[0.9375rem] leading-[1.75] text-foreground-muted">
 									{track.description[locale]}
 								</p>
 								{#if track.tags.length}
-									<ul class="mt-4 flex flex-wrap gap-2">
+									<ul class="mt-5 flex flex-wrap gap-2">
 										{#each track.tags as tag (tag)}
-											<li
-												class="border-hairline border px-2.5 py-1 font-mono text-[10px] tracking-[0.12em] text-foreground-subtle uppercase"
-											>
-												{tag}
-											</li>
+											<li class="b-chip">{tag}</li>
 										{/each}
 									</ul>
 								{/if}
@@ -233,20 +238,23 @@
 
 	<!-- Outcomes — what a student takes away. Omitted when empty, per R-PT. -->
 	{#if program.outcomes.length}
-		<section class="border-hairline border-t py-14 md:py-20">
+		<section class="bg-background py-20 md:py-28">
 			<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 				<Reveal y={24}>
-					<h2 class="text-2xl font-light text-foreground md:text-3xl">
+					<h2 class="b-display text-[1.75rem] font-extrabold text-sea-900 md:text-[2.5rem]">
 						{m.program_page_outcomesHeading()}
 					</h2>
-					<ul class="mt-10 grid gap-10 md:grid-cols-3">
-						{#each program.outcomes as outcome (outcome.title.en)}
-							<li>
-								<div class="h-px w-12 bg-brand" aria-hidden="true"></div>
-								<h3 class="mt-5 text-base font-bold text-foreground md:text-lg">
+					<div class="b-rule mt-7" aria-hidden="true"></div>
+					<ul class="mt-10 grid gap-4 md:grid-cols-3 md:gap-5">
+						{#each program.outcomes as outcome, i (outcome.title.en)}
+							<li class="b-card">
+								<p class="font-display text-xs font-bold tracking-[0.2em] text-brand tabular-nums">
+									{String(i + 1).padStart(2, '0')}
+								</p>
+								<h3 class="b-display mt-3 text-lg font-extrabold text-sea-900 md:text-xl">
 									{outcome.title[locale]}
 								</h3>
-								<p class="mt-3 text-sm leading-relaxed text-foreground-subtle">
+								<p class="mt-3 text-[0.9375rem] leading-[1.75] text-foreground-muted">
 									{outcome.description[locale]}
 								</p>
 							</li>
@@ -263,14 +271,14 @@
 		enquiry button is not one.
 	-->
 	{#if compliance?.length}
-		<section class="border-hairline border-t bg-surface-2 py-14 md:py-16">
+		<section class="bg-sea-tint py-16 md:py-20">
 			<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
-				<div class="border-hairline max-w-3xl border p-6 md:p-8">
-					<h2 class="font-mono text-[11px] tracking-[0.24em] text-foreground uppercase">
+				<div class="b-panel max-w-3xl bg-paper">
+					<h2 class="font-display text-xs font-bold tracking-[0.22em] text-brand uppercase">
 						{m.program_page_complianceHeading()}
 					</h2>
 					{#each compliance as paragraph (paragraph)}
-						<p class="mt-4 text-sm leading-relaxed text-foreground-subtle">{paragraph}</p>
+						<p class="mt-4 text-sm leading-[1.8] text-foreground-muted">{paragraph}</p>
 					{/each}
 				</div>
 			</div>
@@ -282,13 +290,16 @@
 		"this comes from / connects to / leads to" as a single thought about where they are in the
 		journey, rather than three unrelated link lists.
 	-->
-	<section class="border-hairline border-t py-14 md:py-20">
+	<section class="bg-sea-tint py-16 md:py-20">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
-				<div class="grid gap-10 md:grid-cols-3">
+				<!-- Column count follows the row's actual length. `previousStep` only exists where a
+				     programme has a feeder (Project Studio today), so a fixed 3-up left a third of
+				     the row empty on every other programme page. -->
+				<div class="grid gap-4 md:gap-5 {previousStep ? 'md:grid-cols-3' : 'md:grid-cols-2'}">
 					{#if previousStep}
-						<div>
-							<h2 class="font-mono text-[11px] tracking-[0.24em] text-foreground-subtle uppercase">
+						<div class="b-card b-card-on-tint">
+							<h2 class="font-display text-xs font-bold tracking-[0.2em] text-brand uppercase">
 								{m.program_page_previousStepHeading()}
 							</h2>
 							<a
@@ -303,8 +314,8 @@
 						</div>
 					{/if}
 
-					<div>
-						<h2 class="font-mono text-[11px] tracking-[0.24em] text-foreground-subtle uppercase">
+					<div class="b-card b-card-on-tint">
+						<h2 class="font-display text-xs font-bold tracking-[0.2em] text-brand uppercase">
 							{m.program_page_academicLinkHeading()}
 						</h2>
 						<ul class="mt-4 space-y-2">
@@ -324,8 +335,8 @@
 						</ul>
 					</div>
 
-					<div>
-						<h2 class="font-mono text-[11px] tracking-[0.24em] text-foreground-subtle uppercase">
+					<div class="b-card b-card-on-tint">
+						<h2 class="font-display text-xs font-bold tracking-[0.2em] text-brand uppercase">
 							{m.program_page_nextStepHeading()}
 						</h2>
 						<ul class="mt-4 space-y-2">
@@ -350,34 +361,37 @@
 	</section>
 
 	<!-- Tuition + enquiry CTA. Price is by enquiry site-wide (plan §5), so this states that. -->
-	<section class="border-hairline border-t bg-surface-4 py-14 md:py-20">
+	<section class="bg-background py-20 md:py-28">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
-			<!-- Non-band tokens: `bg-surface-4` is #e8edf3, a NEAR-WHITE surface (app.css:169 still
-			     carries the "was #0a0c10" note from when it was the deepest DARK band). The band-*
-			     family is white-ink-on-dark by construction, so `text-band-foreground` measured
-			     1.18:1 here and `text-band-foreground/70` 1.12:1. The eyebrow moves to the SOLID
-			     `foreground-muted` rather than keeping a /70 alpha — app.css:178 introduces that
-			     token as exactly "the solid replacement for text-white/60". Measured after:
-			     heading 15.07:1, eyebrow 8.76:1, border/fill and focus ring 5.13:1.
-			     See docs/DESIGN-TOKENS.md §2. -->
+			<!-- Non-band tokens throughout: this is a LIGHT ground, and the band-* family is
+			     white-ink-on-dark by construction (`text-band-foreground` measured 1.18:1 when this
+			     section was `bg-surface-4`). The eyebrow uses solid `--brand` rather than any alpha
+			     rung — app.css §4 is explicit that brand text is written full-opacity.
+			     Measured on white: heading 12.32:1, eyebrow 7.27:1, CTA label on fill 7.27:1. -->
 			<Reveal y={24}>
-				<p class="font-mono text-[11px] tracking-[0.24em] text-foreground-muted uppercase">
-					{m.program_page_tuitionByEnquiry()}
-				</p>
-				<h2 class="mt-5 max-w-2xl text-2xl font-light text-foreground md:text-4xl">
-					{m.program_page_ctaHeading()}
-				</h2>
-				<!-- `registerHref` localizes internally (see $lib/program-cta), so it is passed through
+				<div class="b-panel">
+					<p class="font-display text-xs font-bold tracking-[0.22em] text-brand uppercase">
+						{m.program_page_tuitionByEnquiry()}
+					</p>
+					<h2
+						class="b-display mt-5 max-w-2xl text-[1.75rem] font-extrabold text-sea-900 md:text-[2.5rem]"
+					>
+						{m.program_page_ctaHeading()}
+					</h2>
+					<!-- `registerHref` localizes internally (see $lib/program-cta), so it is passed through
 				     bare — wrapping it in `localizeHref` again double-prefixes on /zh. Every other
 				     call site in the repo does the same. -->
-				<a
-					href={registerHref(program.slug)}
-					onclick={onRegisterClick}
-					class="group mt-8 inline-flex items-center gap-2.5 border border-action bg-action px-6 py-3.5 text-sm font-medium text-action-foreground transition-colors duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-				>
-					<span>{m.program_page_ctaButton()}</span>
-					<ArrowRight class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-				</a>
+					<a
+						href={registerHref(program.slug)}
+						onclick={onRegisterClick}
+						class="group mt-8 inline-flex items-center gap-2.5 rounded-sm border border-action bg-action px-7 py-3.5 text-sm font-semibold text-action-foreground transition-colors duration-200 hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:translate-y-px"
+					>
+						<span>{m.program_page_ctaButton()}</span>
+						<ArrowRight
+							class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+						/>
+					</a>
+				</div>
 			</Reveal>
 		</div>
 	</section>

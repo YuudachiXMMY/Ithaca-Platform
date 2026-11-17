@@ -19,7 +19,7 @@
 </svelte:head>
 
 <section class="flex min-h-[70dvh] flex-col items-center justify-center px-6 text-center">
-	<p class="mb-4 font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+	<p class="mb-4 font-display text-xs font-bold tracking-[0.28em] text-brand-bright uppercase">
 		{page.status}
 	</p>
 	<h1 class="mb-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">

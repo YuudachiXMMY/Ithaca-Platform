@@ -58,7 +58,7 @@
 	// padding.
 </script>
 
-<section class="bg-surface-0" aria-label={m.home_mission_eyebrow()}>
+<section class="bg-background" aria-label={m.home_mission_eyebrow()}>
 	<!-- Mission showcase: the empowerment statement, relocated here from the hero band as the
 	     page's single <h1>, set in soft brand light. Large light display echoes the Cavafy quote in
 	     the QuoteBand above so the mission reads as the journey's destination. SSR-safe; Reveal is
@@ -66,19 +66,20 @@
 	<div class="mission-aura">
 		<div class="mx-auto max-w-[1100px] px-5 pt-20 pb-10 sm:px-8 md:px-[6vw] md:pt-28 md:pb-14">
 			<Reveal y={24}>
-				<p class="font-display text-xs tracking-[0.28em] text-brand-bright uppercase">
+				<p class="font-display text-xs font-bold tracking-[0.24em] text-brand uppercase">
 					{m.home_mission_eyebrow()}
 				</p>
+				<!-- Was `font-light`. The page's single <h1> was also its lightest display text, which
+				     is the same emphasis inversion SectionHeader was built to fix — and the brochure
+				     sets its cover statement at 900. The clamp is unchanged: 2.5→4.5rem is 1.8x, inside
+				     the 2.5x ceiling WCAG 1.4.4 needs for zoom to still reach 200%. -->
 				<h1
-					class="mt-6 max-w-[28ch] text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-light tracking-tight text-foreground"
+					class="b-display mt-6 max-w-[26ch] text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-bold tracking-tight text-sea-900"
 				>
 					{m.home_hero_empowerment()}
 				</h1>
-				<div
-					class="mt-8 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-					aria-hidden="true"
-				></div>
-				<p class="mt-8 max-w-xl text-base leading-relaxed text-foreground-muted md:text-lg">
+				<div class="b-rule mt-8 w-28" aria-hidden="true"></div>
+				<p class="mt-8 max-w-xl text-lg leading-[1.8] text-foreground-muted">
 					{m.home_mission_lede()}
 				</p>
 			</Reveal>
@@ -86,14 +87,15 @@
 	</div>
 
 	<!-- Our Approach: a short header so the three pillars no longer start cold. -->
-	<div class="mx-auto max-w-[1400px] px-5 pt-6 text-center sm:px-8 md:px-[6vw] md:pt-8">
+	<div class="mx-auto max-w-[1400px] px-5 pt-10 text-center sm:px-8 md:px-[6vw] md:pt-14">
 		<Reveal y={20}>
-			<p class="font-display text-xs tracking-[0.28em] text-brand-bright uppercase">
+			<p class="font-display text-xs font-bold tracking-[0.24em] text-brand uppercase">
 				{m.home_mission_approachEyebrow()}
 			</p>
-			<p class="mx-auto mt-3 max-w-md text-lg font-medium text-foreground/80">
+			<p class="mx-auto mt-4 max-w-lg text-lg leading-[1.7] font-medium text-foreground">
 				{m.home_mission_approachIntro()}
 			</p>
+			<div class="b-rule mx-auto mt-6 w-20" aria-hidden="true"></div>
 		</Reveal>
 	</div>
 
@@ -101,9 +103,12 @@
 		<div
 			class="mx-auto grid max-w-[1400px] items-center gap-6 px-5 py-10 sm:px-8 md:grid-cols-2 md:gap-12 md:px-[6vw] md:py-14"
 		>
-			<!-- Image -->
+			<!-- Image. Rounded and hairlined to match the brochure's `.mc-photo`, so a photograph
+			     reads as a framed plate rather than a bleed into the page. -->
 			<div
-				class="relative aspect-[16/10] overflow-hidden md:aspect-[3/2] {i % 2 === 1
+				class="relative aspect-[16/10] overflow-clip rounded-card border border-sea-card-line md:aspect-[3/2] {i %
+					2 ===
+				1
 					? 'md:order-2'
 					: ''}"
 			>
@@ -119,11 +124,14 @@
 			<!-- Text -->
 			<div class={i % 2 === 1 ? 'md:order-1' : ''}>
 				<Reveal y={24}>
-					<h2 class="text-2xl font-bold text-foreground md:text-3xl">
+					<p class="font-display text-xs font-bold tracking-[0.2em] text-brand tabular-nums">
+						{String(i + 1).padStart(2, '0')}
+					</p>
+					<h2 class="b-display mt-3 text-2xl font-extrabold text-sea-900 md:text-3xl">
 						{pillar.title()}
 					</h2>
-					<div class="mt-4 h-px w-10 bg-brand/30" aria-hidden="true"></div>
-					<p class="mt-4 max-w-md text-base leading-relaxed text-foreground-muted">
+					<div class="b-rule mt-5 w-16" aria-hidden="true"></div>
+					<p class="mt-5 max-w-md text-base leading-[1.8] text-foreground-muted">
 						{pillar.description()}
 					</p>
 				</Reveal>
@@ -151,11 +159,21 @@
 		></div>
 		<div class="relative mx-auto w-full max-w-[1400px] px-5 pb-10 sm:px-8 md:px-[6vw] md:pb-12">
 			<Reveal y={24}>
-				<h2 class="max-w-[20ch] text-2xl font-bold text-band-foreground md:text-3xl">
+				<p class="font-display text-xs font-bold tracking-[0.2em] text-band-brand tabular-nums">
+					03
+				</p>
+				<h2
+					class="b-display mt-3 max-w-[20ch] text-2xl font-extrabold text-band-foreground md:text-3xl"
+				>
 					{CLOSING_PILLAR.title()}
 				</h2>
-				<div class="mt-4 h-px w-10 bg-band-brand/40" aria-hidden="true"></div>
-				<p class="mt-4 max-w-md text-base leading-relaxed text-band-foreground-muted">
+				<!-- Band side: the page-ground gradient would vanish here, so the rule is the band's
+				     own brand tone. 7.85:1 on navy-900. -->
+				<div
+					class="mt-5 h-[3px] w-16 rounded-sm bg-gradient-to-r from-band-brand to-band-brand/20"
+					aria-hidden="true"
+				></div>
+				<p class="mt-5 max-w-md text-base leading-[1.8] text-band-foreground-muted">
 					{CLOSING_PILLAR.description()}
 				</p>
 			</Reveal>

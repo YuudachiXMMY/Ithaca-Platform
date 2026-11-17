@@ -73,11 +73,58 @@
 	--navy-700: #14325c; /* raised plane inside a band; band hairlines */
 	--navy-500: #2b4c7e; /* informational blue on light (8.61:1 on white) */
 
-	/* Teal — the single accent (§8.1 "one accent"). */
+	/* Teal — WAS the single accent (§8.1 "one accent") until 2026-11-17.
+	   The ramp is KEPT because three consumers read these values outside CSS and
+	   do not follow a semantic-token edit: `og/render.ts` (satori has no cascade),
+	   `trike-geometry.ts` / `EVSceneContents.svelte` / `FatLine.svelte` (three.js
+	   materials take literals). The semantic tokens in §4 no longer point here —
+	   see the SEA block below for why. */
 	--teal-600: #0b6e70; /* THE teal that works on white: 6.04:1 text, 6.04:1 under white */
 	--teal-500: #0f8b8d; /* 4.12:1 on white — GRAPHICS ONLY, never text */
 	--teal-300: #5fc3c4; /* the teal for dark bands: 7.94:1 on navy-900 */
 	--teal-100: #d9f1f1; /* band chips / strongest band brand tone */
+
+	/* ----------------------------------------------------------------------
+	   Sea — the brand blue of the 2026-11 brochure, and the accent this site
+	   now runs on (owner direction 2026-11-17; docs/DECISIONS.md).
+
+	   WHY THE SWITCH. §8.2's accent was teal. The current brand artefact —
+	   `伊萨卡家族学院_2027-学院手册.html`, revised through V5 in 2026-11 —
+	   contains NO teal at all: it is built on two blues, `--sea #1C5A8C` and
+	   `--navy #272F6B`, used together as a gradient on every piece of section
+	   furniture. A site in teal-green beside a brochure in blue is a brand
+	   inconsistency, not two valid takes.
+
+	   The swap is CHEAP and REVERSIBLE precisely because §4's semantic layer
+	   exists: `--brand`/`--action` are aliases, so ~230 utility occurrences
+	   follow a one-line edit. To revert, point §4 back at the teal ramp above;
+	   nothing else needs touching.
+
+	   CONTRAST IMPROVES ACROSS THE BOARD — every value below was computed the
+	   same way as the rest of this file (WCAG 2.x relative luminance, sRGB), and
+	   the ones that replace a teal are compared against it:
+	     sea-700 vs teal-600 on white   7.27:1 vs 6.04:1   (the AA floor gains 1.23)
+	     sea-800 vs teal-700 on white  10.02:1 vs 8.83:1   (hover only deepens)
+	     sea-300 vs teal-300 on navy    7.85:1 vs 7.94:1   (−0.09, both well clear)
+	     sea-100 vs teal-100 on navy   12.99:1 vs 14.00:1  (−1.01, both AAA)
+	   So no assertion that passed on teal can fail on sea. */
+	--sea-900: #272f6b; /* the brochure's `--navy`. 12.32:1 on white — display headings
+	                       and the far end of the brand gradient. NOT --navy-900: that
+	                       is the dark BAND surface and is 3 shades deeper. */
+	--sea-800: #15456b; /* 10.02:1 on white — the hover/emphatic tone */
+	--sea-700: #1c5a8c; /* the brochure's `--sea`. THE brand blue: 7.27:1 as text on
+	                       white, and 7.27:1 under white as a CTA fill */
+	--sea-500: #3e86be; /* 3.92:1 on white — GRAPHICS ONLY, never text */
+	--sea-300: #8fb7dc; /* the sea for dark bands: 7.85:1 on navy-900, and it carries
+	                       ink at 8.43:1 when used as a band CTA fill */
+	--sea-100: #d7e6f4; /* band chips / strongest band brand tone. 12.99:1 on navy-900 */
+
+	/* The brochure's three paper tints, which are what make it read light. Ink
+	   clears AAA on all three (16.9 / 16.6 / 15.8:1). */
+	--paper: #fcfcfd; /* the brochure's page ground */
+	--sea-tint: #eff4f8; /* `--tint2` — the card / panel ground */
+	--sea-tint-strong: #e4edf4; /* `--tint` — the strongest wash, for pull-quotes */
+	--sea-card-line: #d9e2ec; /* `--cardline` — 1.45:1, DECORATIVE card edge only */
 
 	/* Amber — badges and shapes only. §8.2: "amber is never used for body text".
 	   The ban is arithmetic, not taste: amber-500 is 2.03:1 on white and
@@ -194,31 +241,32 @@
 	/* Brand. The dark system's discipline was "--brand for lines/icons/numbers,
 	   --brand-bright for text, full opacity only". That discipline survives the
 	   inversion but "bright" now means HIGHER CONTRAST AGAINST THE SURFACE, not
-	   lighter — on a light ground the legible teal is the dark one.
-	   --brand is safe for BOTH text (6.04:1) and graphics; --brand-bright
-	   (8.83:1) is the emphatic tone for eyebrows/labels/small caps.
-	   Opacity discipline still applies, and the new numbers are HARSHER than the
-	   old cerulean ones this comment used to quote (3.9 / 2.8 were #3e8fc7
-	   figures and are wrong for teal): on white, brand/90 = 4.88:1 (the AA floor,
-	   0.38 of margin), brand/80 = 3.98 (large text only), brand/70 = 3.24
-	   (graphics only — 0.24 over the 3:1 floor, not "comfortable"), brand/50 =
-	   2.22 (decorative only). brand TEXT must be full-opacity. */
-	--brand: var(--teal-600); /* was #3e8fc7 */
-	--brand-bright: var(--teal-700); /* was #5aa6db */
-	--brand-graphic: var(--teal-500); /* NEW — 3.5–4.1:1: hairlines/fills, never text */
+	   lighter — on a light ground the legible blue is the dark one.
+	   --brand is safe for BOTH text (7.27:1) and graphics; --brand-bright
+	   (10.02:1) is the emphatic tone for eyebrows/labels/small caps.
 
-	/* CTA. White on teal-600 is 6.04:1; hover deepens to 8.83:1, so contrast
+	   Opacity discipline still applies, and because sea is LIGHTER than the teal
+	   it replaces, every opacity rung gains margin rather than losing it. On
+	   white: brand/90 = 5.95:1 (clears AA with 1.45 of margin, where teal/90 had
+	   0.38), brand/80 = 4.85 (now clears AA for normal text, where teal/80 was
+	   large-text-only), brand/70 = 3.92 (large text / graphics), brand/50 = 2.60
+	   (decorative only). brand TEXT is still written full-opacity by convention —
+	   the rungs are documented so a reviewer can check one, not so they get used. */
+	--brand: var(--sea-700); /* was var(--teal-600), before that #3e8fc7 */
+	--brand-bright: var(--sea-800); /* was var(--teal-700), before that #5aa6db */
+	--brand-graphic: var(--sea-500); /* 3.92:1: hairlines/fills, never text */
+
+	/* CTA. White on sea-700 is 7.27:1; hover deepens to 10.02:1, so contrast
 	   only ever improves on interaction.
-	   NOTE — on a light ground there is exactly one teal that both carries text
-	   at 4.5:1 and takes white text at 4.5:1, so --brand and --action have
-	   COLLAPSED onto the same value (they were #3e8fc7 vs #2a6ca8 before the
-	   inversion). All 14 `bg-action` CTAs pair it with `outline-brand`, so the
-	   focus ring is now the same hue as the fill it surrounds (1.00:1). That
+	   NOTE — --brand and --action remain COLLAPSED onto the same value (they were
+	   #3e8fc7 vs #2a6ca8 before the inversion, then both teal-600, now both
+	   sea-700). All 14 `bg-action` CTAs pair it with `outline-brand`, so the
+	   focus ring is the same hue as the fill it surrounds (1.00:1). That
 	   still satisfies WCAG 1.4.11 — but ONLY because `outline-offset-2` leaves a
-	   2px gap of page background, and teal-600 vs white is 6.04:1. DO NOT remove
+	   2px gap of page background, and sea-700 vs white is 7.27:1. DO NOT remove
 	   the offset from those call sites. See docs/DESIGN-TOKENS.md §3.0 R-FILL. */
-	--action: var(--teal-600); /* was #2a6ca8 */
-	--action-hover: var(--teal-700); /* was #215c93 */
+	--action: var(--sea-700); /* was var(--teal-600), before that #2a6ca8 */
+	--action-hover: var(--sea-800); /* was var(--teal-700), before that #215c93 */
 	--action-foreground: var(--white); /* NEW — made explicit; used to be implicit */
 
 	/* ======================================================================
@@ -253,14 +301,14 @@
 	   The figure this comment used to print was the rejected #5a7296 draft's —
 	   see the note at --band-rule-strong above. */
 	--band-border-strong: var(--band-rule-strong);
-	--band-brand: var(--teal-300); /* 7.94:1 — brand text/lines on a band */
-	--band-brand-strong: var(--teal-100); /* 14.00:1 */
+	--band-brand: var(--sea-300); /* 7.85:1 — brand text/lines on a band */
+	--band-brand-strong: var(--sea-100); /* 12.99:1 */
 
-	/* A teal-600 button on navy-900 has a 2.74:1 *boundary* against the band and
-	   fails WCAG 1.4.11. On a band the CTA therefore inverts too: teal-300 fill
-	   (7.94:1 boundary) carrying ink text (8.52:1). */
-	--band-action: var(--teal-300);
-	--band-action-hover: var(--teal-100);
+	/* A sea-700 button on navy-900 has a 2.26:1 *boundary* against the band and
+	   fails WCAG 1.4.11. On a band the CTA therefore inverts too: sea-300 fill
+	   (7.85:1 boundary) carrying ink text (8.43:1). */
+	--band-action: var(--sea-300);
+	--band-action-hover: var(--sea-100);
 	--band-action-foreground: var(--ink);
 
 	/* ======================================================================
@@ -372,6 +420,21 @@
 	--color-teal-500: var(--teal-500);
 	--color-teal-300: var(--teal-300);
 	--color-teal-100: var(--teal-100);
+
+	/* Sea — the brochure's brand ramp (see §1). Exposed so the section furniture
+	   below can be spelled as utilities (`text-sea-900`, `bg-sea-tint`) rather
+	   than arbitrary values, and so `from-sea-700 to-sea-900` composes the brand
+	   gradient inline where a component needs a one-off. */
+	--color-sea-900: var(--sea-900);
+	--color-sea-800: var(--sea-800);
+	--color-sea-700: var(--sea-700);
+	--color-sea-500: var(--sea-500);
+	--color-sea-300: var(--sea-300);
+	--color-sea-100: var(--sea-100);
+	--color-paper: var(--paper);
+	--color-sea-tint: var(--sea-tint);
+	--color-sea-tint-strong: var(--sea-tint-strong);
+	--color-sea-card-line: var(--sea-card-line);
 	--color-amber-800: var(--amber-800);
 	--color-amber-600: var(--amber-600);
 	--color-amber-500: var(--amber-500);
@@ -593,9 +656,236 @@ body::before {
 	background-size: 256px;
 }
 
+/* ==========================================================================
+   SECTION FURNITURE — the 2026-11 brochure's section language, ported.
+
+   THE PROBLEM THIS SOLVES. Before 2026-11-17 the site had no shared way to say
+   "a new section starts here". Sections were told apart only by alternating
+   their background between white and one of the four mist rungs, which on a
+   light system is a 1–3% difference — so on a 9000px homepage eleven distinct
+   blocks read as one undifferentiated scroll, and the only things that DID
+   stand out were four near-black panels. The owner's direction (2026-11-17) was
+   the opposite of what was there: make each block unmistakable, WITHOUT heavy
+   colour.
+
+   The brochure had already solved exactly this, and its revision history shows
+   the same two moves in the same order — V3 "区块卡片化" gave every block a
+   tinted card with a brand gradient down its leading edge, and V4/V5 then took
+   the one dark page LIGHT. These classes are that solution, in CSS.
+
+   WHY A CLASS AND NOT UTILITIES. Each of these is 4–8 declarations including a
+   pseudo-element; as utilities that is a 12-class soup repeated at ~40 call
+   sites, and the ::before cannot be expressed at all without arbitrary variants.
+
+   WHY `@layer components` AND NOT UNLAYERED, like most rules in this file.
+   Because a call site must be able to say `.b-card p-8` and get 8. Unlayered
+   rules BEAT every `@layer utilities` rule regardless of specificity — that is
+   exactly why the CJK block further down is deliberately unlayered, and it is
+   the property we do NOT want here. Written unlayered, `.b-card`'s padding
+   silently wins over any `p-*` a component writes, and the only way out is
+   `!important` at the call site. In `components` (which Tailwind's own
+   `@import` orders before `utilities`) a utility overrides a single property
+   and everything else in the class still applies. Keep these inside the layer.
+   ========================================================================== */
+
+:root {
+	/* The brochure's signature: its two blues as one gradient. Every piece of
+	   section furniture below draws from these two, which is what makes a card
+	   edge, a rule and a numeral badge read as one family. */
+	--brand-gradient: linear-gradient(180deg, var(--sea-700) 0%, var(--sea-900) 100%);
+	--brand-gradient-h: linear-gradient(
+		90deg,
+		var(--sea-700) 0%,
+		var(--sea-900) 55%,
+		transparent 100%
+	);
+}
+
+@layer components {
+	/* The section card. A tinted ground + hairline + a 4px brand gradient down the
+	   leading edge — the brochure's `.card` (V3), which is the single move that
+	   makes blocks legible as blocks.
+
+	   Radius is the literal 12px rather than var(--radius-card): that token is
+	   declared inside `@theme inline`, where Tailwind inlines the EXPRESSION into
+	   each utility, so reading it back through var() here is not guaranteed.
+	   `rounded-card` (the utility) and this literal are the same 12px by hand. */
+	.b-card {
+		position: relative;
+		/* `clip`, not `hidden`: both contain the ::before, but `clip` does not create
+		   a scroll container, so a focused control inside a card can still be
+		   scrolled into view by the page rather than inside the card. In the floor
+		   since Chromium 90 / Safari 16 (AGENTS.md). */
+		overflow: clip;
+		background: var(--sea-tint);
+		border: 1px solid var(--sea-card-line);
+		border-radius: 12px;
+		/* Leading padding clears the 4px edge; the rest is the brochure's ratio. */
+		padding: 1.75rem 1.75rem 1.875rem 2.25rem;
+	}
+	.b-card::before {
+		content: '';
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: 0;
+		inline-size: 4px;
+		background: var(--brand-gradient);
+	}
+	@media (min-width: 768px) {
+		.b-card {
+			padding: 2.25rem 2.5rem 2.375rem 3rem;
+		}
+	}
+
+	/* A card that sits ON a tinted section rather than on the page: it flips to the
+	   paper ground so it still lifts off what is behind it. Same inversion rule the
+	   `--card-bg` comment states in §4. */
+	.b-card-on-tint {
+		background: var(--paper);
+	}
+
+	/* The leading brand edge on its own, for a card whose content must reach the
+	   border — a photograph, a table, a map. `.b-card` cannot be used there because
+	   its padding is what clears the edge; this gives the same 4px mark to a
+	   container that supplies its own spacing. The host needs `position: relative`
+	   and a clip, both of which `.b-card-media` below sets. */
+	.b-edge::before {
+		content: '';
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: 0;
+		inline-size: 4px;
+		background: var(--brand-gradient);
+		z-index: 2;
+	}
+
+	/* The media card — the brochure's `.mcard`. Same family as `.b-card`, but the
+	   padding moves to an inner element so a photograph can sit flush to the top
+	   and side borders. */
+	.b-card-media {
+		position: relative;
+		overflow: clip;
+		background: var(--paper);
+		border: 1px solid var(--sea-card-line);
+		border-radius: 12px;
+	}
+
+	/* The panel — the same language at section scale (the brochure's `.panel` /
+	   `.bigbox`), for a block that wraps other content rather than being a leaf. */
+	.b-panel {
+		position: relative;
+		overflow: clip;
+		background: var(--sea-tint);
+		border: 1px solid var(--sea-card-line);
+		border-radius: 20px;
+		padding: 2rem 1.75rem 2.25rem 2.25rem;
+	}
+	.b-panel::before {
+		content: '';
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: 0;
+		inline-size: 5px;
+		background: var(--brand-gradient);
+	}
+	@media (min-width: 768px) {
+		.b-panel {
+			padding: 3rem 3.25rem 3.25rem 3.75rem;
+		}
+	}
+
+	/* The section rule — the brochure's `.sec-rule`. A gradient that starts solid
+	   at the text edge and dissolves, so it reads as a brand mark rather than a
+	   divider line. Decorative: every call site is aria-hidden or a ::before. */
+	.b-rule {
+		block-size: 3px;
+		border-radius: 2px;
+		background: var(--brand-gradient-h);
+	}
+
+	/* The outlined section numeral — the brochure's `.sec .num`. Transparent fill
+	   with a stroked outline, so a 1-2 character ordinal can be set very large
+	   without adding visual weight. `-webkit-text-stroke` is prefix-only but
+	   universally supported (it predates the floor by a decade); where it is
+	   somehow absent the text simply renders transparent, so a `color` floor is
+	   declared first for that case to degrade to a visible, tinted numeral.
+
+	   The stroke is sea-500, not sea-300. Measured on the tinted section ground
+	   the numerals mostly sit on, sea-300 is 1.90:1 — present in a screenshot,
+	   invisible on a real screen. sea-500 is 3.54:1 there and 3.92:1 on white,
+	   clearing the 3:1 floor WCAG 1.4.11 sets for a non-text graphic. It is
+	   decorative and aria-hidden either way, but an ornament nobody can see is
+	   just dead weight. */
+	.b-numeral {
+		font-family: var(--font-stack-display);
+		font-weight: 800;
+		line-height: 0.78;
+		letter-spacing: -0.02em;
+		color: var(--sea-500);
+	}
+	@supports (-webkit-text-stroke: 1px red) {
+		.b-numeral {
+			color: transparent;
+			-webkit-text-stroke: 2px var(--sea-500);
+		}
+	}
+
+	/* The chip — the brochure's `.chip`. A pill that labels a card without taking
+	   a colour block. Sized in rem so it follows a user's root font-size, and with
+	   NO fixed height, per the typography guide's text-spacing rule. */
+	.b-chip {
+		display: inline-block;
+		padding: 0.2rem 0.65rem 0.25rem;
+		border: 1px solid var(--sea-card-line);
+		border-radius: 999px;
+		background: var(--paper);
+		color: var(--ink-2);
+		font-size: 0.75rem;
+		line-height: 1.5;
+		letter-spacing: 0.04em;
+		white-space: nowrap;
+	}
+	.b-chip-brand {
+		border-color: color-mix(in srgb, var(--sea-700) 28%, transparent);
+		background: var(--sea-tint);
+		color: var(--sea-700);
+	}
+	/* Floor for the chip above where color-mix is unavailable (iOS Safari < 16.2,
+	   X5): a plain card hairline. The brand ground and ink still read. */
+	@supports not (color: color-mix(in lab, red, red)) {
+		.b-chip-brand {
+			border-color: var(--sea-card-line);
+		}
+	}
+
+	/* The pull-quote / highlight block — the brochure's `.hl` and `.qcard`. A
+	   leading brand edge WITHOUT the full card treatment, for a line that needs
+	   emphasis inside running copy. */
+	.b-quote {
+		border-inline-start: 3px solid var(--sea-700);
+		background: var(--paper);
+		border-radius: 0 10px 10px 0;
+		padding: 1.125rem 1.5rem 1.25rem;
+	}
+}
+
+/* CJK display weight. The Latin faces are variable and reach 800 honestly, but
+   the self-built Noto Sans SC subset ships THREE static weights (300/400/700 —
+   scripts/build-cjk-subset.ts), so a Chinese heading cannot go heavier than 700
+   and reads lighter than the English beside it at the same nominal weight.
+
+   The brochure hit this too and solved it the same way: a hairline stroke in
+   the text's own colour, which thickens the stem without shifting the hue or
+   the metrics. Scoped to :lang(zh) because the Latin faces need no help, and
+   kept at 0.3px — enough to match 700 against Manrope 800, below the point
+   where counters start to fill in at body sizes. */
+:lang(zh) .b-display {
+	-webkit-text-stroke: 0.3px currentColor;
+}
+
 /* Skip-to-content for keyboard navigation. Solid CTA fill + its own foreground
-   token: white on teal-600 = 6.04:1. Previously brand fill + --foreground-dark,
-   which on the new palette would be ink on teal-600 = 2.94:1. */
+   token: white on sea-700 = 7.27:1. Previously brand fill + --foreground-dark,
+   which on the new palette would be ink on sea-700 = 2.44:1. */
 .skip-to-content {
 	position: absolute;
 	top: -100%;

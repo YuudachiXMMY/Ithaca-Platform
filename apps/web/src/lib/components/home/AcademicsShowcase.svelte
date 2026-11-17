@@ -37,18 +37,19 @@
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
-<section class="bg-background py-14 md:py-20" aria-labelledby="home-academics-heading">
+<section class="bg-background py-20 md:py-28" aria-labelledby="home-academics-heading">
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={24}>
 			<SectionHeader
 				id="home-academics-heading"
+				index="02"
 				heading={m.home_academics_heading}
 				sub={m.home_academics_subheading}
 			>
 				{#snippet action()}
 					<a
 						href={localizeHref('/academics')}
-						class="group inline-flex items-center gap-2 text-sm font-medium text-brand-bright transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+						class="group inline-flex items-center gap-2 text-sm font-semibold text-brand transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 					>
 						<span>{m.home_academics_viewAll()}</span>
 						<ArrowRight
@@ -58,19 +59,21 @@
 				{/snippet}
 			</SectionHeader>
 
-			<ul class="bg-hairline mt-10 grid gap-px md:grid-cols-2 lg:grid-cols-4">
+			<!-- Separated cards rather than a hairline grid: see JourneyStrip for why the rules
+			     made four tracks read as one table instead of four doors. -->
+			<ul class="mt-10 grid gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-4">
 				{#each TRACKS as track (track.href)}
-					<li class="bg-background">
+					<li>
 						<a
 							href={localizeHref(track.href)}
-							class="group flex h-full flex-col p-6 transition-colors duration-200 hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand"
+							class="b-card group flex h-full flex-col transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-brand/35 hover:shadow-[0_6px_20px_-8px_rgba(28,90,140,0.28)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 						>
-							<h3 class="text-lg font-bold text-foreground">{track.label()}</h3>
-							<p class="mt-3 grow text-sm leading-relaxed text-foreground-subtle">
+							<h3 class="b-display text-lg font-extrabold text-sea-900">{track.label()}</h3>
+							<p class="mt-3 grow text-[0.9375rem] leading-[1.75] text-foreground-muted">
 								{track.line()}
 							</p>
 							<ArrowRight
-								class="mt-5 h-4 w-4 text-brand-bright transition-transform duration-200 group-hover:translate-x-1"
+								class="mt-6 h-4 w-4 text-brand transition-transform duration-200 group-hover:translate-x-1"
 								aria-hidden="true"
 							/>
 						</a>
