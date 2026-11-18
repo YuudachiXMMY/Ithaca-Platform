@@ -100,16 +100,16 @@
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
-<section class="bg-surface-1" aria-label={m.home_highlights_ariaLabel()}>
+<section class="bg-sea-tint" aria-label={m.home_highlights_ariaLabel()}>
 	<div class="px-5 sm:px-8 md:px-[6vw]">
-		<div class="border-b border-border pt-10 pb-4 md:pt-16 md:pb-3">
-			<SectionHeader heading={m.home_highlights_heading}>
+		<div class="pt-20 pb-8 md:pt-28 md:pb-10">
+			<SectionHeader index="06" heading={m.home_highlights_heading}>
 				{#snippet action()}
 					<!-- The supporting line rides in `action`, not `sub`: on this band it has always sat
 					     opposite the heading rather than under it, and it is hidden below md where that
 					     arrangement has no room. -->
 					<p
-						class="hidden max-w-xs text-right text-xs leading-relaxed text-foreground-subtle md:block"
+						class="hidden max-w-xs text-right text-sm leading-relaxed text-foreground-subtle md:block"
 					>
 						{m.home_highlights_subheading()}
 					</p>
@@ -130,11 +130,15 @@
 		role="group"
 		tabindex="0"
 		aria-label={m.home_highlights_heading()}
-		class="grid grid-cols-2 gap-[2px] px-5 py-2 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand sm:px-8 md:h-[min(70vh,560px)] md:snap-x md:snap-proximity md:grid-cols-[520px_360px_440px_380px] md:grid-rows-[45fr_13fr_42fr] md:overflow-x-auto md:px-[6vw] md:py-0 md:pb-6"
+		class="grid grid-cols-2 gap-3 px-5 py-2 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand sm:px-8 md:h-[min(70vh,560px)] md:snap-x md:snap-proximity md:grid-cols-[520px_360px_440px_380px] md:grid-rows-[45fr_13fr_42fr] md:gap-4 md:overflow-x-auto md:px-[6vw] md:py-0 md:pb-6"
 	>
 		{#each HIGHLIGHTS as h, i (i)}
+			<!-- Each frame is its own plate: rounded, hairlined, and separated by a real gap. At
+			     `gap-[2px]` the six photographs fused into a single dark mass — the scrims each cell
+			     needs for legibility added up across a seamless wall. Spacing them costs nothing and
+			     is what lets the band read light. -->
 			<article
-				class="group relative overflow-hidden {i < 2
+				class="group relative overflow-clip rounded-card border border-sea-card-line {i < 2
 					? 'aspect-[3/4]'
 					: 'aspect-square'} md:aspect-auto md:snap-start {PLACEMENT[i]}"
 			>
@@ -196,17 +200,17 @@
 		OUTSIDE the scroll region on purpose: inside it the link would be reachable only after
 		swiping past six cards on a phone.
 	-->
-	<div class="mx-auto max-w-[1400px] px-5 pt-8 sm:px-8 md:px-[6vw]">
+	<div class="mx-auto max-w-[1400px] px-5 pt-10 pb-4 sm:px-8 md:px-[6vw]">
 		<!--
 			NON-band tokens on this link, deliberately. The cards above sit on photographs and use
-			`band-*` ink, but this link is OUTSIDE the scroll region, on the section's own
-			`bg-surface-1` ground — a light one. The first version used `text-band-brand-strong`
-			here and measured 1.13:1 (#d9f1f1 on #fafbfc); `e2e/a11y.spec.ts` caught it. See
-			docs/DESIGN-TOKENS.md §2 for the band / non-band split.
+			`band-*` ink, but this link is OUTSIDE the scroll region, on the section's own light
+			ground. The first version used `text-band-brand-strong` here and measured 1.13:1
+			(#d9f1f1 on #fafbfc); `e2e/a11y.spec.ts` caught it. See docs/DESIGN-TOKENS.md §2 for
+			the band / non-band split.
 		-->
 		<a
 			href={localizeHref('/news')}
-			class="group inline-flex items-center gap-2 text-sm font-medium text-brand-bright transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+			class="group inline-flex items-center gap-2 text-sm font-semibold text-brand transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 		>
 			<span>{m.home_highlights_viewNews()}</span>
 			<ArrowRight class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />

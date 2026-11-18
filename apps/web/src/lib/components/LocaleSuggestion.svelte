@@ -294,7 +294,7 @@
 		transition:fly={{ y: -8, duration: prefersReducedMotion.current ? 0 : 200 }}
 	>
 		<div class="flex items-start justify-between gap-3">
-			<p id="locale-suggestion-heading" class="text-base font-semibold text-foreground">
+			<p id="locale-suggestion-heading" class="b-display text-base font-bold text-sea-900">
 				{m.localeSuggest_heading({}, { locale: 'zh' })}
 			</p>
 			<button

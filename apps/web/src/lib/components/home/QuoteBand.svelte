@@ -18,27 +18,43 @@
 	];
 </script>
 
-<section class="bg-surface-0" aria-label={m.home_hero_author()}>
-	<div class="mx-auto max-w-[1100px] px-5 py-16 sm:px-8 md:px-[6vw] md:py-24">
+<!--
+	2026-11-17 — centred, with an ornament above and below.
+
+	This was four lines of 24px text in the top-left of an otherwise empty white band, which read as
+	a stray paragraph rather than the premise the mission answers. The brochure sets the same quote
+	as its cover statement: centred, generously leaded, between two short dissolving rules
+	(`.cover-orn`). That composition is what makes a quotation feel placed rather than left over,
+	and it is this page's one type moment.
+
+	The lines stay separate `<p>`s inside the blockquote: the line breaks are the poem's, not the
+	container's, and they must not reflow with the viewport.
+-->
+<section class="bg-sea-tint" aria-label={m.home_hero_author()}>
+	<div class="mx-auto max-w-[900px] px-5 py-20 text-center sm:px-8 md:px-[6vw] md:py-28">
 		<Reveal y={20}>
 			<div
-				class="mb-8 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
+				class="mx-auto h-px w-16 bg-gradient-to-r from-transparent via-brand to-transparent"
 				aria-hidden="true"
 			></div>
-			<blockquote>
+			<blockquote class="mt-10">
 				{#each quoteLines as line (line)}
 					<p
-						class="font-display text-2xl leading-[1.3] font-light tracking-tight text-foreground md:text-3xl"
+						class="font-display text-[clamp(1.375rem,2.6vw,2rem)] leading-[1.65] font-light tracking-tight text-sea-900"
 					>
 						{line}
 					</p>
 				{/each}
 				<cite
-					class="mt-6 block font-display text-xs tracking-[0.25em] text-foreground-muted uppercase not-italic"
+					class="mt-8 block font-display text-xs font-bold tracking-[0.3em] text-brand uppercase not-italic"
 				>
 					{m.home_hero_author()}
 				</cite>
 			</blockquote>
+			<div
+				class="mx-auto mt-10 h-px w-16 bg-gradient-to-r from-transparent via-brand to-transparent"
+				aria-hidden="true"
+			></div>
 		</Reveal>
 	</div>
 </section>

@@ -40,7 +40,10 @@
 >
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={24}>
-			<h2 id="results-destinations-heading" class="text-2xl font-light text-foreground md:text-4xl">
+			<h2
+				id="results-destinations-heading"
+				class="b-display text-2xl font-extrabold text-sea-900 md:text-4xl"
+			>
 				{m.results_destinations_heading()}
 			</h2>
 			<p class="mt-5 max-w-2xl text-base leading-relaxed text-foreground-subtle">
@@ -51,13 +54,13 @@
 				{#each COLUMNS as column (column.heading)}
 					{#if column.entries.length > 0}
 						<div>
-							<h3 class="font-mono text-[11px] tracking-[0.24em] text-brand uppercase">
+							<h3 class="font-display text-xs font-bold tracking-[0.24em] text-brand uppercase">
 								{column.heading}
 							</h3>
 							<ul class="mt-6 flex flex-col">
 								{#each column.entries as entry (entry.id)}
 									<li class="border-hairline border-t py-4 first:border-t-0 first:pt-0">
-										<span class="block text-base font-semibold text-foreground">
+										<span class="b-display block text-base font-bold text-sea-900">
 											{entry.institution[locale]}
 										</span>
 										{#if entry.field}

@@ -97,7 +97,8 @@
 	 * which would abut the FAQ's ground on the day the FAQ appears.
 	 */
 	const containerClass = 'mx-auto w-full max-w-[1400px] px-5 py-14 sm:px-8 md:px-[6vw] md:py-20';
-	const headingClass = 'text-2xl font-bold tracking-tight text-foreground md:text-4xl';
+	const headingClass =
+		'b-display text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.5rem]';
 </script>
 
 <Seo title={m.admissions_hero_title()} description={m.admissions_meta_description()} />
@@ -157,7 +158,7 @@
 	<AdmissionsGlance rows={calendar} />
 
 	<!-- 3. R-ADM-1 — the five steps, as a photo/rail split. -->
-	<section class="bg-surface-0">
+	<section class="bg-background">
 		<div class={containerClass}>
 			<Reveal y={24}>
 				{@render sectionHead(m.admissions_steps_title())}
@@ -171,7 +172,7 @@
 	<!-- 4. R-ADM-2 + R-ADM-3 — one section, generated from every non-closed Season. The dates and
 	     the price are fields of the same row, so they are rendered on the same card; there is no
 	     longer a separate tuition section re-listing every programme under its own heading. -->
-	<section class="bg-surface-3">
+	<section class="bg-sea-tint">
 		<div class={containerClass}>
 			<Reveal y={24}>
 				{@render sectionHead(m.admissions_calendar_title(), m.admissions_calendar_description())}
@@ -196,7 +197,7 @@
 	     empty disclosure list is worse than no section: placeholder questions would read as answers.
 	     The section appears the moment the owner supplies entries. -->
 	{#if ADMISSIONS_FAQ.length > 0}
-		<section class="bg-surface-0">
+		<section class="bg-background">
 			<div class={containerClass}>
 				<Reveal y={24}>
 					{@render sectionHead(m.admissions_faq_title())}
@@ -250,7 +251,7 @@
 	<!-- scroll-margin so the sticky header does not cover the heading when /admissions#book lands.
 	     `--spacing-nav` was removed with the design-system pass (it had zero consumers); every call
 	     site writes the arbitrary value instead. -->
-	<section id="book" class="scroll-mt-[var(--nav-h)] bg-surface-2">
+	<section id="book" class="scroll-mt-[var(--nav-h)] bg-sea-tint">
 		<div class={containerClass}>
 			<Reveal y={24}>
 				{@render sectionHead(m.admissions_book_title(), m.admissions_book_description())}

@@ -41,33 +41,33 @@
 	];
 </script>
 
-<section class="bg-surface-3 py-14 md:py-20" aria-labelledby="outcomes-heading">
+<section class="bg-background py-20 md:py-28" aria-labelledby="outcomes-heading">
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<!-- Section heading -->
 		<Reveal y={20} duration={500}>
 			<div>
 				<h2
 					id="outcomes-heading"
-					class="text-2xl font-bold tracking-tight text-foreground md:text-4xl"
+					class="b-display text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.5rem]"
 				>
 					{m.about_outcomes_heading()}
 				</h2>
-				<div
-					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-					aria-hidden="true"
-				></div>
-				<p class="mt-6 max-w-[56ch] text-base leading-relaxed text-foreground-muted">
+				<div class="b-rule mt-7" aria-hidden="true"></div>
+				<p class="mt-6 max-w-[56ch] text-base leading-[1.8] text-foreground-muted">
 					{m.about_outcomes_subtitle()}
 				</p>
 			</div>
 		</Reveal>
 
-		<!-- Featured outcomes: image cards with overlay text -->
-		<div class="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2">
+		<!-- Featured outcomes. The copy sits UNDER the photograph on the card's own ground rather
+		     than over a scrim — same move as ProgramsShowcase, same two reasons: two scrimmed
+		     rectangles side by side were the heaviest block on this page, and ink on paper is
+		     17.74:1 where white on a scrim hovers near the 4.5:1 floor. -->
+		<div class="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
 			{#each featured as outcome, i (outcome.title)}
 				<Reveal y={24} duration={500} delay={i * 80}>
-					<div class="group relative overflow-hidden">
-						<div class="relative aspect-[3/2]">
+					<div class="b-card-media b-edge group h-full">
+						<div class="relative aspect-[3/2] overflow-clip">
 							<enhanced:img
 								src={outcome.image}
 								alt={outcome.title()}
@@ -75,37 +75,34 @@
 								loading="lazy"
 								class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
 							/>
-							<!-- Gradient overlay for text legibility -->
-							<div
-								class="absolute inset-0 bg-gradient-to-t from-overlay/95 via-overlay/70 to-transparent"
-							></div>
+						</div>
 
-							<!-- Text overlay -->
-							<div class="absolute right-0 bottom-0 left-0 p-5 md:p-6">
-								<h3 class="text-lg leading-tight font-bold text-band-foreground">
-									{outcome.title()}
-								</h3>
-								<p class="mt-1.5 max-w-[48ch] text-sm leading-relaxed text-band-foreground/80">
-									{outcome.description()}
-								</p>
-							</div>
+						<div class="p-5 pl-6 md:p-6 md:pl-7">
+							<h3 class="b-display text-lg leading-tight font-extrabold text-sea-900 md:text-xl">
+								{outcome.title()}
+							</h3>
+							<p class="mt-2.5 max-w-[48ch] text-[0.9375rem] leading-[1.75] text-foreground-muted">
+								{outcome.description()}
+							</p>
 						</div>
 					</div>
 				</Reveal>
 			{/each}
 		</div>
 
-		<!-- Compact outcomes: numbered grid -->
-		<div class="mt-12 grid grid-cols-1 gap-x-10 gap-y-0 md:grid-cols-2">
+		<!-- Compact outcomes: numbered cards -->
+		<div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
 			{#each compact as outcome, i (outcome.num)}
 				<Reveal y={16} duration={400} delay={i * 60}>
-					<div class="flex gap-4 border-t border-border py-6">
-						<span class="shrink-0 pt-0.5 font-mono text-sm font-medium tracking-[0.2em] text-brand">
+					<div class="b-card flex h-full gap-4">
+						<span
+							class="shrink-0 pt-0.5 font-display text-sm font-bold tracking-[0.2em] text-brand tabular-nums"
+						>
 							{outcome.num}
 						</span>
 						<div>
-							<h3 class="text-base font-semibold text-foreground">{outcome.title()}</h3>
-							<p class="mt-1.5 text-sm leading-relaxed text-foreground-muted">
+							<h3 class="b-display text-base font-bold text-sea-900">{outcome.title()}</h3>
+							<p class="mt-2 text-sm leading-[1.75] text-foreground-muted">
 								{outcome.description()}
 							</p>
 						</div>

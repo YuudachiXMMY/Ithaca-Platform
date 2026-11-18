@@ -989,3 +989,101 @@ brand-lock。这次按要求把另一半也做了。
 为什么值得做：主入站路径是微信分享，多数访客落地时并不知道 Ithaca 是什么，而首屏除了 48px
 logo 栅格里烘着的 "Family Academy" 之外没有任何说明。一句「offer + 受众 + 地区」拿到首屏最大
 字号，引文往下退一屏，读起来是「我们是谁」→「我们凭什么这么想」。
+
+## 2026-11-17 — 全站视觉对齐 2026-11 产品手册（品牌色换血 + 区块语言）
+
+所有者给的三条要求：**每个区块要醒目、避免太重的颜色、内容不要太密、用词要有质感**，参考物是
+`02_Marketing/Brochures/产品手册/伊萨卡家族学院_2027-学院手册.html`（V5 修订）。
+
+### 品牌主色 teal → sea（手册的两支蓝）
+
+§8.2 的 accent 是 teal `#0B6E70`。**手册里一点 teal 都没有** —— 它整套建立在
+`--sea #1C5A8C` 与 `--navy #272F6B` 两支蓝上，并把两者作为渐变用在每一处区块装饰上。官网一身
+青绿、手册一身蓝，这不是两种成立的取法，是品牌不一致。
+
+换色只改 `app.css` §4 的语义层（`--brand` / `--brand-bright` / `--brand-graphic` / `--action` /
+`--action-hover` / `--band-brand*` / `--band-action*`），因为那一层本来就是别名 —— 约 230 处
+utility 跟着一行走。**要回退，把 §4 指回 teal ramp 即可，别处不用动。**
+
+`--teal-*` 色阶**保留**：`og/render.ts`（satori 没有级联）、`trike-geometry.ts` /
+`EVSceneContents.svelte` / `FatLine.svelte`（three.js 材质吃字面值）这三类消费者读的是值，不跟
+语义 token 走。
+
+对比度**全面变好**，没有任何一条断言会因此变红（算法同 `app.css` 开头声明的那套）：
+
+| 角色                          | 旧（teal） | 新（sea）   |
+| ----------------------------- | ---------- | ----------- |
+| `--brand` 白底文字            | 6.04:1     | **7.27:1**  |
+| `--brand-bright` 白底         | 8.83:1     | **10.02:1** |
+| `--band-brand` 在 navy-900 上 | 7.94:1     | 7.85:1      |
+| `--band-brand-strong`         | 14.00:1    | 12.99:1     |
+
+两处微降仍远在 AAA 之上。e2e 的 `a11y.spec.ts` + `header-contrast.spec.ts` 共 **174 条全绿**。
+
+### 区块语言：手册 V3「区块卡片化」+ V4/V5「浅色化」
+
+改版前区块之间**只靠 `bg-surface-0..4` 五档交替**来区分，而在浅色系统里那是 1–3% 的差，于是
+9000px 的首页上十一个区块读起来是一整条，真正跳出来的反而是四块近黑的面板 —— 和所有者要的
+恰好相反。
+
+手册早就解过这题，而且它自己的修订史就是答案：V3 给每个区块加了「浅底 + 细边 + 左侧品牌渐变
+竖条」的卡片，V4/V5 把唯一的深色页改成浅色。照搬成 CSS，落在 `app.css` 的 SECTION FURNITURE
+一节：`.b-card` / `.b-card-media` / `.b-edge` / `.b-panel` / `.b-rule` / `.b-numeral` / `.b-chip`
+/ `.b-quote`，外加给中文补字重的 `.b-display`。
+
+三条执行规则：
+
+1. **背景只剩两档**（`--paper` 白 / `--sea-tint`），逐区块交替。卡片底色与所在区块**反转**
+   （区块白 → 卡片 tint，区块 tint → 卡片白），这正是 §4 `--card-bg` 注释早就写下的那条规则。
+2. **照片上的文字改为照片下的文字**。首页 Programs、about 的 Outcomes / ProgramsBento / Join Us
+   原本是 `from-overlay/95` 的深色 scrim 压在照片上。那不是可读性蒙版，是「背后恰好有张照片的
+   深色矩形」，四块叠在一起就是整页最重的东西。改成照片在上、文案落在卡片自己的纸面上之后，
+   正文从贴着 4.5:1 的地板变成 17.74:1，照片也终于看得见了。
+   **真正的 scrim 一处没动** —— hero 和 MissionSection 收尾带的文字确实压在照片上，R-SCRIM 仍然
+   适用。
+3. **`@layer components`，不是无层**。这几个类必须能被调用点的 `p-8` 覆盖。无层规则**胜过**
+   `@layer utilities`（这正是本文件下面 CJK 那段**刻意**无层的原因），写成无层会让 `.b-card` 的
+   padding 吃掉任何 `p-*`，只能在调用点加 `!important` 才出得来。
+
+### 版式：把「强调与说服力倒挂」收干净
+
+11-15 那次 `SectionHeader` 修掉了首页的倒挂，但同一个毛病在别处还活着，这次一并清理：
+
+- **`font-light` 的标题全部加重**。全站 30 处 `font-light` 落在 h1/h2 上 —— 页面唯一的 `<h1>`
+  同时是页面最轻的字。引文与 lede（QuoteBand、research/ithaca-dialogues 的两处 `<p>`）**保留**
+  轻盈，那是它们该有的样子。
+- **`/programs` 的两个 `<h2>` 曾被设成 12px 小标签**，比它们底下的卡片标题还小 —— 和 11-15 记
+  下的是同一种事故。
+- **46 处 `font-mono text-[11px]` eyebrow** 改为 `font-display text-xs font-bold`：px 字号无视
+  读者的根字号，而 mono 也不是手册的 label 字体（手册用 sans + 字距）。**`Header.svelte` 与
+  `EVModel3DSection.svelte` 排除在外** —— 前者有 `nav-single-line.spec.ts` 盯着导航栏单行，后者
+  是独立的 3D 场景视觉系统。表单、微信号、邮箱这类**标识符仍然是 mono**，那是 mono 该用的地方。
+- **卡片标题统一为 `--sea-900`**，对齐手册的 `.card-head h3{color:var(--navy)}`。
+- `clamp()` 一律守住 **最大值 ≤ 最小值 × 2.5**（WCAG 1.4.4，浏览器缩放仍能到 200%）。
+
+### 内容密度
+
+区块 padding 普遍 `py-14 md:py-20` → `py-20 md:py-28`，正文行高 `leading-relaxed`(1.625) →
+`1.75–1.8`。首页因此从 9082px 长到 10952px —— **变长是故意的**，同样的信息摊开在更多留白里，
+正是「不要太密」。
+
+### 文案
+
+只动了四处，都是「屏幕上说不清楚」的地方，不是润色：
+
+- `journey_*_label` 去掉行首序号：大数字现在由组件画，标签里再带一个就是印两遍。
+- `home_results_item{1,2,3}Label`（**新增**）：首页唯一的证据区块把「奖项 / 就读 / 已获录取」三
+  类事实并排排在同一种字里。11-02 标准存在的意义就是把**已就读**和**拿到但没去**分开，而这个
+  区分当时只存在于挑字符串的人脑子里，屏幕上看不出来。
+- `journey_research_tag` 中文版原本是没翻的 `Portfolio` → `成果`。
+- `research_coCreation_tracks` 英文版后两项补成首字母大写 —— 它现在被拆成三个 chip，每一项要
+  各自成立。
+
+### 没做的，以及为什么
+
+- **深色照片 hero 一个没改。** 所有者说的「避免太重的颜色」指的是色块，不是照片；而 hero 的
+  scrim 是 `header-contrast.spec.ts` 按 `headerOnDark()` 路由表逐条采样的可读性契约。
+- **MissionSection 三支柱的构图没动。** 它 brand-lock 在 11-04 手册上，且「两行是节奏、三行是
+  模板」那条取舍本身有理由（见组件注释）。只改了字重和分隔线。
+- **`content:check` 仍然退出 1。** 那是内容方欠的四处 `TODO(content)`（`results.ts` /
+  `partners.ts`），`src/lib/content/` 这次一行没碰，与改版无关。

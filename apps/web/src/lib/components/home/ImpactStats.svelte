@@ -50,22 +50,22 @@
 </script>
 
 <section
-	class="bg-surface-4 py-20 md:py-28"
+	class="bg-sea-tint py-20 md:py-28"
 	aria-label={m.home_impact_ariaLabel()}
 	use:inview={{ threshold: 0.2 }}
 	oninview={reveal}
 >
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
-		<div class="mb-12 md:mb-16">
-			<SectionHeader heading={m.home_impact_heading} />
+		<div class="mb-10 md:mb-12">
+			<SectionHeader index="05" heading={m.home_impact_heading} />
 		</div>
-		<div class="grid grid-cols-2 gap-px overflow-hidden bg-surface-2 md:grid-cols-4">
+		<div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
 			{#each stats as stat, i (stat.key)}
 				<!-- The reveal starts at FULL opacity and animates only `transform`. Chrome excludes an
 				     `opacity: 0` element from its LCP candidates, so the old `opacity:0` start both hid
 				     the real metric and deferred the paint users perceive (LAUNCH-CHECKLIST gate). -->
 				<div
-					class="bg-surface-4 p-6 text-center md:p-10"
+					class="b-card b-card-on-tint text-center"
 					style={prefersReducedMotion.current
 						? undefined
 						: `transform:translateY(${revealed ? 0 : 24}px);transition:transform 0.8s cubic-bezier(0.33,1,0.68,1) ${i * 250}ms`}
@@ -74,18 +74,20 @@
 					     endpoints (36px → 60px), but it stops spending two rungs of the type scale on
 					     what is really a single display-numeral role — see DESIGN-TOKENS §10.4. -->
 					<p
-						class="font-display text-[clamp(2.25rem,4vw,3.75rem)] font-bold tracking-tight text-foreground tabular-nums"
+						class="font-display text-[clamp(2.25rem,4vw,3.75rem)] font-extrabold tracking-tight text-sea-900 tabular-nums"
 					>
 						{stat.value}{stat.suffix ?? ''}
 					</p>
 					<div
-						class="mx-auto mt-3 h-px w-12 bg-brand/50"
+						class="b-rule mx-auto mt-3 w-12"
 						style={prefersReducedMotion.current
 							? undefined
 							: `transform:scaleX(${revealed ? 1 : 0});transform-origin:center;transition:transform 0.5s cubic-bezier(0.33,1,0.68,1) ${i * 250 + 400}ms`}
 					></div>
-					<p class="mt-3 text-sm font-semibold text-brand-bright">{COPY[stat.key].label()}</p>
-					<p class="mt-1.5 text-xs leading-relaxed text-foreground-subtle">
+					<p class="mt-4 font-display text-xs font-bold tracking-[0.18em] text-brand uppercase">
+						{COPY[stat.key].label()}
+					</p>
+					<p class="mt-2 text-sm leading-[1.7] text-foreground-muted">
 						{COPY[stat.key].detail()}
 					</p>
 				</div>

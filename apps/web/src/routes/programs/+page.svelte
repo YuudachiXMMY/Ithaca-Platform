@@ -142,17 +142,17 @@
 			href={localizeHref(program.href)}
 			onclick={() =>
 				trackProgramCtaClick({ program: program.slug, location: 'programs_index', locale })}
-			class="group flex h-full flex-col overflow-hidden border border-border-strong bg-card-bg transition-colors duration-300 hover:border-brand focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand"
+			class="b-card-media b-edge group flex h-full flex-col transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-brand/35 hover:shadow-[0_8px_24px_-10px_rgba(28,90,140,0.3)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 		>
 			<div
-				class="relative shrink-0 overflow-hidden
+				class="relative shrink-0 overflow-clip
 					{stacked
 					? 'h-[100px] md:h-[120px]'
 					: hasImage
 						? 'h-[240px] md:h-[300px]'
 						: 'h-[180px] md:h-[220px]'}
 					{isFeatured && !stacked ? 'lg:h-[360px]' : ''}
-					{!hasImage ? 'bg-surface-4' : ''}"
+					{!hasImage ? 'bg-sea-tint' : ''}"
 			>
 				{#if hasImage}
 					<enhanced:img
@@ -161,11 +161,11 @@
 						sizes={isFeatured ? '(max-width: 768px) 100vw, 66vw' : '(max-width: 768px) 100vw, 33vw'}
 						loading={isFeatured ? 'eager' : 'lazy'}
 						fetchpriority={isFeatured ? 'high' : undefined}
-						class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+						class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
 					/>
 				{:else}
-					<!-- Photo-less card: restrained deep base with a single brand hairline at the base
-					     edge (echoes the section hairline; no off-brand color, no dot-grid). -->
+					<!-- Photo-less card: the tinted ground with a single brand hairline at its base edge
+					     (echoes the section rule; no off-brand colour, no dot-grid). -->
 					<div
 						class="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-brand via-brand/40 to-transparent"
 						aria-hidden="true"
@@ -173,9 +173,9 @@
 				{/if}
 			</div>
 
-			<div class="flex grow flex-col {stacked ? 'p-4' : 'p-5 md:p-6'}">
+			<div class="flex grow flex-col {stacked ? 'p-4 pl-5' : 'p-5 pl-6 md:p-6 md:pl-7'}">
 				<h2
-					class="leading-tight font-bold tracking-tight text-foreground
+					class="b-display leading-tight font-extrabold tracking-tight text-sea-900
 						{stacked
 						? 'mb-2 text-sm md:text-base'
 						: isFeatured
@@ -185,12 +185,10 @@
 					{TITLE[program.id]()}
 				</h2>
 
+				<!-- The two badges are the brochure's chip, in rem. They were `text-[10px]`/`[11px]`,
+				     a px font-size that ignores the reader's root size. -->
 				<div class="flex flex-wrap items-center gap-2 {stacked ? 'mb-2' : 'mb-3'}">
-					<span
-						class="inline-block w-fit border border-brand/30 px-3 py-1 font-mono tracking-[0.2em] text-brand-bright uppercase {stacked
-							? 'text-[10px]'
-							: 'text-[11px]'}"
-					>
+					<span class="b-chip b-chip-brand font-display font-bold tracking-[0.12em] uppercase">
 						{TAG[program.id]()}
 					</span>
 
@@ -198,11 +196,7 @@
 					     "Open" while the programme page says otherwise. Absent for a programme with no
 					     Season record — an empty badge would read as a rendering fault. -->
 					{#if season}
-						<span
-							class="inline-block w-fit border border-border-strong bg-surface-2 px-3 py-1 font-mono tracking-[0.2em] text-foreground-muted uppercase {stacked
-								? 'text-[10px]'
-								: 'text-[11px]'}"
-						>
+						<span class="b-chip font-display font-bold tracking-[0.12em] uppercase">
 							{SEASON_STATUS[season.registration]()}
 						</span>
 					{/if}
@@ -252,15 +246,12 @@
 	<section class="px-5 pt-24 pb-14 sm:px-8 md:px-[6vw] md:pt-36 md:pb-20">
 		<div class="max-w-[1400px]">
 			<Reveal y={24}>
-				<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+				<p class="font-display text-xs font-bold tracking-[0.24em] text-brand uppercase">
 					{m.programs_index_heroEyebrow()}
 				</p>
-				<div
-					class="mt-5 h-px w-16 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-					aria-hidden="true"
-				></div>
+				<div class="b-rule mt-5 w-20" aria-hidden="true"></div>
 				<h1
-					class="mt-6 max-w-[16ch] text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-light tracking-tight text-foreground"
+					class="b-display mt-6 max-w-[16ch] text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-bold tracking-tight text-sea-900"
 				>
 					{m.programs_index_title()}
 				</h1>
@@ -279,11 +270,17 @@
 	     which keeps the col-span / auto-rows layout contract intact. -->
 	<section class="px-5 pt-14 pb-14 sm:px-8 md:px-[6vw] md:pt-20 md:pb-20">
 		<Reveal y={24}>
-			<h2 class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+			<!-- A real section head, not a 12px label. This <h2> names the PROJECTS board — the
+			     page's main content — and was set smaller than the card titles under it, the same
+			     emphasis inversion SectionHeader documents. -->
+			<h2
+				class="b-display text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.5rem]"
+			>
 				{m.programs_index_boardHeading()}
 			</h2>
+			<div class="b-rule mt-7 max-w-[1400px]" aria-hidden="true"></div>
 			<div
-				class="mt-8 grid max-w-[1400px] auto-rows-[minmax(260px,auto)] grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-3"
+				class="mt-10 grid max-w-[1400px] auto-rows-[minmax(260px,auto)] grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-3"
 			>
 				{#each topCards as program (program.id)}
 					{@render card(program, false)}
@@ -308,13 +305,16 @@
 		away from. They get their own band, their own heading, and no season badge (Dialogue's
 		dates are still TODO(content); Research Lab has no `Program` record at all).
 	-->
-	<section class="border-hairline border-t bg-surface-2 px-5 py-14 sm:px-8 md:px-[6vw] md:py-20">
+	<section class="bg-sea-tint px-5 py-20 sm:px-8 md:px-[6vw] md:py-20">
 		<Reveal y={24}>
 			<div class="max-w-[1400px]">
-				<h2 class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+				<h2
+					class="b-display text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.5rem]"
+				>
 					{m.programs_index_researchExitHeading()}
 				</h2>
-				<p class="mt-5 max-w-2xl text-lg leading-relaxed text-foreground-muted">
+				<div class="b-rule mt-7" aria-hidden="true"></div>
+				<p class="mt-8 max-w-2xl text-lg leading-[1.8] text-foreground-muted">
 					{m.programs_index_researchExitBody()}
 				</p>
 
@@ -323,31 +323,33 @@
 						<li>
 							<a
 								href={localizeHref(exit.href)}
-								class="group flex h-full flex-col overflow-hidden border border-border-strong bg-card-bg transition-colors duration-300 hover:border-brand focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand"
+								class="b-card-media b-edge group flex h-full flex-col transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-brand/35 hover:shadow-[0_8px_24px_-10px_rgba(28,90,140,0.3)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 							>
-								<div class="relative h-[200px] shrink-0 overflow-hidden md:h-[240px]">
+								<div class="relative h-[200px] shrink-0 overflow-clip md:h-[240px]">
 									<enhanced:img
 										src={IMAGES[exit.id]}
 										alt={exit.imageAlt}
 										sizes="(max-width: 768px) 100vw, 50vw"
 										loading="lazy"
-										class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+										class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
 									/>
 								</div>
-								<div class="flex grow flex-col p-5 md:p-6">
-									<h3 class="text-lg font-bold tracking-tight text-foreground md:text-xl">
+								<div class="flex grow flex-col p-5 pl-6 md:p-6 md:pl-7">
+									<h3
+										class="b-display text-lg font-extrabold tracking-tight text-sea-900 md:text-xl"
+									>
 										{TITLE[exit.id]()}
 									</h3>
 									<span
-										class="mt-3 inline-block w-fit border border-brand/30 px-3 py-1 font-mono text-[11px] tracking-[0.2em] text-brand-bright uppercase"
+										class="b-chip b-chip-brand mt-3 font-display font-bold tracking-[0.12em] uppercase"
 									>
 										{TAG[exit.id]()}
 									</span>
-									<p class="mt-4 grow text-sm leading-relaxed text-foreground-muted">
+									<p class="mt-4 grow text-[0.9375rem] leading-[1.75] text-foreground-muted">
 										{DESCRIPTION[exit.id]()}
 									</p>
 									<span
-										class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-brand-bright transition-all duration-300 group-hover:gap-3"
+										class="mt-5 inline-flex items-center gap-2 font-display text-xs font-bold tracking-[0.18em] text-brand uppercase transition-all duration-300 group-hover:gap-3"
 									>
 										{m.programs_index_learnMore()}
 										<ArrowRight
@@ -368,10 +370,10 @@
 		than on each card because it is a statement about how the ACADEMY schedules, not about one
 		programme — the two programmes it applies to already render it in place of a window.
 	-->
-	<section class="border-hairline border-t px-5 py-14 sm:px-8 md:px-[6vw] md:py-16">
+	<section class="bg-background px-5 py-20 sm:px-8 md:px-[6vw] md:py-24">
 		<Reveal y={24}>
-			<div class="max-w-[1400px]">
-				<p class="max-w-2xl text-base leading-relaxed text-foreground-subtle">
+			<div class="b-panel max-w-[1400px]">
+				<p class="max-w-2xl text-base leading-[1.8] text-foreground-muted">
 					{m.programs_index_onDemandNote()}
 				</p>
 				<a

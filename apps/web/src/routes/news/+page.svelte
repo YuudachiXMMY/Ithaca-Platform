@@ -80,10 +80,10 @@
 <div class="bg-background">
 	<header class="border-hairline border-b pt-32 pb-12 md:pt-40 md:pb-16">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
-			<p class="font-mono text-[11px] tracking-[0.28em] text-brand uppercase">
+			<p class="font-display text-xs font-bold tracking-[0.28em] text-brand uppercase">
 				{m.news_hero_eyebrow()}
 			</p>
-			<h1 class="mt-5 max-w-3xl text-4xl font-light text-foreground md:text-6xl">
+			<h1 class="b-display mt-5 max-w-3xl text-4xl font-bold text-sea-900 md:text-6xl">
 				{m.news_hero_title()}
 			</h1>
 			<p class="mt-5 max-w-2xl text-base leading-relaxed text-foreground-subtle">
@@ -95,15 +95,20 @@
 	{#if featured}
 		<section class="border-hairline border-b py-12 md:py-16" aria-labelledby="news-featured">
 			<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
-				<p class="font-mono text-[11px] tracking-[0.24em] text-brand uppercase">
+				<p class="font-display text-xs font-bold tracking-[0.24em] text-brand uppercase">
 					{m.news_featuredLabel()}
 				</p>
 				<div class="mt-6 grid gap-10 md:grid-cols-2">
 					<div>
-						<p class="font-mono text-[11px] tracking-[0.18em] text-foreground-subtle uppercase">
+						<p
+							class="font-display text-xs font-bold tracking-[0.18em] text-foreground-subtle uppercase"
+						>
 							{KIND_LABEL[featured.kind]()} · {formatDate(featured.date)}
 						</p>
-						<h2 id="news-featured" class="mt-4 text-2xl font-light text-foreground md:text-4xl">
+						<h2
+							id="news-featured"
+							class="b-display mt-4 text-2xl font-extrabold text-sea-900 md:text-4xl"
+						>
 							{featured.title[locale]}
 						</h2>
 						{#each featured.body[locale] as paragraph (paragraph)}
@@ -145,10 +150,12 @@
 					{#each rest as item (item.slug)}
 						<li class="bg-background p-6 md:p-8">
 							<Reveal y={16}>
-								<p class="font-mono text-[11px] tracking-[0.18em] text-foreground-subtle uppercase">
+								<p
+									class="font-display text-xs font-bold tracking-[0.18em] text-foreground-subtle uppercase"
+								>
 									{KIND_LABEL[item.kind]()} · {formatDate(item.date)}
 								</p>
-								<h2 class="mt-4 text-lg font-bold text-foreground md:text-xl">
+								<h2 class="b-display mt-4 text-lg font-extrabold text-sea-900 md:text-xl">
 									{item.title[locale]}
 								</h2>
 								{#each item.body[locale] as paragraph (paragraph)}

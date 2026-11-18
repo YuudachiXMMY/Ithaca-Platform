@@ -335,7 +335,7 @@
 
 {#if status === 'success'}
 	<div class="border border-brand/30 bg-brand/5 p-8 text-center" role="status" aria-live="polite">
-		<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+		<p class="font-display text-xs font-bold tracking-[0.28em] text-brand-bright uppercase">
 			{m.contact_form_successTitle()}
 		</p>
 		<p class="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-foreground-muted">
@@ -457,7 +457,7 @@
 
 				{#if paramProgram}
 					<p
-						class="inline-flex w-fit border border-brand/30 bg-surface-2 px-3 py-1 font-mono text-[11px] tracking-[0.2em] text-brand-bright uppercase"
+						class="inline-flex w-fit border border-brand/30 bg-surface-2 px-3 py-1 font-display text-xs font-bold tracking-[0.2em] text-brand-bright uppercase"
 					>
 						{m.admissions_book_selected({
 							program: PROGRAM_OPTIONS.find((option) => option.slug === paramProgram)?.name ?? ''
@@ -570,7 +570,7 @@
 		     failure does not end the conversation. -->
 		{#if offerFallback}
 			<div class="border border-border-strong bg-surface-2 p-4">
-				<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+				<p class="font-display text-xs font-bold tracking-[0.28em] text-brand-bright uppercase">
 					{m.contact_form_fallbackTitle()}
 				</p>
 				<div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">

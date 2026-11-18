@@ -39,17 +39,17 @@
 			: m.common_team_honorificMr({ name: member.name });
 </script>
 
-<section class="bg-surface-3 py-14 md:py-20" aria-labelledby="team-heading">
+<section class="bg-background py-20 md:py-28" aria-labelledby="team-heading">
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={20} duration={500}>
 			<div>
-				<h2 id="team-heading" class="text-2xl font-bold tracking-tight text-foreground md:text-4xl">
+				<h2
+					id="team-heading"
+					class="b-display text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.5rem]"
+				>
 					{m.about_team_heading()}
 				</h2>
-				<div
-					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-					aria-hidden="true"
-				></div>
+				<div class="b-rule mt-6 w-28" aria-hidden="true"></div>
 				<p class="mt-6 max-w-md text-base leading-relaxed text-foreground-muted">
 					{m.about_team_subtitle()}
 				</p>
@@ -61,7 +61,9 @@
 			{#each TEAM_MEMBERS as member, i (member.name)}
 				<Reveal y={20} duration={400} delay={i * 50}>
 					<div>
-						<div class="relative aspect-[3/4] overflow-hidden bg-surface-0">
+						<div
+							class="relative aspect-[3/4] overflow-clip rounded-card border border-sea-card-line bg-paper"
+						>
 							{#if TEAM_IMAGE[member.name]}
 								<enhanced:img
 									src={TEAM_IMAGE[member.name]}

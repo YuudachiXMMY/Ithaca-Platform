@@ -22,36 +22,64 @@
 	 * and points at the page — rather than listing institution names here, where there is no room
 	 * to carry the offer/attending distinction that the decision exists to protect.
 	 */
-	const ITEMS = [m.home_results_item1, m.home_results_item2, m.home_results_item3];
+	/**
+	 * Each claim now carries the label that says WHAT KIND of claim it is.
+	 *
+	 * That is not decoration. The 11-02 standard this strip is built to — see above — exists to
+	 * keep an offer a student declined separate from a place they actually attend. The three items
+	 * were already chosen to respect it, but nothing on screen SAID so: "Princeton University,
+	 * Financial Engineering" and a row of seven more institutions sat side by side in identical
+	 * type, which is exactly the conflation the standard forbids. The labels make the distinction
+	 * the decision protects visible to the reader instead of only to the person who picked the
+	 * three strings.
+	 */
+	const ITEMS = [
+		{ label: m.home_results_item1Label, value: m.home_results_item1 },
+		{ label: m.home_results_item2Label, value: m.home_results_item2 },
+		{ label: m.home_results_item3Label, value: m.home_results_item3 }
+	];
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
-<section
-	class="border-hairline border-y bg-surface-2 py-10 md:py-12"
-	aria-labelledby="home-results-heading"
->
+<section class="bg-background py-20 md:py-28" aria-labelledby="home-results-heading">
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={20}>
 			<!-- Was a `text-xs` uppercase label that happened to BE the h2. This is the only evidence
 			     block on the homepage and it was set smaller than everything around it — see the
 			     inversion note in SectionHeader. -->
-			<SectionHeader id="home-results-heading" heading={m.home_results_heading} />
+			<SectionHeader
+				id="home-results-heading"
+				index="04"
+				heading={m.home_results_heading}
+				action={viewAll}
+			/>
 
-			<div class="mt-8 flex flex-wrap items-center gap-x-10 gap-y-4">
-				<ul class="flex flex-wrap items-center gap-x-8 gap-y-3">
-					{#each ITEMS as item (item)}
-						<li class="text-base text-foreground">{item()}</li>
-					{/each}
-				</ul>
-				<a
-					href={localizeHref('/success-stories')}
-					class="group inline-flex items-center gap-2 text-sm font-medium text-brand-bright transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-				>
-					<span>{m.home_results_viewAll()}</span>
-					<ArrowRight class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-				</a>
-			</div>
+			<!-- Three cards, one per kind of claim. The old row set all three as one run of 16px
+			     text on a near-empty band: the page's only proof carried less weight than the
+			     stats block below it, which asserts nothing in particular. -->
+			<ul class="mt-10 grid gap-4 md:grid-cols-3 md:gap-5">
+				{#each ITEMS as item (item.label)}
+					<li class="b-card">
+						<p class="font-display text-xs font-bold tracking-[0.2em] text-brand uppercase">
+							{item.label()}
+						</p>
+						<p class="b-display mt-3 text-lg leading-[1.5] font-bold text-sea-900">
+							{item.value()}
+						</p>
+					</li>
+				{/each}
+			</ul>
 		</Reveal>
 	</div>
 </section>
+
+{#snippet viewAll()}
+	<a
+		href={localizeHref('/success-stories')}
+		class="group inline-flex items-center gap-2 text-sm font-semibold text-brand transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+	>
+		<span>{m.home_results_viewAll()}</span>
+		<ArrowRight class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+	</a>
+{/snippet}

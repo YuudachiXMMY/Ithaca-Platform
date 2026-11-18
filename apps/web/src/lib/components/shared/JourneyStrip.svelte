@@ -33,8 +33,10 @@
 	 */
 	interface Props {
 		compact?: boolean;
+		/** Decorative section ordinal, passed by the page. See SectionHeader. */
+		index?: string;
 	}
-	let { compact = false }: Props = $props();
+	let { compact = false, index }: Props = $props();
 
 	const STAGES = [
 		{
@@ -64,7 +66,7 @@
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
 <section
-	class="border-hairline border-y bg-surface-2 {compact ? 'py-10 md:py-12' : 'py-14 md:py-20'}"
+	class="bg-sea-tint {compact ? 'py-14 md:py-20' : 'py-20 md:py-28'}"
 	aria-labelledby="journey-heading"
 >
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
@@ -72,26 +74,36 @@
 			<!-- Was a `text-xs` uppercase label that happened to BE the h2. This strip is the
 			     clearest statement of the product model on the homepage (01 Academic → 02 Projects
 			     → 03 Research) and it was the smallest heading on the page — see SectionHeader. -->
-			<SectionHeader id="journey-heading" heading={m.journey_heading} />
+			<SectionHeader id="journey-heading" heading={m.journey_heading} {index} />
 
-			<ol class="bg-hairline mt-8 grid gap-px md:grid-cols-3">
-				{#each STAGES as stage (stage.number)}
-					<li class="bg-surface-2">
+			<!--
+				Three separated cards, not a hairline grid. The grid read as one table with rules in
+				it; the brochure's `.steps` sets each stage as its own card with a chevron in the
+				gutter, which is what makes the SEQUENCE visible rather than just the three items.
+				`items-stretch` + `h-full` keeps the three equal height whatever the copy does.
+			-->
+			<ol class="mt-10 grid gap-4 md:grid-cols-3 md:gap-5">
+				{#each STAGES as stage, i (stage.number)}
+					<li class="relative">
 						<a
 							href={localizeHref(stage.href)}
-							class="group flex h-full flex-col p-6 transition-colors duration-200 hover:bg-surface-4/40 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand md:p-8"
+							class="b-card b-card-on-tint group flex h-full flex-col transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-brand/35 hover:shadow-[0_6px_20px_-8px_rgba(28,90,140,0.28)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 						>
-							<span class="font-display text-3xl font-light text-brand tabular-nums md:text-4xl">
+							<span
+								class="font-display text-3xl font-extrabold text-brand tabular-nums md:text-4xl"
+							>
 								{stage.number}
 							</span>
-							<span class="mt-4 font-display text-xs tracking-[0.22em] text-foreground uppercase">
+							<span
+								class="b-display mt-4 font-display text-base font-bold tracking-wide text-sea-900"
+							>
 								{stage.label()}
 							</span>
-							<span class="mt-4 grow text-base leading-relaxed text-foreground-subtle">
+							<span class="mt-3 grow text-base leading-[1.75] text-foreground-muted">
 								{stage.line()}
 							</span>
 							<span
-								class="mt-5 inline-flex items-center gap-2 font-display text-xs tracking-[0.2em] text-foreground-muted uppercase"
+								class="mt-6 inline-flex items-center gap-2 font-display text-xs font-bold tracking-[0.18em] text-brand uppercase"
 							>
 								{stage.tag()}
 								<ArrowRight
@@ -99,6 +111,16 @@
 								/>
 							</span>
 						</a>
+
+						<!-- The chevron that makes three cards read as one arc (brochure `.step::after`).
+						     Decorative, and only between cards — never after the last. Hidden on the
+						     stacked layout, where the cards already read top-to-bottom. -->
+						{#if i < STAGES.length - 1}
+							<span
+								class="absolute top-1/2 -right-[13px] z-10 hidden -translate-y-1/2 text-xl leading-none font-bold text-sea-500 md:block"
+								aria-hidden="true">›</span
+							>
+						{/if}
 					</li>
 				{/each}
 			</ol>
@@ -108,12 +130,15 @@
 				above — they describe where a student goes after Ithaca, which is not a fourth stage
 				of the journey and not a product. See the component comment.
 			-->
-			<p class="mt-8 max-w-3xl text-sm leading-relaxed text-foreground-subtle">
-				{m.journey_universityNote()}
-			</p>
-			<p class="mt-3 font-display text-xs tracking-[0.18em] text-foreground-muted uppercase">
-				{m.journey_closing()}
-			</p>
+			<div class="mt-10">
+				<div class="h-px w-12 bg-sea-card-line" aria-hidden="true"></div>
+				<p class="mt-4 max-w-3xl text-sm leading-[1.8] text-foreground-subtle">
+					{m.journey_universityNote()}
+				</p>
+				<p class="mt-3 font-display text-xs tracking-[0.18em] text-foreground-subtle uppercase">
+					{m.journey_closing()}
+				</p>
+			</div>
 		</Reveal>
 	</div>
 </section>
