@@ -174,10 +174,6 @@
 		{
 			question: m.programs_ithacaDialogues_faq_items_contacts_question,
 			answer: m.programs_ithacaDialogues_faq_items_contacts_answer
-		},
-		{
-			question: m.programs_ithacaDialogues_faq_items_language_question,
-			answer: m.programs_ithacaDialogues_faq_items_language_answer
 		}
 	];
 </script>
