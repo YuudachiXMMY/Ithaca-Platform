@@ -268,7 +268,7 @@ describe.each(['en', 'zh'] as const)('§6.3 — the consent gate on /results (%s
 
 			// The page itself still renders: /results is a route, not a section, and an empty gate is
 			// not a 404. Its <h1> and the Dialogues films below are unaffected.
-			expect(body).toContain(locale === 'en' ? 'Success Stories' : '学生成果');
+			expect(body).toContain(locale === 'en' ? 'Success Stories' : '学员成果');
 			expect(body).toContain('Reza Moridi');
 		},
 		RENDER_TIMEOUT_MS

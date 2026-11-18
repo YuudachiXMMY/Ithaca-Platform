@@ -38,7 +38,7 @@ export const STATS: readonly Stat[] = [
 		// include Research Lab, so the two contradicted each other in adjacent lines (found in the
 		// 2026-11-15 design review). The `source` string was the correct one of the two.
 		value: 7,
-		label: { en: 'Programs', zh: '课程' },
+		label: { en: 'Programs', zh: '课程与项目' },
 		source:
 			'Count of cards on /programs: the six `Program` records plus Research Lab (owner ruling 2026-11-14)'
 	},
@@ -53,7 +53,7 @@ export const STATS: readonly Stat[] = [
 		key: 'projects',
 		value: 50,
 		suffix: '+',
-		label: { en: 'Projects', zh: '项目' },
+		label: { en: 'Projects', zh: '学生项目作品' },
 		source: 'Published figure on ithacateens.com; project definition not yet documented'
 	}
 ];

@@ -66,7 +66,7 @@ export const HIGHLIGHTS: readonly Highlight[] = [
 		tag: { en: 'Campus Visit', zh: '校园参访' },
 		title: {
 			en: 'Sedra Student Design Centre, University of Waterloo Faculty of Engineering',
-			zh: '参观滑铁卢大学工程学院的 Sedra 学生设计中心'
+			zh: '滑铁卢大学工程学院 Sedra 学生设计中心'
 		},
 		caption: {
 			en: "Students toured the design teams' workshops and saw how university engineering projects are built from the ground up.",
@@ -102,11 +102,11 @@ export const HIGHLIGHTS: readonly Highlight[] = [
 		tag: { en: 'Guest Lecture', zh: '嘉宾讲座' },
 		title: {
 			en: 'Professor Geoffrey Hinton on Artificial Intelligence',
-			zh: '多伦多大学诺贝尔奖获得者辛顿教授分享人工智能洞见'
+			zh: '辛顿教授谈人工智能'
 		},
 		caption: {
 			en: 'Students attended a University of Toronto lecture by Nobel laureate Professor Geoffrey Hinton on the frontiers of artificial intelligence.',
-			zh: '走进座无虚席的多伦多大学讲堂，聆听诺贝尔奖获得者解读人工智能前沿。'
+			zh: '学生在多伦多大学聆听诺贝尔奖得主辛顿教授讲解人工智能前沿。'
 		},
 		media: {
 			src: '$lib/assets/highlights/wechat-img-197.jpg',
