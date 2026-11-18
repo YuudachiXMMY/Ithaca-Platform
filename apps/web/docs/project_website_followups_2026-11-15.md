@@ -10,13 +10,13 @@
 
 ### 现状：四个入口、三种文案、两个目的地
 
-| 入口 | 文件 | 文案 key（英 / 中） | 去向 |
-|---|---|---|---|
-| header CTA 按钮 | `Header.svelte:420` + `nav.ts:170` `CTA_HREF` | `nav_admissions` "Admissions" / 「招生入学」 | `/admissions` |
-| 首屏主 CTA | `HeroSection.svelte:92` | `home_hero_ctaPrograms` "View programs" / 「探索项目」 | `/programs` |
-| 首屏次 CTA | `HeroSection.svelte:98` | `home_hero_ctaContact` "Get in touch" / 「联系我们」 | `/contact-us` |
-| 收尾 CTA | `ContactSection.svelte:190` | `home_contact_cta` "Get in touch" / 「立即联系」 | `/contact-us` |
-| footer | `nav.ts` `FOOTER_LINKS` | `nav_contactUs` "Contact Us" | `/contact-us` |
+| 入口            | 文件                                          | 文案 key（英 / 中）                                    | 去向          |
+| --------------- | --------------------------------------------- | ------------------------------------------------------ | ------------- |
+| header CTA 按钮 | `Header.svelte:420` + `nav.ts:170` `CTA_HREF` | `nav_admissions` "Admissions" / 「招生入学」           | `/admissions` |
+| 首屏主 CTA      | `HeroSection.svelte:92`                       | `home_hero_ctaPrograms` "View programs" / 「探索项目」 | `/programs`   |
+| 首屏次 CTA      | `HeroSection.svelte:98`                       | `home_hero_ctaContact` "Get in touch" / 「联系我们」   | `/contact-us` |
+| 收尾 CTA        | `ContactSection.svelte:190`                   | `home_contact_cta` "Get in touch" / 「立即联系」       | `/contact-us` |
+| footer          | `nav.ts` `FOOTER_LINKS`                       | `nav_contactUs` "Contact Us"                           | `/contact-us` |
 
 两个具体毛病：
 
@@ -62,12 +62,12 @@ export function consultHref(): string {
 
 **③ 改四处调用点。**
 
-| 文件 | 改什么 |
-|---|---|
-| `ContactSection.svelte:190` | `href={localizeHref('/contact-us')}` → `href={consultHref()}`；`{m.home_contact_cta()}` → `{m.common_cta_bookConsult()}`。这里收益最大：按钮终于和它上方那句承诺是同一件事 |
-| `HeroSection.svelte:98` | 同上一组改动。首屏次 CTA 变成「预约免费咨询」，主 CTA「探索项目」不动 —— 一个给还在看的人，一个给已经决定的人，这个分工是对的 |
-| `nav.ts` `FOOTER_LINKS` | `/contact-us` 保留，但它从此是**通用咨询**入口，不是主转化 |
-| `messages/*.json` | `home_contact_cta` / `home_hero_ctaContact` 两个 key 失去调用点，删掉（`npm run i18n:check` 只校对齐不校孤儿，`knip` 也不扫 message，所以**必须手动删**，否则它们会以「看起来还在用」的状态留在目录里） |
+| 文件                        | 改什么                                                                                                                                                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ContactSection.svelte:190` | `href={localizeHref('/contact-us')}` → `href={consultHref()}`；`{m.home_contact_cta()}` → `{m.common_cta_bookConsult()}`。这里收益最大：按钮终于和它上方那句承诺是同一件事                              |
+| `HeroSection.svelte:98`     | 同上一组改动。首屏次 CTA 变成「预约免费咨询」，主 CTA「探索项目」不动 —— 一个给还在看的人，一个给已经决定的人，这个分工是对的                                                                           |
+| `nav.ts` `FOOTER_LINKS`     | `/contact-us` 保留，但它从此是**通用咨询**入口，不是主转化                                                                                                                                              |
+| `messages/*.json`           | `home_contact_cta` / `home_hero_ctaContact` 两个 key 失去调用点，删掉（`npm run i18n:check` 只校对齐不校孤儿，`knip` 也不扫 message，所以**必须手动删**，否则它们会以「看起来还在用」的状态留在目录里） |
 
 **④ 让 `/contact-us` 说明区别。** 现在两条路都通向它却不解释。在 `/contact-us` 顶部加一句
 分流：「要约咨询请走『预约免费咨询』；这里是一般问询（课程细节、费用、排期）。」
@@ -87,19 +87,19 @@ export function consultHref(): string {
 
 ### 现状：八个 section，三种形制，两种对齐
 
-| Section | 文件:行 | 现在的 h2 | 对齐 | eyebrow |
-|---|---|---|---|---|
-| Our Mission | `MissionSection.svelte:71` | `<h1>` clamp(2.5–4.5rem) | 左 | 有 |
-| Our Approach | `MissionSection.svelte:90` | 无 h2，只有一个 `<p>` eyebrow | **居中** | 有 |
-| 三支柱 | `MissionSection.svelte:121,153` | `text-2xl md:text-3xl lg:text-4xl` | 左 | 无 |
-| The Journey | `JourneyStrip.svelte:71` | **`text-xs` 字距 0.28em 大写** | 左 | 即 h2 本身 |
-| Academics | `AcademicsShowcase.svelte:44` | `text-2xl md:text-4xl` | 左 | 无 |
-| Our Programs | `ProgramsShowcase.svelte:149` | `text-2xl md:text-4xl` | **居中** | 无 |
-| Success Stories | `ResultsStrip.svelte:35` | **`text-xs` 字距 0.28em 大写** | 左 | 即 h2 本身 |
-| Impact | `ImpactStats.svelte:59` | `text-2xl md:text-4xl` | **居中** | 无 |
-| Featured | `FeaturedSection.svelte:59` | `text-xl md:text-2xl` | 左 | 有（独立 `<p>`） |
-| Highlights | `StudentHighlights.svelte:105` | `text-xl md:text-3xl` | 左 | 无（右侧有副文） |
-| Get in Touch | `ContactSection.svelte:129` | `text-3xl md:text-[2.75rem]` | **居中** | 无 |
+| Section         | 文件:行                         | 现在的 h2                          | 对齐     | eyebrow          |
+| --------------- | ------------------------------- | ---------------------------------- | -------- | ---------------- |
+| Our Mission     | `MissionSection.svelte:71`      | `<h1>` clamp(2.5–4.5rem)           | 左       | 有               |
+| Our Approach    | `MissionSection.svelte:90`      | 无 h2，只有一个 `<p>` eyebrow      | **居中** | 有               |
+| 三支柱          | `MissionSection.svelte:121,153` | `text-2xl md:text-3xl lg:text-4xl` | 左       | 无               |
+| The Journey     | `JourneyStrip.svelte:71`        | **`text-xs` 字距 0.28em 大写**     | 左       | 即 h2 本身       |
+| Academics       | `AcademicsShowcase.svelte:44`   | `text-2xl md:text-4xl`             | 左       | 无               |
+| Our Programs    | `ProgramsShowcase.svelte:149`   | `text-2xl md:text-4xl`             | **居中** | 无               |
+| Success Stories | `ResultsStrip.svelte:35`        | **`text-xs` 字距 0.28em 大写**     | 左       | 即 h2 本身       |
+| Impact          | `ImpactStats.svelte:59`         | `text-2xl md:text-4xl`             | **居中** | 无               |
+| Featured        | `FeaturedSection.svelte:59`     | `text-xl md:text-2xl`              | 左       | 有（独立 `<p>`） |
+| Highlights      | `StudentHighlights.svelte:105`  | `text-xl md:text-3xl`              | 左       | 无（右侧有副文） |
+| Get in Touch    | `ContactSection.svelte:129`     | `text-3xl md:text-[2.75rem]`       | **居中** | 无               |
 
 **批评里「强调方向与说服力倒挂」的机制就在这张表里**：Journey（最清楚地解释了产品模型）和
 Success Stories（唯一的成果证据）是全页仅有的两个「是 h2 却长得像标签」的段落，
@@ -107,16 +107,16 @@ Success Stories（唯一的成果证据）是全页仅有的两个「是 h2 却�
 
 ### 建议的八档
 
-| 档 | 值 | 用途 |
-|---|---|---|
-| display | `clamp(2.5rem,6vw,4.5rem)` | 只给 `<h1>`（Mission），全页一次 |
-| 4xl 36px | `text-2xl md:text-4xl` | **所有 section h2，唯一一档** |
-| 3xl 30px | | 卡片大标题 / 支柱标题 |
-| xl 20px | | 卡片标题 |
-| lg 18px | | 引导段 |
-| base 16px | | 正文 |
-| sm 14px | | 副文、链接 |
-| xs 12px | | eyebrow、标签（**下限**，已在 PR #19 落地） |
+| 档        | 值                         | 用途                                        |
+| --------- | -------------------------- | ------------------------------------------- |
+| display   | `clamp(2.5rem,6vw,4.5rem)` | 只给 `<h1>`（Mission），全页一次            |
+| 4xl 36px  | `text-2xl md:text-4xl`     | **所有 section h2，唯一一档**               |
+| 3xl 30px  |                            | 卡片大标题 / 支柱标题                       |
+| xl 20px   |                            | 卡片标题                                    |
+| lg 18px   |                            | 引导段                                      |
+| base 16px |                            | 正文                                        |
+| sm 14px   |                            | 副文、链接                                  |
+| xs 12px   |                            | eyebrow、标签（**下限**，已在 PR #19 落地） |
 
 需要退场的：`text-5xl`、`text-6xl`、`text-[2.75rem]`、`text-[48px]`、`text-[64px]`。
 
@@ -215,11 +215,11 @@ Success Stories（唯一的成果证据）是全页仅有的两个「是 h2 却�
 
 ### 拍摄 / 选片规格
 
-| 用途 | 最小宽度 | 构图要求 |
-|---|---|---|
-| `ProgramsShowcase` 大格 | 1920px | `sizes` 为 66vw，1400px 容器下渲染约 924px，2× 即 1848px |
-| `ProgramsShowcase` 小格 | 1200px | 34vw ≈ 476px，2× 即 952px |
-| `StudentHighlights` 各格 | 1200px | 桌面列宽 360–520px，2× 即 1040px；移动端 50vw |
+| 用途                     | 最小宽度 | 构图要求                                                 |
+| ------------------------ | -------- | -------------------------------------------------------- |
+| `ProgramsShowcase` 大格  | 1920px   | `sizes` 为 66vw，1400px 容器下渲染约 924px，2× 即 1848px |
+| `ProgramsShowcase` 小格  | 1200px   | 34vw ≈ 476px，2× 即 952px                                |
+| `StudentHighlights` 各格 | 1200px   | 桌面列宽 360–520px，2× 即 1040px；移动端 50vw            |
 
 **所有卡片共通的一条**：卡面渐变是 `from-overlay/95 via-overlay/70 to-transparent`，
 即**下三分之一会被压暗并叠上标题与说明文字**。所以选片时下三分之一要留给「可以被盖住的内容」——

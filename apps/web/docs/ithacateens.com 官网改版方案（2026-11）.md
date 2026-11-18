@@ -10,18 +10,18 @@ Nov 2, 2026 · @Jadyn
 
 **现状主要差距（按严重程度排序）：**
 
-| # | 差距 | 依据 |
-| --- | --- | --- |
-| 1 | `/programs` 为旧版残留页：仍列 Engineering Projects、Summer & Winter Camps、Ithaca Night、"AI Entrepreneurship Camp（13 周旧文案）"，与首页项目卡不一致；无 AI Investment Lab | 10-11 决议：将 Summer & Winter Camps 改为 AI Investment Lab |
-| 2 | AI 投资实验室（第四旗舰）全站缺失，产品已于 10-26 定稿（101/102 两期制） | 10-20 四旗舰定调；10-26 产品结构 |
-| 3 | Academics 四轨为 AP / OSSD / STEM / Tutoring，缺 SAT·ACT 标化与大学课业辅导两条线；STEM 独立成轨与三折页口径不符 | 三折页 v5：学术板块 = AP/OSSD/IB/大学课业 + SAT/ACT |
-| 4 | 无"研究"板块页面：Research Lab、Project Studio 站内无落点，三大板块（学术/项目/研究）架构未呈现 | 10-20 三大板块；10-26 三折页模块划分 |
-| 5 | 无新闻/动态板块 | 10-11 决议：添加"新闻"板块 |
-| 6 | Results 页仅 2 条成果，缺往届去向汇总与首批 5 个学员故事 | 10-20：success story 首批 5 案例；11-02 录取成果展示口径 |
-| 7 | Admissions 咨询表单"Programs of interest"仍为旧项目清单；五步流程细节文案缺失（页面自注 being written up） | 现状核查 |
-| 8 | 机构介绍偏空、拼接感强，待重写 | 11-02 决议 |
-| 9 | 中文版 `/zh` 未完成，而目标客群为华人中高净值家庭 | 10-01 改版记录；10-20 客群定调 |
-| 10 | 品牌口径未统一：Ithaca Dialogue（三折页）vs Ithaca Dialogues（官网）；公司注册 Ithaca Education Inc.（11-02）后页脚法律主体待定 | 11-02：下一批宣传材料前统一品牌口径 |
+| #   | 差距                                                                                                                                                                          | 依据                                                        |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| 1   | `/programs` 为旧版残留页：仍列 Engineering Projects、Summer & Winter Camps、Ithaca Night、"AI Entrepreneurship Camp（13 周旧文案）"，与首页项目卡不一致；无 AI Investment Lab | 10-11 决议：将 Summer & Winter Camps 改为 AI Investment Lab |
+| 2   | AI 投资实验室（第四旗舰）全站缺失，产品已于 10-26 定稿（101/102 两期制）                                                                                                      | 10-20 四旗舰定调；10-26 产品结构                            |
+| 3   | Academics 四轨为 AP / OSSD / STEM / Tutoring，缺 SAT·ACT 标化与大学课业辅导两条线；STEM 独立成轨与三折页口径不符                                                              | 三折页 v5：学术板块 = AP/OSSD/IB/大学课业 + SAT/ACT         |
+| 4   | 无"研究"板块页面：Research Lab、Project Studio 站内无落点，三大板块（学术/项目/研究）架构未呈现                                                                               | 10-20 三大板块；10-26 三折页模块划分                        |
+| 5   | 无新闻/动态板块                                                                                                                                                               | 10-11 决议：添加"新闻"板块                                  |
+| 6   | Results 页仅 2 条成果，缺往届去向汇总与首批 5 个学员故事                                                                                                                      | 10-20：success story 首批 5 案例；11-02 录取成果展示口径    |
+| 7   | Admissions 咨询表单"Programs of interest"仍为旧项目清单；五步流程细节文案缺失（页面自注 being written up）                                                                    | 现状核查                                                    |
+| 8   | 机构介绍偏空、拼接感强，待重写                                                                                                                                                | 11-02 决议                                                  |
+| 9   | 中文版 `/zh` 未完成，而目标客群为华人中高净值家庭                                                                                                                             | 10-01 改版记录；10-20 客群定调                              |
+| 10  | 品牌口径未统一：Ithaca Dialogue（三折页）vs Ithaca Dialogues（官网）；公司注册 Ithaca Education Inc.（11-02）后页脚法律主体待定                                               | 11-02：下一批宣传材料前统一品牌口径                         |
 
 **保留不动的现状资产**：Cavafy 引文 Hero（与三折页品牌定稿一致）、Our Approach 三支柱、Results 页的 consent 声明与"成果回链项目页"模式、全站"价格 by enquiry"策略。
 
@@ -31,16 +31,16 @@ Nov 2, 2026 · @Jadyn
 
 **主导航（7 项 + 1 CTA 按钮）：**
 
-| 位置 | 菜单项 | 落点 | 对应板块 |
-| --- | --- | --- | --- |
-| 左 1 | Academics 学术辅导 | /academics | 01 学术（入口） |
-| 左 2 | Programs 旗舰项目 | /programs | 02 项目（四旗舰 + 工程启蒙） |
-| 左 3 | Research 研究与孵化 | /research（新增） | 03 研究（出口） |
-| 中 | Logo | / | — |
-| 右 1 | Results 成果 | /success-stories | 可信度 |
-| 右 2 | News 动态 | /news（新增） | 内容沉淀 |
-| 右 3 | About 关于 | /about-us | 品牌 |
-| CTA 按钮 | Admissions · 预约咨询 | /admissions | 转化 |
+| 位置     | 菜单项                | 落点              | 对应板块                     |
+| -------- | --------------------- | ----------------- | ---------------------------- |
+| 左 1     | Academics 学术辅导    | /academics        | 01 学术（入口）              |
+| 左 2     | Programs 旗舰项目     | /programs         | 02 项目（四旗舰 + 工程启蒙） |
+| 左 3     | Research 研究与孵化   | /research（新增） | 03 研究（出口）              |
+| 中       | Logo                  | /                 | —                            |
+| 右 1     | Results 成果          | /success-stories  | 可信度                       |
+| 右 2     | News 动态             | /news（新增）     | 内容沉淀                     |
+| 右 3     | About 关于            | /about-us         | 品牌                         |
+| CTA 按钮 | Admissions · 预约咨询 | /admissions       | 转化                         |
 
 **下拉子菜单（桌面悬停 / 移动端展开）：**
 
@@ -67,18 +67,18 @@ Nov 2, 2026 · @Jadyn
 
 ### 3.1 首页 `/`
 
-| 区块 | 修改 |
-| --- | --- |
-| Hero（Cavafy 引文） | 保留不动 |
-| Our Approach 三支柱 | 保留不动 |
-| 新增：成长旅程条 | 置于 Our Programs 之前。三段式：01 学术 ACADEMIC → 02 项目 PROJECTS → 03 研究 RESEARCH，各配一句三折页索引文案，分别链向 /academics、/programs、/research |
-| Our Programs 四卡 | 换为四旗舰：EV Team · AI Entrepreneurship Bootcamp · Ithaca Dialogue · **AI Investment Lab**（替换现"Other Programs"卡）。每卡一句三折页定位语 + 档期 |
-| 新增：Academics 区块 | 四卡：AP / OSSD / SAT·ACT / 大学课业辅导，导语"按学生风格匹配老师 · 入学诊断 · 阶段测验"，整块链 /academics（10-01 本地已做，随本次一并上线） |
-| 数据区块 | 标题改 Building programs that **matter**（语法）；Programs 数与新产品体系核对后更新 |
-| Featured（Moridi） | 改为可轮换 Featured 栏目，内容由 /news 最新条目驱动 |
-| Student Highlights | 精简保留，底部 CTA 改"更多动态 → /news" |
-| 新增：Results 条带 | 一行：AIEC 2026 全场大奖 · 普林斯顿金融工程 · 往届去向院校名单，链 /success-stories |
-| Get In Touch | 邮箱统一 info@ithacateens.com；文案加"免费 20–30 分钟升学与成长路径规划、项目选择咨询"（三折页 11-04 版 CTA） |
+| 区块                 | 修改                                                                                                                                                      |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hero（Cavafy 引文）  | 保留不动                                                                                                                                                  |
+| Our Approach 三支柱  | 保留不动                                                                                                                                                  |
+| 新增：成长旅程条     | 置于 Our Programs 之前。三段式：01 学术 ACADEMIC → 02 项目 PROJECTS → 03 研究 RESEARCH，各配一句三折页索引文案，分别链向 /academics、/programs、/research |
+| Our Programs 四卡    | 换为四旗舰：EV Team · AI Entrepreneurship Bootcamp · Ithaca Dialogue · **AI Investment Lab**（替换现"Other Programs"卡）。每卡一句三折页定位语 + 档期     |
+| 新增：Academics 区块 | 四卡：AP / OSSD / SAT·ACT / 大学课业辅导，导语"按学生风格匹配老师 · 入学诊断 · 阶段测验"，整块链 /academics（10-01 本地已做，随本次一并上线）             |
+| 数据区块             | 标题改 Building programs that **matter**（语法）；Programs 数与新产品体系核对后更新                                                                       |
+| Featured（Moridi）   | 改为可轮换 Featured 栏目，内容由 /news 最新条目驱动                                                                                                       |
+| Student Highlights   | 精简保留，底部 CTA 改"更多动态 → /news"                                                                                                                   |
+| 新增：Results 条带   | 一行：AIEC 2026 全场大奖 · 普林斯顿金融工程 · 往届去向院校名单，链 /success-stories                                                                       |
+| Get In Touch         | 邮箱统一 info@ithacateens.com；文案加"免费 20–30 分钟升学与成长路径规划、项目选择咨询"（三折页 11-04 版 CTA）                                             |
 
 ### 3.2 `/programs` 全页重建（P0，最高优先）
 
@@ -185,24 +185,24 @@ Nov 2, 2026 · @Jadyn
 
 ## 五、全站横切事项
 
-| 事项 | 规则 | 状态 |
-| --- | --- | --- |
-| 合规声明 ×3 | ① College Board / ACT 商标声明：Academics 各页页脚 ② 投资合规声明：Investment Lab 页及任何提及处 ③ "不承诺发表"：Research 页 | 文案已在三折页定稿，照搬 |
-| 成果展示口径 | 录取成果与最终去向分列标注；奖学金核实后展示；优先加美高认知度院校 | 11-02 决议，Results 页执行 |
-| 品牌命名 | Ithaca Dialogue 单复数全站统一（三折页用单数，官网现用 Dialogues）；品牌名、英文名、一句话定位随"下一批宣传材料"统一 | 待 Joshua 拍板 |
-| 法律主体 | 页脚 © 是否标注 Ithaca Education Inc. | 待品牌口径确认，先不动 |
-| 联系方式 | 邮箱 info@ithacateens.com（joshua.wang@ithacafo.com 并列）；微信 Joshua 个人号；电话维持 | 10-24 定稿，全站统一替换 |
-| 中文版 `/zh` | 与英文页同步改版；目标客群为华人家庭，中文版与英文版同权重交付 | 现中文版未完成 |
-| 价格 | 全站不公开价格，Tuition by enquiry；报价在咨询中给出 | 维持现状 |
+| 事项         | 规则                                                                                                                         | 状态                       |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| 合规声明 ×3  | ① College Board / ACT 商标声明：Academics 各页页脚 ② 投资合规声明：Investment Lab 页及任何提及处 ③ "不承诺发表"：Research 页 | 文案已在三折页定稿，照搬   |
+| 成果展示口径 | 录取成果与最终去向分列标注；奖学金核实后展示；优先加美高认知度院校                                                           | 11-02 决议，Results 页执行 |
+| 品牌命名     | Ithaca Dialogue 单复数全站统一（三折页用单数，官网现用 Dialogues）；品牌名、英文名、一句话定位随"下一批宣传材料"统一         | 待 Joshua 拍板             |
+| 法律主体     | 页脚 © 是否标注 Ithaca Education Inc.                                                                                        | 待品牌口径确认，先不动     |
+| 联系方式     | 邮箱 info@ithacateens.com（joshua.wang@ithacafo.com 并列）；微信 Joshua 个人号；电话维持                                     | 10-24 定稿，全站统一替换   |
+| 中文版 `/zh` | 与英文页同步改版；目标客群为华人家庭，中文版与英文版同权重交付                                                               | 现中文版未完成             |
+| 价格         | 全站不公开价格，Tuition by enquiry；报价在咨询中给出                                                                         | 维持现状                   |
 
 ## 六、实施优先级与分期
 
-| 期 | 内容 | 依赖 |
-| --- | --- | --- |
-| **P0**（本次迭代，落实 10-11 决议） | `/programs` 重建 · AI Investment Lab 新页 · 首页 Programs 区块换四旗舰 + 旅程条 + Academics 区块上线 · Admissions 表单与开班卡更新 · 全站邮箱统一 | 无外部依赖，文案齐备，可直接开工 |
-| **P1** | `/news` 新页（首批内容：走进 TMU、AIEC、已剪访谈）· Results 扩充往届去向区块 · `/academics` 两条新轨（SAT·ACT、大学课业）· Dialogue 命名统一 | 学员故事需家庭授权；访谈视频随剪辑进度 |
-| **P2** | `/research` 板块页 + 主导航调整 · 工程启蒙课、Project Studio 页 · About 重写替换 · 中文版 `/zh` 全量同步 | About 等 Joshua 初稿；导航调整与 /research 同步上线避免空链 |
-| **暂缓** | 页脚法律主体标注 · G7–8 入口产品 · 申请规划服务 | 分别待品牌口径、2027 Q1 拍板、服务边界定义 |
+| 期                                  | 内容                                                                                                                                              | 依赖                                                        |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| **P0**（本次迭代，落实 10-11 决议） | `/programs` 重建 · AI Investment Lab 新页 · 首页 Programs 区块换四旗舰 + 旅程条 + Academics 区块上线 · Admissions 表单与开班卡更新 · 全站邮箱统一 | 无外部依赖，文案齐备，可直接开工                            |
+| **P1**                              | `/news` 新页（首批内容：走进 TMU、AIEC、已剪访谈）· Results 扩充往届去向区块 · `/academics` 两条新轨（SAT·ACT、大学课业）· Dialogue 命名统一      | 学员故事需家庭授权；访谈视频随剪辑进度                      |
+| **P2**                              | `/research` 板块页 + 主导航调整 · 工程启蒙课、Project Studio 页 · About 重写替换 · 中文版 `/zh` 全量同步                                          | About 等 Joshua 初稿；导航调整与 /research 同步上线避免空链 |
+| **暂缓**                            | 页脚法律主体标注 · G7–8 入口产品 · 申请规划服务                                                                                                   | 分别待品牌口径、2027 Q1 拍板、服务边界定义                  |
 
 **风险提示（内部）**
 

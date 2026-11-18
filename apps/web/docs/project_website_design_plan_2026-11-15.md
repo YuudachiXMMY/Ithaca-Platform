@@ -7,12 +7,12 @@
 
 每条批评都回到代码核验过，不照抄。结论分四档：
 
-| 档 | 含义 | 条数 |
-|---|---|---|
-| ✅ 确认 | 代码里确有此事，可直接动手 | 9 |
-| ♻️ 重写 | 现象是真的，但批评给的诊断或处方错了 | 3 |
-| ❌ 驳回 | 与当前代码不符 | 2 |
-| ⛔ 冲突 | 与 `+page.svelte` / `DECISIONS.md` 里已记录的决策正面冲突，需要你先裁决 | 2 |
+| 档      | 含义                                                                    | 条数 |
+| ------- | ----------------------------------------------------------------------- | ---- |
+| ✅ 确认 | 代码里确有此事，可直接动手                                              | 9    |
+| ♻️ 重写 | 现象是真的，但批评给的诊断或处方错了                                    | 3    |
+| ❌ 驳回 | 与当前代码不符                                                          | 2    |
+| ⛔ 冲突 | 与 `+page.svelte` / `DECISIONS.md` 里已记录的决策正面冲突，需要你先裁决 | 2    |
 
 ---
 
@@ -53,10 +53,10 @@
 
 ## 二、❌ 驳回两条（代码里不是这样）
 
-| # | 批评原文 | 核验结果 |
-|---|---|---|
-| R-1 | "Hero quote is marked up as paragraphs, not a blockquote" | **不成立**。`HeroSection.svelte:48` 就是 `<blockquote>`，四行 `<p>` 在它里面 —— 这是 blockquote 的正确用法。无需改动。 |
-| R-2 | "Inquiry form marks *Student's grade* as required inside a block titled optional" | **不成立**。`EnquiryForm.svelte:428-433`：`<label>` 文案是 `contact_form_gradeLabel` = "Student's grade"，不带任何 required 标记；`<select>` 没有 `required` 属性（全文件搜 `required` 只命中一条注释：「Only `name` and `email` are required」）；首项是空值 `contact_form_gradeUnset`；`/api/contact` 的 Zod schema 里它是 optional。整条链路上没有任何地方把它标成必填。 |
+| #   | 批评原文                                                                          | 核验结果                                                                                                                                                                                                                                                                                                                                                                    |
+| --- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R-1 | "Hero quote is marked up as paragraphs, not a blockquote"                         | **不成立**。`HeroSection.svelte:48` 就是 `<blockquote>`，四行 `<p>` 在它里面 —— 这是 blockquote 的正确用法。无需改动。                                                                                                                                                                                                                                                      |
+| R-2 | "Inquiry form marks _Student's grade_ as required inside a block titled optional" | **不成立**。`EnquiryForm.svelte:428-433`：`<label>` 文案是 `contact_form_gradeLabel` = "Student's grade"，不带任何 required 标记；`<select>` 没有 `required` 属性（全文件搜 `required` 只命中一条注释：「Only `name` and `email` are required」）；首项是空值 `contact_form_gradeUnset`；`/api/contact` 的 Zod schema 里它是 optional。整条链路上没有任何地方把它标成必填。 |
 
 R-2 大概是把浏览器对同组内别的字段的原生提示读串了。两条都不要动。
 
@@ -104,38 +104,38 @@ R-2 大概是把浏览器对同组内别的字段的原生提示读串了。两�
 
 ### 批次 1 — 可访问性下限（批评优先级 5，最该先做）
 
-| # | 问题 | 位置 | 处方 |
-|---|---|---|---|
-| A-1 | newsletter 邮箱输入框只有 placeholder，没有 label 也没有 `aria-label` | `NewsletterForm.svelte:113-122` | 加 `aria-label={m.newsletter_emailLabel()}`（或 sr-only `<label for>`）。新增一条 message × 2 locale。**这是真 bug，不是品味问题** —— 读屏用户在这个字段上听不到任何提示。 |
-| A-2 | 正文区 29 个元素小于 12px | 首页实测：`text-[11px]` × 12、`text-[10px]` × 2、`text-[9px]` × 1。具体：`HeroSection.svelte:64`（署名）、`MissionSection.svelte:49,71`（eyebrow）、`ResultsStrip.svelte:37`（h2）、`JourneyStrip.svelte:71,85,92,112`、`StudentHighlights.svelte:109,162,172`、`ProgramsShowcase.svelte:129` | 设 12px 下限：`text-[11px]`/`[10px]`/`[9px]` → `text-xs`(12px)。注意 `StudentHighlights.svelte:150` 的 48/64px 大数字是 `aria-hidden` 装饰，不在此列。eyebrow 收字号会动 `tracking`，需要一轮视觉确认。 |
-| A-3 | 移动端触控目标：行内链接 20px、footer 链接 17px、法务链接 16px，低于 WCAG 2.2 的 24px | footer 文字块 `Footer.svelte:155` 是 `text-xs`；行内链接散落在各 section | 给链接加垂直 padding 凑到 44px（批评建议值，高于 WCAG 底线）。纯 padding，不影响视觉尺寸。 |
-| A-4 | 两张截图卡上的文字与叠加标题互撞，照片上的对比度在实际中不达标 | `StudentHighlights.svelte` 的 `appImg`（`assets/programs/app.png`，一个网页截图）与 AI Bootcamp 的幻灯片帧 | 换成照片。这是素材缺口不是代码问题，`ProgramsShowcase.svelte:13-15` 已经为 AI Investment Lab 挂了同类 `TODO(asset)`。建议并入同一份素材清单。 |
+| #   | 问题                                                                                  | 位置                                                                                                                                                                                                                                                                                          | 处方                                                                                                                                                                                                    |
+| --- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A-1 | newsletter 邮箱输入框只有 placeholder，没有 label 也没有 `aria-label`                 | `NewsletterForm.svelte:113-122`                                                                                                                                                                                                                                                               | 加 `aria-label={m.newsletter_emailLabel()}`（或 sr-only `<label for>`）。新增一条 message × 2 locale。**这是真 bug，不是品味问题** —— 读屏用户在这个字段上听不到任何提示。                              |
+| A-2 | 正文区 29 个元素小于 12px                                                             | 首页实测：`text-[11px]` × 12、`text-[10px]` × 2、`text-[9px]` × 1。具体：`HeroSection.svelte:64`（署名）、`MissionSection.svelte:49,71`（eyebrow）、`ResultsStrip.svelte:37`（h2）、`JourneyStrip.svelte:71,85,92,112`、`StudentHighlights.svelte:109,162,172`、`ProgramsShowcase.svelte:129` | 设 12px 下限：`text-[11px]`/`[10px]`/`[9px]` → `text-xs`(12px)。注意 `StudentHighlights.svelte:150` 的 48/64px 大数字是 `aria-hidden` 装饰，不在此列。eyebrow 收字号会动 `tracking`，需要一轮视觉确认。 |
+| A-3 | 移动端触控目标：行内链接 20px、footer 链接 17px、法务链接 16px，低于 WCAG 2.2 的 24px | footer 文字块 `Footer.svelte:155` 是 `text-xs`；行内链接散落在各 section                                                                                                                                                                                                                      | 给链接加垂直 padding 凑到 44px（批评建议值，高于 WCAG 底线）。纯 padding，不影响视觉尺寸。                                                                                                              |
+| A-4 | 两张截图卡上的文字与叠加标题互撞，照片上的对比度在实际中不达标                        | `StudentHighlights.svelte` 的 `appImg`（`assets/programs/app.png`，一个网页截图）与 AI Bootcamp 的幻灯片帧                                                                                                                                                                                    | 换成照片。这是素材缺口不是代码问题，`ProgramsShowcase.svelte:13-15` 已经为 AI Investment Lab 挂了同类 `TODO(asset)`。建议并入同一份素材清单。                                                           |
 
 ### 批次 2 — 一致性（成本中等，收益在「看起来是一套」）
 
-| # | 问题 | 位置 | 处方 |
-|---|---|---|---|
-| S-1 | section header 三种形制、两种对齐 | eyebrow + 大标题（`MissionSection.svelte:49-56`，左）；eyebrow 单独当 11px h2（`ResultsStrip.svelte:37`、`JourneyStrip.svelte:71`）；大标题无 eyebrow（`AcademicsShowcase.svelte:44` 左 / `ProgramsShowcase.svelte:149` 居中 / `ImpactStats.svelte:59` 居中 / `ContactSection.svelte:124` 居中 / `StudentHighlights.svelte:105` 左） | 抽一个 `shared/SectionHeader.svelte`（eyebrow? + h2 + 可选 subheading + 可选右侧链接），统一左对齐。顺带解决 A-2 里 Results/Journey 的 11px h2 —— 它们当前**是 h2 却长得像标签**，这正是批评「强调方向与说服力倒挂」的机制。 |
-| S-2 | 首页在用 16 种字号（9px–64px），section 标题落在 24/30/36/44 四档 | 统计见上。h2：`text-2xl md:text-4xl`（24/36）× 3、`text-xl md:text-3xl`（20/30）× 1、`text-3xl md:text-[2.75rem]`（30/44）× 1、`font-mono text-[11px]` × 2 | 收到约 8 档，section h2 只保留一档。注意 `ContactSection.svelte:121-123` 的注释：44px（`2.75rem`）是 §8.2 规定的 h2 上限且是刻意取到顶的，收敛时要么以它为唯一值、要么同步改那条注释和 §8.2。 |
-| S-3 | eyebrow 和统计数字用 `ui-monospace` 系统栈，字形随操作系统变 | `app.css:319-321,349,464-465` 只定义了 `--font-sans` / `--font-display`（Manrope + Inter + Noto Sans SC），**没有 `--font-mono`** → 所有 `font-mono` 落到 Tailwind v4 默认系统栈。批评的诊断准确。 | 两条路：① 载入一款 mono（+ 一个字体请求，和 `DECISIONS.md` 的 LCP 纪律冲突，要先量）；② 数字改用 Manrope 的 tabular figures（`font-variant-numeric: tabular-nums`，零新增请求）。**推荐 ②**，统计数字（`ImpactStats.svelte:75`）尤其该这么做 —— tabular 本来就是数字对齐的正解。eyebrow 则可以直接用 display 字体加大 tracking。 |
-| S-4 | logo 是 96×96 位图显示在 48px，wordmark 烤在图里 | `Header.svelte:27-28`（`logo.png?enhanced&w=96;192;288`、`logo-ink.png`）、`:390` | 换成 SVG 标记 + 实文字 lockup。顺带解决两件事：C-1 说的「唯一描述词不可读」，以及 `Header.svelte:380` 记录的「header logo 在 `/` 和 `/zh` 的 18 个样本里全是 LCP 元素」—— SVG 会让那个 LCP 大幅变轻。`:177-180` 记着明暗两套位图是因为原图 wordmark 是 50% 白；实文字 lockup 一次性消掉这个双图维护。**这条的性能收益可能比设计收益大。** |
+| #   | 问题                                                              | 位置                                                                                                                                                                                                                                                                                                                                 | 处方                                                                                                                                                                                                                                                                                                                                      |
+| --- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| S-1 | section header 三种形制、两种对齐                                 | eyebrow + 大标题（`MissionSection.svelte:49-56`，左）；eyebrow 单独当 11px h2（`ResultsStrip.svelte:37`、`JourneyStrip.svelte:71`）；大标题无 eyebrow（`AcademicsShowcase.svelte:44` 左 / `ProgramsShowcase.svelte:149` 居中 / `ImpactStats.svelte:59` 居中 / `ContactSection.svelte:124` 居中 / `StudentHighlights.svelte:105` 左） | 抽一个 `shared/SectionHeader.svelte`（eyebrow? + h2 + 可选 subheading + 可选右侧链接），统一左对齐。顺带解决 A-2 里 Results/Journey 的 11px h2 —— 它们当前**是 h2 却长得像标签**，这正是批评「强调方向与说服力倒挂」的机制。                                                                                                              |
+| S-2 | 首页在用 16 种字号（9px–64px），section 标题落在 24/30/36/44 四档 | 统计见上。h2：`text-2xl md:text-4xl`（24/36）× 3、`text-xl md:text-3xl`（20/30）× 1、`text-3xl md:text-[2.75rem]`（30/44）× 1、`font-mono text-[11px]` × 2                                                                                                                                                                           | 收到约 8 档，section h2 只保留一档。注意 `ContactSection.svelte:121-123` 的注释：44px（`2.75rem`）是 §8.2 规定的 h2 上限且是刻意取到顶的，收敛时要么以它为唯一值、要么同步改那条注释和 §8.2。                                                                                                                                             |
+| S-3 | eyebrow 和统计数字用 `ui-monospace` 系统栈，字形随操作系统变      | `app.css:319-321,349,464-465` 只定义了 `--font-sans` / `--font-display`（Manrope + Inter + Noto Sans SC），**没有 `--font-mono`** → 所有 `font-mono` 落到 Tailwind v4 默认系统栈。批评的诊断准确。                                                                                                                                   | 两条路：① 载入一款 mono（+ 一个字体请求，和 `DECISIONS.md` 的 LCP 纪律冲突，要先量）；② 数字改用 Manrope 的 tabular figures（`font-variant-numeric: tabular-nums`，零新增请求）。**推荐 ②**，统计数字（`ImpactStats.svelte:75`）尤其该这么做 —— tabular 本来就是数字对齐的正解。eyebrow 则可以直接用 display 字体加大 tracking。          |
+| S-4 | logo 是 96×96 位图显示在 48px，wordmark 烤在图里                  | `Header.svelte:27-28`（`logo.png?enhanced&w=96;192;288`、`logo-ink.png`）、`:390`                                                                                                                                                                                                                                                    | 换成 SVG 标记 + 实文字 lockup。顺带解决两件事：C-1 说的「唯一描述词不可读」，以及 `Header.svelte:380` 记录的「header logo 在 `/` 和 `/zh` 的 18 个样本里全是 LCP 元素」—— SVG 会让那个 LCP 大幅变轻。`:177-180` 记着明暗两套位图是因为原图 wordmark 是 50% 白；实文字 lockup 一次性消掉这个双图维护。**这条的性能收益可能比设计收益大。** |
 
 ### 批次 3 — 转化路径与内容（需要一点文案决策）
 
-| # | 问题 | 位置 | 处方 |
-|---|---|---|---|
-| T-1 | 三个转化标签指向两个目的地：header "Admissions" → `/admissions`，"Get in touch" 和 "Contact Us" → `/contact-us`，而 `/contact-us` 不解释区别 | `HeroSection.svelte:76`、`ContactSection.svelte:169-182`、`nav.ts` | 统一成一个主标签。批评建议 "Book a free consultation"，对齐收尾段已经承诺的 20–30 分钟咨询。注意 `DECISIONS.md` M-4：节目页 CTA 已统一到 `/admissions?program=<slug>#book`，并由 `program-cta.test.ts` + `admissions-funnel.spec.ts` 钉死。**首页应该并进这套既有机制，而不是另起一套** —— 也就是说首页主 CTA 指向 `/admissions#book`，`/contact-us` 退为次级（一般咨询）。这比批评的处方更贴合现状。 |
-| T-2 | WeChat 只在 footer，收尾联系块只有地址/电话/邮箱 | `Footer.svelte:123-132` 已有 `contact/WeChatQr.svelte`（带 `location` 和 `showId`）；`ContactSection.svelte:136-167` 没有 | 在 Get in Touch 块复用 `<WeChatQr location="home_contact" />`。组件现成，一行。**`Footer.svelte:123-126` 的注释本身就是最强论据**：微信是本站主要到达路径，家长在微信内置浏览器里长按二维码比填一个会失败的表单更可行，而那条注释正是在说 `wechat_qr_view` 事件因此几乎测不到 —— 把二维码放进转化区同时解决曝光和可测量性。 |
-| T-3 | highlight 卡描述被省略号截断且无法展开 | `StudentHighlights.svelte:167`（`line-clamp-3` 标题）、`:172`（`line-clamp-2` 11px 描述）；`<article>` 不可点击，整个 section 只有末尾一个 `/news` 链接（`:208`） | 两条：① 砍文案到放得下（`:156-159` 的注释已说明 clamp 是为了防长标题把描述挤出最小格 380×42%）；② 每张卡链到对应 `/news` 条目。②更好但需要 news 侧的对应条目存在。可先做①。 |
-| T-4 | 窄桌面宽度下联系信息行在数值中间断行（电话、邮编） | `ContactSection.svelte:136`（`flex ... sm:flex-row sm:justify-center sm:gap-6`）、`:149,157`（`text-sm` 值，无 `whitespace`） | 给电话和邮编加 `whitespace-nowrap`。两个 class，零风险。 |
+| #   | 问题                                                                                                                                         | 位置                                                                                                                                                              | 处方                                                                                                                                                                                                                                                                                                                                                                                                  |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T-1 | 三个转化标签指向两个目的地：header "Admissions" → `/admissions`，"Get in touch" 和 "Contact Us" → `/contact-us`，而 `/contact-us` 不解释区别 | `HeroSection.svelte:76`、`ContactSection.svelte:169-182`、`nav.ts`                                                                                                | 统一成一个主标签。批评建议 "Book a free consultation"，对齐收尾段已经承诺的 20–30 分钟咨询。注意 `DECISIONS.md` M-4：节目页 CTA 已统一到 `/admissions?program=<slug>#book`，并由 `program-cta.test.ts` + `admissions-funnel.spec.ts` 钉死。**首页应该并进这套既有机制，而不是另起一套** —— 也就是说首页主 CTA 指向 `/admissions#book`，`/contact-us` 退为次级（一般咨询）。这比批评的处方更贴合现状。 |
+| T-2 | WeChat 只在 footer，收尾联系块只有地址/电话/邮箱                                                                                             | `Footer.svelte:123-132` 已有 `contact/WeChatQr.svelte`（带 `location` 和 `showId`）；`ContactSection.svelte:136-167` 没有                                         | 在 Get in Touch 块复用 `<WeChatQr location="home_contact" />`。组件现成，一行。**`Footer.svelte:123-126` 的注释本身就是最强论据**：微信是本站主要到达路径，家长在微信内置浏览器里长按二维码比填一个会失败的表单更可行，而那条注释正是在说 `wechat_qr_view` 事件因此几乎测不到 —— 把二维码放进转化区同时解决曝光和可测量性。                                                                           |
+| T-3 | highlight 卡描述被省略号截断且无法展开                                                                                                       | `StudentHighlights.svelte:167`（`line-clamp-3` 标题）、`:172`（`line-clamp-2` 11px 描述）；`<article>` 不可点击，整个 section 只有末尾一个 `/news` 链接（`:208`） | 两条：① 砍文案到放得下（`:156-159` 的注释已说明 clamp 是为了防长标题把描述挤出最小格 380×42%）；② 每张卡链到对应 `/news` 条目。②更好但需要 news 侧的对应条目存在。可先做①。                                                                                                                                                                                                                           |
+| T-4 | 窄桌面宽度下联系信息行在数值中间断行（电话、邮编）                                                                                           | `ContactSection.svelte:136`（`flex ... sm:flex-row sm:justify-center sm:gap-6`）、`:149,157`（`text-sm` 值，无 `whitespace`）                                     | 给电话和邮编加 `whitespace-nowrap`。两个 class，零风险。                                                                                                                                                                                                                                                                                                                                              |
 
 ### 另外：批评没提，我查出来的
 
-| # | 问题 | 位置 |
-|---|---|---|
-| X-1 | `stats.ts` 注释与数值自相矛盾：注释写 "Still **six** after the 2026-11 revamp"，紧跟 `value: 7`。`source` 字符串（6 records + Research Lab）是对的，注释是腐烂的。 | `src/lib/content/stats.ts:28-34` |
-| X-2 | IB 在三处文案里与 AP/OSSD/SAT 并列成独立赛道，但站点只有五条赛道、IB 只存在于 tutoring 之内 —— 文案承诺大于交付。 | `journey_academic_line`、`academics_hero_description`、`metadata_academics_description`（见 W-1） |
-| X-3 | 批评提到「一个空的未命名 iframe」。我这次没定位到它（渲染态问题，静态读码看不见）。如果要清，需要跑起来抓 DOM。 | 待定 |
+| #   | 问题                                                                                                                                                               | 位置                                                                                              |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| X-1 | `stats.ts` 注释与数值自相矛盾：注释写 "Still **six** after the 2026-11 revamp"，紧跟 `value: 7`。`source` 字符串（6 records + Research Lab）是对的，注释是腐烂的。 | `src/lib/content/stats.ts:28-34`                                                                  |
+| X-2 | IB 在三处文案里与 AP/OSSD/SAT 并列成独立赛道，但站点只有五条赛道、IB 只存在于 tutoring 之内 —— 文案承诺大于交付。                                                  | `journey_academic_line`、`academics_hero_description`、`metadata_academics_description`（见 W-1） |
+| X-3 | 批评提到「一个空的未命名 iframe」。我这次没定位到它（渲染态问题，静态读码看不见）。如果要清，需要跑起来抓 DOM。                                                    | 待定                                                                                              |
 
 ---
 
@@ -169,17 +169,20 @@ R-2 大概是把浏览器对同组内别的字段的原生提示读串了。两�
 # Design Context — apps/web (ithacateens.com)
 
 ## Target audience
+
 安省（主要是 GTA）华人家庭的家长，以及 9–12 年级学生。主要到达路径是**微信分享**
 ——绝大多数访客在落地时对 Ithaca 一无所知，且相当一部分在微信内置
 WKWebView 里浏览（不自动播放视频、表单提交失败率高）。
 
 ## Use cases
+
 1. 家长评估一家升学/项目机构：先确认「教不教 AP/OSSD」，再看有没有成果。
 2. 家长或学生找一个具体项目（EV、AI Bootcamp、Dialogue、Investment Lab）。
 3. 已决定的人要尽快约上一次 20–30 分钟咨询。
 4. 微信内长按二维码加顾问，而不是填表。
 
 ## Brand personality / tone
+
 Institutional calm premium。克制的 teal + navy，真实学生摄影，具名证据
 （AIEC 2026、Hinton 讲座、Moridi 博士、Sedra 设计中心），不炫技。
 Manrope（display）+ Inter（body）+ Noto Sans SC（中文）。
@@ -187,6 +190,7 @@ Manrope（display）+ Inter（body）+ Noto Sans SC（中文）。
 （DECISIONS D-4）。
 
 ## Constraints
+
 - SvelteKit 2 + Svelte 5 runes，Paraglide 做 URL 式 i18n（en / zh），**无数据库**。
 - LCP 是纪律而非愿望：hero 视频为此砍掉（DECISIONS #7），header logo 是 `/` 和
   `/zh` 的实测 LCP 元素。任何新字体/新大图都要先量。
@@ -195,11 +199,13 @@ Manrope（display）+ Inter（body）+ Noto Sans SC（中文）。
 - 文案一律走 Paraglide，两个 locale 必须同步（`npm run i18n:check`）。
 
 ## Brand locks (2026-11)
+
 - Hero 的 Cavafy 引言
 - Our Approach 三支柱
-两者与 11-04 宣传册绑定，改动需所有者裁决。
+  两者与 11-04 宣传册绑定，改动需所有者裁决。
 
 ## Differentiation
+
 名字本身：Cavafy 的《Ithaca》—— 旅程重于终点。站点结构就是这个隐喻
 （01 Academic → 02 Projects → 03 Research 三块板）。记得住的那一件事应该是
 「这家机构把路径讲清楚了」，不是某个视觉效果。
