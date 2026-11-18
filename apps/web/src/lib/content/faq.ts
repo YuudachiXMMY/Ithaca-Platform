@@ -25,7 +25,7 @@ export const EV_FAQ: readonly FAQ[] = [
 		q: { en: 'Who can join the EV team?', zh: '谁可以加入 EV 车队？' },
 		a: {
 			en: 'Students in Grades 9 through 12 in the Greater Toronto Area. We welcome anyone interested in engineering, automotive technology, or team-based projects. No prior experience is required.',
-			zh: '大多伦多地区 8 至 11 年级的学生。我们欢迎任何对工程、汽车技术或团队项目感兴趣的人。无需任何先前经验。'
+			zh: '大多伦多地区 9 至 12 年级的学生。欢迎任何对工程、汽车技术或团队项目感兴趣的同学加入，无需任何经验。'
 		}
 	},
 	{

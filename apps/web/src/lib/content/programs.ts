@@ -213,7 +213,7 @@ export const PROGRAMS: readonly Program[] = [
 	// ── AI Entrepreneurship Bootcamp ─────────────────────────────────────────────────────────────
 	{
 		slug: 'ai-entrepreneurship-bootcamp',
-		name: { en: 'AI Entrepreneurship Bootcamp', zh: 'AI 创业训练营' },
+		name: { en: 'AI Entrepreneurship Bootcamp', zh: 'AI 创业探索营' },
 		tagline: {
 			en: 'From first idea to investor-ready pitch in 13 weeks.',
 			zh: '13 周内，从第一个创意到投资人级别的路演。'
@@ -238,7 +238,7 @@ export const PROGRAMS: readonly Program[] = [
 		gallery: [
 			{
 				src: '$lib/assets/programs/ai-bootcamp/AI-Entrep_05.jpg',
-				alt: { en: 'Students at AI Entrepreneurship Bootcamp', zh: 'AI 创业训练营的学生' },
+				alt: { en: 'Students at AI Entrepreneurship Bootcamp', zh: 'AI 创业探索营的学生' },
 				width: 1920,
 				height: 1280
 			},
@@ -250,7 +250,7 @@ export const PROGRAMS: readonly Program[] = [
 			},
 			{
 				src: '$lib/assets/programs/ai-bootcamp/AI-Entrep_81.jpg',
-				alt: { en: 'Students at AI Entrepreneurship Bootcamp', zh: 'AI 创业训练营的学生' },
+				alt: { en: 'Students at AI Entrepreneurship Bootcamp', zh: 'AI 创业探索营的学生' },
 				width: 1920,
 				height: 1280
 			}
@@ -277,7 +277,7 @@ export const PROGRAMS: readonly Program[] = [
 				title: { en: 'In-depth exposure to AI entrepreneurship', zh: '深度 AI 创业体验' },
 				description: {
 					en: 'Through hands-on workshops, mentor sessions, and competition preparation, students gain first-hand exposure to the intersection of technology and business innovation.',
-					zh: '通过参观顶级金融机构和动手工作坊，学生亲身体验科技与商业创新交汇的前沿。'
+					zh: '通过动手工作坊、导师辅导与备赛训练，学生亲身接触科技与商业创新的交汇点。'
 				}
 			},
 			{
@@ -493,7 +493,7 @@ export const PROGRAMS: readonly Program[] = [
 		// programme record — it is the same programme, one level up.
 		tracks: [
 			{
-				name: { en: 'FIN 101 · 8 weeks · 16 sessions', zh: 'Lab 101 · 8 周 · 16 课时' },
+				name: { en: 'FIN 101 · 8 weeks · 16 sessions', zh: 'FIN 101 · 8 周 · 16 课时' },
 				description: {
 					en: 'Investment theory, AI tools, data modelling fundamentals, and simulated trading.',
 					zh: '投资理论 · AI 工具使用 · 数据建模基础 · 模拟投资操作。'
@@ -501,10 +501,10 @@ export const PROGRAMS: readonly Program[] = [
 				tags: ['Investment Theory', 'AI Tools', 'Data Modelling', 'Simulated Trading']
 			},
 			{
-				name: { en: 'FIN 102 · Advanced · 5 weeks', zh: 'Lab 102 · 进阶 · 5 周' },
+				name: { en: 'FIN 102 · Advanced · 5 weeks', zh: 'FIN 102 · 进阶 · 5 周' },
 				description: {
 					en: 'Builds on FIN 101 and progresses to small-scale live investing. Details are available on request.',
-					zh: '在 101 基础上转向真实小额投资实操。详询。'
+					zh: '在 FIN 101 的基础上，进阶到小额真实投资实操。详情欢迎咨询。'
 				},
 				tags: []
 			}

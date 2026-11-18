@@ -159,7 +159,7 @@ export const SEASONS: readonly Season[] = [
 	{
 		id: 'ail-101-f26',
 		programSlug: 'ai-investment-lab',
-		label: { en: 'FIN 101, Fall 2026', zh: 'Lab 101 —— 2026 年秋季' },
+		label: { en: 'FIN 101, Fall 2026', zh: 'FIN 101，2026 年秋季' },
 		start: '2026-09-01',
 		end: '2026-12-31',
 		// "8 weeks, 16 sessions" stays copy rather than becoming `seasonDuration(start, end)`, for

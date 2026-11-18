@@ -277,12 +277,12 @@ consent 门禁管**（Andy Song 的普林斯顿入读就在 `results.ts` 里，�
   原本显示计算时长的地方（EV 页首屏条、详情条、`/admissions` 日历）改显示学期，
   `start` / `end` 与 JSON-LD 不变。`season-contract.test.ts` 相应改为同时平移首期的起始月。
 
-**中文页这一轮按业主要求没有处理**，所以 `/zh` 下有几处写死的文案和上面的数据对不上，补中文时
+~~**中文页这一轮按业主要求没有处理**，所以 `/zh` 下有几处写死的文案和上面的数据对不上，补中文时
 照这张单子改即可：`programs_aiCamp_hero_subtitle`（8 至 12 年级）、
 `programs_evChallenge_faq_items_whoCanJoin_answer` 与 `faq.ts` 对应条目（8 至 11 年级）、
 `programs.ts` / `season-data.ts` 里 `zh` 字段的「Lab 101 / Lab 102」、合规声明里的「Lab 102」、
 `home_results_item3`、学业辅导相关文案与商标声明里的 IB、AI 创业营成果描述里的「参观顶级金融机构」。
-另有上一轮留下的两处：OSSD 学分仍写 18/12、`academics_tracks_eyebrow` 仍是「四个方向」。
+另有上一轮留下的两处：OSSD 学分仍写 18/12、`academics_tracks_eyebrow` 仍是「四个方向」。~~ —— 🟢 2026-11-18 全部补齐：`zh.json` 按现行英文逐条对齐（127 条），上列 `faq.ts` / `programs.ts` / `season-data.ts` 的 `zh` 字段同步改为 9-12 年级与 FIN 101 / FIN 102。同日业主裁定：中文项目名统一为「AI 创业探索营」（原「AI 创业训练营」），英文名不变。
 
 #### 🟡 C-10f · 方案自己列的「待拍板」项
 
