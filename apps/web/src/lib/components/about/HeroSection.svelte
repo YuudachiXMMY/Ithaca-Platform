@@ -47,17 +47,17 @@
 		<!-- Above-the-fold hero text renders statically in SSR (no Reveal gate) so the LCP
 		     <p> paints immediately; mirrors how the homepage keeps its hero text in SSR. -->
 		<div class="max-w-md">
-			<p class="font-mono text-[11px] tracking-[0.28em] text-band-brand-strong uppercase">
+			<p class="font-display text-xs font-bold tracking-[0.28em] text-band-brand-strong uppercase">
 				{m.about_hero_eyebrow()}
 			</p>
 			<h1
 				id="about-heading"
-				class="mt-6 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-light tracking-tight text-band-foreground"
+				class="b-display mt-6 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-bold tracking-tight text-band-foreground"
 			>
 				{m.about_hero_title()}
 			</h1>
 			<div
-				class="mt-6 h-px w-24 bg-gradient-to-r from-band-brand via-band-brand/40 to-transparent"
+				class="mt-6 h-[3px] w-24 rounded-sm bg-gradient-to-r from-band-brand to-band-brand/20"
 				aria-hidden="true"
 			></div>
 			<p class="mt-6 text-base leading-relaxed text-band-foreground/80">
@@ -69,7 +69,7 @@
 				{#each facts as fact (fact.label)}
 					<div>
 						<span
-							class="block font-mono text-xs tracking-[0.15em] text-band-brand-strong uppercase"
+							class="block font-display text-xs font-bold tracking-[0.15em] text-band-brand-strong uppercase"
 						>
 							{fact.label()}
 						</span>

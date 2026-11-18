@@ -51,7 +51,7 @@
 <div
 	class="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-14"
 >
-	<div class="relative aspect-[4/3] overflow-hidden">
+	<div class="relative aspect-[4/3] overflow-clip rounded-card border border-sea-card-line">
 		<enhanced:img
 			src={stepsImage}
 			alt={m.admissions_steps_imageAlt()}
@@ -62,17 +62,23 @@
 	</div>
 
 	<div>
-		<ol class="flex flex-col">
+		<!-- Five cards, not five rows separated by hairlines. This is the admissions funnel — the
+		     thing the whole site exists to feed — and it was the flattest block on the page: a
+		     ruled list reads as reference material, where the brochure sets the same sequence as
+		     discrete steps you move through (`.steps .row`). -->
+		<ol class="flex flex-col gap-3">
 			{#each ADMISSION_STEPS as step, index (step)}
-				<li class="flex gap-5 border-t border-border py-5 first:border-t-0 first:pt-0">
-					<span class="mt-1 shrink-0 font-mono text-sm tracking-[0.2em] text-brand">
+				<li class="b-card b-card-on-tint flex gap-5 py-5 md:py-6">
+					<span
+						class="mt-0.5 shrink-0 font-display text-xl leading-none font-extrabold text-brand tabular-nums"
+					>
 						{String(index + 1).padStart(2, '0')}
 					</span>
 					<div>
-						<span class="text-base leading-snug font-semibold text-foreground md:text-lg">
+						<span class="b-display text-base leading-snug font-bold text-sea-900 md:text-lg">
 							{LABEL[step]()}
 						</span>
-						<p class="mt-2 max-w-[52ch] text-sm leading-relaxed text-foreground-muted">
+						<p class="mt-2 max-w-[52ch] text-sm leading-[1.75] text-foreground-muted">
 							{DETAIL[step]()}
 						</p>
 					</div>
@@ -80,7 +86,7 @@
 			{/each}
 		</ol>
 
-		<p class="mt-8 max-w-[60ch] text-sm leading-relaxed text-foreground-subtle">
+		<p class="mt-8 max-w-[60ch] text-sm leading-[1.8] text-foreground-subtle">
 			{m.admissions_steps_note()}
 		</p>
 	</div>

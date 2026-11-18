@@ -96,7 +96,8 @@
 		return m.admissions_calendar_windowWithLength({ window: row.window, length });
 	}
 
-	const termClass = 'font-mono text-[11px] tracking-[0.2em] text-foreground-subtle uppercase';
+	const termClass =
+		'font-display text-xs font-bold tracking-[0.2em] text-foreground-subtle uppercase';
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
@@ -115,7 +116,9 @@
 					     family, the same way the about-us and /programs overlay cards carry theirs. The
 					     image is decorative here — the name it illustrates is the heading two lines of
 					     markup away — so `alt` is empty rather than a second copy of that name. -->
-					<div class="relative aspect-[16/9] overflow-hidden">
+					<div
+						class="relative aspect-[16/9] overflow-clip rounded-card border border-sea-card-line"
+					>
 						<enhanced:img
 							src={picture}
 							alt=""
@@ -134,7 +137,7 @@
 								{row.programName}
 							</h3>
 							<span
-								class="shrink-0 border border-band-brand/50 px-2 py-1 font-mono text-[11px] tracking-[0.2em] text-band-brand-strong uppercase"
+								class="shrink-0 border border-band-brand/50 px-2 py-1 font-display text-xs font-bold tracking-[0.2em] text-band-brand-strong uppercase"
 							>
 								{STATUS[row.registration]()}
 							</span>
@@ -146,7 +149,7 @@
 							{row.programName}
 						</h3>
 						<span
-							class="shrink-0 border border-brand/40 px-2 py-1 font-mono text-[11px] tracking-[0.2em] text-brand-bright uppercase"
+							class="shrink-0 border border-brand/40 px-2 py-1 font-display text-xs font-bold tracking-[0.2em] text-brand-bright uppercase"
 						>
 							{STATUS[row.registration]()}
 						</span>

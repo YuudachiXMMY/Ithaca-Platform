@@ -85,14 +85,11 @@
 <section class="border-t border-border py-14 md:py-20">
 	<div class={containerClass}>
 		<h2
-			class="text-3xl leading-[1.05] font-light tracking-tight text-foreground md:text-4xl lg:text-5xl"
+			class="b-display text-3xl leading-[1.05] font-bold tracking-tight text-sea-900 md:text-4xl lg:text-5xl"
 		>
 			{m.programs_evChallenge_workshopToRoles_workshopTitle()}
 		</h2>
-		<div
-			class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-			aria-hidden="true"
-		></div>
+		<div class="b-rule mt-6 w-28" aria-hidden="true"></div>
 		<div
 			class="mt-10 grid auto-rows-[160px] grid-cols-2 gap-2 md:auto-rows-[200px] md:grid-cols-3 lg:auto-rows-[240px] lg:gap-3"
 		>
@@ -121,14 +118,11 @@
 
 	<div class="relative {containerClass}">
 		<h2
-			class="text-3xl leading-[1.05] font-light tracking-tight text-foreground md:text-4xl lg:text-5xl"
+			class="b-display text-3xl leading-[1.05] font-bold tracking-tight text-sea-900 md:text-4xl lg:text-5xl"
 		>
 			{m.programs_evChallenge_workshopToRoles_rolesTitle()}
 		</h2>
-		<div
-			class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-			aria-hidden="true"
-		></div>
+		<div class="b-rule mt-6 w-28" aria-hidden="true"></div>
 		<div class="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:gap-4">
 			{#each ROLES as role, i (i)}
 				{@const Icon = role.icon}

@@ -167,7 +167,7 @@
 	<section class="grid min-h-[85dvh] grid-cols-1 items-center gap-0 lg:grid-cols-2">
 		<div class="order-2 px-5 py-16 sm:px-8 md:px-[6vw] lg:order-1 lg:py-0 lg:pr-12 lg:pl-[6vw]">
 			<h1
-				class="mb-6 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-light tracking-tight text-foreground"
+				class="b-display mb-6 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] font-bold tracking-tight text-sea-900"
 			>
 				{m.programs_aiCamp_hero_title()}
 			</h1>
@@ -244,7 +244,9 @@
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
 				<div class="mb-12 max-w-[1100px]">
-					<h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
+					<h2
+						class="b-display text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.25rem] lg:text-4xl"
+					>
 						{m.programs_aiCamp_overview_title()}
 					</h2>
 					<div class="mt-4 h-px w-10 bg-brand/30" aria-hidden="true"></div>
@@ -310,7 +312,9 @@
 					</div>
 
 					<div>
-						<h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
+						<h2
+							class="b-display text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.25rem] lg:text-4xl"
+						>
 							{m.programs_aiCamp_structure_title()}
 						</h2>
 						<div class="mt-4 mb-10 h-px w-10 bg-brand/30" aria-hidden="true"></div>
@@ -318,7 +322,7 @@
 							{#each DETAILS as detail (detail.label)}
 								<div>
 									<span
-										class="mb-1.5 block font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase"
+										class="mb-1.5 block font-display text-xs font-bold tracking-[0.28em] text-brand-bright uppercase"
 									>
 										{detail.label}
 									</span>
@@ -339,7 +343,9 @@
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
 				<div class="mb-12 lg:max-w-[60%]">
-					<h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
+					<h2
+						class="b-display text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.25rem] lg:text-4xl"
+					>
 						{m.programs_aiCamp_contest_title()}
 					</h2>
 					<div class="mt-4 mb-6 h-px w-10 bg-brand/30" aria-hidden="true"></div>
@@ -361,7 +367,7 @@
 						{#each MODULES as module, i (i)}
 							<li class="flex items-start gap-4 text-foreground-muted">
 								<span
-									class="mt-1 shrink-0 font-mono text-[11px] tracking-[0.2em] text-brand uppercase"
+									class="mt-1 shrink-0 font-display text-xs font-bold tracking-[0.2em] text-brand uppercase"
 								>
 									{String(i + 1).padStart(2, '0')}
 								</span>
@@ -408,7 +414,9 @@
 			<Reveal y={24}>
 				<div class="grid grid-cols-1 gap-12 lg:grid-cols-[3fr_2fr] lg:gap-16">
 					<div>
-						<h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
+						<h2
+							class="b-display text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.25rem] lg:text-4xl"
+						>
 							{m.programs_aiCamp_goals_title()}
 						</h2>
 						<div class="mt-4 mb-10 h-px w-10 bg-brand/30" aria-hidden="true"></div>
@@ -455,7 +463,9 @@
 	<section class="bg-card-bg py-14 md:py-20">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<Reveal y={24}>
-				<h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
+				<h2
+					class="b-display text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.25rem] lg:text-4xl"
+				>
 					{m.programs_aiCamp_team_title()}
 				</h2>
 				<div class="mt-4 mb-8 h-px w-10 bg-brand/30" aria-hidden="true"></div>
@@ -471,7 +481,7 @@
 
 				<div class="grid grid-cols-1 gap-12 md:grid-cols-2">
 					<div>
-						<h3 class="mb-4 text-xl font-bold text-foreground">
+						<h3 class="b-display mb-4 text-xl font-extrabold text-sea-900">
 							{m.programs_aiCamp_team_educators_title()}
 						</h3>
 						<p class="max-w-[50ch] leading-relaxed text-foreground-muted">
@@ -480,7 +490,7 @@
 					</div>
 
 					<div>
-						<h3 class="mb-4 text-xl font-bold text-foreground">
+						<h3 class="b-display mb-4 text-xl font-extrabold text-sea-900">
 							{m.programs_aiCamp_team_mentors_title()}
 						</h3>
 						<p class="mb-6 max-w-[50ch] leading-relaxed text-foreground-muted">
@@ -505,7 +515,9 @@
 	<section class="py-14 md:py-20">
 		<div class="mx-auto max-w-3xl px-5 sm:px-8">
 			<Reveal y={24}>
-				<h2 class="mb-4 text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
+				<h2
+					class="b-display mb-4 text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.25rem] lg:text-4xl"
+				>
 					{m.programs_aiCamp_faq_title()}
 				</h2>
 				<p class="mb-12 text-foreground-subtle">

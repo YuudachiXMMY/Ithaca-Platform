@@ -96,43 +96,84 @@
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->
 
-{#snippet cell(program: (typeof FLAGSHIPS)[number], large: boolean)}
+<!--
+	2026-11-17 — the tiles are LIGHT CARDS, not scrimmed photographs.
+
+	Each cell used to be a full-bleed photograph with white copy over a
+	`from-overlay/95` gradient. That is the heaviest thing on the homepage, and
+	four of them stacked in a bento read as one dark slab — the opposite of the
+	owner's direction. It also cost legibility: text on a scrim lands near the
+	4.5:1 floor and moves with whatever the photograph does underneath, whereas
+	the same words on paper are 17.74:1 and fixed.
+
+	So the photograph becomes an ILLUSTRATION at the top of a card and the copy
+	moves onto the card's own ground — the brochure's `.mcard`. Nothing is lost:
+	the photographs are still here, still the first thing in each tile, and still
+	the largest element in the section.
+-->
+{#snippet cell(program: (typeof FLAGSHIPS)[number], variant: 'large' | 'small' | 'wide')}
 	<a
 		href={localizeHref(program.href)}
 		onclick={() => onProgramClick(program.slug)}
-		class="group relative flex h-full min-h-[180px] flex-col justify-end overflow-hidden bg-surface-4 transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand sm:min-h-[220px] md:min-h-[240px]"
+		class="b-card-media b-edge group flex h-full transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-brand/35 hover:shadow-[0_8px_24px_-10px_rgba(28,90,140,0.3)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand {variant ===
+		'wide'
+			? 'flex-col sm:flex-row'
+			: 'flex-col'}"
 	>
-		<enhanced:img
-			src={program.img}
-			alt={program.alt()}
-			sizes={large ? '(max-width: 768px) 100vw, 66vw' : '(max-width: 768px) 100vw, 34vw'}
-			loading="lazy"
-			class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-		/>
+		<!-- `wide` puts the photograph beside the copy (the brochure's `.mcard`). The full-width
+		     tile needs it: a 16/9 frame across both columns is an 800px-tall photograph, which
+		     pushed this one section past three screens on its own.
 
+		     `large` takes no aspect ratio at all. It spans both rows of the bento, so the grid
+		     stretches it to whatever the two cards beside it add up to — and with a fixed ratio the
+		     surplus landed in the copy area as a band of empty card. `flex-1` hands that surplus to
+		     the photograph instead, which is the thing worth looking at. -->
 		<div
-			class="absolute inset-0 bg-gradient-to-t from-overlay/95 via-overlay/70 to-transparent"
-			aria-hidden="true"
-		></div>
+			class="relative overflow-clip {variant === 'large'
+				? 'aspect-[16/10] md:aspect-auto md:min-h-[18rem] md:flex-1'
+				: variant === 'wide'
+					? 'aspect-[16/9] sm:aspect-auto sm:w-[38%] sm:shrink-0'
+					: 'aspect-[16/9]'}"
+		>
+			<enhanced:img
+				src={program.img}
+				alt={program.alt()}
+				sizes={variant === 'large'
+					? '(max-width: 768px) 100vw, 66vw'
+					: variant === 'wide'
+						? '(max-width: 640px) 100vw, 38vw'
+						: '(max-width: 768px) 100vw, 34vw'}
+				loading="lazy"
+				class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+			/>
+		</div>
 
-		<div class="relative z-10 p-4 md:p-5 {large ? 'md:p-6' : ''}">
+		<!-- `large` does NOT grow: its photograph took the flex-1 above, so the copy block sits at
+		     its natural height under it. The other two variants still grow, which is what keeps the
+		     two small cards' "Learn more" rows on a common baseline. -->
+		<div class="flex flex-col p-5 pl-6 md:p-6 md:pl-7 {variant === 'large' ? 'shrink-0' : 'grow'}">
 			<h3
-				class="font-bold text-band-foreground {large
-					? 'text-base sm:text-lg md:text-xl'
-					: 'text-sm md:text-base'}"
+				class="b-display font-extrabold text-sea-900 {variant === 'small'
+					? 'text-base md:text-lg'
+					: 'text-xl md:text-2xl'}"
 			>
 				{program.title()}
 			</h3>
-			<p class="mt-1.5 hidden max-w-md text-xs leading-relaxed text-band-foreground/80 sm:block">
+			<p
+				class="mt-2.5 max-w-prose text-[0.9375rem] leading-[1.75] text-foreground-muted {variant ===
+				'large'
+					? ''
+					: 'grow'}"
+			>
 				{program.description()}
 			</p>
 			{#if windows.get(program.slug)}
-				<p class="mt-1.5 text-xs font-medium tracking-wide text-band-foreground/70">
-					{windows.get(program.slug)}
+				<p class="mt-4">
+					<span class="b-chip b-chip-brand">{windows.get(program.slug)}</span>
 				</p>
 			{/if}
 			<div
-				class="mt-3 flex items-center gap-1.5 text-xs font-medium text-band-brand-strong transition-colors duration-200 group-hover:text-band-foreground"
+				class="mt-5 flex items-center gap-1.5 font-display text-xs font-bold tracking-[0.18em] text-brand uppercase"
 			>
 				<span>{m.home_programs_learnMore()}</span>
 				<ArrowRight
@@ -143,26 +184,28 @@
 	</a>
 {/snippet}
 
-<section class="bg-surface-4 py-8 md:py-10" aria-label={m.home_programs_ariaLabel()}>
+<section class="bg-sea-tint py-20 md:py-28" aria-label={m.home_programs_ariaLabel()}>
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={24}>
 			<!-- Left, not centred. It was one of four centred headers against four left ones, and the
 			     alignment did not track anything — see SectionHeader. -->
-			<div class="mb-8">
-				<SectionHeader heading={m.home_programs_heading} sub={m.home_programs_subheading} />
+			<div class="mb-10">
+				<SectionHeader
+					index="03"
+					heading={m.home_programs_heading}
+					sub={m.home_programs_subheading}
+				/>
 			</div>
 		</Reveal>
 
-		<!-- Bento grid: 2fr | 1fr with 1px line separators. Cells always render (SSR-safe); one
-		     Reveal fades the whole grid up on scroll. -->
+		<!-- Bento: the flagship takes a 2fr column and the full height beside it, so the four are
+		     not four equal tiles. Real gaps now, not 1px rules — the cards carry their own edges. -->
 		<Reveal y={24}>
-			<div
-				class="grid gap-px overflow-hidden bg-surface-2 md:grid-cols-[2fr_1fr] md:grid-rows-[1fr_1fr_auto]"
-			>
-				<div class="md:row-span-2">{@render cell(FLAGSHIPS[0], true)}</div>
-				<div>{@render cell(FLAGSHIPS[1], false)}</div>
-				<div>{@render cell(FLAGSHIPS[2], false)}</div>
-				<div class="md:col-span-2">{@render cell(FLAGSHIPS[3], false)}</div>
+			<div class="grid gap-4 md:grid-cols-[2fr_1fr] md:grid-rows-[auto_auto] md:gap-5">
+				<div class="md:row-span-2">{@render cell(FLAGSHIPS[0], 'large')}</div>
+				<div>{@render cell(FLAGSHIPS[1], 'small')}</div>
+				<div>{@render cell(FLAGSHIPS[2], 'small')}</div>
+				<div class="md:col-span-2">{@render cell(FLAGSHIPS[3], 'wide')}</div>
 			</div>
 		</Reveal>
 	</div>

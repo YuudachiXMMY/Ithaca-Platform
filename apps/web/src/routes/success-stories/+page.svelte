@@ -95,7 +95,8 @@
 	 * drawn through it.
 	 */
 	const containerClass = 'mx-auto w-full max-w-[1400px] px-5 py-14 sm:px-8 md:px-[6vw] md:py-20';
-	const headingClass = 'text-2xl font-bold tracking-tight text-foreground md:text-4xl';
+	const headingClass =
+		'b-display text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.5rem]';
 </script>
 
 <Seo title={m.results_hero_title()} description={m.results_meta_description()} />
@@ -104,10 +105,7 @@
 <!-- The hero carries this page's one eyebrow; the two sections below lead with their heading. -->
 {#snippet sectionHead(heading: string, description?: string)}
 	<h2 class={headingClass}>{heading}</h2>
-	<div
-		class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-		aria-hidden="true"
-	></div>
+	<div class="b-rule mt-6 w-28" aria-hidden="true"></div>
 	{#if description}
 		<p class="mt-6 max-w-[60ch] text-base leading-relaxed text-foreground-muted">{description}</p>
 	{/if}
@@ -134,7 +132,7 @@
 	     state and not a "coming soon", because the heading is itself a thing a withheld record must
 	     not leak through. -->
 	{#if groups.length > 0}
-		<section class="bg-surface-0">
+		<section class="bg-background">
 			<div class={containerClass}>
 				<Reveal y={24}>
 					{@render sectionHead(m.results_timeline_title())}
@@ -160,7 +158,7 @@
 
 	<!-- R-RES-1, the Dialogues films. Same rule: no records, no section. -->
 	{#if interviews.length > 0}
-		<section class="bg-surface-3">
+		<section class="bg-sea-tint">
 			<div class={containerClass}>
 				<Reveal y={24}>
 					{@render sectionHead(m.results_interviews_title(), m.results_interviews_description())}
@@ -178,7 +176,7 @@
 	     ContactSection, the programme CTA blocks). UNCONDITIONAL, unlike the two sections above: it
 	     describes the academy, not a student, so it has nothing to leak and it is the whole page
 	     when the gate withholds everything. -->
-	<section class="bg-surface-0" aria-label={m.results_cta_ariaLabel()}>
+	<section class="bg-background" aria-label={m.results_cta_ariaLabel()}>
 		<div class={containerClass}>
 			<Reveal y={24}>
 				<!-- The content sits in NORMAL FLOW with the photograph absolutely positioned behind it,

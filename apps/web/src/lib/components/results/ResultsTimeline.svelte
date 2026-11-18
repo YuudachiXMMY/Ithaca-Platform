@@ -56,7 +56,7 @@
 	const evidenceFor = (result: ResultView): Picture | null =>
 		result.evidence ? (EVIDENCE[result.evidence.src] ?? null) : null;
 
-	const railClass = 'font-mono text-[11px] tracking-[0.2em] uppercase';
+	const railClass = 'font-display text-xs font-bold tracking-[0.2em] uppercase';
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- internal links use Paraglide localizeHref() for URL-based i18n; SvelteKit resolve() would drop the locale prefix -->

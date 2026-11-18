@@ -10,6 +10,31 @@ report it** (§8). Do not invent a value.
 and `.claude/PRPs/reviews/design-tokens-review-round2.md` (25 findings).
 Every ratio printed anywhere in this document was recomputed in those passes — see §4 for the method.
 
+> ### ⚠ AMENDMENT 2026-11-17 — **the accent is no longer teal; every teal figure below is stale**
+>
+> The brand accent moved from the teal ramp to **sea** (the 2026-11 brochure's two blues,
+> `--sea-700 #1C5A8C` + `--sea-900 #272F6B`). See `DECISIONS.md`, 2026-11-17, for why.
+>
+> **What this does to this document.** The swap happened entirely in the §4 semantic layer —
+> `--brand`, `--brand-bright`, `--brand-graphic`, `--action`, `--action-hover`, `--band-brand*`
+> and `--band-action*` now alias `--sea-*`. So every row in §3 that names a SEMANTIC token
+> (`text-brand`, `bg-action`, …) is still correct and still the thing to write. What is stale is
+> every **ratio** quoted beside a teal: on white, brand is **7.27:1** (was 6.04) and brand-bright
+> **10.02:1** (was 8.83); on navy-900, band-brand is **7.85:1** (was 7.94) and band-brand-strong
+> **12.99:1** (was 14.00). Contrast improved in both directions that matter, so no rule in this
+> file becomes unsafe — the numbers are simply conservative now. The `--teal-*` ramp is KEPT and
+> still correct for its three non-CSS consumers (`og/render.ts`, and the three.js material
+> literals), which do not follow a semantic-token edit.
+>
+> **Also added, and not described anywhere below:** the SECTION FURNITURE layer in `app.css`
+> (`.b-card`, `.b-card-media`, `.b-edge`, `.b-panel`, `.b-rule`, `.b-numeral`, `.b-chip`,
+> `.b-quote`, `.b-display`) and the three paper tints it runs on (`--paper`, `--sea-tint`,
+> `--sea-tint-strong`, `--sea-card-line`). Those classes live in `@layer components` ON PURPOSE —
+> unlayered would beat every `@layer utilities` rule and make their padding un-overridable from a
+> call site. The section-background system is now **two rungs** (`--paper` / `--sea-tint`)
+> alternating down a page, not the five-rung `--surface-*` ladder §3 documents; the ladder tokens
+> remain for element-level use.
+
 > ### ⚠ AMENDMENT 2026-10-13 — **two kinds of staleness in this file, read before using it as a map**
 >
 > 1. **The `ev-challenge` paths below no longer exist.** `src/routes/programs/ev-challenge/` now

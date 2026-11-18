@@ -76,18 +76,25 @@
 
 		<div class="relative z-10 px-5 pb-14 sm:px-8 md:px-[6vw] md:pb-20">
 			<div class="max-w-3xl">
-				<p class="font-mono text-[11px] tracking-[0.28em] text-band-brand-strong uppercase">
+				<p
+					class="font-display text-xs font-bold tracking-[0.28em] text-band-brand-strong uppercase"
+				>
 					{eyebrow}
 				</p>
 				<div
-					class="mt-6 h-px w-24 bg-gradient-to-r from-band-brand via-band-brand/40 to-transparent"
+					class="mt-6 h-[3px] w-24 rounded-sm bg-gradient-to-r from-band-brand to-band-brand/20"
 					aria-hidden="true"
 				></div>
-				<h1 id={headingId} class="mt-6 text-4xl font-light text-band-foreground md:text-6xl">
+				<h1
+					id={headingId}
+					class="b-display mt-6 text-4xl font-bold text-band-foreground md:text-6xl"
+				>
 					{title}
 				</h1>
 				{#if audience}
-					<p class="mt-5 font-mono text-xs tracking-[0.14em] text-band-foreground/75 uppercase">
+					<p
+						class="mt-5 font-display text-xs font-bold tracking-[0.14em] text-band-foreground/75 uppercase"
+					>
 						{audience}
 					</p>
 				{/if}
@@ -113,7 +120,9 @@
 		<section class="border-hairline border-t py-14 md:py-16">
 			<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 				<Reveal y={24}>
-					<h2 class="font-mono text-[11px] tracking-[0.24em] text-foreground-subtle uppercase">
+					<h2
+						class="font-display text-xs font-bold tracking-[0.24em] text-foreground-subtle uppercase"
+					>
 						{m.academics_beyondClassroomHeading()}
 					</h2>
 					<ul class="mt-5 flex flex-wrap gap-x-10 gap-y-3">
@@ -136,7 +145,7 @@
 		</section>
 	{/if}
 
-	<section class="border-hairline border-t bg-surface-4 py-14 md:py-20">
+	<section class="bg-sea-tint py-14 md:py-20">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 			<!-- Non-band tokens: `bg-surface-4` is #e8edf3, a NEAR-WHITE surface (app.css:169 still
 			     carries the "was #0a0c10" note from when it was the deepest DARK band). The band-*
@@ -146,7 +155,7 @@
 			     button label #fff on #0b6e70 6.04:1, hover fill 8.83:1. See docs/DESIGN-TOKENS.md §2
 			     for the band / non-band split. -->
 			<Reveal y={24}>
-				<h2 class="max-w-2xl text-2xl font-light text-foreground md:text-4xl">
+				<h2 class="b-display max-w-2xl text-2xl font-extrabold text-sea-900 md:text-4xl">
 					{m.program_page_ctaHeading()}
 				</h2>
 				<a

@@ -78,19 +78,16 @@
 	}
 </script>
 
-<section class="bg-surface-0 py-14 md:py-20" aria-labelledby="highlights-heading">
+<section class="bg-sea-tint py-20 md:py-28" aria-labelledby="highlights-heading">
 	<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 		<Reveal y={20} duration={500}>
 			<h2
 				id="highlights-heading"
-				class="text-2xl font-bold tracking-tight text-foreground md:text-4xl"
+				class="b-display text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.5rem]"
 			>
 				{m.about_highlights_heading()}
 			</h2>
-			<div
-				class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-				aria-hidden="true"
-			></div>
+			<div class="b-rule mt-6 w-28" aria-hidden="true"></div>
 		</Reveal>
 
 		<!-- Featured spotlight: Andy Song - prominent display -->
@@ -99,7 +96,7 @@
 				<div
 					use:inview={{ rootMargin: '200px', once: true }}
 					oninview={() => (featuredVisible = true)}
-					class="relative aspect-video overflow-hidden bg-surface-3"
+					class="relative aspect-video overflow-clip rounded-card border border-sea-card-line bg-sea-tint"
 				>
 					{#if featuredVisible}
 						<iframe
@@ -138,7 +135,9 @@
 			>
 				{#each videos as video (video.src)}
 					<div>
-						<div class="relative aspect-[9/16] overflow-hidden bg-surface-3">
+						<div
+							class="relative aspect-[9/16] overflow-clip rounded-card border border-sea-card-line bg-sea-tint"
+						>
 							{#if galleryVisible}
 								<iframe
 									class="absolute inset-0 h-full w-full"
@@ -158,7 +157,7 @@
 		<!-- Community gallery - horizontal scroll -->
 		<Reveal y={24} duration={500}>
 			<div class="mt-10">
-				<h3 id="about-community-gallery" class="mb-4 text-xl font-bold text-foreground">
+				<h3 id="about-community-gallery" class="b-display mb-4 text-xl font-extrabold text-sea-900">
 					{m.about_highlights_community_heading()}
 				</h3>
 

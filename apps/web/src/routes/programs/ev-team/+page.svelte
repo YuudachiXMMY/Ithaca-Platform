@@ -279,7 +279,7 @@
 		<div class="relative z-10 w-full px-6 pb-0 md:px-12 lg:px-[8vw]">
 			<div class="mb-6 max-w-[540px]">
 				<h1
-					class="mb-4 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.05] font-light tracking-tight text-band-foreground"
+					class="b-display mb-4 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.05] font-bold tracking-tight text-band-foreground"
 				>
 					{m.programs_evChallenge_hero_title()}
 				</h1>
@@ -336,15 +336,12 @@
 			<Reveal y={24}>
 				<div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
 					<div>
-						<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+						<p class="font-display text-xs font-bold tracking-[0.28em] text-brand-bright uppercase">
 							{m.home_mission_eyebrow()}
 						</p>
-						<div
-							class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-							aria-hidden="true"
-						></div>
+						<div class="b-rule mt-6 w-28" aria-hidden="true"></div>
 						<h2
-							class="mt-6 mb-6 text-3xl leading-[1.1] font-light tracking-tight text-foreground md:text-4xl lg:text-5xl"
+							class="b-display mt-6 mb-6 text-3xl leading-[1.1] font-bold tracking-tight text-sea-900 md:text-4xl lg:text-5xl"
 						>
 							{m.programs_evChallenge_mission_title()}
 						</h2>
@@ -389,21 +386,20 @@
 			<Reveal y={24}>
 				<div class="grid grid-cols-1 items-start gap-16 lg:grid-cols-[2fr_3fr] lg:gap-24">
 					<div>
-						<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+						<p class="font-display text-xs font-bold tracking-[0.28em] text-brand-bright uppercase">
 							{m.programs_evChallenge_programDetails_eyebrow()}
 						</p>
-						<div
-							class="mt-4 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-							aria-hidden="true"
-						></div>
-						<h2 class="mt-6 mb-12 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+						<div class="b-rule mt-4 w-28" aria-hidden="true"></div>
+						<h2
+							class="b-display mt-6 mb-12 text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.25rem]"
+						>
 							{m.programs_evChallenge_programDetails_title()}
 						</h2>
 						<div class="space-y-6">
 							{#each DETAILS as detail (detail.label)}
 								<div>
 									<span
-										class="mb-1 block font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase"
+										class="mb-1 block font-display text-xs font-bold tracking-[0.28em] text-brand-bright uppercase"
 										>{detail.label}</span
 									>
 									{#each detail.values as value (value)}
@@ -435,15 +431,12 @@
 			<Reveal y={24}>
 				<div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-[3fr_2fr] lg:gap-20">
 					<div>
-						<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+						<p class="font-display text-xs font-bold tracking-[0.28em] text-brand-bright uppercase">
 							{m.programs_evChallenge_gains_eyebrow()}
 						</p>
-						<div
-							class="mt-4 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-							aria-hidden="true"
-						></div>
+						<div class="b-rule mt-4 w-28" aria-hidden="true"></div>
 						<h2
-							class="mt-6 mb-14 text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl"
+							class="b-display mt-6 mb-14 text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.25rem] lg:text-4xl"
 						>
 							{m.programs_evChallenge_gains_title()}
 						</h2>
@@ -452,7 +445,7 @@
 								<div
 									class="relative border-l-2 border-brand/30 pl-6 transition-colors hover:border-brand/60"
 								>
-									<h3 class="mb-2 text-base font-bold text-foreground md:text-lg">
+									<h3 class="b-display mb-2 text-base font-bold text-sea-900 md:text-lg">
 										{gain.title()}
 									</h3>
 									<p class="max-w-[48ch] text-sm leading-relaxed text-foreground-subtle">
@@ -527,14 +520,11 @@
 		<Reveal y={24}>
 			<div class="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-[6vw]">
 				<h2
-					class="text-3xl leading-[1.05] font-light tracking-tight text-foreground md:text-4xl lg:text-5xl"
+					class="b-display text-3xl leading-[1.05] font-bold tracking-tight text-sea-900 md:text-4xl lg:text-5xl"
 				>
 					{m.programs_evChallenge_pastSeasons_title()}
 				</h2>
-				<div
-					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-					aria-hidden="true"
-				></div>
+				<div class="b-rule mt-6 w-28" aria-hidden="true"></div>
 				<p class="mt-6 mb-14 max-w-[50ch] text-sm text-foreground-subtle md:mb-20">
 					{m.programs_evChallenge_pastSeasons_subtitle()}
 				</p>
@@ -559,7 +549,9 @@
 									class="h-px w-10 shrink-0 bg-gradient-to-r from-brand via-brand/40 to-transparent"
 									aria-hidden="true"
 								></div>
-								<span class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+								<span
+									class="font-display text-xs font-bold tracking-[0.28em] text-brand-bright uppercase"
+								>
 									{film.season()}
 								</span>
 								<span class="text-[11px] text-foreground-subtle">
@@ -595,7 +587,9 @@
 				<div class="grid grid-cols-1 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16">
 					<div class="flex flex-col justify-between">
 						<div>
-							<h2 class="mb-4 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+							<h2
+								class="b-display mb-4 text-[1.75rem] font-extrabold tracking-tight text-sea-900 md:text-[2.25rem]"
+							>
 								{m.programs_evChallenge_cta_title()}
 							</h2>
 							<p class="mb-6 max-w-[34ch] text-sm text-foreground-subtle">
@@ -634,7 +628,7 @@
 						</div>
 					</div>
 					<div>
-						<h3 class="mb-2 text-lg font-bold text-foreground">
+						<h3 class="b-display mb-2 text-lg font-extrabold text-sea-900">
 							{m.programs_evChallenge_faq_title()}
 						</h3>
 						<p class="mb-5 text-xs text-foreground-subtle">

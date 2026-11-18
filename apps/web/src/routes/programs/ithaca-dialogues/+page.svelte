@@ -197,7 +197,7 @@
 			class="order-2 px-5 py-16 sm:px-8 md:px-[6vw] md:py-20 lg:order-1 lg:py-0 lg:pr-12 lg:pl-[12vw]"
 		>
 			<h1
-				class="mb-3 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.05] font-light tracking-tight text-foreground"
+				class="b-display mb-3 text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.05] font-bold tracking-tight text-sea-900"
 			>
 				{m.programs_ithacaDialogues_hero_title()}
 			</h1>
@@ -292,10 +292,7 @@
 					<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
 						{m.programs_ithacaDialogues_whyNow_title()}
 					</h2>
-					<div
-						class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-						aria-hidden="true"
-					></div>
+					<div class="b-rule mt-6 w-28" aria-hidden="true"></div>
 					<p class="mt-6 leading-relaxed text-foreground-muted">
 						{m.programs_ithacaDialogues_whyNow_description()}
 					</p>
@@ -306,7 +303,7 @@
 				<Reveal y={24}>
 					<div class="bg-card-bg p-8 md:p-12 lg:max-w-[70%]">
 						<span
-							class="mb-3 block font-display text-5xl font-light tracking-tight text-foreground tabular-nums md:text-6xl lg:text-7xl"
+							class="b-display mb-3 block font-display text-5xl font-bold tracking-tight text-sea-900 tabular-nums md:text-6xl lg:text-7xl"
 						>
 							{m.programs_ithacaDialogues_whyNow_stats_gdp_value()}
 						</span>
@@ -318,7 +315,7 @@
 				<Reveal y={24} delay={80}>
 					<div class="bg-card-bg p-8 md:p-12 lg:ml-auto lg:max-w-[50%]">
 						<span
-							class="mb-3 block font-display text-4xl font-light tracking-tight text-foreground tabular-nums md:text-5xl"
+							class="b-display mb-3 block font-display text-4xl font-bold tracking-tight text-sea-900 tabular-nums md:text-5xl"
 						>
 							{m.programs_ithacaDialogues_whyNow_stats_jobs_value()}
 						</span>
@@ -330,7 +327,7 @@
 				<Reveal y={24} delay={160}>
 					<div class="bg-card-bg p-8 md:p-12 lg:ml-[25%] lg:max-w-[55%]">
 						<span
-							class="mb-3 block font-display text-4xl font-light tracking-tight text-brand tabular-nums md:text-5xl"
+							class="b-display mb-3 block font-display text-4xl font-bold tracking-tight text-brand tabular-nums md:text-5xl"
 						>
 							{m.programs_ithacaDialogues_whyNow_stats_adoption_value()}
 						</span>
@@ -352,10 +349,7 @@
 						<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
 							{m.programs_ithacaDialogues_tracks_title()}
 						</h2>
-						<div
-							class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-							aria-hidden="true"
-						></div>
+						<div class="b-rule mt-6 w-28" aria-hidden="true"></div>
 						<p class="mt-6 mb-12 max-w-[50ch] leading-relaxed text-foreground-muted">
 							{m.programs_ithacaDialogues_tracks_subtitle()}
 						</p>
@@ -367,12 +361,12 @@
 									class="flex gap-6 py-6 {i < TRACKS.length - 1 ? 'border-b border-border' : ''}"
 								>
 									<span
-										class="w-16 shrink-0 font-mono text-4xl leading-none tracking-[0.2em] text-brand tabular-nums md:text-5xl"
+										class="w-16 shrink-0 font-display text-4xl leading-none font-extrabold tracking-[0.1em] text-brand tabular-nums md:text-5xl"
 									>
 										{track.id}
 									</span>
 									<div class="pt-1">
-										<h3 class="mb-1.5 text-lg font-semibold text-foreground">{track.name()}</h3>
+										<h3 class="b-display mb-1.5 text-lg font-bold text-sea-900">{track.name()}</h3>
 										<p class="leading-relaxed text-foreground-muted">{track.question()}</p>
 									</div>
 								</div>
@@ -400,10 +394,7 @@
 				<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
 					{m.programs_ithacaDialogues_interviewSectors_title()}
 				</h2>
-				<div
-					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-					aria-hidden="true"
-				></div>
+				<div class="b-rule mt-6 w-28" aria-hidden="true"></div>
 			</Reveal>
 
 			<div class="relative mt-8 mb-12 h-[240px] overflow-hidden md:h-[360px]">
@@ -419,7 +410,7 @@
 				{#each SECTORS as sector, i (i)}
 					<Reveal y={20} delay={i * 80}>
 						<div>
-							<h3 class="mb-4 text-xl font-bold text-foreground">{sector.title()}</h3>
+							<h3 class="b-display mb-4 text-xl font-extrabold text-sea-900">{sector.title()}</h3>
 							<ul class="space-y-2">
 								{#each sector.roles as role, j (j)}
 									<li class="leading-relaxed text-foreground-muted">{role()}</li>
@@ -439,17 +430,16 @@
 				<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
 					{m.programs_ithacaDialogues_journey_title()}
 				</h2>
-				<div
-					class="mt-6 mb-12 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-					aria-hidden="true"
-				></div>
+				<div class="b-rule mt-6 mb-12 w-28" aria-hidden="true"></div>
 			</Reveal>
 
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_1.5fr_1fr]">
 				{#each PHASES as phase, i (i)}
 					<Reveal y={24} delay={i * 80}>
 						<div class="h-full bg-background p-8 md:p-10">
-							<span class="mb-4 block font-mono text-[11px] tracking-[0.2em] text-brand uppercase">
+							<span
+								class="mb-4 block font-display text-xs font-bold tracking-[0.2em] text-brand uppercase"
+							>
 								{m.programs_ithacaDialogues_journey_phaseLabel()}
 								{phase.phase()}
 							</span>
@@ -474,16 +464,13 @@
 				<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
 					{m.programs_ithacaDialogues_produce_title()}
 				</h2>
-				<div
-					class="mt-6 mb-12 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-					aria-hidden="true"
-				></div>
+				<div class="b-rule mt-6 mb-12 w-28" aria-hidden="true"></div>
 			</Reveal>
 
 			<div class="grid grid-cols-1 gap-4 lg:grid-cols-[3fr_2fr]">
 				<Reveal y={24}>
 					<div class="h-full bg-card-bg p-8 md:p-12">
-						<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+						<p class="font-display text-xs font-bold tracking-[0.28em] text-brand-bright uppercase">
 							{m.programs_ithacaDialogues_produce_report_badge()}
 						</p>
 						<div class="mt-4 h-px w-10 bg-brand/30" aria-hidden="true"></div>
@@ -505,7 +492,7 @@
 
 				<Reveal y={24} delay={80}>
 					<div class="flex h-full flex-col bg-card-bg p-8 md:p-12">
-						<p class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+						<p class="font-display text-xs font-bold tracking-[0.28em] text-brand-bright uppercase">
 							{m.programs_ithacaDialogues_produce_documentary_badge()}
 						</p>
 						<div class="mt-4 h-px w-10 bg-brand/30" aria-hidden="true"></div>
@@ -541,10 +528,7 @@
 				<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
 					{m.programs_ithacaDialogues_faq_title()}
 				</h2>
-				<div
-					class="mt-6 h-px w-24 bg-gradient-to-r from-brand via-brand/40 to-transparent"
-					aria-hidden="true"
-				></div>
+				<div class="b-rule mt-6 w-28" aria-hidden="true"></div>
 				<p class="mt-6 mb-12 text-foreground-muted">
 					{m.programs_ithacaDialogues_faq_reachUsPrefix()}
 					<a

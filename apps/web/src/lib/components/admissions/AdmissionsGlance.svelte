@@ -95,7 +95,7 @@
   band carrying one label does not need a system for labels.
 -->
 {#if rows.length > 0}
-	<section class="bg-surface-4" aria-label={m.admissions_glance_ariaLabel()}>
+	<section class="bg-sea-tint" aria-label={m.admissions_glance_ariaLabel()}>
 		<div class="mx-auto max-w-[1400px] px-5 py-10 sm:px-8 md:px-[6vw] md:py-14">
 			<!--
 				FLAT on purpose. A `<dl>` may only directly contain `<dt>` / `<dd>` pairs or a `<div>`
@@ -108,11 +108,11 @@
 				class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-[minmax(0,6fr)_minmax(0,3fr)_minmax(0,3fr)] md:items-end md:gap-12"
 			>
 				<div class="sm:col-span-2 md:col-span-1">
-					<dt class="font-mono text-[11px] tracking-[0.28em] text-brand-bright uppercase">
+					<dt class="font-display text-xs font-bold tracking-[0.28em] text-brand-bright uppercase">
 						{m.admissions_glance_nextLabel()}
 					</dt>
 					<dd
-						class="mt-4 font-display text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.1] font-light tracking-tight text-foreground"
+						class="b-display mt-4 font-display text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.1] font-bold tracking-tight text-sea-900"
 					>
 						{nextWindow ?? m.admissions_calendar_tbc()}
 					</dd>
@@ -121,7 +121,7 @@
 				{#each supporting as fact (fact.label)}
 					<div class="min-w-0">
 						<dt class="text-sm leading-snug text-foreground-muted">{fact.label}</dt>
-						<dd class="mt-1 text-lg leading-snug font-semibold text-foreground">
+						<dd class="b-display mt-1 text-lg leading-snug font-bold text-sea-900">
 							{fact.value}
 						</dd>
 					</div>
