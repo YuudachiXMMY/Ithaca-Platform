@@ -77,6 +77,14 @@ export const NEWS: readonly NewsItem[] = [
 	{
 		slug: 'teertstra-interview',
 		// Published film on the `ithaca-dialogues` record.
+		//
+		// NOTE (2026-11-19): the original id (1118510980) is privacy-restricted — Vimeo's oEmbed
+		// returns dimensions but no title for it, same as the two `Highlights.svelte` ids that
+		// only work there because that component appends the video's private embed hash (`h=`),
+		// which `VimeoEmbed.svelte` does not. It would not actually play on `/news`. Swapped for
+		// a public re-upload of the same interview (Phoebe Li and Sarah Wang's questions for Dr.
+		// Teertstra) that the owner supplied directly — real student names are in that video's
+		// own caption but are not repeated here, consistent with the gap this entry already names.
 		consentVerified: true,
 		kind: 'interview',
 		title: {
@@ -93,17 +101,25 @@ export const NEWS: readonly NewsItem[] = [
 			zh: ['一场 Ithaca Dialogue 对谈，从前期调研到访谈现场均由学生主导。']
 		},
 		video: {
-			id: '1118510980',
+			id: '1234583398',
 			title: {
 				en: 'Student interview with Dr. Peter Teertstra',
 				zh: '学生采访 Peter Teertstra 博士'
-			}
+			},
+			aspectPadding: '177.78%'
 		},
 		programSlug: 'ithaca-dialogues'
 	},
 	{
 		slug: 'scotiabank-interview',
 		// Published film on the `ithaca-dialogues` record.
+		//
+		// NOTE (2026-11-19): the original id (1118098299) is privacy-restricted, same issue as
+		// `teertstra-interview` above — swapped for a public re-upload the owner supplied directly.
+		// The body below now names the two executives; that is NOT new exposure introduced here —
+		// `results.ts`'s consent-verified `andy-song-princeton` entry already names both in detail
+		// (the same wording is reused below), so the §6.3 bar for this record was already cleared
+		// on that surface. Withdrawing consent would mean editing both files; see the NOTE there.
 		consentVerified: true,
 		kind: 'interview',
 		title: {
@@ -111,13 +127,16 @@ export const NEWS: readonly NewsItem[] = [
 			zh: 'Andy Song 采访丰业银行高管'
 		},
 		date: '2026-06',
-		// TODO(content): one paragraph of context for this interview.
 		body: {
-			en: ['An Ithaca Dialogue conversation with senior leaders at one of Canada’s largest banks.'],
-			zh: ['一场在加拿大最大的银行之一内部进行的 Ithaca Dialogue 对谈。']
+			en: [
+				'Andy Song, in an Ithaca Dialogue conversation, interviewed Mr. Carlos Orencio Horta, Director of AI at Scotiabank, and Mr. Tanaby Zibamanzar, Director of Data Analytics.'
+			],
+			zh: [
+				'一场 Ithaca Dialogue 对谈：Andy Song 采访了丰业银行人工智能总监 Carlos Orencio Horta 先生与数据分析总监 Tanaby Zibamanzar 先生。'
+			]
 		},
 		video: {
-			id: '1118098299',
+			id: '1248480059',
 			title: {
 				en: 'Andy Song interviewing Scotiabank executives',
 				zh: 'Andy Song 采访丰业银行高管'
@@ -131,33 +150,10 @@ export const NEWS: readonly NewsItem[] = [
 	// `consentVerified: false` on all of them — every one either names an identifiable guest or
 	// shows students on camera, and none has gone through the §6.3 sign-off `moridi-ai-in-ontario`
 	// and its siblings above already have. Flip to `true` per entry once the owner confirms.
-	{
-		slug: 'ev-teertstra-interview-phoebe-sarah',
-		consentVerified: false,
-		kind: 'interview',
-		title: {
-			en: 'Phoebe Li and Sarah Wang interview Prof. Peter Teertstra on the EV Challenge',
-			zh: 'Phoebe Li 与 Sarah Wang 采访 Peter Teertstra 教授，谈 EV Challenge'
-		},
-		date: '2026-10',
-		body: {
-			en: [
-				'Two Ithaca students interview Dr. Peter Teertstra, professor of engineering at the University of Waterloo, with questions about the EV Challenge.'
-			],
-			zh: [
-				'两位伊萨卡学员 Phoebe Li 与 Sarah Wang 采访滑铁卢大学工程学院教授 Peter Teertstra，就 EV Challenge 相关问题请教。'
-			]
-		},
-		video: {
-			id: '1234583398',
-			title: {
-				en: 'Phoebe Li and Sarah Wang interview Prof. Peter Teertstra',
-				zh: 'Phoebe Li 与 Sarah Wang 采访 Peter Teertstra 教授'
-			},
-			aspectPadding: '177.78%'
-		},
-		programSlug: 'ev-team'
-	},
+	//
+	// (The Phoebe Li/Sarah Wang interview with Prof. Teertstra that was originally a separate
+	// entry here now lives at `teertstra-interview` above — the owner identified it as a public
+	// re-upload of that entry's long-broken private video, not a second piece of footage.)
 	{
 		slug: 'ev-teertstra-program-intro',
 		consentVerified: false,
@@ -341,14 +337,21 @@ export const NEWS: readonly NewsItem[] = [
 	// §3.7), and this is where its content lands.
 	{
 		slug: 'honda-production-line-visit',
-		// Published film on the `ev-team` record; the entry names an institution, not a person.
+		// Published film on the `ev-team` record; the entry names an institution, not a person —
+		// the real video does name Honda Canada's CEO, Jean Marc Leclerc, but that is not repeated
+		// here without a fresh §6.3 sign-off on naming an individual.
+		//
+		// NOTE (2026-11-19): the original id (1117749184) is privacy-restricted, same issue as
+		// `teertstra-interview` and `scotiabank-interview` above. Swapped for a public re-upload
+		// the owner supplied directly; its own caption dates the visit "3月10日" (March 10), more
+		// specific than the '2026-05' this entry previously carried, so `date` moved to match.
 		consentVerified: true,
 		kind: 'event',
 		title: {
 			en: 'The EV team visits the Honda production line',
 			zh: 'EV 车队参观本田生产线'
 		},
-		date: '2026-05',
+		date: '2026-03',
 		// TODO(content): what the team saw and took back into the build. The film is published; a
 		// paragraph of context is not.
 		body: {
@@ -360,40 +363,10 @@ export const NEWS: readonly NewsItem[] = [
 			]
 		},
 		video: {
-			id: '1117749184',
+			id: '1248478548',
 			title: {
 				en: 'Ithaca EV team visits Honda production line',
 				zh: '伊萨卡 EV 车队参观本田生产线'
-			}
-		},
-		programSlug: 'ev-team'
-	},
-	{
-		slug: 'ev-honda-visit-leclerc',
-		consentVerified: false,
-		kind: 'event',
-		// NOTE: the clip's own caption dates this visit "3月10日" (March 10); the entry above
-		// (`honda-production-line-visit`, id 1117749184) dates what reads like the same kind of
-		// visit '2026-05'. Unclear whether this is the same visit misdated, a second visit, or a
-		// different year's March 10 — left to the owner to reconcile rather than guessed here.
-		title: {
-			en: 'Honda Canada hosts the EV team, with CEO Jean Marc Leclerc',
-			zh: '本田加拿大接待伊萨卡 EV 车队，CEO Jean Marc Leclerc 到场'
-		},
-		date: '2026-03',
-		body: {
-			en: [
-				"At Honda Canada's invitation, part of the EV team visited Honda's production line to see how AI is used in vehicle manufacturing. Honda Canada CEO Jean Marc Leclerc joined the visit."
-			],
-			zh: [
-				'应 Honda Canada 之邀，伊萨卡 EV 项目组部分成员参访本田生产线，了解 AI 参与造车的过程，本田加拿大 CEO Jean Marc Leclerc 到场接待。'
-			]
-		},
-		video: {
-			id: '1234583270',
-			title: {
-				en: 'The EV team at Honda Canada, with CEO Jean Marc Leclerc',
-				zh: 'EV 车队参访本田加拿大，CEO Jean Marc Leclerc 接待'
 			},
 			aspectPadding: '177.78%'
 		},
