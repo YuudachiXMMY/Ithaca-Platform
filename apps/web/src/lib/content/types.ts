@@ -37,6 +37,12 @@ export interface Media {
 export interface VimeoRef {
 	id: string;
 	title: Localized;
+	/**
+	 * CSS `padding-top` for `VimeoEmbed`'s aspect-ratio box, e.g. `'177.78%'` (9:16, phone-shot
+	 * clips) or `'56.25%'` (16:9). Omit for the landscape default every consumer already assumes
+	 * (`'56.25%'`) — only set this for a portrait film, where forcing a 16:9 box pillarboxes it.
+	 */
+	aspectPadding?: string;
 }
 
 export interface Season {

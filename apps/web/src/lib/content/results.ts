@@ -51,12 +51,15 @@ export const RESULTS: readonly Result[] = [
 		},
 		// prd.md §6.3 names this item as already-published and therefore consent-verified.
 		//
-		// NOTE: this is the one record whose subject is also named OUTSIDE the consent gate. The
-		// Ithaca Dialogues film `1118098299` is titled "Andy Song interviewing Scotiabank
-		// executives" and lives on `Program.videos`, and §6.1's `VimeoRef` has no `consentVerified`
-		// field — so flipping the flag below removes this entry from `/results` and the homepage
-		// proof band but NOT that film's title, on `/results` or on `/programs/ithaca-dialogues`.
-		// Withdrawing consent for this alumnus therefore means editing `programs.ts` as well.
+		// NOTE: this is the one record whose subject is also named OUTSIDE the consent gate, and
+		// as of 2026-11-19 in three places, not two. The Ithaca Dialogues film (titled "Andy Song
+		// interviewing Scotiabank executives") lives on `Program.videos` here in `programs.ts`'s
+		// `ithaca-dialogues` record; `content/news.ts`'s `scotiabank-interview` entry now also
+		// spells out both executives' names in its body, reusing this entry's exact wording rather
+		// than inventing a second phrasing. §6.1's `VimeoRef` and `NewsItem.consentVerified` are
+		// two different gates — flipping the flag below removes this entry from `/results` and the
+		// homepage proof band but touches neither the film's title in `programs.ts` nor the body
+		// text in `news.ts`. Withdrawing consent for this alumnus means editing both of those too.
 		// Not a content gap (consent is on record today), which is why it is a NOTE and not a
 		// `TODO(content)`; recorded here because the gate cannot see it.
 		consentVerified: true

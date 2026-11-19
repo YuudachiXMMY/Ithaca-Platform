@@ -263,6 +263,8 @@ export function resultsTimeline(
 export interface InterviewView {
 	readonly videoId: string;
 	readonly title: string;
+	/** See `VimeoRef.aspectPadding` — carried through so a portrait film isn't forced to 16:9. */
+	readonly aspectPadding?: string;
 }
 
 /**
@@ -284,7 +286,11 @@ export function dialoguesInterviews(
 ): InterviewView[] {
 	const program = programs.find((candidate) => candidate.slug === slug);
 	if (!program) return [];
-	return program.videos.map((video) => ({ videoId: video.id, title: video.title[locale] }));
+	return program.videos.map((video) => ({
+		videoId: video.id,
+		title: video.title[locale],
+		aspectPadding: video.aspectPadding
+	}));
 }
 
 /**

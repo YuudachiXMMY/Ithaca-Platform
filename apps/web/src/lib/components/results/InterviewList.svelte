@@ -20,18 +20,18 @@
 		interviews: readonly InterviewView[];
 	}
 	let { interviews }: Props = $props();
-
-	/** 16:9 — the aspect every Dialogues film is published at. */
-	const ASPECT = '56.25%';
 </script>
 
 <ul class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
 	{#each interviews as interview (interview.videoId)}
 		<li class="flex flex-col gap-4">
+			<!-- 16:9 by default; `aspectPadding` comes from the content record for a portrait film
+			     (2026-11-19: the Teertstra interview is one), which would otherwise be pillarboxed
+			     inside a forced 16:9 box. -->
 			<VimeoEmbed
 				videoId={interview.videoId}
 				title={interview.title}
-				aspectPadding={ASPECT}
+				aspectPadding={interview.aspectPadding ?? '56.25%'}
 				loading="lazy"
 			/>
 			<h3 class="text-base leading-snug font-bold tracking-tight text-foreground">

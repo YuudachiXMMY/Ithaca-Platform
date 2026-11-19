@@ -128,12 +128,14 @@
 						{/if}
 					</div>
 					{#if featured.video}
-						<!-- 16:9 — every film in `content/news.ts` is a landscape interview or visit
-						     recording. `loading` is left eager: the featured embed is above the fold. -->
+						<!-- `featured` is always `moridi-ai-in-ontario` today, a landscape recording, but
+						     the box still reads `VimeoRef.aspectPadding` rather than hardcoding 16:9 — a
+						     phone-shot portrait film becoming the featured entry should not silently
+						     pillarbox. `loading` is left eager: the featured embed is above the fold. -->
 						<VimeoEmbed
 							videoId={featured.video.id}
 							title={featured.video.title[locale]}
-							aspectPadding="56.25%"
+							aspectPadding={featured.video.aspectPadding ?? '56.25%'}
 						/>
 					{/if}
 				</div>
@@ -163,10 +165,13 @@
 								{/each}
 								{#if item.video}
 									<div class="mt-5">
+										<!-- Several 2026-11 entries are phone-shot portrait clips; `aspectPadding`
+										     comes from the content record so those render 9:16 instead of
+										     pillarboxed inside a forced 16:9 box. -->
 										<VimeoEmbed
 											videoId={item.video.id}
 											title={item.video.title[locale]}
-											aspectPadding="56.25%"
+											aspectPadding={item.video.aspectPadding ?? '56.25%'}
 											loading="lazy"
 										/>
 									</div>

@@ -346,6 +346,13 @@ export const PROGRAMS: readonly Program[] = [
 		],
 		// The Moridi interview is the homepage's featured video (R-HOME-5); it is a Dialogues
 		// output, so the canonical record lives here and the homepage references it by id.
+		//
+		// NOTE (2026-11-19): the Teertstra and Scotiabank ids below were swapped for public
+		// re-uploads — the originals are privacy-restricted (no public embed hash), which silently
+		// broke two of the three embeds on `/success-stories`'s `InterviewList` (it renders through
+		// `VimeoEmbed.svelte`, same as `/news`, which cannot supply the `h=` param a private Vimeo
+		// video needs). See the matching NOTE on `content/news.ts`'s `teertstra-interview` and
+		// `scotiabank-interview` entries, which hit the identical bug and got the identical fix.
 		videos: [
 			{
 				id: '1201561760',
@@ -355,14 +362,15 @@ export const PROGRAMS: readonly Program[] = [
 				}
 			},
 			{
-				id: '1118510980',
+				id: '1234583398',
 				title: {
 					en: 'Student interview with Dr. Peter Teertstra',
 					zh: '学生采访 Peter Teertstra 博士'
-				}
+				},
+				aspectPadding: '177.78%'
 			},
 			{
-				id: '1118098299',
+				id: '1248480059',
 				title: {
 					en: 'Andy Song interviewing Scotiabank executives',
 					zh: 'Andy Song 采访丰业银行高管'

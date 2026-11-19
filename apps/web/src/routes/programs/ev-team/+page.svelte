@@ -206,8 +206,22 @@
 		}
 	];
 
-	// Secondary past-season clips (portrait Vimeo embeds), verbatim ids from Next.
-	const CLIP_IDS = ['1202133768', '1202133767', '1202133769'];
+	// Secondary past-season clips (portrait Vimeo embeds). The first three are the original clips,
+	// verbatim ids from Next, with no real per-clip title (the Next markup gave every one the same
+	// generic accessible name). The last three (2026-11-19) are new and DO have real content — a
+	// student interview, a programme interview, and a site visit — so they carry their own title
+	// rather than reusing the generic one.
+	const CLIPS = [
+		{ videoId: '1202133768', title: 'EV team clip' },
+		{ videoId: '1202133767', title: 'EV team clip' },
+		{ videoId: '1202133769', title: 'EV team clip' },
+		{
+			videoId: '1234583398',
+			title: 'Phoebe Li and Sarah Wang interview Prof. Peter Teertstra'
+		},
+		{ videoId: '1234583275', title: 'Dr. Peter Teertstra on the EV Challenge' },
+		{ videoId: '1234583270', title: 'The EV team at Honda Canada' }
+	];
 
 	// Hero parallax (Tier 2): the race photo drifts vertically as the hero scrolls
 	// out. The base `scale-[1.15]` (kept as the reduced-motion static state) gives
@@ -564,16 +578,21 @@
 			</div>
 		</Reveal>
 
-		<!-- The three portrait clips, as one full-measure strip of three.
+		<!-- The portrait clips, as full-measure strips of three.
 		     `grid-cols-3` at EVERY width rather than stacking on small screens: these are 9:16
-		     boxes, so one column would spend 5.3 viewport heights on three incidental clips. They
-		     are a strip, and a strip of three is the unit — not three objects that happen to be
-		     adjacent. -->
+		     boxes, so one column would spend over 5 viewport heights per three clips. Six clips
+		     (2026-11-19) wrap into two even rows rather than one strip now, but the reasoning is
+		     the same: a strip of three is the unit, not clips that happen to be adjacent. -->
 		<Reveal y={24}>
 			<div class="mx-auto mt-12 max-w-[1400px] px-5 sm:px-8 md:mt-16 md:px-[6vw]">
 				<div class="grid grid-cols-3 gap-2 lg:gap-3">
-					{#each CLIP_IDS as videoId (videoId)}
-						<VimeoEmbed {videoId} title="EV team clip" aspectPadding="177.78%" loading="lazy" />
+					{#each CLIPS as clip (clip.videoId)}
+						<VimeoEmbed
+							videoId={clip.videoId}
+							title={clip.title}
+							aspectPadding="177.78%"
+							loading="lazy"
+						/>
 					{/each}
 				</div>
 			</div>
