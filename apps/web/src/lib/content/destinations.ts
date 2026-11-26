@@ -146,5 +146,12 @@ export const DESTINATIONS: readonly Destination[] = [
 		},
 		kind: 'offer',
 		verified: true
+	},
+	{
+		id: 'cambridge-architecture',
+		institution: { en: 'University of Cambridge', zh: '剑桥大学' },
+		field: { en: 'Architecture', zh: '建筑设计' },
+		kind: 'offer',
+		verified: true
 	}
 ];

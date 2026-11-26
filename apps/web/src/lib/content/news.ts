@@ -132,7 +132,7 @@ export const NEWS: readonly NewsItem[] = [
 				'Andy Song, in an Ithaca Dialogue conversation, interviewed Mr. Carlos Orencio Horta, Director of AI at Scotiabank, and Mr. Tanaby Zibamanzar, Director of Data Analytics.'
 			],
 			zh: [
-				'一场 Ithaca Dialogue 对谈：Andy Song 采访了丰业银行人工智能总监 Carlos Orencio Horta 先生与数据分析总监 Tanaby Zibamanzar 先生。'
+				'伊萨卡家族学院邀请ScotiaBank AI赋能与机器学习部总监Mr.Carlos Orencio Horta 以及 ScotiaBank 数据科学与分析部总监 Mr. Tanaby Zibamanzar Mofrad，接受学生们的采访。'
 			]
 		},
 		video: {
