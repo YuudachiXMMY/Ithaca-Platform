@@ -116,20 +116,23 @@ export const NEWS: readonly NewsItem[] = [
 		//
 		// NOTE (2026-11-19): the original id (1118098299) is privacy-restricted, same issue as
 		// `teertstra-interview` above — swapped for a public re-upload the owner supplied directly.
-		// The body below now names the two executives; that is NOT new exposure introduced here —
-		// `results.ts`'s consent-verified `andy-song-princeton` entry already names both in detail
-		// (the same wording is reused below), so the §6.3 bar for this record was already cleared
-		// on that surface. Withdrawing consent would mean editing both files; see the NOTE there.
+		//
+		// NOTE (2026-11-26): the guest students here are unnamed on purpose, not a content gap —
+		// an earlier draft of this entry (and of `results.ts`'s `andy-song-princeton`) misattributed
+		// this interview to Andy Song, who was not involved. The title, body and video title below
+		// are generic rather than naming whoever actually conducted it, so no consent gate applies
+		// to this record on that account; `consentVerified` below is only about the two named
+		// Scotiabank executives.
 		consentVerified: true,
 		kind: 'interview',
 		title: {
-			en: 'Andy Song interviews Scotiabank executives',
-			zh: 'Andy Song 采访丰业银行高管'
+			en: 'Ithaca students interview Scotiabank executives',
+			zh: 'Ithaca 学生采访丰业银行高管'
 		},
 		date: '2026-06',
 		body: {
 			en: [
-				'Andy Song, in an Ithaca Dialogue conversation, interviewed Mr. Carlos Orencio Horta, Director of AI at Scotiabank, and Mr. Tanaby Zibamanzar, Director of Data Analytics.'
+				'In an Ithaca Dialogue conversation, Ithaca students interviewed Mr. Carlos Orencio Horta, Director of AI at Scotiabank, and Mr. Tanaby Zibamanzar, Director of Data Analytics.'
 			],
 			zh: [
 				'伊萨卡家族学院邀请ScotiaBank AI赋能与机器学习部总监Mr.Carlos Orencio Horta 以及 ScotiaBank 数据科学与分析部总监 Mr. Tanaby Zibamanzar Mofrad，接受学生们的采访。'
@@ -138,8 +141,8 @@ export const NEWS: readonly NewsItem[] = [
 		video: {
 			id: '1248480059',
 			title: {
-				en: 'Andy Song interviewing Scotiabank executives',
-				zh: 'Andy Song 采访丰业银行高管'
+				en: 'Ithaca students interviewing Scotiabank executives',
+				zh: 'Ithaca 学生采访丰业银行高管'
 			}
 		},
 		programSlug: 'ithaca-dialogues'
