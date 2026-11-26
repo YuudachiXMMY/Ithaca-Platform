@@ -2,7 +2,31 @@
 	import { getLocale } from '$lib/paraglide/runtime';
 	import Reveal from '$lib/components/shared/Reveal.svelte';
 	import { DESTINATIONS } from '$lib/content/destinations';
+	import type { InstitutionLogo } from '$lib/content/types';
 	import * as m from '$lib/paraglide/messages';
+
+	// Vector marks, not photos — no `?enhanced` responsive srcset needed, just the file URL.
+	// Keyed by `Destination.logo`; the map (not the data file) owns the import statements because
+	// Vite needs a static `import` per asset.
+	import toronto from '$lib/assets/institutions/toronto.svg';
+	import waterloo from '$lib/assets/institutions/waterloo.svg';
+	import risd from '$lib/assets/institutions/risd.svg';
+	import queens from '$lib/assets/institutions/queens.svg';
+	import western from '$lib/assets/institutions/western.svg';
+	import york from '$lib/assets/institutions/york.svg';
+	import ubc from '$lib/assets/institutions/ubc.svg';
+	import cambridge from '$lib/assets/institutions/cambridge.svg';
+
+	const LOGOS: Record<InstitutionLogo, string> = {
+		toronto,
+		waterloo,
+		risd,
+		queens,
+		western,
+		york,
+		ubc,
+		cambridge
+	};
 
 	/**
 	 * "Where past students went" — plan §3.5, rendered as TWO labelled lists.
@@ -59,25 +83,37 @@
 							</h3>
 							<ul class="mt-6 flex flex-col">
 								{#each column.entries as entry (entry.id)}
-									<li class="border-hairline border-t py-4 first:border-t-0 first:pt-0">
-										<span class="b-display block text-base font-bold text-sea-900">
-											{entry.institution[locale]}
-										</span>
-										{#if entry.field}
-											<span class="mt-1 block text-sm text-foreground-subtle">
-												{entry.field[locale]}
-											</span>
+									<li
+										class="border-hairline flex items-start gap-3 border-t py-4 first:border-t-0 first:pt-0"
+									>
+										{#if entry.logo}
+											<img
+												src={LOGOS[entry.logo]}
+												alt={entry.institution[locale]}
+												loading="lazy"
+												class="mt-0.5 h-8 w-8 shrink-0 object-contain"
+											/>
 										{/if}
-										<!--
-											Shown only once checked (11-02). `verified` already gates the whole
-											record above, so a scholarship reaching this point has been through
-											the same gate as the admission it hangs off.
-										-->
-										{#if entry.scholarship}
-											<span class="mt-1 block text-sm text-brand">
-												{entry.scholarship[locale]}
+										<div>
+											<span class="b-display block text-base font-bold text-sea-900">
+												{entry.institution[locale]}
 											</span>
-										{/if}
+											{#if entry.field}
+												<span class="mt-1 block text-sm text-foreground-subtle">
+													{entry.field[locale]}
+												</span>
+											{/if}
+											<!--
+												Shown only once checked (11-02). `verified` already gates the whole
+												record above, so a scholarship reaching this point has been through
+												the same gate as the admission it hangs off.
+											-->
+											{#if entry.scholarship}
+												<span class="mt-1 block text-sm text-brand">
+													{entry.scholarship[locale]}
+												</span>
+											{/if}
+										</div>
 									</li>
 								{/each}
 							</ul>

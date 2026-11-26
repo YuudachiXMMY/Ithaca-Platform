@@ -1093,3 +1093,28 @@ utility 跟着一行走。**要回退，把 §4 指回 teal ramp 即可，别处
   模板」那条取舍本身有理由（见组件注释）。只改了字重和分隔线。
 - **`content:check` 仍然退出 1。** 那是内容方欠的四处 `TODO(content)`（`results.ts` /
   `partners.ts`），`src/lib/content/` 这次一行没碰，与改版无关。
+
+## 2026-11-26 — `/success-stories` 的 "Where past students went" 加院校 logo
+
+`Destination` 新增可选字段 `logo?: InstitutionLogo`（`src/lib/content/types.ts`），
+`DestinationsSection.svelte` 据此在机构名称前渲染一个 32px 图标。11 条记录对应 8 所不同院校
+（多伦多大学出现 4 次，同校记录复用同一个 logo key），素材存在新目录
+`src/lib/assets/institutions/`。
+
+- **素材来源是 Wikimedia Commons，不是各校官网的品牌资源页。** 这 8 个文件标注的授权都是
+  "consists only of simple geometric shapes or text" 或 CC0/CC-BY-SA（剑桥用的是盾徽 SVG，
+  因为该校在 Commons 上没有一份自由授权的纯文字 wordmark）。**这是文件本身的 Commons 授权，
+  不等于该校的商标使用许可** —— 大学 logo/校徽本身通常仍受商标法保护，在公开商业网站的"招生
+  成果展示"场景下使用，业界常见但并非零风险。如果校方或法务事后对某个 logo 的使用提出异议，
+  应优先替换或移除该条目的 logo（保留文字记录），而不是援引 Commons 的文件授权辩护——那个授权
+  覆盖的是"复制这份 SVG 文件"，不覆盖"把它当作该校的官方标识在第三方网站上使用"。
+- **用普通 `<img>` 不用 `<enhanced:img>`。** 这 8 个文件是矢量图标，不是照片——不需要
+  `?enhanced` 生成的多尺寸响应式 raster srcset，而且 `@sveltejs/enhanced-img` 本身也不处理
+  SVG。`waterloo.svg`（2.8KB）和 `risd.svg`（1.1KB）两个文件在构建后被 Vite 自动内联成
+  `data:` URI（低于默认 4KB 的 `assetsInlineLimit`），这是预期行为，不是漏渲染。
+- **8 个 key 统一用"学校"级别的 logo，不是子学院（Ivey / Schulich / Sauder / Smith）各自的
+  logo。** 子学院品牌页更难找到可信的免费授权素材，且多数读者认学校名不认商学院名——用学校
+  logo 识别度更高，风险面也更小（只需为一所学校的商标负责，不是四所）。
+- **`alt` 复用 `entry.institution[locale]`，没有新开 Paraglide key。** 图标紧跟在同一行的机构
+  名称文字旁边，对屏幕阅读器是重复信息；复用已有字符串比新增一组双语 alt 词条更省，也不会漂
+  移出同步。
