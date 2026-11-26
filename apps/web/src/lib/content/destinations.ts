@@ -73,28 +73,32 @@ export const DESTINATIONS: readonly Destination[] = [
 		institution: { en: 'University of Toronto', zh: '多伦多大学' },
 		field: { en: 'Engineering', zh: '工程' },
 		kind: 'offer',
-		verified: true
+		verified: true,
+		logo: 'toronto'
 	},
 	{
 		id: 'toronto-computer-science',
 		institution: { en: 'University of Toronto', zh: '多伦多大学' },
 		field: { en: 'Computer Science', zh: '计算机科学' },
 		kind: 'offer',
-		verified: true
+		verified: true,
+		logo: 'toronto'
 	},
 	{
 		id: 'toronto-rotman',
 		institution: { en: 'University of Toronto', zh: '多伦多大学' },
 		field: { en: 'Rotman Commerce', zh: 'Rotman 商学院' },
 		kind: 'offer',
-		verified: true
+		verified: true,
+		logo: 'toronto'
 	},
 	{
 		id: 'toronto-economics',
 		institution: { en: 'University of Toronto', zh: '多伦多大学' },
 		field: { en: 'Economics', zh: '经济' },
 		kind: 'offer',
-		verified: true
+		verified: true,
+		logo: 'toronto'
 	},
 	{
 		id: 'waterloo-mathematics-farm',
@@ -104,13 +108,15 @@ export const DESTINATIONS: readonly Destination[] = [
 			zh: '数学 —— 金融分析与风险管理'
 		},
 		kind: 'offer',
-		verified: true
+		verified: true,
+		logo: 'waterloo'
 	},
 	{
 		id: 'risd',
 		institution: { en: 'Rhode Island School of Design', zh: '罗德岛设计学院' },
 		kind: 'offer',
-		verified: true
+		verified: true,
+		logo: 'risd'
 	},
 	// Added 2026-11-14 from the 2027 Program Guide (11-12 edition), which lists it in the same
 	// undifferentiated roll-up as the rest. `'offer'` for the reason given in the header.
@@ -121,13 +127,15 @@ export const DESTINATIONS: readonly Destination[] = [
 			zh: '女王大学 Smith 商学院'
 		},
 		kind: 'offer',
-		verified: true
+		verified: true,
+		logo: 'queens'
 	},
 	{
 		id: 'western-ivey',
 		institution: { en: 'Western University, Ivey Business School', zh: '西安大略大学 Ivey 商学院' },
 		kind: 'offer',
-		verified: true
+		verified: true,
+		logo: 'western'
 	},
 	{
 		id: 'york-schulich',
@@ -136,7 +144,8 @@ export const DESTINATIONS: readonly Destination[] = [
 			zh: '约克大学 Schulich 商学院'
 		},
 		kind: 'offer',
-		verified: true
+		verified: true,
+		logo: 'york'
 	},
 	{
 		id: 'ubc-sauder',
@@ -145,13 +154,15 @@ export const DESTINATIONS: readonly Destination[] = [
 			zh: '不列颠哥伦比亚大学 Sauder 商学院'
 		},
 		kind: 'offer',
-		verified: true
+		verified: true,
+		logo: 'ubc'
 	},
 	{
 		id: 'cambridge-architecture',
 		institution: { en: 'University of Cambridge', zh: '剑桥大学' },
 		field: { en: 'Architecture', zh: '建筑设计' },
 		kind: 'offer',
-		verified: true
+		verified: true,
+		logo: 'cambridge'
 	}
 ];

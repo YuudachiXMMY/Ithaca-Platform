@@ -213,6 +213,14 @@ export interface NewsItem {
  * `scholarship` is optional and `verified` is required and separate: the same decision says a
  * scholarship is shown only once checked, so an unverified figure is encodable but not renderable.
  */
+/**
+ * Key into the logo lookup `DestinationsSection.svelte` builds from `$lib/assets/institutions/`.
+ * A key, not a path: the asset import has to be static for `?enhanced`/Vite to pick it up, so the
+ * component owns the import statements and this field only selects among them.
+ */
+export type InstitutionLogo =
+	'toronto' | 'waterloo' | 'risd' | 'queens' | 'western' | 'york' | 'ubc' | 'cambridge';
+
 export interface Destination {
 	id: string;
 	institution: Localized;
@@ -222,6 +230,8 @@ export interface Destination {
 	year?: number;
 	scholarship?: Localized;
 	verified: boolean;
+	/** Omitted renders no mark — not every institution has a sourced logo yet. */
+	logo?: InstitutionLogo;
 }
 
 export interface Event {
