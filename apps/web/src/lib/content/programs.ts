@@ -372,8 +372,8 @@ export const PROGRAMS: readonly Program[] = [
 			{
 				id: '1248480059',
 				title: {
-					en: 'Andy Song interviewing Scotiabank executives',
-					zh: 'Andy Song 采访丰业银行高管'
+					en: 'Ithaca students interviewing Scotiabank executives',
+					zh: 'Ithaca 学生采访丰业银行高管'
 				}
 			}
 		],

@@ -50,13 +50,12 @@ const ADMISSION_ID = 'andy-song-princeton';
 /**
  * Strings that appear ON THE PAGE **only** because of one record.
  *
- * Chosen deliberately, and this is the sharp edge of the whole test: "Andy Song" and "Scotiabank"
- * are NOT here, even though both are in the admission record's copy, because the Ithaca Dialogues
- * film titled "Andy Song interviewing Scotiabank executives" renders them from `Program.videos` in
- * the section below the timeline. An absence assertion on either would fail for a reason that has
- * nothing to do with the gate — and, worse, a presence assertion on either would PASS with the gate
- * working perfectly. (That overlap is itself a real §6.3 edge; see the NOTE on the record in
- * `src/lib/content/results.ts`.)
+ * "Andy Song" and "Scotiabank" are deliberately NOT here: the Ithaca Dialogues video in the section
+ * below the timeline (`Program.videos` on `ithaca-dialogues`) is titled generically ("Ithaca
+ * students interviewing Scotiabank executives") precisely because that interview was never Andy's
+ * — see the NOTE on `andy-song-princeton` in `src/lib/content/results.ts`. An absence assertion on
+ * either name would still fail for a reason that has nothing to do with the gate, since neither is
+ * unique to this record's own copy any more than it was before.
  */
 const FINGERPRINT: Record<string, Record<Locale, string[]>> = {
 	[AWARD_ID]: {
@@ -64,8 +63,8 @@ const FINGERPRINT: Record<string, Record<Locale, string[]>> = {
 		zh: ['AIEC 2026 大奖', '人工智能创业大赛']
 	},
 	[ADMISSION_ID]: {
-		en: ['Princeton University', 'Carlos Orencio Horta'],
-		zh: ['普林斯顿大学', 'Carlos Orencio Horta']
+		en: ['Princeton University', 'began his studies'],
+		zh: ['普林斯顿大学', '入读普林斯顿大学']
 	}
 };
 

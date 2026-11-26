@@ -46,22 +46,17 @@ export const RESULTS: readonly Result[] = [
 			zh: 'Andy Song 入读普林斯顿大学'
 		},
 		detail: {
-			en: 'Andy interviewed Mr. Carlos Orencio Horta, Director of AI at Scotiabank, and Mr. Tanaby Zibamanzar, Director of Data Analytics. He graduated from high school in June 2025 and began his studies at Princeton University that September.',
-			zh: 'Andy 采访了丰业银行人工智能总监 Carlos Orencio Horta 先生与数据分析总监 Tanaby Zibamanzar 先生。Andy 于 2025 年 6 月高中毕业，并于 2025 年 9 月入读普林斯顿大学。'
+			en: 'He graduated from high school in June 2025 and began his studies at Princeton University that September.',
+			zh: 'Andy 于 2025 年 6 月高中毕业，并于 2025 年 9 月入读普林斯顿大学。'
 		},
 		// prd.md §6.3 names this item as already-published and therefore consent-verified.
 		//
-		// NOTE: this is the one record whose subject is also named OUTSIDE the consent gate, and
-		// as of 2026-11-19 in three places, not two. The Ithaca Dialogues film (titled "Andy Song
-		// interviewing Scotiabank executives") lives on `Program.videos` here in `programs.ts`'s
-		// `ithaca-dialogues` record; `content/news.ts`'s `scotiabank-interview` entry now also
-		// spells out both executives' names in its body, reusing this entry's exact wording rather
-		// than inventing a second phrasing. §6.1's `VimeoRef` and `NewsItem.consentVerified` are
-		// two different gates — flipping the flag below removes this entry from `/results` and the
-		// homepage proof band but touches neither the film's title in `programs.ts` nor the body
-		// text in `news.ts`. Withdrawing consent for this alumnus means editing both of those too.
-		// Not a content gap (consent is on record today), which is why it is a NOTE and not a
-		// `TODO(content)`; recorded here because the gate cannot see it.
+		// NOTE (2026-11-26): this entry no longer references the Scotiabank interview. That film
+		// was a different, unnamed Ithaca Dialogues guest, not Andy — the earlier draft
+		// misattributed it to him. The interview now lives only in `content/news.ts`'s
+		// `scotiabank-interview` entry and `programs.ts`'s `ithaca-dialogues` video, both titled
+		// generically ("Ithaca students interview Scotiabank executives") rather than naming
+		// anyone, so withdrawing consent here affects only this record.
 		consentVerified: true
 	}
 
